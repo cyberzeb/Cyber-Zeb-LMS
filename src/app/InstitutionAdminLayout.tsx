@@ -5,8 +5,8 @@ export function InstitutionAdminLayout() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const isOverviewActive = location.pathname === '/institution/overview'
-  const isCampusesActive = location.pathname === '/' || location.pathname === ''
+  const isOverviewActive = location.pathname === '/admin/institution/overview'
+  const isCampusesActive = location.pathname === '/admin' || location.pathname === '/admin/'
 
   const linkItem = (text: string, to: string) => {
     const element = (
@@ -38,8 +38,8 @@ export function InstitutionAdminLayout() {
     {
       title: 'Institution',
       items: [
-        { label: linkItem('Overview', '/institution/overview'), active: isOverviewActive },
-        { label: linkItem('Campuses & Colleges', '/'), active: isCampusesActive },
+        { label: linkItem('Overview', '/admin/institution/overview'), active: isOverviewActive },
+        { label: linkItem('Campuses & Colleges', '/admin'), active: isCampusesActive },
         { label: 'Departments' },
         { label: 'Programs' },
       ],
@@ -49,6 +49,7 @@ export function InstitutionAdminLayout() {
       items: [
         { label: 'Courses' },
         { label: 'People' },
+        { label: linkItem('Service Requests', '/admin/leads') },
         { label: 'Reports' },
         { label: 'Settings' },
       ],
@@ -67,9 +68,11 @@ export function InstitutionAdminLayout() {
         if (sidebarItem) {
           const text = sidebarItem.textContent?.trim()
           if (text === 'Overview') {
-            navigate('/institution/overview')
+            navigate('/admin/institution/overview')
           } else if (text === 'Campuses & Colleges') {
-            navigate('/')
+            navigate('/admin')
+          } else if (text === 'Service Requests') {
+            navigate('/admin/leads')
           }
         }
       }}
