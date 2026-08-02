@@ -1,5 +1,8 @@
+import { Link } from 'react-router-dom'
+
 interface NavItem {
   label: string
+  to?: string
   active?: boolean
 }
 
@@ -39,19 +42,34 @@ export function Sidebar({ sections, userName, userRole }: SidebarProps) {
           <div className="text-[10px] text-navy-200 uppercase tracking-wider mx-3 mt-3.5 mb-1.5">
             {section.title}
           </div>
-          {section.items.map((item) => (
-            <div
-              key={item.label}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13.5px] cursor-pointer
+          {section.items.map((item) => {
+            const rowClass = `flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13.5px] cursor-pointer
                 ${item.active
                   ? 'bg-lemon-500/15 text-lemon-500 font-semibold'
                   : 'text-[#dfe3ef] hover:bg-white/5'
-                }`}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full ${item.active ? 'bg-lemon-500' : 'bg-navy-500'}`} />
-              {item.label}
-            </div>
-          ))}
+                }`
+            const dot = (
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${item.active ? 'bg-lemon-500' : 'bg-navy-500'}`}
+              />
+            )
+
+            if (item.to) {
+              return (
+                <Link key={item.label} to={item.to} className={rowClass}>
+                  {dot}
+                  {item.label}
+                </Link>
+              )
+            }
+
+            return (
+              <div key={item.label} className={rowClass}>
+                {dot}
+                {item.label}
+              </div>
+            )
+          })}
         </div>
       ))}
 
