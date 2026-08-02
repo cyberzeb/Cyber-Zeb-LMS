@@ -90,4 +90,80 @@ export interface InstitutionOverviewData {
   ssoProviders: SsoProvider[]
   auditLogEntries: AuditLogEntry[]
 }
+
+/* ── Programs ─────────────────────────────────────────────── */
+export type ProgramLevel =
+  | 'Undergraduate'
+  | 'Postgraduate'
+  | 'Doctoral'
+  | 'Certificate'
+
+export interface ProgramRow {
+  id: string
+  code: string
+  name: string
+  level: ProgramLevel
+  department: string
+  duration: string
+  enrolledCount: number
+  courseCount: number
+  status: 'active' | 'draft' | 'archived'
+}
+
+/* ── Courses ──────────────────────────────────────────────── */
+export interface CourseSummary {
+  id: string
+  code: string
+  title: string
+  instructor: string
+  department: string
+  level: string
+  enrolledCount: number
+  moduleCount: number
+  status: 'published' | 'draft' | 'archived'
+  progressPercent: number
+  icon: string
+}
+
+/* ── People ───────────────────────────────────────────────── */
+export type PersonRole =
+  | 'Student'
+  | 'Instructor'
+  | 'Admin'
+  | 'Parent'
+  | 'Staff'
+
+export interface PersonRow {
+  id: string
+  name: string
+  email: string
+  role: PersonRole
+  department: string
+  status: 'active' | 'invited' | 'suspended'
+  lastActive: string
+  initials: string
+}
+
+/* ── Reports ──────────────────────────────────────────────── */
+export interface ReportCategory {
+  id: string
+  title: string
+  description: string
+  icon: string
+  reportCount: number
+}
+
+export interface GeneratedReport {
+  id: string
+  name: string
+  category: string
+  generatedOn: string
+  format: 'PDF' | 'Excel' | 'CSV'
+  status: 'ready' | 'processing' | 'scheduled'
+}
+
+export interface TrendPoint {
+  label: string
+  value: number
+}
 

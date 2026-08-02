@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import type { SetupStep } from '../types'
 
@@ -28,8 +29,8 @@ export function SetupProgressCard({ steps, percent }: SetupProgressCardProps) {
           {steps.map((step) => (
             <div key={step.id} className="flex items-start gap-3 pb-3 border-b border-divider/40 last:border-0 last:pb-0">
               {step.done ? (
-                <div className="w-5 h-5 rounded-full bg-lemon-500 flex items-center justify-center text-[10px] text-navy-900 shrink-0 font-extrabold">
-                  ✓
+                <div className="w-5 h-5 rounded-full bg-lemon-500 flex items-center justify-center text-navy-900 shrink-0">
+                  <Check size={12} strokeWidth={3.5} />
                 </div>
               ) : (
                 <div className="w-5 h-5 rounded-full border border-secondary-text/40 flex items-center justify-center shrink-0" />
