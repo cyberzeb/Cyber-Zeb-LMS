@@ -5,6 +5,7 @@ import type { PersonRow } from '../types'
 interface PeopleTableProps {
   people: PersonRow[]
   onSelect?: (person: PersonRow) => void
+  onDelete?: (person: PersonRow) => void
 }
 
 const statusMap: Record<PersonRow['status'], { label: string; tone: StatusTone }> = {
@@ -28,7 +29,7 @@ const avatarColors = [
   'bg-info text-white',
 ]
 
-export function PeopleTable({ people, onSelect }: PeopleTableProps) {
+export function PeopleTable({ people, onSelect, onDelete }: PeopleTableProps) {
   return (
     <GlassCard className="p-0 overflow-hidden">
       <div className="hidden md:grid grid-cols-[2.4fr_1.2fr_1.4fr_1fr_0.9fr] gap-4 px-6 py-3.5 border-b border-divider/60 bg-gradient-to-b from-white/70 to-white/30">
@@ -49,7 +50,7 @@ export function PeopleTable({ people, onSelect }: PeopleTableProps) {
             <div
               key={person.id}
               onClick={() => onSelect?.(person)}
-              className="grid grid-cols-1 md:grid-cols-[2.4fr_1.2fr_1.4fr_1fr_0.9fr] gap-2 md:gap-4 px-6 py-3.5 items-center cursor-pointer transition-all hover:bg-white/60 hover:shadow-[inset_3px_0_0_var(--color-lemon-500)]"
+              className="group grid grid-cols-1 md:grid-cols-[2.4fr_1.2fr_1.4fr_1fr_0.9fr] gap-2 md:gap-4 px-6 py-3.5 items-center cursor-pointer transition-all hover:bg-white/60 hover:shadow-[inset_3px_0_0_var(--color-lemon-500)]"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div
@@ -77,8 +78,20 @@ export function PeopleTable({ people, onSelect }: PeopleTableProps) {
 
               <div className="text-[12px] text-secondary-text">{person.lastActive}</div>
 
-              <div>
+              <div className="flex items-center justify-between gap-2">
                 <StatusPill label={status.label} tone={status.tone} />
+                {onDelete && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onDelete(person)
+                    }}
+                    aria-label="Remove user"
+                    className="opacity-0 md:group-hover:opacity-100 text-secondary-text hover:text-danger hover:bg-danger-bg w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer shrink-0"
+                  >
+                    🗑
+                  </button>
+                )}
               </div>
             </div>
           )

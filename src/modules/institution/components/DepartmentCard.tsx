@@ -4,6 +4,7 @@ interface DepartmentCardProps {
   studentsCount: number
   facultyCount: number
   icon: string
+  onDelete?: () => void
 }
 
 export function DepartmentCard({
@@ -12,9 +13,19 @@ export function DepartmentCard({
   studentsCount,
   facultyCount,
   icon,
+  onDelete,
 }: DepartmentCardProps) {
   return (
-    <div className="group flex flex-col justify-between p-4 rounded-xl border border-divider/60 bg-white/40 hover:bg-white/80 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+    <div className="group relative flex flex-col justify-between p-4 rounded-xl border border-divider/60 bg-white/40 hover:bg-white/80 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+      {onDelete && (
+        <button
+          onClick={onDelete}
+          aria-label="Delete department"
+          className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 text-secondary-text hover:text-danger hover:bg-danger-bg w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer"
+        >
+          🗑
+        </button>
+      )}
       <div className="flex gap-3.5 items-start">
         <div className="w-10 h-10 shrink-0 rounded-xl bg-lemon-50 flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition-transform duration-300">
           {icon}

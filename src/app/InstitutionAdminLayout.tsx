@@ -48,7 +48,7 @@ export function InstitutionAdminLayout() {
       <Sidebar sections={navSections} userName="Abel Tesfaye" userRole="Institution Admin" />
 
       {/* Right Scrollable Content Area */}
-      <main className="app-scroll flex-1 h-screen overflow-y-auto flex flex-col p-6 md:p-8 gap-6 md:gap-8">
+      <main className="page-content app-scroll flex-1 h-screen overflow-y-auto flex flex-col p-6 md:p-8 gap-6 md:gap-8">
         {/* Breadcrumb line */}
         <div className="flex items-center gap-1.5 text-[12px] text-secondary-text font-medium tracking-wide">
           <span className="text-navy-700 font-semibold">Berana University</span>

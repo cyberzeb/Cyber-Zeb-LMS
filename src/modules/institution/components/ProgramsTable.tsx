@@ -5,6 +5,7 @@ import type { ProgramRow } from '../types'
 interface ProgramsTableProps {
   programs: ProgramRow[]
   onManage?: (program: ProgramRow) => void
+  onDelete?: (program: ProgramRow) => void
 }
 
 const statusMap: Record<ProgramRow['status'], { label: string; tone: StatusTone }> = {
@@ -20,7 +21,7 @@ const levelColors: Record<ProgramRow['level'], string> = {
   Certificate: 'bg-warning-bg text-[#8A6D00]',
 }
 
-export function ProgramsTable({ programs, onManage }: ProgramsTableProps) {
+export function ProgramsTable({ programs, onManage, onDelete }: ProgramsTableProps) {
   return (
     <GlassCard className="p-0 overflow-hidden">
       {/* Header row (desktop) */}
@@ -42,7 +43,7 @@ export function ProgramsTable({ programs, onManage }: ProgramsTableProps) {
             <div
               key={program.id}
               onClick={() => onManage?.(program)}
-              className="grid grid-cols-1 md:grid-cols-[2.4fr_1.2fr_1fr_0.9fr_0.9fr_0.8fr] gap-2 md:gap-4 px-6 py-4 items-center cursor-pointer transition-all hover:bg-white/60 hover:shadow-[inset_3px_0_0_var(--color-lemon-500)]"
+              className="group grid grid-cols-1 md:grid-cols-[2.4fr_1.2fr_1fr_0.9fr_0.9fr_0.8fr] gap-2 md:gap-4 px-6 py-4 items-center cursor-pointer transition-all hover:bg-white/60 hover:shadow-[inset_3px_0_0_var(--color-lemon-500)]"
             >
               <div className="min-w-0">
                 <div className="font-bold text-navy-900 text-[14px] truncate leading-tight">
@@ -73,8 +74,20 @@ export function ProgramsTable({ programs, onManage }: ProgramsTableProps) {
                 <span className="md:hidden text-secondary-text font-normal text-[11.5px]"> enrolled</span>
               </div>
 
-              <div>
+              <div className="flex items-center justify-between gap-2">
                 <StatusPill label={status.label} tone={status.tone} />
+                {onDelete && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onDelete(program)
+                    }}
+                    aria-label="Delete program"
+                    className="opacity-0 md:group-hover:opacity-100 text-secondary-text hover:text-danger hover:bg-danger-bg w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer shrink-0"
+                  >
+                    🗑
+                  </button>
+                )}
               </div>
             </div>
           )

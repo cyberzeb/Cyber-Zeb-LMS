@@ -5,10 +5,14 @@ import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
 import { SearchInput } from '../../../shared/components/SearchInput'
+import { Modal } from '../../../shared/components/Modal'
+import { FormField } from '../../../shared/components/FormField'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
+import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
 import { CourseCard } from '../components/CourseCard'
 import type { CourseSummary } from '../types'
 
-const mockCourses: CourseSummary[] = [
+const seedCourses: CourseSummary[] = [
   {
     id: 'c1',
     code: 'CS-201',
@@ -116,13 +120,39 @@ const mockCourses: CourseSummary[] = [
 ]
 
 const tabs = ['All', 'Published', 'Draft', 'Archived']
+const departmentOptions = [
+  'Computer Science & IT',
+  'Business Administration',
+  'Engineering & Technology',
+  'Social Sciences',
+  'Health & Life Sciences',
+  'Arts & Humanities',
+]
+const levelOptions = ['Undergraduate', 'Postgraduate', 'Doctoral', 'Certificate']
+const iconOptions = ['📘', '🧮', '🤖', '📈', '🛡️', '🏗️', '🧠', '🌍', '🔬', '💡']
+
+const emptyForm = {
+  title: '',
+  code: '',
+  instructor: '',
+  department: departmentOptions[0],
+  level: levelOptions[0],
+  icon: iconOptions[0],
+}
 
 export function CoursesPage() {
+  const { notify } = useToast()
+  const [courses, setCourses] = useLocalStorageState<CourseSummary[]>(
+    'berana:courses',
+    seedCourses,
+  )
   const [activeTab, setActiveTab] = useState('All')
   const [query, setQuery] = useState('')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [form, setForm] = useState(emptyForm)
 
   const filtered = useMemo(() => {
-    return mockCourses.filter((c) => {
+    return courses.filter((c) => {
       const matchesTab = activeTab === 'All' || c.status === activeTab.toLowerCase()
       const q = query.trim().toLowerCase()
       const matchesQuery =
@@ -132,14 +162,47 @@ export function CoursesPage() {
         c.instructor.toLowerCase().includes(q)
       return matchesTab && matchesQuery
     })
-  }, [activeTab, query])
+  }, [courses, activeTab, query])
 
   const totals = useMemo(() => {
-    const published = mockCourses.filter((c) => c.status === 'published').length
-    const drafts = mockCourses.filter((c) => c.status === 'draft').length
-    const enrolled = mockCourses.reduce((sum, c) => sum + c.enrolledCount, 0)
-    return { total: mockCourses.length, published, drafts, enrolled }
-  }, [])
+    const published = courses.filter((c) => c.status === 'published').length
+    const drafts = courses.filter((c) => c.status === 'draft').length
+    const enrolled = courses.reduce((sum, c) => sum + c.enrolledCount, 0)
+    return { total: courses.length, published, drafts, enrolled }
+  }, [courses])
+
+  const openModal = () => {
+    setForm(emptyForm)
+    setModalOpen(true)
+  }
+
+  const handleCreate = () => {
+    if (!form.title.trim() || !form.code.trim()) {
+      notify('Please provide a course title and code.', 'error')
+      return
+    }
+    const newCourse: CourseSummary = {
+      id: createId('course'),
+      title: form.title.trim(),
+      code: form.code.trim().toUpperCase(),
+      instructor: form.instructor.trim() || 'Unassigned',
+      department: form.department,
+      level: form.level,
+      icon: form.icon,
+      enrolledCount: 0,
+      moduleCount: 0,
+      status: 'draft',
+      progressPercent: 0,
+    }
+    setCourses((prev) => [newCourse, ...prev])
+    setModalOpen(false)
+    notify(`Course “${newCourse.title}” created as a draft.`)
+  }
+
+  const handleDelete = (course: CourseSummary) => {
+    setCourses((prev) => prev.filter((c) => c.id !== course.id))
+    notify(`Course “${course.title}” deleted.`, 'info')
+  }
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
@@ -148,8 +211,12 @@ export function CoursesPage() {
         subtitle="Author, publish and monitor the courses delivered across your institution."
         actions={
           <>
-            <Button variant="secondary">Course Templates</Button>
-            <Button variant="primary">+ Create Course</Button>
+            <Button variant="secondary" onClick={() => notify('Course templates library is coming soon.', 'info')}>
+              Course Templates
+            </Button>
+            <Button variant="primary" onClick={openModal}>
+              + Create Course
+            </Button>
           </>
         }
       />
@@ -182,7 +249,8 @@ export function CoursesPage() {
             <CourseCard
               key={course.id}
               course={course}
-              onOpen={(c) => console.log('Open course', c.id)}
+              onOpen={(c) => notify(`Opening “${c.title}” — the authoring view is next up.`, 'info')}
+              onDelete={handleDelete}
             />
           ))}
         </div>
@@ -191,6 +259,68 @@ export function CoursesPage() {
           No courses match your filters.
         </GlassCard>
       )}
+
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        icon="📚"
+        title="Create Course"
+        description="Set up a new course. It will be saved as a draft."
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleCreate}>
+              Create Course
+            </Button>
+          </>
+        }
+      >
+        <FormField
+          label="Course Title"
+          value={form.title}
+          onChange={(v) => setForm({ ...form, title: v })}
+          placeholder="e.g. Data Structures & Algorithms"
+        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            label="Course Code"
+            value={form.code}
+            onChange={(v) => setForm({ ...form, code: v })}
+            placeholder="e.g. CS-201"
+          />
+          <FormField
+            label="Instructor"
+            value={form.instructor}
+            onChange={(v) => setForm({ ...form, instructor: v })}
+            placeholder="e.g. Dr. Aaron Selassie"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            label="Department"
+            type="select"
+            value={form.department}
+            options={departmentOptions}
+            onChange={(v) => setForm({ ...form, department: v })}
+          />
+          <FormField
+            label="Level"
+            type="select"
+            value={form.level}
+            options={levelOptions}
+            onChange={(v) => setForm({ ...form, level: v })}
+          />
+        </div>
+        <FormField
+          label="Icon"
+          type="select"
+          value={form.icon}
+          options={iconOptions}
+          onChange={(v) => setForm({ ...form, icon: v })}
+        />
+      </Modal>
     </div>
   )
 }

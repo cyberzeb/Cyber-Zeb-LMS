@@ -5,6 +5,7 @@ import type { CourseSummary } from '../types'
 interface CourseCardProps {
   course: CourseSummary
   onOpen?: (course: CourseSummary) => void
+  onDelete?: (course: CourseSummary) => void
 }
 
 const statusMap: Record<CourseSummary['status'], { label: string; tone: StatusTone }> = {
@@ -13,12 +14,12 @@ const statusMap: Record<CourseSummary['status'], { label: string; tone: StatusTo
   archived: { label: 'Archived', tone: 'neutral' },
 }
 
-export function CourseCard({ course, onOpen }: CourseCardProps) {
+export function CourseCard({ course, onOpen, onDelete }: CourseCardProps) {
   const status = statusMap[course.status]
 
   return (
     <GlassCard
-      className="p-5 flex flex-col gap-4 hover:shadow-[0_12px_32px_rgba(27,35,64,0.12)] hover:-translate-y-0.5 transition-all cursor-pointer"
+      className="group p-5 flex flex-col gap-4 hover:shadow-[0_12px_32px_rgba(27,35,64,0.12)] hover:-translate-y-0.5 transition-all cursor-pointer"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
@@ -81,12 +82,26 @@ export function CourseCard({ course, onOpen }: CourseCardProps) {
             </div>
           </div>
         </div>
-        <button
-          onClick={() => onOpen?.(course)}
-          className="text-lemon-700 hover:text-lemon-900 font-bold text-[12px] cursor-pointer bg-transparent border-none p-0"
-        >
-          Manage →
-        </button>
+        <div className="flex items-center gap-1">
+          {onDelete && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete(course)
+              }}
+              aria-label="Delete course"
+              className="opacity-0 group-hover:opacity-100 text-secondary-text hover:text-danger hover:bg-danger-bg w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer"
+            >
+              🗑
+            </button>
+          )}
+          <button
+            onClick={() => onOpen?.(course)}
+            className="text-lemon-700 hover:text-lemon-900 font-bold text-[12px] cursor-pointer bg-transparent border-none px-1"
+          >
+            Manage →
+          </button>
+        </div>
       </div>
     </GlassCard>
   )

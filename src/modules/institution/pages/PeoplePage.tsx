@@ -5,10 +5,14 @@ import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
 import { SearchInput } from '../../../shared/components/SearchInput'
+import { Modal } from '../../../shared/components/Modal'
+import { FormField } from '../../../shared/components/FormField'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
+import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
 import { PeopleTable } from '../components/PeopleTable'
-import type { PersonRow } from '../types'
+import type { PersonRole, PersonRow } from '../types'
 
-const mockPeople: PersonRow[] = [
+const seedPeople: PersonRow[] = [
   {
     id: 'u1',
     name: 'Selam Girma',
@@ -121,12 +125,43 @@ const tabToRole: Record<string, PersonRow['role']> = {
   Staff: 'Staff',
 }
 
+const roleOptions: PersonRole[] = ['Student', 'Instructor', 'Admin', 'Parent', 'Staff']
+const departmentOptions = [
+  'Computer Science & IT',
+  'Business Administration',
+  'Engineering & Technology',
+  'Social Sciences',
+  'Registrar Office',
+  '—',
+]
+
+const emptyForm = {
+  name: '',
+  email: '',
+  role: 'Student' as PersonRole,
+  department: departmentOptions[0],
+}
+
+function initialsFromName(name: string): string {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .filter(Boolean)
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+}
+
 export function PeoplePage() {
+  const { notify } = useToast()
+  const [people, setPeople] = useLocalStorageState<PersonRow[]>('berana:people', seedPeople)
   const [activeTab, setActiveTab] = useState('All')
   const [query, setQuery] = useState('')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [form, setForm] = useState(emptyForm)
 
   const filtered = useMemo(() => {
-    return mockPeople.filter((p) => {
+    return people.filter((p) => {
       const matchesTab = activeTab === 'All' || p.role === tabToRole[activeTab]
       const q = query.trim().toLowerCase()
       const matchesQuery =
@@ -136,14 +171,44 @@ export function PeoplePage() {
         p.department.toLowerCase().includes(q)
       return matchesTab && matchesQuery
     })
-  }, [activeTab, query])
+  }, [people, activeTab, query])
 
   const totals = useMemo(() => {
-    const students = mockPeople.filter((p) => p.role === 'Student').length
-    const instructors = mockPeople.filter((p) => p.role === 'Instructor').length
-    const pending = mockPeople.filter((p) => p.status === 'invited').length
-    return { total: mockPeople.length, students, instructors, pending }
-  }, [])
+    const students = people.filter((p) => p.role === 'Student').length
+    const instructors = people.filter((p) => p.role === 'Instructor').length
+    const pending = people.filter((p) => p.status === 'invited').length
+    return { total: people.length, students, instructors, pending }
+  }, [people])
+
+  const openModal = () => {
+    setForm(emptyForm)
+    setModalOpen(true)
+  }
+
+  const handleInvite = () => {
+    if (!form.name.trim() || !form.email.trim()) {
+      notify('Please provide a name and email.', 'error')
+      return
+    }
+    const newPerson: PersonRow = {
+      id: createId('user'),
+      name: form.name.trim(),
+      email: form.email.trim().toLowerCase(),
+      role: form.role,
+      department: form.department,
+      status: 'invited',
+      lastActive: 'Never',
+      initials: initialsFromName(form.name),
+    }
+    setPeople((prev) => [newPerson, ...prev])
+    setModalOpen(false)
+    notify(`Invitation sent to ${newPerson.name}.`)
+  }
+
+  const handleDelete = (person: PersonRow) => {
+    setPeople((prev) => prev.filter((p) => p.id !== person.id))
+    notify(`${person.name} removed.`, 'info')
+  }
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
@@ -152,8 +217,12 @@ export function PeoplePage() {
         subtitle="Invite, import and manage every user account, role and access status in your institution."
         actions={
           <>
-            <Button variant="secondary">Import CSV</Button>
-            <Button variant="primary">+ Invite User</Button>
+            <Button variant="secondary" onClick={() => notify('Bulk CSV import unlocks with the backend.', 'info')}>
+              Import CSV
+            </Button>
+            <Button variant="primary" onClick={openModal}>
+              + Invite User
+            </Button>
           </>
         }
       />
@@ -182,12 +251,63 @@ export function PeoplePage() {
       </div>
 
       {filtered.length > 0 ? (
-        <PeopleTable people={filtered} onSelect={(p) => console.log('Select person', p.id)} />
+        <PeopleTable
+          people={filtered}
+          onSelect={(p) => notify(`${p.name}'s profile view is coming soon.`, 'info')}
+          onDelete={handleDelete}
+        />
       ) : (
         <GlassCard className="p-10 text-center text-secondary-text text-[13.5px] font-medium">
           No people match your filters.
         </GlassCard>
       )}
+
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        icon="✉️"
+        title="Invite User"
+        description="Send an invitation. The user stays pending until they activate."
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleInvite}>
+              Send Invite
+            </Button>
+          </>
+        }
+      >
+        <FormField
+          label="Full Name"
+          value={form.name}
+          onChange={(v) => setForm({ ...form, name: v })}
+          placeholder="e.g. Selam Girma"
+        />
+        <FormField
+          label="Email Address"
+          value={form.email}
+          onChange={(v) => setForm({ ...form, email: v })}
+          placeholder="e.g. selam.girma@berana.edu"
+        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            label="Role"
+            type="select"
+            value={form.role}
+            options={roleOptions}
+            onChange={(v) => setForm({ ...form, role: v as PersonRole })}
+          />
+          <FormField
+            label="Department"
+            type="select"
+            value={form.department}
+            options={departmentOptions}
+            onChange={(v) => setForm({ ...form, department: v })}
+          />
+        </div>
+      </Modal>
     </div>
   )
 }

@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
+import { useLocalStorageState } from '../../../shared/hooks/useLocalStorageState'
 import { SettingsSection } from '../components/settings/SettingsSection'
 import { SettingField } from '../components/settings/SettingField'
 import { ToggleRow } from '../components/settings/ToggleRow'
@@ -9,47 +11,99 @@ interface ToggleState {
   [key: string]: boolean
 }
 
-const initialModules: ToggleState = {
-  virtualClassroom: true,
-  attendance: true,
-  assessments: true,
-  payments: false,
-  certificates: true,
-  parentPortal: false,
+interface SettingsState {
+  general: {
+    name: string
+    timezone: string
+    language: string
+    currency: string
+  }
+  branding: {
+    domain: string
+    sender: string
+    primary: string
+  }
+  academic: {
+    grading: string
+    attendance: string
+    completion: string
+  }
+  modules: ToggleState
+  integrations: ToggleState
 }
 
-const initialIntegrations: ToggleState = {
-  zoom: true,
-  googleSso: true,
-  microsoftSso: false,
-  stripe: false,
-  emailSms: true,
-}
-
-export function SettingsPage() {
-  const [general, setGeneral] = useState({
+const defaultSettings: SettingsState = {
+  general: {
     name: 'Berana University',
     timezone: '(GMT+3) East Africa Time',
     language: 'English',
     currency: 'ETB — Ethiopian Birr',
-  })
-  const [branding, setBranding] = useState({
+  },
+  branding: {
     domain: 'learn.berana.edu',
     sender: 'no-reply@berana.edu',
     primary: 'Lemon / Navy',
-  })
-  const [academic, setAcademic] = useState({
+  },
+  academic: {
     grading: 'Letter Grade (A–F)',
     attendance: '75% minimum',
     completion: 'All modules + passing grade',
-  })
-  const [modules, setModules] = useState<ToggleState>(initialModules)
-  const [integrations, setIntegrations] = useState<ToggleState>(initialIntegrations)
+  },
+  modules: {
+    virtualClassroom: true,
+    attendance: true,
+    assessments: true,
+    payments: false,
+    certificates: true,
+    parentPortal: false,
+  },
+  integrations: {
+    zoom: true,
+    googleSso: true,
+    microsoftSso: false,
+    stripe: false,
+    emailSms: true,
+  },
+}
 
+export function SettingsPage() {
+  const { notify } = useToast()
+  const [stored, setStored] = useLocalStorageState<SettingsState>(
+    'berana:settings',
+    defaultSettings,
+  )
+  const [draft, setDraft] = useState<SettingsState>(stored)
+
+  const { general, branding, academic, modules, integrations } = draft
+
+  const isDirty = useMemo(
+    () => JSON.stringify(draft) !== JSON.stringify(stored),
+    [draft, stored],
+  )
+
+  const setGeneral = (patch: Partial<SettingsState['general']>) =>
+    setDraft((d) => ({ ...d, general: { ...d.general, ...patch } }))
+  const setBranding = (patch: Partial<SettingsState['branding']>) =>
+    setDraft((d) => ({ ...d, branding: { ...d.branding, ...patch } }))
+  const setAcademic = (patch: Partial<SettingsState['academic']>) =>
+    setDraft((d) => ({ ...d, academic: { ...d.academic, ...patch } }))
   const toggleModule = (key: string) =>
-    setModules((prev) => ({ ...prev, [key]: !prev[key] }))
+    setDraft((d) => ({ ...d, modules: { ...d.modules, [key]: !d.modules[key] } }))
   const toggleIntegration = (key: string) =>
-    setIntegrations((prev) => ({ ...prev, [key]: !prev[key] }))
+    setDraft((d) => ({
+      ...d,
+      integrations: { ...d.integrations, [key]: !d.integrations[key] },
+    }))
+
+  const handleSave = () => {
+    setStored(draft)
+    notify('Settings saved successfully.')
+  }
+
+  const handleDiscard = () => {
+    setDraft(stored)
+    notify('Changes discarded.', 'info')
+  }
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
@@ -58,8 +112,12 @@ export function SettingsPage() {
         subtitle="Configure your institution profile, branding, identity, academic defaults and modules."
         actions={
           <>
-            <Button variant="secondary">Discard</Button>
-            <Button variant="primary">Save Changes</Button>
+            <Button variant="secondary" onClick={handleDiscard} disabled={!isDirty}>
+              Discard
+            </Button>
+            <Button variant="primary" onClick={handleSave} disabled={!isDirty}>
+              {isDirty ? 'Save Changes' : 'Saved'}
+            </Button>
           </>
         }
       />
@@ -73,7 +131,7 @@ export function SettingsPage() {
           <SettingField
             label="Institution Name"
             value={general.name}
-            onChange={(v) => setGeneral({ ...general, name: v })}
+            onChange={(v) => setGeneral({ name: v })}
           />
           <SettingField
             label="Timezone"
@@ -85,7 +143,7 @@ export function SettingsPage() {
               '(GMT+1) Central European Time',
               '(GMT-5) Eastern Time',
             ]}
-            onChange={(v) => setGeneral({ ...general, timezone: v })}
+            onChange={(v) => setGeneral({ timezone: v })}
           />
           <div className="grid grid-cols-2 gap-4">
             <SettingField
@@ -93,7 +151,7 @@ export function SettingsPage() {
               type="select"
               value={general.language}
               options={['English', 'Amharic', 'French', 'Arabic']}
-              onChange={(v) => setGeneral({ ...general, language: v })}
+              onChange={(v) => setGeneral({ language: v })}
             />
             <SettingField
               label="Currency"
@@ -105,7 +163,7 @@ export function SettingsPage() {
                 'EUR — Euro',
                 'KES — Kenyan Shilling',
               ]}
-              onChange={(v) => setGeneral({ ...general, currency: v })}
+              onChange={(v) => setGeneral({ currency: v })}
             />
           </div>
         </SettingsSection>
@@ -119,19 +177,19 @@ export function SettingsPage() {
             label="Custom Domain"
             value={branding.domain}
             hint="Learners access the portal at this address."
-            onChange={(v) => setBranding({ ...branding, domain: v })}
+            onChange={(v) => setBranding({ domain: v })}
           />
           <SettingField
             label="Email Sender Address"
             value={branding.sender}
-            onChange={(v) => setBranding({ ...branding, sender: v })}
+            onChange={(v) => setBranding({ sender: v })}
           />
           <SettingField
             label="Theme Palette"
             type="select"
             value={branding.primary}
             options={['Lemon / Navy', 'Blue / Slate', 'Emerald / Charcoal']}
-            onChange={(v) => setBranding({ ...branding, primary: v })}
+            onChange={(v) => setBranding({ primary: v })}
           />
         </SettingsSection>
 
@@ -145,14 +203,14 @@ export function SettingsPage() {
             type="select"
             value={academic.grading}
             options={['Letter Grade (A–F)', 'Percentage (0–100)', 'Pass / Fail', 'GPA (4.0)']}
-            onChange={(v) => setAcademic({ ...academic, grading: v })}
+            onChange={(v) => setAcademic({ grading: v })}
           />
           <SettingField
             label="Minimum Attendance"
             type="select"
             value={academic.attendance}
             options={['60% minimum', '70% minimum', '75% minimum', '80% minimum']}
-            onChange={(v) => setAcademic({ ...academic, attendance: v })}
+            onChange={(v) => setAcademic({ attendance: v })}
           />
           <SettingField
             label="Completion Rule"
@@ -163,7 +221,7 @@ export function SettingsPage() {
               'All modules viewed',
               'Final assessment passed',
             ]}
-            onChange={(v) => setAcademic({ ...academic, completion: v })}
+            onChange={(v) => setAcademic({ completion: v })}
           />
         </SettingsSection>
 
@@ -259,7 +317,11 @@ export function SettingsPage() {
                 Download a full archive of institution records.
               </div>
             </div>
-            <Button variant="secondary" size="sm">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => notify('Preparing your data export…', 'info')}
+            >
               Export
             </Button>
           </div>
@@ -270,7 +332,11 @@ export function SettingsPage() {
                 Suspend all access. This can only be undone by a platform admin.
               </div>
             </div>
-            <Button variant="danger" size="sm">
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => notify('Deactivation requires platform-admin approval.', 'error')}
+            >
               Deactivate
             </Button>
           </div>

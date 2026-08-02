@@ -1,7 +1,12 @@
+import { useState } from 'react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { Modal } from '../../../shared/components/Modal'
+import { FormField } from '../../../shared/components/FormField'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
+import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
 import { ReportCategoryCard } from '../components/ReportCategoryCard'
 import { GeneratedReportsList } from '../components/GeneratedReportsList'
 import { MiniBarChart } from '../components/MiniBarChart'
@@ -69,7 +74,7 @@ const completionTrend: TrendPoint[] = [
   { label: 'Cert', value: 92 },
 ]
 
-const recentReports: GeneratedReport[] = [
+const seedReports: GeneratedReport[] = [
   {
     id: 'g1',
     name: 'Fall Semester Grade Distribution',
@@ -112,7 +117,70 @@ const recentReports: GeneratedReport[] = [
   },
 ]
 
+const categoryOptions = categories.map((c) => c.title)
+const formatOptions: GeneratedReport['format'][] = ['PDF', 'Excel', 'CSV']
+
+const emptyForm = {
+  name: '',
+  category: categoryOptions[0],
+  format: 'PDF' as GeneratedReport['format'],
+}
+
+function todayLabel(): string {
+  return new Date().toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
 export function ReportsPage() {
+  const { notify } = useToast()
+  const [reports, setReports] = useLocalStorageState<GeneratedReport[]>(
+    'berana:reports',
+    seedReports,
+  )
+  const [modalOpen, setModalOpen] = useState(false)
+  const [form, setForm] = useState(emptyForm)
+
+  const openModal = () => {
+    setForm(emptyForm)
+    setModalOpen(true)
+  }
+
+  const handleGenerate = () => {
+    if (!form.name.trim()) {
+      notify('Please give the report a name.', 'error')
+      return
+    }
+    const id = createId('report')
+    const newReport: GeneratedReport = {
+      id,
+      name: form.name.trim(),
+      category: form.category,
+      generatedOn: 'Generating…',
+      format: form.format,
+      status: 'processing',
+    }
+    setReports((prev) => [newReport, ...prev])
+    setModalOpen(false)
+    notify('Report generation started…', 'info')
+
+    // Simulate async generation completing.
+    window.setTimeout(() => {
+      setReports((prev) =>
+        prev.map((r) =>
+          r.id === id ? { ...r, status: 'ready', generatedOn: todayLabel() } : r,
+        ),
+      )
+      notify(`“${newReport.name}” is ready to download.`)
+    }, 1800)
+  }
+
+  const handleDownload = (report: GeneratedReport) => {
+    notify(`Downloading “${report.name}” (${report.format})…`)
+  }
+
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
@@ -120,8 +188,12 @@ export function ReportsPage() {
         subtitle="Generate, schedule and export academic, financial and operational insights."
         actions={
           <>
-            <Button variant="secondary">Schedule Report</Button>
-            <Button variant="primary">+ New Report</Button>
+            <Button variant="secondary" onClick={() => notify('Scheduled delivery unlocks with the backend.', 'info')}>
+              Schedule Report
+            </Button>
+            <Button variant="primary" onClick={openModal}>
+              + New Report
+            </Button>
           </>
         }
       />
@@ -160,16 +232,57 @@ export function ReportsPage() {
             <ReportCategoryCard
               key={category.id}
               category={category}
-              onOpen={(c) => console.log('Open report category', c.id)}
+              onOpen={(c) => {
+                setForm({ ...emptyForm, category: c.title, name: `${c.title} Report` })
+                setModalOpen(true)
+              }}
             />
           ))}
         </div>
       </div>
 
-      <GeneratedReportsList
-        reports={recentReports}
-        onDownload={(r) => console.log('Download report', r.id)}
-      />
+      <GeneratedReportsList reports={reports} onDownload={handleDownload} />
+
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        icon="📑"
+        title="New Report"
+        description="Generate a report from your institution data."
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleGenerate}>
+              Generate Report
+            </Button>
+          </>
+        }
+      >
+        <FormField
+          label="Report Name"
+          value={form.name}
+          onChange={(v) => setForm({ ...form, name: v })}
+          placeholder="e.g. Fall Semester Grade Distribution"
+        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            label="Category"
+            type="select"
+            value={form.category}
+            options={categoryOptions}
+            onChange={(v) => setForm({ ...form, category: v })}
+          />
+          <FormField
+            label="Format"
+            type="select"
+            value={form.format}
+            options={formatOptions}
+            onChange={(v) => setForm({ ...form, format: v as GeneratedReport['format'] })}
+          />
+        </div>
+      </Modal>
     </div>
   )
 }

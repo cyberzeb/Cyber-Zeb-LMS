@@ -4,10 +4,14 @@ import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { SearchInput } from '../../../shared/components/SearchInput'
+import { Modal } from '../../../shared/components/Modal'
+import { FormField } from '../../../shared/components/FormField'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
+import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
 import { DepartmentCard } from '../components/DepartmentCard'
 import type { Department } from '../types'
 
-const mockDepartments: Department[] = [
+const seedDepartments: Department[] = [
   {
     id: 'd1',
     name: 'Computer Science & IT',
@@ -58,22 +62,65 @@ const mockDepartments: Department[] = [
   },
 ]
 
+const iconOptions = ['💻', '📊', '⚙️', '🌍', '🧬', '🎨', '🏛️', '📚', '🔬', '⚖️']
+
+const emptyForm = {
+  name: '',
+  headName: '',
+  icon: iconOptions[0],
+}
+
 export function DepartmentsPage() {
+  const { notify } = useToast()
+  const [departments, setDepartments] = useLocalStorageState<Department[]>(
+    'berana:departments',
+    seedDepartments,
+  )
   const [query, setQuery] = useState('')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [form, setForm] = useState(emptyForm)
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (q === '') return mockDepartments
-    return mockDepartments.filter(
+    if (q === '') return departments
+    return departments.filter(
       (d) => d.name.toLowerCase().includes(q) || d.headName.toLowerCase().includes(q),
     )
-  }, [query])
+  }, [departments, query])
 
   const totals = useMemo(() => {
-    const students = mockDepartments.reduce((sum, d) => sum + d.studentsCount, 0)
-    const faculty = mockDepartments.reduce((sum, d) => sum + d.facultyCount, 0)
-    return { total: mockDepartments.length, students, faculty }
-  }, [])
+    const students = departments.reduce((sum, d) => sum + d.studentsCount, 0)
+    const faculty = departments.reduce((sum, d) => sum + d.facultyCount, 0)
+    return { total: departments.length, students, faculty }
+  }, [departments])
+
+  const openModal = () => {
+    setForm(emptyForm)
+    setModalOpen(true)
+  }
+
+  const handleCreate = () => {
+    if (!form.name.trim()) {
+      notify('Please provide a department name.', 'error')
+      return
+    }
+    const newDept: Department = {
+      id: createId('dept'),
+      name: form.name.trim(),
+      headName: form.headName.trim() || 'To be assigned',
+      studentsCount: 0,
+      facultyCount: 0,
+      icon: form.icon,
+    }
+    setDepartments((prev) => [...prev, newDept])
+    setModalOpen(false)
+    notify(`Department “${newDept.name}” added.`)
+  }
+
+  const handleDelete = (dept: Department) => {
+    setDepartments((prev) => prev.filter((d) => d.id !== dept.id))
+    notify(`Department “${dept.name}” deleted.`, 'info')
+  }
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
@@ -82,8 +129,12 @@ export function DepartmentsPage() {
         subtitle="Organize faculties, schools and departments and assign their academic leadership."
         actions={
           <>
-            <Button variant="secondary">Manage Heads</Button>
-            <Button variant="primary">+ Add Department</Button>
+            <Button variant="secondary" onClick={() => notify('Leadership management view is coming soon.', 'info')}>
+              Manage Heads
+            </Button>
+            <Button variant="primary" onClick={openModal}>
+              + Add Department
+            </Button>
           </>
         }
       />
@@ -119,6 +170,7 @@ export function DepartmentsPage() {
               studentsCount={dept.studentsCount}
               facultyCount={dept.facultyCount}
               icon={dept.icon}
+              onDelete={() => handleDelete(dept)}
             />
           ))}
         </div>
@@ -127,6 +179,44 @@ export function DepartmentsPage() {
           No departments match your search.
         </GlassCard>
       )}
+
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        icon="🏛️"
+        title="Add Department"
+        description="Create a new department and assign its head."
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleCreate}>
+              Add Department
+            </Button>
+          </>
+        }
+      >
+        <FormField
+          label="Department Name"
+          value={form.name}
+          onChange={(v) => setForm({ ...form, name: v })}
+          placeholder="e.g. Computer Science & IT"
+        />
+        <FormField
+          label="Head of Department"
+          value={form.headName}
+          onChange={(v) => setForm({ ...form, headName: v })}
+          placeholder="e.g. Dr. Aaron Selassie"
+        />
+        <FormField
+          label="Icon"
+          type="select"
+          value={form.icon}
+          options={iconOptions}
+          onChange={(v) => setForm({ ...form, icon: v })}
+        />
+      </Modal>
     </div>
   )
 }
