@@ -1,6 +1,8 @@
+import { Building2, Users, KeyRound, Settings } from 'lucide-react'
 import { useInstitutionOverview } from '../hooks/useInstitution'
 import { StatBlock } from '../../../shared/components/StatBlock'
-import { GlassCard } from '../../../shared/layout/GlassCard'
+
+const STAT = 17
 import { OrgStructureTree } from '../components/OrgStructureTree'
 import { AuditFeedCard } from '../components/AuditFeedCard'
 import { SetupProgressCard } from '../components/SetupProgressCard'
@@ -28,32 +30,32 @@ export function InstitutionOverviewPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       {/* 4 StatBlocks horizontally across the top */}
-      <GlassCard className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-divider/40">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
         <StatBlock
           label="Campuses"
           value={`${data.statTotals.activeCampusCount}/${data.statTotals.campusCount}`}
           sub="Active campuses"
-          icon="🏢"
+          icon={<Building2 size={STAT} />}
         />
         <StatBlock
           label="Total Users"
           value={data.statTotals.totalUsers.toLocaleString()}
           sub={`${data.statTotals.pendingInvitations} pending invites`}
-          icon="👤"
+          icon={<Users size={STAT} />}
         />
         <StatBlock
           label="SSO Integrations"
           value={`${data.statTotals.activeIntegrations}/${data.statTotals.totalIntegrations}`}
           sub="Connected providers"
-          icon="🔑"
+          icon={<KeyRound size={STAT} />}
         />
         <StatBlock
           label="Setup Progress"
           value={`${data.statTotals.setupProgressPercent}%`}
           sub="Setup completion"
-          icon="⚙️"
+          icon={<Settings size={STAT} />}
         />
-      </GlassCard>
+      </div>
 
       {/* 2-column Grid below */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
