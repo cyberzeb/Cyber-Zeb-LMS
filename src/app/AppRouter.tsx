@@ -9,11 +9,48 @@ import { PeoplePage } from '../modules/institution/pages/PeoplePage'
 import { ReportsPage } from '../modules/institution/pages/ReportsPage'
 import { SettingsPage } from '../modules/institution/pages/SettingsPage'
 import { LandingPage } from '../modules/marketing/pages/LandingPage'
+import { StudentLayout } from '../modules/students/layout/StudentLayout'
+import { StudentDashboardPage } from '../modules/students/pages/studentdashboard'
+import { StudentResourcesPage } from '../modules/students/pages/studentresources'
+import { StudentQuizzesPage } from '../modules/students/pages/studentquizzes'
+import { StudentAssignmentsPage } from '../modules/students/pages/studentassignments'
+import { StudentCalendarPage } from '../modules/students/pages/studentcalendar'
+import { StudentGradesPage } from '../modules/students/pages/studentgrades'
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
+  },
+  {
+    path: '/student',
+    element: <StudentLayout />,
+    children: [
+      {
+        index: true,
+        element: <StudentDashboardPage />,
+      },
+      {
+        path: 'resources',
+        element: <StudentResourcesPage />,
+      },
+      {
+        path: 'quizzes',
+        element: <StudentQuizzesPage />,
+      },
+      {
+        path: 'assignments',
+        element: <StudentAssignmentsPage />,
+      },
+      {
+        path: 'calendar',
+        element: <StudentCalendarPage />,
+      },
+      {
+        path: 'grades',
+        element: <StudentGradesPage />,
+      },
+    ],
   },
   {
     path: '/admin',

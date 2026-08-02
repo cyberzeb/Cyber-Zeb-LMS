@@ -17,9 +17,19 @@ interface SidebarProps {
   sections: NavSection[]
   userName: string
   userRole: string
+  brandLogoSrc?: string
+  brandName?: string
+  brandSubtitle?: string
 }
 
-export function Sidebar({ sections, userName, userRole }: SidebarProps) {
+export function Sidebar({
+  sections,
+  userName,
+  userRole,
+  brandLogoSrc,
+  brandName = 'Berana LMS',
+  brandSubtitle = 'Cyber-Zeb',
+}: SidebarProps) {
   const initials = userName
     .split(' ')
     .map((n) => n[0])
@@ -33,12 +43,18 @@ export function Sidebar({ sections, userName, userRole }: SidebarProps) {
       <div className="absolute -left-10 top-24 w-40 h-40 rounded-full bg-lemon-500/10 blur-3xl pointer-events-none" />
 
       <div className="relative flex items-center gap-2.5 px-2.5 pb-6">
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-lemon-200 to-lemon-500 flex items-center justify-center font-extrabold text-navy-900 text-sm shadow-[0_4px_14px_rgba(168,212,0,0.4)]">
-          B
-        </div>
+        {brandLogoSrc ? (
+          <div className="w-8 h-8 rounded-xl bg-white/90 flex items-center justify-center shadow-[0_4px_14px_rgba(168,212,0,0.4)] overflow-hidden">
+            <img src={brandLogoSrc} alt={`${brandName} logo`} className="w-full h-full object-cover" />
+          </div>
+        ) : (
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-lemon-200 to-lemon-500 flex items-center justify-center font-extrabold text-navy-900 text-sm shadow-[0_4px_14px_rgba(168,212,0,0.4)]">
+            B
+          </div>
+        )}
         <div>
-          <div className="font-bold text-sm tracking-tight">Berana LMS</div>
-          <div className="text-[10px] text-navy-200 uppercase tracking-wider">Cyber-Zeb</div>
+          <div className="font-bold text-sm tracking-tight">{brandName}</div>
+          <div className="text-[10px] text-navy-200 uppercase tracking-wider">{brandSubtitle}</div>
         </div>
       </div>
 
