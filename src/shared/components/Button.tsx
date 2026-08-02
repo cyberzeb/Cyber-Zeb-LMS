@@ -10,11 +10,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  primary: 'bg-lemon-500 text-navy-900 border border-transparent hover:bg-lemon-200 font-bold',
+  primary:
+    'bg-gradient-to-b from-lemon-500 to-lemon-700 text-navy-900 border border-lemon-700/30 font-bold shadow-[0_2px_10px_rgba(168,212,0,0.35)] hover:shadow-[0_4px_16px_rgba(168,212,0,0.45)] hover:brightness-[1.03]',
   secondary:
-    'bg-white text-navy-900 border border-divider hover:border-navy-200 hover:bg-navy-50 font-semibold',
-  ghost: 'bg-transparent text-lemon-700 hover:text-lemon-900 border-none font-bold',
-  danger: 'bg-danger-bg text-danger border border-danger/25 hover:bg-danger/10 font-semibold',
+    'bg-white/80 text-navy-900 border border-divider hover:border-navy-200 hover:bg-white font-semibold shadow-sm',
+  ghost:
+    'bg-transparent text-lemon-700 hover:text-lemon-900 hover:bg-lemon-50 border border-transparent font-bold',
+  danger:
+    'bg-danger-bg text-danger border border-danger/25 hover:bg-danger/10 font-semibold',
 }
 
 const sizeClasses: Record<Size, string> = {
@@ -31,7 +34,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center gap-1.5 rounded-lg cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-lg cursor-pointer transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
       {...rest}
     >
       {children}

@@ -31,7 +31,7 @@ const avatarColors = [
 export function PeopleTable({ people, onSelect }: PeopleTableProps) {
   return (
     <GlassCard className="p-0 overflow-hidden">
-      <div className="hidden md:grid grid-cols-[2.4fr_1.2fr_1.4fr_1fr_0.9fr] gap-4 px-6 py-3.5 border-b border-divider/60 bg-white/40">
+      <div className="hidden md:grid grid-cols-[2.4fr_1.2fr_1.4fr_1fr_0.9fr] gap-4 px-6 py-3.5 border-b border-divider/60 bg-gradient-to-b from-white/70 to-white/30">
         {['Name', 'Role', 'Department', 'Last Active', 'Status'].map((h) => (
           <span
             key={h}
@@ -49,7 +49,7 @@ export function PeopleTable({ people, onSelect }: PeopleTableProps) {
             <div
               key={person.id}
               onClick={() => onSelect?.(person)}
-              className="grid grid-cols-1 md:grid-cols-[2.4fr_1.2fr_1.4fr_1fr_0.9fr] gap-2 md:gap-4 px-6 py-3.5 items-center hover:bg-white/50 cursor-pointer transition-colors"
+              className="grid grid-cols-1 md:grid-cols-[2.4fr_1.2fr_1.4fr_1fr_0.9fr] gap-2 md:gap-4 px-6 py-3.5 items-center cursor-pointer transition-all hover:bg-white/60 hover:shadow-[inset_3px_0_0_var(--color-lemon-500)]"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div

@@ -22,7 +22,7 @@ export function CourseCard({ course, onOpen }: CourseCardProps) {
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-11 h-11 rounded-xl bg-navy-50 flex items-center justify-center text-xl shrink-0">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-lemon-50 to-lemon-200 ring-1 ring-lemon-500/20 flex items-center justify-center text-xl shrink-0 shadow-sm">
             {course.icon}
           </div>
           <div className="min-w-0">

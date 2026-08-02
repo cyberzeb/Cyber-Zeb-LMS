@@ -12,7 +12,7 @@ export function ReportCategoryCard({ category, onOpen }: ReportCategoryCardProps
       className="p-5 flex flex-col gap-3 cursor-pointer hover:shadow-[0_12px_32px_rgba(27,35,64,0.12)] hover:-translate-y-0.5 transition-all"
     >
       <div className="flex items-center justify-between">
-        <div className="w-11 h-11 rounded-xl bg-navy-50 flex items-center justify-center text-xl">
+        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-lemon-50 to-lemon-200 ring-1 ring-lemon-500/20 flex items-center justify-center text-xl shadow-sm">
           {category.icon}
         </div>
         <span className="text-[11px] font-bold text-secondary-text bg-navy-50 px-2.5 py-1 rounded-full">

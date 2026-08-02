@@ -7,11 +7,11 @@ interface StatusPillProps {
 }
 
 const toneClasses: Record<StatusTone, { pill: string; dot: string }> = {
-  success: { pill: 'bg-lemon-50 text-lemon-900', dot: 'bg-lemon-500' },
-  warning: { pill: 'bg-warning-bg text-[#8A6D00]', dot: 'bg-warning' },
-  danger: { pill: 'bg-danger-bg text-danger', dot: 'bg-danger' },
-  info: { pill: 'bg-info-bg text-info', dot: 'bg-info' },
-  neutral: { pill: 'bg-navy-50 text-navy-500', dot: 'bg-navy-500' },
+  success: { pill: 'bg-lemon-50 text-lemon-900 ring-1 ring-lemon-500/25', dot: 'bg-lemon-500' },
+  warning: { pill: 'bg-warning-bg text-[#8A6D00] ring-1 ring-warning/30', dot: 'bg-warning' },
+  danger: { pill: 'bg-danger-bg text-danger ring-1 ring-danger/25', dot: 'bg-danger' },
+  info: { pill: 'bg-info-bg text-info ring-1 ring-info/25', dot: 'bg-info' },
+  neutral: { pill: 'bg-navy-50 text-navy-500 ring-1 ring-navy-900/10', dot: 'bg-navy-500' },
 }
 
 export function StatusPill({ label, tone = 'neutral', dot = true }: StatusPillProps) {
