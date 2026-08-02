@@ -1,3 +1,4 @@
+import { Building2 } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import type { Campus } from '../types'
 
@@ -31,7 +32,9 @@ export function OrgStructureTree({ campuses, onAddCampus }: OrgStructureTreeProp
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">🏢</span>
+                  <span className="w-9 h-9 rounded-lg bg-navy-50 text-navy-700 flex items-center justify-center shrink-0">
+                    <Building2 size={17} />
+                  </span>
                   <div>
                     <h4 className="font-bold text-navy-900 text-[14.5px] leading-tight">
                       {campus.name}

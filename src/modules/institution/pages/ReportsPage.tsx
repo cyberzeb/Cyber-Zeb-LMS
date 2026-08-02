@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { FileText, Clock, CheckCircle2, TrendingUp, Plus, CalendarClock } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
@@ -11,6 +12,8 @@ import { ReportCategoryCard } from '../components/ReportCategoryCard'
 import { GeneratedReportsList } from '../components/GeneratedReportsList'
 import { MiniBarChart } from '../components/MiniBarChart'
 import type { ReportCategory, GeneratedReport, TrendPoint } from '../types'
+
+const STAT = 17
 
 const categories: ReportCategory[] = [
   {
@@ -189,27 +192,29 @@ export function ReportsPage() {
         actions={
           <>
             <Button variant="secondary" onClick={() => notify('Scheduled delivery unlocks with the backend.', 'info')}>
-              Schedule Report
+              <CalendarClock size={15} />
+              Schedule
             </Button>
             <Button variant="primary" onClick={openModal}>
-              + New Report
+              <Plus size={16} />
+              New Report
             </Button>
           </>
         }
       />
 
-      <GlassCard className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-divider/40">
-        <StatBlock label="Reports Generated" value="1,284" sub="This year" icon="📑" />
-        <StatBlock label="Scheduled" value="14" sub="Auto-delivery" icon="⏰" iconBg="bg-info-bg" />
-        <StatBlock label="Avg. Completion" value="86%" icon="✅" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <StatBlock label="Reports Generated" value="1,284" sub="This year" icon={<FileText size={STAT} />} />
+        <StatBlock label="Scheduled" value="14" sub="Auto-delivery" icon={<Clock size={STAT} />} />
+        <StatBlock label="Avg. Completion" value="86%" icon={<CheckCircle2 size={STAT} />} />
         <StatBlock
           label="Active Learners"
           value="2,066"
           sub="+3% vs last month"
-          icon="📈"
-          iconBg="bg-warning-bg"
+          icon={<TrendingUp size={STAT} />}
+          trend="up"
         />
-      </GlassCard>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-stretch">
         <MiniBarChart
@@ -246,7 +251,7 @@ export function ReportsPage() {
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        icon="📑"
+        icon={<FileText size={18} />}
         title="New Report"
         description="Generate a report from your institution data."
         footer={

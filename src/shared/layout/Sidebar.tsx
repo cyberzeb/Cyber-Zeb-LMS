@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
+import type { ReactNode } from 'react'
 
 interface NavItem {
   label: string
   to?: string
   active?: boolean
+  icon?: ReactNode
 }
 
 interface NavSection {
@@ -57,7 +59,13 @@ export function Sidebar({ sections, userName, userRole }: SidebarProps) {
                   ${item.active ? 'h-5 opacity-100' : 'h-0 opacity-0 group-hover:h-3 group-hover:opacity-60'}`}
               />
             )
-            const dot = (
+            const leading = item.icon ? (
+              <span
+                className={`shrink-0 transition-colors ${item.active ? 'text-lemon-500' : 'text-navy-200 group-hover:text-white'}`}
+              >
+                {item.icon}
+              </span>
+            ) : (
               <span
                 className={`w-1.5 h-1.5 rounded-full transition-colors ${item.active ? 'bg-lemon-500' : 'bg-navy-500 group-hover:bg-navy-200'}`}
               />
@@ -67,7 +75,7 @@ export function Sidebar({ sections, userName, userRole }: SidebarProps) {
               return (
                 <Link key={item.label} to={item.to} className={rowClass}>
                   {indicator}
-                  {dot}
+                  {leading}
                   {item.label}
                 </Link>
               )
@@ -76,7 +84,7 @@ export function Sidebar({ sections, userName, userRole }: SidebarProps) {
             return (
               <div key={item.label} className={rowClass}>
                 {indicator}
-                {dot}
+                {leading}
                 {item.label}
               </div>
             )

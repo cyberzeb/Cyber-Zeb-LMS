@@ -6,7 +6,7 @@ interface ModalProps {
   open: boolean
   title: string
   description?: string
-  icon?: string
+  icon?: ReactNode
   onClose: () => void
   children: ReactNode
   footer?: ReactNode
@@ -48,7 +48,7 @@ export function Modal({ open, title, description, icon, onClose, children, foote
         <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-4 border-b border-divider/60 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             {icon && (
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-lemon-50 to-lemon-200 ring-1 ring-lemon-500/20 flex items-center justify-center text-lg shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-lemon-50 to-lemon-200 ring-1 ring-lemon-500/20 text-lemon-900 flex items-center justify-center shrink-0">
                 {icon}
               </div>
             )}

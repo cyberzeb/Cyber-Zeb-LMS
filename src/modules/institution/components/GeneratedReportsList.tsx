@@ -1,3 +1,4 @@
+import { FileText, FileSpreadsheet, FileType, Download } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill, type StatusTone } from '../../../shared/components/StatusPill'
 import type { GeneratedReport } from '../types'
@@ -13,10 +14,10 @@ const statusMap: Record<GeneratedReport['status'], { label: string; tone: Status
   scheduled: { label: 'Scheduled', tone: 'neutral' },
 }
 
-const formatIcon: Record<GeneratedReport['format'], string> = {
-  PDF: '📄',
-  Excel: '📊',
-  CSV: '🗂️',
+const formatIcon: Record<GeneratedReport['format'], typeof FileText> = {
+  PDF: FileText,
+  Excel: FileSpreadsheet,
+  CSV: FileType,
 }
 
 export function GeneratedReportsList({ reports, onDownload }: GeneratedReportsListProps) {
@@ -32,13 +33,14 @@ export function GeneratedReportsList({ reports, onDownload }: GeneratedReportsLi
       <div className="flex flex-col">
         {reports.map((report) => {
           const status = statusMap[report.status]
+          const FormatIcon = formatIcon[report.format]
           return (
             <div
               key={report.id}
               className="flex items-center gap-4 py-3.5 border-b border-divider/40 last:border-0"
             >
-              <div className="w-9 h-9 rounded-lg bg-navy-50 flex items-center justify-center text-base shrink-0">
-                {formatIcon[report.format]}
+              <div className="w-9 h-9 rounded-lg bg-navy-50 text-navy-700 flex items-center justify-center shrink-0">
+                <FormatIcon size={16} />
               </div>
 
               <div className="flex-1 min-w-0">
@@ -55,8 +57,9 @@ export function GeneratedReportsList({ reports, onDownload }: GeneratedReportsLi
               <button
                 onClick={() => onDownload?.(report)}
                 disabled={report.status !== 'ready'}
-                className="text-lemon-700 hover:text-lemon-900 font-bold text-[12px] cursor-pointer bg-transparent border-none p-0 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                className="flex items-center gap-1.5 text-lemon-700 hover:text-lemon-900 font-bold text-[12px] cursor-pointer bg-transparent border-none p-0 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
               >
+                <Download size={13} />
                 Download
               </button>
             </div>

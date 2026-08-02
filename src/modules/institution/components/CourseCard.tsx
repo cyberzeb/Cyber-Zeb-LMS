@@ -1,5 +1,7 @@
+import { User, Building2, Trash2 } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill, type StatusTone } from '../../../shared/components/StatusPill'
+import { Monogram } from '../../../shared/components/Monogram'
 import type { CourseSummary } from '../types'
 
 interface CourseCardProps {
@@ -23,9 +25,7 @@ export function CourseCard({ course, onOpen, onDelete }: CourseCardProps) {
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-lemon-50 to-lemon-200 ring-1 ring-lemon-500/20 flex items-center justify-center text-xl shrink-0 shadow-sm">
-            {course.icon}
-          </div>
+          <Monogram label={course.title} size="md" />
           <div className="min-w-0">
             <div className="text-[10.5px] font-bold uppercase tracking-wider text-secondary-text">
               {course.code}
@@ -39,12 +39,12 @@ export function CourseCard({ course, onOpen, onDelete }: CourseCardProps) {
       </div>
 
       <div className="flex flex-col gap-1.5 text-[12px] text-secondary-text">
-        <div className="flex items-center gap-1.5">
-          <span>👤</span>
+        <div className="flex items-center gap-2">
+          <User size={13} className="text-navy-500 shrink-0" />
           <span className="text-navy-700 font-medium truncate">{course.instructor}</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span>🏛️</span>
+        <div className="flex items-center gap-2">
+          <Building2 size={13} className="text-navy-500 shrink-0" />
           <span className="truncate">{course.department}</span>
         </div>
       </div>
@@ -92,7 +92,7 @@ export function CourseCard({ course, onOpen, onDelete }: CourseCardProps) {
               aria-label="Delete course"
               className="opacity-0 group-hover:opacity-100 text-secondary-text hover:text-danger hover:bg-danger-bg w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer"
             >
-              🗑
+              <Trash2 size={14} />
             </button>
           )}
           <button

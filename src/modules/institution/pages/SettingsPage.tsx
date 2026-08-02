@@ -1,4 +1,12 @@
 import { useMemo, useState } from 'react'
+import {
+  Building2,
+  Palette,
+  GraduationCap,
+  Blocks,
+  Plug,
+  AlertTriangle,
+} from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
@@ -6,6 +14,8 @@ import { useLocalStorageState } from '../../../shared/hooks/useLocalStorageState
 import { SettingsSection } from '../components/settings/SettingsSection'
 import { SettingField } from '../components/settings/SettingField'
 import { ToggleRow } from '../components/settings/ToggleRow'
+
+const SEC = 17
 
 interface ToggleState {
   [key: string]: boolean
@@ -124,7 +134,7 @@ export function SettingsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
         <SettingsSection
-          icon="🏛️"
+          icon={<Building2 size={SEC} />}
           title="General"
           description="Core identity and localization for your institution."
         >
@@ -169,7 +179,7 @@ export function SettingsPage() {
         </SettingsSection>
 
         <SettingsSection
-          icon="🎨"
+          icon={<Palette size={SEC} />}
           title="Branding & Domain"
           description="How Berana appears to your learners and staff."
         >
@@ -194,7 +204,7 @@ export function SettingsPage() {
         </SettingsSection>
 
         <SettingsSection
-          icon="🎓"
+          icon={<GraduationCap size={SEC} />}
           title="Academic Defaults"
           description="Grading, attendance and completion rules applied to new courses."
         >
@@ -226,7 +236,7 @@ export function SettingsPage() {
         </SettingsSection>
 
         <SettingsSection
-          icon="🧩"
+          icon={<Blocks size={SEC} />}
           title="Modules"
           description="Enable only the features your institution needs."
         >
@@ -269,7 +279,7 @@ export function SettingsPage() {
         </SettingsSection>
 
         <SettingsSection
-          icon="🔌"
+          icon={<Plug size={SEC} />}
           title="Integrations"
           description="Connect Berana with external identity and service providers."
         >
@@ -306,7 +316,7 @@ export function SettingsPage() {
         </SettingsSection>
 
         <SettingsSection
-          icon="⚠️"
+          icon={<AlertTriangle size={SEC} />}
           title="Danger Zone"
           description="Irreversible and high-impact institution actions."
         >

@@ -1,5 +1,17 @@
 import { Sidebar } from '../shared/layout/Sidebar'
 import { Outlet, useLocation } from 'react-router-dom'
+import {
+  LayoutDashboard,
+  Building2,
+  Boxes,
+  GraduationCap,
+  BookOpen,
+  Users,
+  BarChart3,
+  Settings,
+} from 'lucide-react'
+
+const ICON_SIZE = 17
 
 const breadcrumbLabels: Record<string, string> = {
   '/': 'Campuses & Colleges · Main Campus',
@@ -23,19 +35,59 @@ export function InstitutionAdminLayout() {
     {
       title: 'Institution',
       items: [
-        { label: 'Overview', to: '/institution/overview', active: isActive('/institution/overview') },
-        { label: 'Campuses & Colleges', to: '/', active: isActive('/') },
-        { label: 'Departments', to: '/institution/departments', active: isActive('/institution/departments') },
-        { label: 'Programs', to: '/institution/programs', active: isActive('/institution/programs') },
+        {
+          label: 'Overview',
+          to: '/institution/overview',
+          active: isActive('/institution/overview'),
+          icon: <LayoutDashboard size={ICON_SIZE} />,
+        },
+        {
+          label: 'Campuses & Colleges',
+          to: '/',
+          active: isActive('/'),
+          icon: <Building2 size={ICON_SIZE} />,
+        },
+        {
+          label: 'Departments',
+          to: '/institution/departments',
+          active: isActive('/institution/departments'),
+          icon: <Boxes size={ICON_SIZE} />,
+        },
+        {
+          label: 'Programs',
+          to: '/institution/programs',
+          active: isActive('/institution/programs'),
+          icon: <GraduationCap size={ICON_SIZE} />,
+        },
       ],
     },
     {
       title: 'Platform',
       items: [
-        { label: 'Courses', to: '/courses', active: isActive('/courses') },
-        { label: 'People', to: '/people', active: isActive('/people') },
-        { label: 'Reports', to: '/reports', active: isActive('/reports') },
-        { label: 'Settings', to: '/settings', active: isActive('/settings') },
+        {
+          label: 'Courses',
+          to: '/courses',
+          active: isActive('/courses'),
+          icon: <BookOpen size={ICON_SIZE} />,
+        },
+        {
+          label: 'People',
+          to: '/people',
+          active: isActive('/people'),
+          icon: <Users size={ICON_SIZE} />,
+        },
+        {
+          label: 'Reports',
+          to: '/reports',
+          active: isActive('/reports'),
+          icon: <BarChart3 size={ICON_SIZE} />,
+        },
+        {
+          label: 'Settings',
+          to: '/settings',
+          active: isActive('/settings'),
+          icon: <Settings size={ICON_SIZE} />,
+        },
       ],
     },
   ]

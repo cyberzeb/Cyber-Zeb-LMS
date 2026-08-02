@@ -1,3 +1,4 @@
+import { CheckCircle2, Clock } from 'lucide-react'
 import type { InstitutionEntity } from '../types'
 
 interface InstitutionHeroProps {
@@ -25,12 +26,22 @@ export function InstitutionHero({ entity, onEdit, onAddProgram }: InstitutionHer
           <h1 className="text-2xl font-extrabold mb-1.5">{entity.name}</h1>
           <p className="text-[12.5px] text-navy-200 m-0">{entity.subtitle}</p>
           <span
-            className={`inline-block mt-2.5 text-[11px] font-bold px-3 py-1 rounded-full
+            className={`inline-flex items-center gap-1.5 mt-2.5 text-[11px] font-bold px-3 py-1 rounded-full
               ${entity.status === 'active'
                 ? 'bg-lemon-500/20 text-lemon-500'
                 : 'bg-white/10 text-navy-200'}`}
           >
-            {entity.status === 'active' ? '🟢 Active Campus' : '⏳ Pending Setup'}
+            {entity.status === 'active' ? (
+              <>
+                <CheckCircle2 size={13} />
+                Active Campus
+              </>
+            ) : (
+              <>
+                <Clock size={13} />
+                Pending Setup
+              </>
+            )}
           </span>
         </div>
 

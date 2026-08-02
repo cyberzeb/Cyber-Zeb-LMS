@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Building2, Users, Briefcase, Plus, UserCog } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
@@ -10,6 +11,8 @@ import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
 import { DepartmentCard } from '../components/DepartmentCard'
 import type { Department } from '../types'
+
+const STAT = 17
 
 const seedDepartments: Department[] = [
   {
@@ -62,12 +65,9 @@ const seedDepartments: Department[] = [
   },
 ]
 
-const iconOptions = ['💻', '📊', '⚙️', '🌍', '🧬', '🎨', '🏛️', '📚', '🔬', '⚖️']
-
 const emptyForm = {
   name: '',
   headName: '',
-  icon: iconOptions[0],
 }
 
 export function DepartmentsPage() {
@@ -110,7 +110,7 @@ export function DepartmentsPage() {
       headName: form.headName.trim() || 'To be assigned',
       studentsCount: 0,
       facultyCount: 0,
-      icon: form.icon,
+      icon: '',
     }
     setDepartments((prev) => [...prev, newDept])
     setModalOpen(false)
@@ -130,25 +130,26 @@ export function DepartmentsPage() {
         actions={
           <>
             <Button variant="secondary" onClick={() => notify('Leadership management view is coming soon.', 'info')}>
+              <UserCog size={15} />
               Manage Heads
             </Button>
             <Button variant="primary" onClick={openModal}>
-              + Add Department
+              <Plus size={16} />
+              Add Department
             </Button>
           </>
         }
       />
 
-      <GlassCard className="grid grid-cols-3 divide-x divide-divider/40">
-        <StatBlock label="Departments" value={totals.total} icon="🏛️" />
+      <div className="grid grid-cols-3 gap-4 md:gap-5">
+        <StatBlock label="Departments" value={totals.total} icon={<Building2 size={STAT} />} />
         <StatBlock
           label="Total Students"
           value={totals.students.toLocaleString()}
-          icon="👥"
-          iconBg="bg-info-bg"
+          icon={<Users size={STAT} />}
         />
-        <StatBlock label="Faculty & Staff" value={totals.faculty} icon="🧑‍🏫" />
-      </GlassCard>
+        <StatBlock label="Faculty & Staff" value={totals.faculty} icon={<Briefcase size={STAT} />} />
+      </div>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <h2 className="text-[15px] font-extrabold text-navy-900">All Departments</h2>
@@ -183,7 +184,7 @@ export function DepartmentsPage() {
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        icon="🏛️"
+        icon={<Building2 size={18} />}
         title="Add Department"
         description="Create a new department and assign its head."
         footer={
@@ -208,13 +209,6 @@ export function DepartmentsPage() {
           value={form.headName}
           onChange={(v) => setForm({ ...form, headName: v })}
           placeholder="e.g. Dr. Aaron Selassie"
-        />
-        <FormField
-          label="Icon"
-          type="select"
-          value={form.icon}
-          options={iconOptions}
-          onChange={(v) => setForm({ ...form, icon: v })}
         />
       </Modal>
     </div>

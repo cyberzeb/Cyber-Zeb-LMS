@@ -1,3 +1,4 @@
+import { Trash2 } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill, type StatusTone } from '../../../shared/components/StatusPill'
 import type { ProgramRow } from '../types'
@@ -85,7 +86,7 @@ export function ProgramsTable({ programs, onManage, onDelete }: ProgramsTablePro
                     aria-label="Delete program"
                     className="opacity-0 md:group-hover:opacity-100 text-secondary-text hover:text-danger hover:bg-danger-bg w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer shrink-0"
                   >
-                    🗑
+                    <Trash2 size={14} />
                   </button>
                 )}
               </div>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Users, GraduationCap, Presentation, MailPlus, Plus, Upload } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
@@ -11,6 +12,8 @@ import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
 import { PeopleTable } from '../components/PeopleTable'
 import type { PersonRole, PersonRow } from '../types'
+
+const STAT = 17
 
 const seedPeople: PersonRow[] = [
   {
@@ -218,27 +221,28 @@ export function PeoplePage() {
         actions={
           <>
             <Button variant="secondary" onClick={() => notify('Bulk CSV import unlocks with the backend.', 'info')}>
+              <Upload size={15} />
               Import CSV
             </Button>
             <Button variant="primary" onClick={openModal}>
-              + Invite User
+              <Plus size={16} />
+              Invite User
             </Button>
           </>
         }
       />
 
-      <GlassCard className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-divider/40">
-        <StatBlock label="Total Users" value={totals.total.toLocaleString()} icon="👥" />
-        <StatBlock label="Students" value={totals.students} icon="🎓" iconBg="bg-info-bg" />
-        <StatBlock label="Instructors" value={totals.instructors} icon="🧑‍🏫" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <StatBlock label="Total Users" value={totals.total.toLocaleString()} icon={<Users size={STAT} />} />
+        <StatBlock label="Students" value={totals.students} icon={<GraduationCap size={STAT} />} />
+        <StatBlock label="Instructors" value={totals.instructors} icon={<Presentation size={STAT} />} />
         <StatBlock
           label="Pending Invites"
           value={totals.pending}
           sub="Awaiting activation"
-          icon="✉️"
-          iconBg="bg-warning-bg"
+          icon={<MailPlus size={STAT} />}
         />
-      </GlassCard>
+      </div>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <FilterTabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
@@ -265,7 +269,7 @@ export function PeoplePage() {
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        icon="✉️"
+        icon={<MailPlus size={18} />}
         title="Invite User"
         description="Send an invitation. The user stays pending until they activate."
         footer={

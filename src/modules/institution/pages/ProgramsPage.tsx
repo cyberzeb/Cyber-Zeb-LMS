@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { GraduationCap, CheckCircle2, Users, BookOpen, Plus, Upload } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
@@ -11,6 +12,8 @@ import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
 import { ProgramsTable } from '../components/ProgramsTable'
 import type { ProgramLevel, ProgramRow } from '../types'
+
+const STAT = 17
 
 const seedPrograms: ProgramRow[] = [
   {
@@ -207,26 +210,32 @@ export function ProgramsPage() {
         actions={
           <>
             <Button variant="secondary" onClick={() => notify('CSV import runs once the backend is connected.', 'info')}>
-              Import Programs
+              <Upload size={15} />
+              Import
             </Button>
             <Button variant="primary" onClick={openModal}>
-              + Add Program
+              <Plus size={16} />
+              Add Program
             </Button>
           </>
         }
       />
 
-      <GlassCard className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-divider/40">
-        <StatBlock label="Total Programs" value={totals.total} icon="🎓" />
-        <StatBlock label="Active" value={totals.active} sub="Currently enrolling" icon="✅" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <StatBlock label="Total Programs" value={totals.total} icon={<GraduationCap size={STAT} />} />
+        <StatBlock
+          label="Active"
+          value={totals.active}
+          sub="Currently enrolling"
+          icon={<CheckCircle2 size={STAT} />}
+        />
         <StatBlock
           label="Students Enrolled"
           value={totals.enrolled.toLocaleString()}
-          icon="👥"
-          iconBg="bg-info-bg"
+          icon={<Users size={STAT} />}
         />
-        <StatBlock label="Linked Courses" value={totals.courses} icon="📚" iconBg="bg-warning-bg" />
-      </GlassCard>
+        <StatBlock label="Linked Courses" value={totals.courses} icon={<BookOpen size={STAT} />} />
+      </div>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <FilterTabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
@@ -253,7 +262,7 @@ export function ProgramsPage() {
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        icon="🎓"
+        icon={<GraduationCap size={18} />}
         title="Add Program"
         description="Create a new academic program. It starts as a draft."
         footer={

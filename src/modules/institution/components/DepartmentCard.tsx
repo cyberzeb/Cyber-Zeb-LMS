@@ -1,9 +1,12 @@
+import { Trash2 } from 'lucide-react'
+import { Monogram } from '../../../shared/components/Monogram'
+
 interface DepartmentCardProps {
   name: string
   headName: string
   studentsCount: number
   facultyCount: number
-  icon: string
+  icon?: string
   onDelete?: () => void
 }
 
@@ -12,7 +15,6 @@ export function DepartmentCard({
   headName,
   studentsCount,
   facultyCount,
-  icon,
   onDelete,
 }: DepartmentCardProps) {
   return (
@@ -23,12 +25,12 @@ export function DepartmentCard({
           aria-label="Delete department"
           className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 text-secondary-text hover:text-danger hover:bg-danger-bg w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer"
         >
-          🗑
+          <Trash2 size={14} />
         </button>
       )}
       <div className="flex gap-3.5 items-start">
-        <div className="w-10 h-10 shrink-0 rounded-xl bg-lemon-50 flex items-center justify-center text-lg shadow-sm group-hover:scale-105 transition-transform duration-300">
-          {icon}
+        <div className="group-hover:scale-105 transition-transform duration-300">
+          <Monogram label={name} size="md" />
         </div>
         <div className="min-w-0">
           <h4 className="font-bold text-navy-900 text-[14.5px] leading-snug tracking-tight truncate">

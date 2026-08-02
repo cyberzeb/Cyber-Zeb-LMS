@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { BookOpen, CheckCircle2, FileEdit, Users, Plus, LayoutTemplate } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
@@ -11,6 +12,8 @@ import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
 import { CourseCard } from '../components/CourseCard'
 import type { CourseSummary } from '../types'
+
+const STAT = 17
 
 const seedCourses: CourseSummary[] = [
   {
@@ -129,7 +132,6 @@ const departmentOptions = [
   'Arts & Humanities',
 ]
 const levelOptions = ['Undergraduate', 'Postgraduate', 'Doctoral', 'Certificate']
-const iconOptions = ['📘', '🧮', '🤖', '📈', '🛡️', '🏗️', '🧠', '🌍', '🔬', '💡']
 
 const emptyForm = {
   title: '',
@@ -137,7 +139,6 @@ const emptyForm = {
   instructor: '',
   department: departmentOptions[0],
   level: levelOptions[0],
-  icon: iconOptions[0],
 }
 
 export function CoursesPage() {
@@ -188,7 +189,7 @@ export function CoursesPage() {
       instructor: form.instructor.trim() || 'Unassigned',
       department: form.department,
       level: form.level,
-      icon: form.icon,
+      icon: '',
       enrolledCount: 0,
       moduleCount: 0,
       status: 'draft',
@@ -212,26 +213,32 @@ export function CoursesPage() {
         actions={
           <>
             <Button variant="secondary" onClick={() => notify('Course templates library is coming soon.', 'info')}>
-              Course Templates
+              <LayoutTemplate size={15} />
+              Templates
             </Button>
             <Button variant="primary" onClick={openModal}>
-              + Create Course
+              <Plus size={16} />
+              Create Course
             </Button>
           </>
         }
       />
 
-      <GlassCard className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-divider/40">
-        <StatBlock label="Total Courses" value={totals.total} icon="📚" />
-        <StatBlock label="Published" value={totals.published} sub="Live for learners" icon="✅" />
-        <StatBlock label="In Draft" value={totals.drafts} icon="📝" iconBg="bg-warning-bg" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <StatBlock label="Total Courses" value={totals.total} icon={<BookOpen size={STAT} />} />
+        <StatBlock
+          label="Published"
+          value={totals.published}
+          sub="Live for learners"
+          icon={<CheckCircle2 size={STAT} />}
+        />
+        <StatBlock label="In Draft" value={totals.drafts} icon={<FileEdit size={STAT} />} />
         <StatBlock
           label="Total Enrollments"
           value={totals.enrolled.toLocaleString()}
-          icon="👥"
-          iconBg="bg-info-bg"
+          icon={<Users size={STAT} />}
         />
-      </GlassCard>
+      </div>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <FilterTabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
@@ -263,7 +270,7 @@ export function CoursesPage() {
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        icon="📚"
+        icon={<BookOpen size={18} />}
         title="Create Course"
         description="Set up a new course. It will be saved as a draft."
         footer={
@@ -313,13 +320,6 @@ export function CoursesPage() {
             onChange={(v) => setForm({ ...form, level: v })}
           />
         </div>
-        <FormField
-          label="Icon"
-          type="select"
-          value={form.icon}
-          options={iconOptions}
-          onChange={(v) => setForm({ ...form, icon: v })}
-        />
       </Modal>
     </div>
   )
