@@ -1,3 +1,4 @@
+import { Cloud, Globe, UserRound } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import type { SsoProvider } from '../types'
 
@@ -8,9 +9,10 @@ interface IdentityStatusCardProps {
 
 export function IdentityStatusCard({ providers, onConfigure }: IdentityStatusCardProps) {
   const getProviderIcon = (name: string) => {
-    if (name.toLowerCase().includes('microsoft') || name.toLowerCase().includes('entra')) return '☁️'
-    if (name.toLowerCase().includes('google')) return '🌐'
-    return '👤'
+    if (name.toLowerCase().includes('microsoft') || name.toLowerCase().includes('entra'))
+      return <Cloud size={17} />
+    if (name.toLowerCase().includes('google')) return <Globe size={17} />
+    return <UserRound size={17} />
   }
 
   return (
@@ -35,7 +37,7 @@ export function IdentityStatusCard({ providers, onConfigure }: IdentityStatusCar
                 className="flex items-center justify-between pb-3 border-b border-divider/40 last:border-0 last:pb-0"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-lg bg-navy-50 flex items-center justify-center text-lg shrink-0">
+                  <div className="w-9 h-9 rounded-lg bg-navy-50 text-navy-700 flex items-center justify-center shrink-0">
                     {getProviderIcon(prov.name)}
                   </div>
                   <div className="min-w-0">
