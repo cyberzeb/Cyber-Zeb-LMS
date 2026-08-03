@@ -27,7 +27,7 @@ export function Sidebar({
   userName,
   userRole,
   brandLogoSrc,
-  brandName = 'Berana LMS',
+  brandName = 'Brana LMS',
   brandSubtitle = 'Cyber-Zeb',
 }: SidebarProps) {
   const initials = userName
