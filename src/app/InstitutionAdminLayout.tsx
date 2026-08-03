@@ -1,5 +1,6 @@
 import { Sidebar } from '../shared/layout/Sidebar'
 import { Outlet, useLocation } from 'react-router-dom'
+import brandLogo from '../assets/Logo.jpg'
 import {
   LayoutDashboard,
   Building2,
@@ -97,7 +98,14 @@ export function InstitutionAdminLayout() {
   return (
     <div className="flex min-h-screen app-shell-bg font-sans overflow-hidden">
       {/* Left Sidebar */}
-      <Sidebar sections={navSections} userName="Abel Tesfaye" userRole="Institution Admin" />
+      <Sidebar
+        sections={navSections}
+        userName="Abel Tesfaye"
+        userRole="Institution Admin"
+        brandLogoSrc={brandLogo}
+        brandName="Brana LMS"
+        brandSubtitle="Cyber-Zeb"
+      />
 
       {/* Right Scrollable Content Area */}
       <main className="page-content app-scroll flex-1 h-screen overflow-y-auto flex flex-col p-6 md:p-8 gap-6 md:gap-8">
