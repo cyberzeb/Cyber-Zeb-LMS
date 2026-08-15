@@ -75,7 +75,89 @@ export interface SsoProvider {
   status: 'connected' | 'enabled' | 'not-configured'
 }
 
+export interface EnrollmentTrendPoint {
+  label: string
+  totalStudents: number
+  activeStudents: number
+}
+
+export interface ProgressOverviewItem {
+  label: string
+  count: number
+  tone: 'success' | 'info' | 'warning' | 'danger'
+}
+
+export interface CoursePerformanceItem {
+  id: string
+  courseCode: string
+  title: string
+  instructor: string
+  enrolled: number
+  completionRate: number
+  status: 'healthy' | 'watch' | 'critical'
+}
+
+export interface AttentionItem {
+  id: string
+  title: string
+  subtitle: string
+  severity: 'low' | 'medium' | 'high'
+}
+
+export interface UpcomingClassItem {
+  id: string
+  title: string
+  course: string
+  instructor: string
+  date: string
+  time: string
+}
+
+export interface DeadlineItem {
+  id: string
+  title: string
+  course: string
+  dueIn: string
+  status: 'upcoming' | 'today' | 'overdue'
+}
+
+export interface ActivityItem {
+  id: string
+  text: string
+  timestamp: string
+  type: 'student' | 'course' | 'assessment' | 'announcement'
+}
+
+export interface AnnouncementItem {
+  id: string
+  title: string
+  audience: string
+  postedAt: string
+  priority: 'normal' | 'important'
+}
+
 export interface InstitutionOverviewData {
+  institutionName: string
+  institutionSubtitle: string
+  kpis: {
+    totalStudents: number
+    activeStudents: number
+    activeCourses: number
+    instructors: number
+    completionRate: number
+    pendingApprovals: number
+  }
+  enrollmentTrend: EnrollmentTrendPoint[]
+  progressOverview: ProgressOverviewItem[]
+  coursePerformance: CoursePerformanceItem[]
+  pendingEnrollments: AttentionItem[]
+  learnersAtRisk: AttentionItem[]
+  overdueAssessments: AttentionItem[]
+  coursesRequiringAttention: AttentionItem[]
+  upcomingLiveClasses: UpcomingClassItem[]
+  upcomingDeadlines: DeadlineItem[]
+  recentActivity: ActivityItem[]
+  recentAnnouncements: AnnouncementItem[]
   statTotals: {
     campusCount: number
     activeCampusCount: number
@@ -166,4 +248,4 @@ export interface TrendPoint {
   label: string
   value: number
 }
-
+
