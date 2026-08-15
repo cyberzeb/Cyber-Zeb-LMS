@@ -1,4 +1,4 @@
-import { BookOpen, CalendarDays, CheckCircle2, GraduationCap, Sparkles } from 'lucide-react'
+import { BookOpen, CalendarDays, GraduationCap, Sparkles } from 'lucide-react'
 import type { StudentDashboardData } from '../types'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 

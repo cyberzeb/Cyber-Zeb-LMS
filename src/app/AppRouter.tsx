@@ -148,6 +148,18 @@ export const router = createBrowserRouter([
         path: 'calendar',
         element: <CampusProfilePage />,
       },
+      {
+        path: 'payments',
+        element: <ReportsPage />,
+      },
+      {
+        path: 'api-integrations',
+        element: <SettingsPage />,
+      },
+      {
+        path: 'help-desk',
+        element: <SettingsPage />,
+      },
     ],
   },
 ])
