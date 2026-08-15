@@ -1,5 +1,6 @@
 import { Sidebar } from '../shared/layout/Sidebar'
 import { Outlet, useLocation } from 'react-router-dom'
+import brandLogo from '../assets/Logo.jpg'
 import {
   BookCheck,
   LayoutDashboard,
@@ -233,7 +234,9 @@ export function InstitutionAdminLayout() {
         sections={navSections}
         userName="Abel Tesfaye"
         userRole="Institution Admin"
-        collapsible
+        brandLogoSrc={brandLogo}
+        brandName="Brana LMS"
+        brandSubtitle="Cyber-Zeb"
       />
 
       {/* Right Scrollable Content Area */}
