@@ -30,7 +30,7 @@ export function Sidebar({
   userName,
   userRole,
   brandLogoSrc,
-  brandName = 'Berana LMS',
+  brandName = 'Brana LMS',
   brandSubtitle = 'Cyber-Zeb',
   collapsible = false,
 }: SidebarProps) {
