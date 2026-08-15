@@ -58,11 +58,19 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <CampusProfilePage />,
+        element: <InstitutionOverviewPage />,
       },
       {
         path: 'institution/overview',
         element: <InstitutionOverviewPage />,
+      },
+      {
+        path: 'institution/dashboard',
+        element: <InstitutionOverviewPage />,
+      },
+      {
+        path: 'institution/profile',
+        element: <CampusProfilePage />,
       },
       {
         path: 'institution/departments',
@@ -86,6 +94,70 @@ export const router = createBrowserRouter([
       },
       {
         path: 'settings',
+        element: <SettingsPage />,
+      },
+      {
+        path: 'live-classes',
+        element: <CoursesPage />,
+      },
+      {
+        path: 'assignments',
+        element: <CoursesPage />,
+      },
+      {
+        path: 'quizzes-exams',
+        element: <CoursesPage />,
+      },
+      {
+        path: 'question-bank',
+        element: <CoursesPage />,
+      },
+      {
+        path: 'students',
+        element: <PeoplePage />,
+      },
+      {
+        path: 'instructors',
+        element: <PeoplePage />,
+      },
+      {
+        path: 'enrollments',
+        element: <PeoplePage />,
+      },
+      {
+        path: 'attendance',
+        element: <ReportsPage />,
+      },
+      {
+        path: 'announcements',
+        element: <ReportsPage />,
+      },
+      {
+        path: 'discussion-forum',
+        element: <ReportsPage />,
+      },
+      {
+        path: 'certificates',
+        element: <ReportsPage />,
+      },
+      {
+        path: 'resources',
+        element: <CoursesPage />,
+      },
+      {
+        path: 'calendar',
+        element: <CampusProfilePage />,
+      },
+      {
+        path: 'payments',
+        element: <ReportsPage />,
+      },
+      {
+        path: 'api-integrations',
+        element: <SettingsPage />,
+      },
+      {
+        path: 'help-desk',
         element: <SettingsPage />,
       },
     ],

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { FileText, Clock, CheckCircle2, TrendingUp, Plus, CalendarClock } from 'lucide-react'
-import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
