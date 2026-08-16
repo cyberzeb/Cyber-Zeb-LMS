@@ -14,6 +14,8 @@ import { GuardiansPage } from '../modules/institution/pages/GuardiansPage'
 import { AdministratorsPage } from '../modules/institution/pages/AdministratorsPage'
 import { VerifyPeoplePage } from '../modules/institution/pages/VerifyPeoplePage'
 import { EnrollmentsPage } from '../modules/institution/pages/EnrollmentsPage'
+import { CertificatesPage } from '../modules/institution/pages/CertificatesPage'
+import { AttendanceAdminPage } from '../modules/institution/pages/AttendanceAdminPage'
 import { ReportsPage } from '../modules/institution/pages/ReportsPage'
 import { SettingsPage } from '../modules/institution/pages/SettingsPage'
 import { LandingPage } from '../modules/marketing/pages/LandingPage'
@@ -46,6 +48,7 @@ import { InstructorGradesPage } from '../modules/instructors/pages/instructorgra
 import { InstructorAttendancePage } from '../modules/instructors/pages/instructorattendance'
 import { InstructorAnnouncementsPage } from '../modules/instructors/pages/instructorannouncements'
 import { InstructorForumPage } from '../modules/instructors/pages/instructorforum'
+import { InstructorCertificatesPage } from '../modules/instructors/pages/instructorcertificates'
 import { InstructorHelpDeskPage } from '../modules/instructors/pages/instructorhelpdesk'
 import { InstructorSettingsPage } from '../modules/instructors/pages/instructorsettings'
 
@@ -181,6 +184,10 @@ export const router = createBrowserRouter([
         element: <InstructorForumPage />,
       },
       {
+        path: 'certificates',
+        element: <InstructorCertificatesPage />,
+      },
+      {
         path: 'help-desk',
         element: <InstructorHelpDeskPage />,
       },
@@ -288,7 +295,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'attendance',
-        element: <ReportsPage />,
+        element: <AttendanceAdminPage />,
       },
       {
         path: 'announcements',
@@ -300,7 +307,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'certificates',
-        element: <ReportsPage />,
+        element: <CertificatesPage />,
       },
       {
         path: 'resources',

@@ -1,4 +1,5 @@
 import {
+  BookCheck,
   BookOpen,
   CalendarDays,
   ClipboardList,
@@ -37,6 +38,7 @@ const breadcrumbLabels: Record<string, string> = {
   '/instructor/attendance': 'Attendance',
   '/instructor/announcements': 'Announcements',
   '/instructor/forum': 'Discussion Forum',
+  '/instructor/certificates': 'Certificates',
   '/instructor/help-desk': 'Help Desk',
   '/instructor/settings': 'Settings',
 }
@@ -141,6 +143,12 @@ export function InstructorLayout() {
           to: '/instructor/forum',
           active: isActive('/instructor/forum'),
           icon: <Users size={ICON_SIZE} />,
+        },
+        {
+          label: 'Certificates',
+          to: '/instructor/certificates',
+          active: isActive('/instructor/certificates'),
+          icon: <BookCheck size={ICON_SIZE} />,
         },
       ],
     },

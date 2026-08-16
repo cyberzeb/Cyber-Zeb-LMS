@@ -139,13 +139,31 @@ export interface ForumThread {
   pinned?: boolean
 }
 
+export type CertificatePendingReason =
+  | 'awaiting-completion'
+  | 'awaiting-instructor-approval'
+  | 'awaiting-admin-approval'
+
 export interface CertificateItem {
   id: string
   title: string
   course: string
+  /** e.g. "Jun 12, 2025" — formatted display string, or "Pending" */
   issuedAt: string
+  /** ISO date string (YYYY-MM-DD) or undefined when not yet issued */
+  issuedAtRaw?: string
+  /** Date the course work was completed */
+  completionDate?: string
   credentialId: string
   status: 'issued' | 'in-progress'
+  /** Only present when status === 'in-progress' */
+  pendingReason?: CertificatePendingReason
+  /** Issuing institution name */
+  institution?: string
+  /** Instructor who signed/issued the certificate */
+  instructorName?: string
+  /** Department */
+  department?: string
 }
 
 export interface PaymentItem {

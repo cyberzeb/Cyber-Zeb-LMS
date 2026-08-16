@@ -1,4 +1,4 @@
-import { buildInstructorDashboard } from '../../../shared/storage/dashboardBuilders'
+import { buildInstructorDashboard, buildInstructorCertificates } from '../../../shared/storage/dashboardBuilders'
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 
 export async function fetchInstructorDashboardData() {
@@ -12,4 +12,17 @@ export async function fetchInstructorDashboardData() {
   }
 
   return buildInstructorDashboard(person)
+}
+
+export async function fetchInstructorCertificates() {
+  await new Promise((resolve) => setTimeout(resolve, 200))
+
+  const session = readPortalSession()
+  const person = getSessionPerson()
+
+  if (!session || session.role !== 'Instructor' || !person) {
+    throw new Error('No instructor session. Select an instructor account to continue.')
+  }
+
+  return buildInstructorCertificates(person)
 }
