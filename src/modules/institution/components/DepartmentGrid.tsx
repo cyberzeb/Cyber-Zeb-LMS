@@ -29,7 +29,6 @@ export function DepartmentGrid({ departments, onAddDepartment }: DepartmentGridP
               headName={dept.headName}
               studentsCount={dept.studentsCount}
               facultyCount={dept.facultyCount}
-              icon={dept.icon}
             />
           ))}
         </div>

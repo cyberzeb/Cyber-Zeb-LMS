@@ -1,20 +1,28 @@
 import { Sidebar } from '../shared/layout/Sidebar'
+import { AdminTopHeader } from '../shared/layout/AdminTopHeader'
+import { AdminFooter } from '../shared/layout/AdminFooter'
 import { Outlet, useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import brandLogo from '../assets/Logo.jpg'
+import { CampusProvider, useCampusContext } from '../modules/institution/context/CampusContext'
+import { readPeopleFromStorage } from '../modules/institution/hooks/usePeople'
+import {
+  countPendingVerifications,
+  PEOPLE_UPDATED_EVENT,
+} from '../modules/institution/utils/peopleVerification'
 import {
   BookCheck,
   LayoutDashboard,
   BookOpen,
   CalendarDays,
-  CircleDollarSign,
   ClipboardList,
   FileText,
   GraduationCap,
   Headset,
-  Layers,
   Library,
   Megaphone,
   MonitorPlay,
+  Network,
   Puzzle,
   Settings,
   ShieldQuestion,
@@ -23,6 +31,11 @@ import {
   UserRoundCog,
   Users,
   Wallet,
+  Briefcase,
+  HeartHandshake,
+  Shield,
+  ShieldCheck,
+  UserCog,
 } from 'lucide-react'
 
 const ICON_SIZE = 17
@@ -33,8 +46,15 @@ const breadcrumbLabels: Record<string, string> = {
   '/admin/institution/dashboard': 'Dashboard',
   '/admin/courses': 'Courses',
   '/admin/institution/programs': 'Learning Paths',
+  '/admin/institution/structure': 'Organization',
+  '/admin/institution/profile': 'Campus Profile',
   '/admin/students': 'Students',
   '/admin/instructors': 'Instructors',
+  '/admin/staff': 'Staff',
+  '/admin/guardians': 'Guardians',
+  '/admin/admins': 'Administrators',
+  '/admin/verify-people': 'Verify People',
+  '/admin/people': 'People & Users',
   '/admin/institution/departments': 'Departments',
   '/admin/enrollments': 'Enrollments',
   '/admin/live-classes': 'Live Classes',
@@ -55,8 +75,32 @@ const breadcrumbLabels: Record<string, string> = {
 }
 
 export function InstitutionAdminLayout() {
+  return (
+    <CampusProvider>
+      <InstitutionAdminShell />
+    </CampusProvider>
+  )
+}
+
+function InstitutionAdminShell() {
   const location = useLocation()
   const path = location.pathname
+  const {
+    campuses,
+    selectedCampusId,
+    setSelectedCampusId,
+    institutionName,
+  } = useCampusContext()
+  const [pendingVerifications, setPendingVerifications] = useState(0)
+
+  useEffect(() => {
+    const refresh = () => {
+      setPendingVerifications(countPendingVerifications(readPeopleFromStorage()))
+    }
+    refresh()
+    window.addEventListener(PEOPLE_UPDATED_EVENT, refresh)
+    return () => window.removeEventListener(PEOPLE_UPDATED_EVENT, refresh)
+  }, [path])
 
   const isActive = (routes: string[]) => routes.some((route) => path === route)
 
@@ -70,22 +114,28 @@ export function InstitutionAdminLayout() {
           active: isActive(['/admin', '/admin/institution/overview', '/admin/institution/dashboard']),
           icon: <LayoutDashboard size={ICON_SIZE} />,
         },
+        {
+          label: 'Organization',
+          to: '/admin/institution/structure',
+          active: isActive(['/admin/institution/structure', '/admin/institution/profile']),
+          icon: <Network size={ICON_SIZE} />,
+        },
       ],
     },
     {
       title: 'Academic',
       items: [
         {
+          label: 'Departments',
+          to: '/admin/institution/departments',
+          active: isActive(['/admin/institution/departments']),
+          icon: <UserCog size={ICON_SIZE} />,
+        },
+        {
           label: 'Courses',
           to: '/admin/courses',
           active: isActive(['/admin/courses']),
           icon: <BookOpen size={ICON_SIZE} />,
-        },
-        {
-          label: 'Learning Paths',
-          to: '/admin/institution/programs',
-          active: isActive(['/admin/institution/programs']),
-          icon: <Layers size={ICON_SIZE} />,
         },
         {
           label: 'Live Classes',
@@ -129,9 +179,34 @@ export function InstitutionAdminLayout() {
           icon: <UserRoundCog size={ICON_SIZE} />,
         },
         {
-          label: 'Departments',
-          to: '/admin/institution/departments',
-          active: isActive(['/admin/institution/departments']),
+          label: 'Staff',
+          to: '/admin/staff',
+          active: isActive(['/admin/staff']),
+          icon: <Briefcase size={ICON_SIZE} />,
+        },
+        {
+          label: 'Guardians',
+          to: '/admin/guardians',
+          active: isActive(['/admin/guardians']),
+          icon: <HeartHandshake size={ICON_SIZE} />,
+        },
+        {
+          label: 'Administrators',
+          to: '/admin/admins',
+          active: isActive(['/admin/admins']),
+          icon: <Shield size={ICON_SIZE} />,
+        },
+        {
+          label: 'Verify People',
+          to: '/admin/verify-people',
+          active: isActive(['/admin/verify-people']),
+          icon: <ShieldCheck size={ICON_SIZE} />,
+          badge: pendingVerifications,
+        },
+        {
+          label: 'All People',
+          to: '/admin/people',
+          active: isActive(['/admin/people']),
           icon: <Users size={ICON_SIZE} />,
         },
         {
@@ -225,38 +300,38 @@ export function InstitutionAdminLayout() {
     },
   ]
 
-  const breadcrumb = breadcrumbLabels[path] ?? ''
+  const breadcrumb =
+    breadcrumbLabels[path] ??
+    (path.startsWith('/admin/institution/profile') ? 'Campus Profile' : '')
 
   return (
-    <div className="flex min-h-screen app-shell-bg font-sans overflow-hidden">
-      {/* Left Sidebar */}
+    <div className="flex h-screen app-shell-bg font-sans overflow-hidden">
       <Sidebar
         sections={navSections}
-        userName="Abel Tesfaye"
-        userRole="Institution Admin"
         brandLogoSrc={brandLogo}
         brandName="Brana LMS"
         brandSubtitle="Cyber-Zeb"
       />
 
-      {/* Right Scrollable Content Area */}
-      <main className="page-content app-scroll flex-1 h-screen overflow-y-auto flex flex-col p-6 md:p-8 gap-6 md:gap-8">
-        {/* Breadcrumb line */}
-        <div className="flex items-center gap-1.5 text-[12px] text-secondary-text font-medium tracking-wide">
-          <span className="text-navy-700 font-semibold">Berana University</span>
-          {breadcrumb && (
-            <>
-              <span className="text-navy-200">/</span>
-              <span>{breadcrumb}</span>
-            </>
-          )}
-        </div>
+      <div className="flex flex-col flex-1 min-w-0">
+        <AdminTopHeader
+          userName="Abel Tesfaye"
+          userRole="Institution Admin"
+          institutionName={institutionName}
+          breadcrumb={breadcrumb}
+          campuses={campuses}
+          selectedCampusId={selectedCampusId}
+          onCampusChange={setSelectedCampusId}
+        />
 
-        {/* Dynamic page content */}
-        <div key={path} className="animate-fade-in-up">
-          <Outlet />
-        </div>
-      </main>
+        <main className="page-content app-scroll flex-1 overflow-y-auto p-5 md:p-6">
+          <div key={path} className="animate-fade-in-up">
+            <Outlet />
+          </div>
+        </main>
+
+        <AdminFooter />
+      </div>
     </div>
   )
 }

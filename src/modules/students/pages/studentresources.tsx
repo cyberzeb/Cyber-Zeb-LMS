@@ -1,45 +1,76 @@
-import { FileDown, Search } from 'lucide-react'
+import { useMemo } from 'react'
+import { BookOpen, FileDown, FileText, PlayCircle, Search } from 'lucide-react'
+import { Button } from '../../../shared/components/Button'
+import { PageHeader } from '../../../shared/components/PageHeader'
+import { StatBlock } from '../../../shared/components/StatBlock'
 import { ResourceLibraryCard } from '../components/ResourceLibraryCard'
+import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
 
 export function StudentResourcesPage() {
   const { data, isLoading, isError } = useStudentDashboard()
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[320px] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-navy-200 border-t-lemon-500" />
-      </div>
-    )
-  }
+  const stats = useMemo(() => {
+    if (!data) return { total: 0, syllabus: 0, notes: 0, video: 0 }
+    return {
+      total: data.resources.length,
+      syllabus: data.resources.filter((r) => r.kind === 'Syllabus').length,
+      notes: data.resources.filter((r) => r.kind === 'Lecture Notes').length,
+      video: data.resources.filter((r) => r.kind === 'Video').length,
+    }
+  }, [data])
 
-  if (isError || !data) {
-    return <div className="rounded-2xl border border-danger/20 bg-danger-bg p-5 text-danger">Failed to load resources.</div>
-  }
+  if (isLoading) return <StudentPageLoading />
+  if (isError || !data) return <StudentPageError message="Failed to load resources." />
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="rounded-2xl bg-gradient-to-br from-navy-900 via-navy-700 to-[#202a4c] p-6 text-white">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-lemon-200">Course content & resources</p>
-            <h1 className="mt-2 text-3xl font-extrabold">Digital library</h1>
-            <p className="mt-2 max-w-2xl text-[13px] leading-6 text-navy-200">
-              Browse syllabi, lecture notes, readings, and instructional videos for your modules.
-            </p>
-          </div>
-
-          <div className="flex gap-2">
-            <button className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[12px] font-semibold text-white">
-              <Search size={14} />
-              Search resources
-            </button>
-            <button className="inline-flex items-center gap-2 rounded-full bg-lemon-500 px-4 py-2 text-[12px] font-bold text-navy-900">
-              <FileDown size={14} />
+    <div className="flex flex-col gap-6 md:gap-8">
+      <PageHeader
+        title="Course Resources"
+        subtitle="Syllabi, lecture notes, readings, and videos for your enrolled modules."
+        actions={
+          <>
+            <Button variant="secondary">
+              <Search size={15} />
+              Search
+            </Button>
+            <Button variant="primary">
+              <FileDown size={15} />
               Download all
-            </button>
-          </div>
-        </div>
+            </Button>
+          </>
+        }
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <StatBlock
+          label="Total files"
+          value={stats.total}
+          sub="Available to download"
+          icon={<BookOpen size={17} />}
+          iconBg="bg-navy-50 text-navy-600"
+        />
+        <StatBlock
+          label="Syllabi"
+          value={stats.syllabus}
+          sub="Course outlines"
+          icon={<BookOpen size={17} />}
+          iconBg="bg-navy-900 text-white"
+        />
+        <StatBlock
+          label="Lecture notes"
+          value={stats.notes}
+          sub="Slides & handouts"
+          icon={<FileText size={17} />}
+          iconBg="bg-info-bg text-info"
+        />
+        <StatBlock
+          label="Videos"
+          value={stats.video}
+          sub="Recorded sessions"
+          icon={<PlayCircle size={17} />}
+          iconBg="bg-success-bg text-success"
+        />
       </div>
 
       <ResourceLibraryCard resources={data.resources} />

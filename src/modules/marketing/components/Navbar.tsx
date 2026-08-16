@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import brandLogo from '../../../assets/Logo.jpg'
 
 interface NavbarProps {
@@ -41,6 +42,24 @@ export function Navbar({ onRequestServiceClick }: NavbarProps) {
           <span className="text-[12px] font-semibold text-navy-200">
             A Cyber-Zeb Consulting product
           </span>
+          <Link
+            to="/student"
+            className="border border-white/20 text-white font-semibold text-[13px] px-4 py-2.5 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            Student Portal
+          </Link>
+          <Link
+            to="/instructor"
+            className="border border-white/20 text-white font-semibold text-[13px] px-4 py-2.5 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            Instructor Portal
+          </Link>
+          <Link
+            to="/admin"
+            className="border border-white/20 text-white font-semibold text-[13px] px-4 py-2.5 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            Institution Admin
+          </Link>
           <button
             onClick={onRequestServiceClick}
             className="bg-lemon-500 text-navy-900 font-bold text-[13px] px-5 py-2.5 rounded-lg hover:bg-lemon-200 transition-colors cursor-pointer"
@@ -76,6 +95,27 @@ export function Navbar({ onRequestServiceClick }: NavbarProps) {
               {link.label}
             </a>
           ))}
+          <Link
+            to="/student"
+            onClick={() => setOpen(false)}
+            className="border border-white/20 text-white font-semibold text-[13.5px] px-5 py-3 rounded-lg text-center"
+          >
+            Student Portal
+          </Link>
+          <Link
+            to="/instructor"
+            onClick={() => setOpen(false)}
+            className="border border-white/20 text-white font-semibold text-[13.5px] px-5 py-3 rounded-lg text-center"
+          >
+            Instructor Portal
+          </Link>
+          <Link
+            to="/admin"
+            onClick={() => setOpen(false)}
+            className="border border-white/20 text-white font-semibold text-[13.5px] px-5 py-3 rounded-lg text-center"
+          >
+            Institution Admin
+          </Link>
           <button
             onClick={() => {
               setOpen(false)

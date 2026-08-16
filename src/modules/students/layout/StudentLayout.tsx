@@ -1,24 +1,60 @@
-import { BookOpen, CalendarDays, ClipboardList, GraduationCap, LayoutDashboard, LibraryBig } from 'lucide-react'
+import { BookOpen, CalendarDays, ClipboardList, GraduationCap, Headset, LayoutDashboard, LibraryBig, Megaphone, MonitorPlay, Settings, SquarePen, UserRoundCheck, Wallet, BookCheck, Users } from 'lucide-react'
 import { Outlet, useLocation } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
 import { Sidebar } from '../../../shared/layout/Sidebar'
+import { AdminTopHeader } from '../../../shared/layout/AdminTopHeader'
+import { AdminFooter } from '../../../shared/layout/AdminFooter'
 import brandLogo from '../../../assets/Logo.jpg'
+import { PortalUserPicker } from '../../../shared/components/PortalUserPicker'
+import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
+import { readInstitutionName } from '../../../shared/storage/readers'
 
 const ICON_SIZE = 17
 
 const breadcrumbLabels: Record<string, string> = {
   '/student': 'Dashboard',
+  '/student/courses': 'My Courses',
+  '/student/live-classes': 'Live Classes',
   '/student/resources': 'Course Content & Resources',
   '/student/quizzes': 'Quizzes and Assessments',
   '/student/assignments': 'Assignment Dropboxes',
   '/student/calendar': 'Schedules and Calendars',
   '/student/grades': 'Grades and Feedback',
+  '/student/attendance': 'Attendance',
+  '/student/announcements': 'Announcements',
+  '/student/forum': 'Discussion Forum',
+  '/student/certificates': 'Certificates',
+  '/student/payments': 'Payments',
+  '/student/help-desk': 'Help Desk',
+  '/student/settings': 'Settings',
 }
 
 export function StudentLayout() {
   const location = useLocation()
   const path = location.pathname
+  const mainRef = useRef<HTMLElement>(null)
+  const session = readPortalSession()
+  const person = getSessionPerson()
 
-  const isActive = (to: string) => path === to || path.startsWith(`${to}/`)
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0, behavior: 'auto' })
+  }, [location.pathname])
+
+  const breadcrumb = path.includes('/courses/') && path.includes('/learn')
+    ? 'Learning'
+    : breadcrumbLabels[path] ?? 'Dashboard'
+
+  if (!session || session.role !== 'Student' || !person) {
+    return <PortalUserPicker role="Student" portalLabel="Student Portal" />
+  }
+
+  const isActive = (to: string) => {
+    if (to === '/student') return path === '/student'
+    if (to === '/student/courses') {
+      return path === '/student/courses' || path === '/student/courses/'
+    }
+    return path === to || path.startsWith(`${to}/`)
+  }
 
   const navSections = [
     {
@@ -31,10 +67,16 @@ export function StudentLayout() {
           icon: <LayoutDashboard size={ICON_SIZE} />,
         },
         {
-          label: 'Resources',
-          to: '/student/resources',
-          active: isActive('/student/resources'),
-          icon: <LibraryBig size={ICON_SIZE} />,
+          label: 'Courses',
+          to: '/student/courses',
+          active: isActive('/student/courses'),
+          icon: <BookOpen size={ICON_SIZE} />,
+        },
+        {
+          label: 'Live Classes',
+          to: '/student/live-classes',
+          active: isActive('/student/live-classes'),
+          icon: <MonitorPlay size={ICON_SIZE} />,
         },
         {
           label: 'Quizzes',
@@ -46,7 +88,13 @@ export function StudentLayout() {
           label: 'Assignments',
           to: '/student/assignments',
           active: isActive('/student/assignments'),
-          icon: <BookOpen size={ICON_SIZE} />,
+          icon: <SquarePen size={ICON_SIZE} />,
+        },
+        {
+          label: 'Resources',
+          to: '/student/resources',
+          active: isActive('/student/resources'),
+          icon: <LibraryBig size={ICON_SIZE} />,
         },
       ],
     },
@@ -65,33 +113,86 @@ export function StudentLayout() {
           active: isActive('/student/grades'),
           icon: <GraduationCap size={ICON_SIZE} />,
         },
+        {
+          label: 'Attendance',
+          to: '/student/attendance',
+          active: isActive('/student/attendance'),
+          icon: <UserRoundCheck size={ICON_SIZE} />,
+        },
+      ],
+    },
+    {
+      title: 'Engagement',
+      items: [
+        {
+          label: 'Announcements',
+          to: '/student/announcements',
+          active: isActive('/student/announcements'),
+          icon: <Megaphone size={ICON_SIZE} />,
+        },
+        {
+          label: 'Discussion Forum',
+          to: '/student/forum',
+          active: isActive('/student/forum'),
+          icon: <Users size={ICON_SIZE} />,
+        },
+        {
+          label: 'Certificates',
+          to: '/student/certificates',
+          active: isActive('/student/certificates'),
+          icon: <BookCheck size={ICON_SIZE} />,
+        },
+      ],
+    },
+    {
+      title: 'Account',
+      items: [
+        {
+          label: 'Payments',
+          to: '/student/payments',
+          active: isActive('/student/payments'),
+          icon: <Wallet size={ICON_SIZE} />,
+        },
+        {
+          label: 'Help Desk',
+          to: '/student/help-desk',
+          active: isActive('/student/help-desk'),
+          icon: <Headset size={ICON_SIZE} />,
+        },
+        {
+          label: 'Settings',
+          to: '/student/settings',
+          active: isActive('/student/settings'),
+          icon: <Settings size={ICON_SIZE} />,
+        },
       ],
     },
   ]
 
-  const breadcrumb = breadcrumbLabels[path] ?? 'Dashboard'
-
   return (
-    <div className="flex min-h-screen app-shell-bg font-sans overflow-hidden">
+    <div className="flex h-screen app-shell-bg font-sans overflow-hidden">
       <Sidebar
         sections={navSections}
-        userName="Amina Lemma"
-        userRole="Student"
         brandLogoSrc={brandLogo}
         brandName="Brana LMS"
         brandSubtitle="Cyber-Zeb"
+        showSystemStatus={false}
       />
-      <main className="page-content app-scroll flex-1 h-screen overflow-y-auto flex flex-col p-6 md:p-8 gap-6 md:gap-8">
-        <div className="flex items-center gap-1.5 text-[12px] text-secondary-text font-medium tracking-wide">
-          <span className="text-navy-700 font-semibold">Student Portal</span>
-          <span className="text-navy-200">/</span>
-          <span>{breadcrumb}</span>
-        </div>
 
-        <div key={path} className="animate-fade-in-up">
-          <Outlet />
-        </div>
-      </main>
+      <div className="flex flex-col flex-1 min-w-0">
+        <AdminTopHeader
+          userName={person.name}
+          userRole="Student"
+          institutionName={readInstitutionName()}
+          breadcrumb={breadcrumb}
+        />
+
+        <main ref={mainRef} className="page-content app-scroll flex-1 overflow-y-auto p-5 md:p-6">
+          <Outlet key={location.pathname} />
+        </main>
+
+        <AdminFooter />
+      </div>
     </div>
   )
 }

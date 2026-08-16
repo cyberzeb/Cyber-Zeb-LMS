@@ -1,8 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import { STORAGE_EVENTS, STORAGE_KEYS } from '../../../shared/storage/keys'
 import { fetchStudentDashboardData } from '../api/studentpApi'
 import type { StudentDashboardData } from '../types'
 
+const RELOAD_KEYS = new Set<string>([
+  STORAGE_KEYS.courses,
+  STORAGE_KEYS.enrollments,
+  STORAGE_KEYS.lessonProgress,
+  STORAGE_KEYS.people,
+  STORAGE_KEYS.departments,
+  STORAGE_KEYS.session,
+])
+
 export function useStudentDashboard() {
+  const location = useLocation()
   const [data, setData] = useState<StudentDashboardData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
@@ -23,6 +35,33 @@ export function useStudentDashboard() {
 
   useEffect(() => {
     void reload()
+  }, [location.pathname, reload])
+
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key && RELOAD_KEYS.has(event.key)) void reload()
+    }
+
+    const onCustom = () => void reload()
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void reload()
+    }
+
+    window.addEventListener('storage', onStorage)
+    window.addEventListener(STORAGE_EVENTS.enrollmentsUpdated, onCustom)
+    window.addEventListener(STORAGE_EVENTS.coursesUpdated, onCustom)
+    window.addEventListener(STORAGE_EVENTS.peopleUpdated, onCustom)
+    window.addEventListener(STORAGE_EVENTS.lessonProgressUpdated, onCustom)
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      window.removeEventListener('storage', onStorage)
+      window.removeEventListener(STORAGE_EVENTS.enrollmentsUpdated, onCustom)
+      window.removeEventListener(STORAGE_EVENTS.coursesUpdated, onCustom)
+      window.removeEventListener(STORAGE_EVENTS.peopleUpdated, onCustom)
+      window.removeEventListener(STORAGE_EVENTS.lessonProgressUpdated, onCustom)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
   }, [reload])
 
   return {
