@@ -130,6 +130,33 @@ export interface StudentRosterItem {
   lastActive: string
 }
 
+export type InstructorCertStatus = 'issued' | 'pending' | 'eligible' | 'not-eligible'
+
+export interface InstructorCertificateRow {
+  /** Composite key: studentId + courseId */
+  id: string
+  studentId: string
+  studentName: string
+  studentEmail: string
+  courseId: string
+  courseCode: string
+  courseTitle: string
+  /** 0–100 */
+  completionPercent: number
+  /** Formatted display string, e.g. "87%" or "—" */
+  finalGrade: string
+  completionDate?: string
+  certStatus: InstructorCertStatus
+  /** Populated when certStatus === 'issued' */
+  certificateId?: string
+  /** Populated when certStatus === 'issued' */
+  issuedAt?: string
+  /** Raw CertificateRecord id — used to pull full details */
+  certRecordId?: string
+  /** Populated for issued certs */
+  institution?: string
+}
+
 export interface HelpDeskTicket {
   id: string
   subject: string

@@ -2,10 +2,11 @@ import type { PersonRow } from '../../modules/institution/types'
 import type { CourseRecord } from '../../modules/institution/types'
 import type { CourseEnrollment } from '../../modules/institution/types'
 import type { StudentDashboardData } from '../../modules/students/types'
-import type { InstructorDashboardData } from '../../modules/instructors/types'
+import type { InstructorDashboardData, InstructorCertificateRow } from '../../modules/instructors/types'
 import type { InstitutionOverviewData } from '../../modules/institution/types'
 import {
   readCampusRecords,
+  readCertificates,
   readCourses,
   readDepartments,
   readEnrollments,
@@ -15,6 +16,7 @@ import {
 } from './readers'
 import { courseTeachesInstructor, instructorTeachingSummary } from '../../modules/institution/utils/courseAssignmentUtils'
 import { getEnrollmentProgressPercent } from '../../modules/students/utils/studentLearningProgress'
+import { certificateToStudentItem } from '../../modules/institution/api/certificatesApi'
 
 function emptyStudentDashboard(student: PersonRow): StudentDashboardData {
   return {
@@ -120,10 +122,14 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
   if (courses.length === 0) return base
 
   const activeCount = courses.filter((c) => c.status === 'active').length
+  const studentCertificates = readCertificates()
+    .filter((c) => c.studentId === student.id && c.status !== 'revoked')
+    .map(certificateToStudentItem)
 
   return {
     ...base,
     courses,
+    certificates: studentCertificates,
     standing: `${activeCount} active course${activeCount === 1 ? '' : 's'}`,
     kpis: { ...base.kpis, activeCourses: activeCount },
     stats: base.stats.map((s) =>
@@ -298,6 +304,7 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
   const people = readPeople()
   const courses = readCourses()
   const enrollments = readEnrollments()
+  const certificates = readCertificates()
   const departments = readDepartments()
   const campusRecords = readCampusRecords()
 
@@ -310,6 +317,7 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
   const completionRate = enrollments.length
     ? Math.round(enrollments.reduce((sum, e) => sum + e.progress, 0) / enrollments.length)
     : 0
+  const certificatesIssued = certificates.filter((c) => c.status === 'issued').length
 
   const campuses = campusRecords.map((campus) => ({
     ...campus,
@@ -370,7 +378,7 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
       completionRate,
       pendingApprovals,
       upcomingLiveSessions: 0,
-      certificatesIssued: 0,
+      certificatesIssued,
     },
     kpiTrends: {
       totalStudents: sparklineFrom(students.length),
@@ -380,7 +388,7 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
       completionRate: sparklineFrom(completionRate),
       pendingApprovals: sparklineFrom(pendingApprovals),
       upcomingLiveSessions: [0],
-      certificatesIssued: [0],
+      certificatesIssued: sparklineFrom(certificatesIssued),
     },
     enrollmentTrend: [{ label: 'Now', totalStudents: students.length, activeStudents }],
     progressOverview: [
@@ -497,4 +505,97 @@ function recentActivityToAudit(
     })
   }
   return entries
+}
+
+// ─── Instructor Certificates ──────────────────────────────────────────────────
+
+/**
+ * Builds the certificate view rows for the instructor-scoped certificates page.
+ *
+ * Logic:
+ *   - Only enrollments in courses taught by this instructor are included.
+ *   - For each enrollment we join with CertificateRecord (if one exists).
+ *   - certStatus derivation:
+ *       'issued'      — a CertificateRecord with status='issued' exists
+ *       'pending'     — a CertificateRecord with status='pending' exists
+ *       'eligible'    — progress >= 80 and no certificate record yet
+ *       'not-eligible'— progress < 80 and no certificate record
+ */
+export function buildInstructorCertificates(instructor: PersonRow): InstructorCertificateRow[] {
+  const allCourses = readCourses()
+  const myCourses = allCourses.filter((c) =>
+    courseTeachesInstructor(c, instructor.id, instructor.name),
+  )
+  if (myCourses.length === 0) return []
+
+  const courseIds = new Set(myCourses.map((c) => c.id))
+  const people = readPeople()
+  const enrollments = readEnrollments().filter(
+    (e) => courseIds.has(e.courseId) && e.status === 'active',
+  )
+  const certificates = readCertificates()
+  const institutionName = readInstitutionName()
+
+  return enrollments.map((enrollment): InstructorCertificateRow => {
+    const person = people.find((p) => p.id === enrollment.studentId)
+    const course = myCourses.find((c) => c.id === enrollment.courseId)
+
+    // Find a certificate record for this student + course (not revoked)
+    const certRecord = certificates.find(
+      (c) =>
+        c.studentId === enrollment.studentId &&
+        c.courseId === enrollment.courseId &&
+        c.status !== 'revoked',
+    )
+
+    const progress = enrollment.progress
+    const gradeDisplay = progress > 0 ? `${progress}%` : '—'
+
+    let certStatus: InstructorCertificateRow['certStatus']
+    if (certRecord?.status === 'issued') {
+      certStatus = 'issued'
+    } else if (certRecord?.status === 'pending') {
+      certStatus = 'pending'
+    } else if (progress >= 80) {
+      certStatus = 'eligible'
+    } else {
+      certStatus = 'not-eligible'
+    }
+
+    const completionDateDisplay = certRecord?.completionDate
+      ? new Date(certRecord.completionDate).toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })
+      : progress >= 100
+        ? 'Completed'
+        : undefined
+
+    const issuedAtDisplay = certRecord?.issueDate
+      ? new Date(certRecord.issueDate).toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })
+      : undefined
+
+    return {
+      id: `${enrollment.studentId}-${enrollment.courseId}`,
+      studentId: enrollment.studentId,
+      studentName: person?.name ?? enrollment.studentName,
+      studentEmail: person?.email ?? '',
+      courseId: enrollment.courseId,
+      courseCode: course?.code ?? enrollment.courseCode,
+      courseTitle: course?.title ?? enrollment.courseTitle,
+      completionPercent: progress,
+      finalGrade: gradeDisplay,
+      completionDate: completionDateDisplay,
+      certStatus,
+      certificateId: certRecord?.certificateId,
+      issuedAt: issuedAtDisplay,
+      certRecordId: certRecord?.id,
+      institution: institutionName,
+    }
+  })
 }

@@ -1,5 +1,6 @@
 import type {
   CampusRecord,
+  CertificateRecord,
   CourseRecord,
   Department,
   PersonRow,
@@ -40,6 +41,10 @@ export function readPrograms(): ProgramRow[] {
 
 export function readEnrollments(): CourseEnrollment[] {
   return readJson<CourseEnrollment[]>(STORAGE_KEYS.enrollments, [])
+}
+
+export function readCertificates(): CertificateRecord[] {
+  return readJson<CertificateRecord[]>(STORAGE_KEYS.certificates, [])
 }
 
 export function readInstitutionName(): string {
