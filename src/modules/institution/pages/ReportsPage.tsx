@@ -10,7 +10,8 @@ import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalSt
 import { ReportCategoryCard } from '../components/ReportCategoryCard'
 import { GeneratedReportsList } from '../components/GeneratedReportsList'
 import { MiniBarChart } from '../components/MiniBarChart'
-import type { ReportCategory, GeneratedReport, TrendPoint } from '../types'
+import { readEnrollments, readPeople } from '../../../shared/storage/readers'
+import type { ReportCategory, GeneratedReport } from '../types'
 
 const STAT = 17
 
@@ -59,66 +60,6 @@ const categories: ReportCategory[] = [
   },
 ]
 
-const enrollmentTrend: TrendPoint[] = [
-  { label: 'Mar', value: 1720 },
-  { label: 'Apr', value: 1810 },
-  { label: 'May', value: 1890 },
-  { label: 'Jun', value: 1940 },
-  { label: 'Jul', value: 2005 },
-  { label: 'Aug', value: 2066 },
-]
-
-const completionTrend: TrendPoint[] = [
-  { label: 'CS', value: 94 },
-  { label: 'Bus', value: 88 },
-  { label: 'Eng', value: 81 },
-  { label: 'Soc', value: 76 },
-  { label: 'Cert', value: 92 },
-]
-
-const seedReports: GeneratedReport[] = [
-  {
-    id: 'g1',
-    name: 'Fall Semester Grade Distribution',
-    category: 'Academic Performance',
-    generatedOn: 'Aug 1, 2026',
-    format: 'PDF',
-    status: 'ready',
-  },
-  {
-    id: 'g2',
-    name: 'Monthly Attendance Summary — July',
-    category: 'Attendance',
-    generatedOn: 'Jul 31, 2026',
-    format: 'Excel',
-    status: 'ready',
-  },
-  {
-    id: 'g3',
-    name: 'Q2 Revenue Reconciliation',
-    category: 'Financial',
-    generatedOn: 'Jul 30, 2026',
-    format: 'Excel',
-    status: 'ready',
-  },
-  {
-    id: 'g4',
-    name: 'Learner Engagement Heatmap',
-    category: 'Engagement',
-    generatedOn: 'In progress',
-    format: 'CSV',
-    status: 'processing',
-  },
-  {
-    id: 'g5',
-    name: 'Weekly Audit Trail Export',
-    category: 'Compliance & Audit',
-    generatedOn: 'Scheduled · Aug 5',
-    format: 'PDF',
-    status: 'scheduled',
-  },
-]
-
 const categoryOptions = categories.map((c) => c.title)
 const formatOptions: GeneratedReport['format'][] = ['PDF', 'Excel', 'CSV']
 
@@ -140,7 +81,7 @@ export function ReportsPage() {
   const { notify } = useToast()
   const [reports, setReports] = useLocalStorageState<GeneratedReport[]>(
     'berana:reports',
-    seedReports,
+    [],
   )
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState(emptyForm)
@@ -183,6 +124,22 @@ export function ReportsPage() {
     notify(`Downloading “${report.name}” (${report.format})…`)
   }
 
+  const readyCount = reports.filter((r) => r.status === 'ready').length
+  const scheduledCount = reports.filter((r) => r.status === 'scheduled').length
+  const activeStudents = readPeople().filter((p) => p.role === 'Student' && p.status === 'active').length
+  const activeEnrollments = readEnrollments().filter((e) => e.status === 'active').length
+  const avgCompletion =
+    activeEnrollments > 0
+      ? Math.round(
+          readEnrollments()
+            .filter((e) => e.status === 'active')
+            .reduce((sum, e) => sum + e.progress, 0) / activeEnrollments,
+        )
+      : 0
+
+  const enrollmentTrend = [{ label: 'Now', value: activeStudents }]
+  const completionTrend = [{ label: 'Avg', value: avgCompletion }]
+
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
@@ -203,15 +160,14 @@ export function ReportsPage() {
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-        <StatBlock label="Reports Generated" value="1,284" sub="This year" icon={<FileText size={STAT} />} />
-        <StatBlock label="Scheduled" value="14" sub="Auto-delivery" icon={<Clock size={STAT} />} />
-        <StatBlock label="Avg. Completion" value="86%" icon={<CheckCircle2 size={STAT} />} />
+        <StatBlock label="Reports Generated" value={readyCount} sub="Ready to download" icon={<FileText size={STAT} />} />
+        <StatBlock label="Scheduled" value={scheduledCount} sub="Auto-delivery" icon={<Clock size={STAT} />} />
+        <StatBlock label="Avg. Completion" value={avgCompletion ? `${avgCompletion}%` : '—'} icon={<CheckCircle2 size={STAT} />} />
         <StatBlock
           label="Active Learners"
-          value="2,066"
-          sub="+3% vs last month"
+          value={activeStudents}
+          sub={`${activeEnrollments} enrollments`}
           icon={<TrendingUp size={STAT} />}
-          trend="up"
         />
       </div>
 

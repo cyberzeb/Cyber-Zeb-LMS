@@ -1,0 +1,31 @@
+/** Bump to reset all Berana localStorage (fresh demo). */
+export const STORAGE_VERSION = 2
+
+export const STORAGE_KEYS = {
+  version: 'berana:storage-version',
+  session: 'berana:session',
+  people: 'berana:people',
+  campuses: 'berana:campuses',
+  colleges: 'berana:colleges',
+  departments: 'berana:departments',
+  programs: 'berana:programs',
+  courses: 'berana:courses',
+  enrollments: 'berana:enrollments',
+  lessonProgress: 'berana:lesson-progress',
+  lessonResponses: 'berana:lesson-responses',
+  settings: 'berana:settings',
+  selectedCampus: 'berana:selectedCampus',
+  reports: 'berana:reports',
+  lmsActivity: 'berana:lms-activity',
+  studentSettings: 'berana:student-settings',
+  instructorSettings: 'berana:instructor-settings',
+} as const
+
+export const STORAGE_EVENTS = {
+  peopleUpdated: 'berana:people-updated',
+  coursesUpdated: 'berana:courses-updated',
+  enrollmentsUpdated: 'berana:enrollments-updated',
+  lessonProgressUpdated: 'berana:lesson-progress-updated',
+  lessonResponsesUpdated: 'berana:lesson-responses-updated',
+  orgUpdated: 'berana:org-updated',
+} as const
