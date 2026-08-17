@@ -9,19 +9,31 @@ export interface InstitutionEntity {
   subtitle: string
   status: 'active' | 'pending' | 'inactive'
   departmentsCount: number
-  programsCount: number
+  collegesCount: number
   studentsCount: number
   facultyCount: number
   completionRate: number
+}
+
+export interface College {
+  id: string
+  name: string
+  deanName: string
+  campusId: string
+  description?: string
 }
 
 export interface Department {
   id: string
   name: string
   headName: string
+  headId?: string
   studentsCount: number
   facultyCount: number
   icon: string
+  campusId: string
+  collegeId: string
+  description?: string
 }
 
 export interface Program {
@@ -47,10 +59,16 @@ export interface CalendarEvent {
   subtitle: string
 }
 
-export interface Campus {
+export interface CampusRecord {
   id: string
   name: string
+  code: string
+  address: string
+  subtitle: string
   status: 'active' | 'pending'
+}
+
+export interface Campus extends CampusRecord {
   deptCount: number
 }
 
@@ -66,6 +84,7 @@ export interface SetupStep {
   title: string
   subtitle: string
   done: boolean
+  href?: string
 }
 
 export interface SsoProvider {
@@ -75,7 +94,135 @@ export interface SsoProvider {
   status: 'connected' | 'enabled' | 'not-configured'
 }
 
+export interface EnrollmentTrendPoint {
+  label: string
+  totalStudents: number
+  activeStudents: number
+}
+
+export interface ProgressOverviewItem {
+  label: string
+  count: number
+  tone: 'success' | 'info' | 'warning' | 'danger'
+}
+
+export interface CoursePerformanceItem {
+  id: string
+  courseCode: string
+  title: string
+  instructor: string
+  enrolled: number
+  completionRate: number
+  status: 'healthy' | 'watch' | 'critical'
+}
+
+export interface AttentionItem {
+  id: string
+  title: string
+  subtitle: string
+  severity: 'low' | 'medium' | 'high'
+}
+
+export interface UpcomingClassItem {
+  id: string
+  title: string
+  course: string
+  instructor: string
+  date: string
+  time: string
+}
+
+export interface DeadlineItem {
+  id: string
+  title: string
+  course: string
+  dueIn: string
+  status: 'upcoming' | 'today' | 'overdue'
+}
+
+export interface ActivityItem {
+  id: string
+  text: string
+  timestamp: string
+  type: 'student' | 'course' | 'assessment' | 'announcement'
+}
+
+export interface AnnouncementItem {
+  id: string
+  title: string
+  body?: string
+  audience: string
+  postedAt: string
+  priority: 'normal' | 'important'
+  author?: string
+  authorRole?: 'admin' | 'instructor'
+  course?: string
+  views?: number
+}
+
+export interface HelpDeskTicket {
+  id: string
+  subject: string
+  requester: string
+  priority: 'low' | 'medium' | 'high'
+  status: 'open' | 'in-review' | 'resolved'
+  updatedAt: string
+}
+
+export interface AssignmentSubmission {
+  id: string
+  assignment: string
+  course: string
+  student: string
+  submittedAt: string
+  status: 'submitted' | 'late' | 'pending' | 'graded'
+}
+
+export interface IntegrationStatusItem {
+  id: string
+  name: string
+  status: 'connected' | 'warning' | 'disconnected'
+  lastSync: string
+}
+
 export interface InstitutionOverviewData {
+  institutionName: string
+  institutionSubtitle: string
+  kpis: {
+    totalStudents: number
+    activeStudents: number
+    activeCourses: number
+    instructors: number
+    completionRate: number
+    pendingApprovals: number
+    upcomingLiveSessions: number
+    certificatesIssued: number
+  }
+  kpiTrends: {
+    totalStudents: number[]
+    activeStudents: number[]
+    activeCourses: number[]
+    instructors: number[]
+    completionRate: number[]
+    pendingApprovals: number[]
+    upcomingLiveSessions: number[]
+    certificatesIssued: number[]
+  }
+  enrollmentTrend: EnrollmentTrendPoint[]
+  progressOverview: ProgressOverviewItem[]
+  coursePerformance: CoursePerformanceItem[]
+  pendingEnrollments: AttentionItem[]
+  learnersAtRisk: AttentionItem[]
+  overdueAssessments: AttentionItem[]
+  coursesRequiringAttention: AttentionItem[]
+  upcomingLiveClasses: UpcomingClassItem[]
+  upcomingDeadlines: DeadlineItem[]
+  recentActivity: ActivityItem[]
+  recentAnnouncements: AnnouncementItem[]
+  calendarEvents: CalendarEvent[]
+  helpDeskTickets: HelpDeskTicket[]
+  assignmentSubmissions: AssignmentSubmission[]
+  integrationStatus: IntegrationStatusItem[]
   statTotals: {
     campusCount: number
     activeCampusCount: number
@@ -90,4 +237,273 @@ export interface InstitutionOverviewData {
   ssoProviders: SsoProvider[]
   auditLogEntries: AuditLogEntry[]
 }
-
+
+/* ── Programs ─────────────────────────────────────────────── */
+export type ProgramLevel =
+  | 'Undergraduate'
+  | 'Postgraduate'
+  | 'Doctoral'
+  | 'Certificate'
+
+export interface ProgramRow {
+  id: string
+  code: string
+  name: string
+  level: ProgramLevel
+  department: string
+  campusId: string
+  duration: string
+  enrolledCount: number
+  courseCount: number
+  status: 'active' | 'draft' | 'archived'
+}
+
+/* ── Courses ──────────────────────────────────────────────── */
+export type CourseDeliveryMode = 'Self-paced' | 'Instructor-led' | 'Hybrid' | 'Live cohort'
+export type CourseResourceType = 'document' | 'video' | 'link' | 'slides' | 'worksheet' | 'other'
+export type CourseLessonType = 'video' | 'reading' | 'quiz' | 'assignment' | 'live-session'
+export type CourseVisibility = 'public' | 'private' | 'restricted'
+
+export interface CourseLessonQuestion {
+  id: string
+  prompt: string
+  type: 'multiple-choice' | 'short-answer'
+  options?: string[]
+  correctIndex?: number
+  sampleAnswer?: string
+  explanation?: string
+}
+
+export interface CourseLesson {
+  id: string
+  title: string
+  type: CourseLessonType
+  durationMinutes: number
+  description?: string
+  questions?: CourseLessonQuestion[]
+}
+
+export interface CourseModule {
+  id: string
+  title: string
+  description?: string
+  lessons: CourseLesson[]
+}
+
+export interface CourseVideo {
+  id: string
+  title: string
+  url: string
+  durationMinutes: number
+  moduleId?: string
+  description?: string
+}
+
+export interface CourseResource {
+  id: string
+  title: string
+  type: CourseResourceType
+  url: string
+  fileName?: string
+  description?: string
+}
+
+export interface CourseSummary {
+  id: string
+  code: string
+  title: string
+  instructor: string
+  instructorId?: string
+  department: string
+  level: string
+  enrolledCount: number
+  moduleCount: number
+  status: 'published' | 'draft' | 'archived'
+  progressPercent: number
+  icon: string
+  approvalStatus?: CourseApprovalStatus
+  submittedByInstructorId?: string
+  submittedByName?: string
+  submittedAt?: string
+  reviewedAt?: string
+  reviewNote?: string
+}
+
+export type CourseApprovalStatus = 'approved' | 'pending' | 'rejected'
+
+export interface CourseRecord extends CourseSummary {
+  shortDescription?: string
+  description?: string
+  credits?: number
+  durationWeeks?: number
+  deliveryMode?: CourseDeliveryMode
+  language?: string
+  prerequisites?: string
+  learningOutcomes?: string
+  tags?: string[]
+  modules?: CourseModule[]
+  videos?: CourseVideo[]
+  resources?: CourseResource[]
+  thumbnailUrl?: string
+  syllabusUrl?: string
+  maxEnrollment?: number
+  allowSelfEnrollment?: boolean
+  certificateEnabled?: boolean
+  discussionForumEnabled?: boolean
+  gradingPolicy?: string
+  visibility?: CourseVisibility
+  startDate?: string
+  endDate?: string
+}
+
+export type CourseCreateInput = Omit<
+  CourseRecord,
+  | 'id'
+  | 'enrolledCount'
+  | 'moduleCount'
+  | 'progressPercent'
+  | 'instructor'
+  | 'instructorId'
+  | 'department'
+  | 'icon'
+> & {
+  department?: string
+  instructorId?: string
+}
+
+/* ── Certificates ─────────────────────────────────────────── */
+export type CertificateStatus = 'issued' | 'pending' | 'revoked'
+
+export interface CertificateTemplate {
+  id: string
+  name: string
+}
+
+export interface CertificateRecord {
+  id: string
+  certificateId: string
+  studentId: string
+  studentName: string
+  courseId: string
+  courseCode: string
+  courseTitle: string
+  instructorId?: string
+  instructorName: string
+  department: string
+  campusId: string
+  completionDate?: string
+  issueDate?: string
+  expirationDate?: string
+  templateId: string
+  templateName: string
+  status: CertificateStatus
+  revokedAt?: string
+}
+
+/* ── Enrollments ──────────────────────────────────────────── */
+export interface CourseEnrollment {
+  id: string
+  studentId: string
+  studentName: string
+  courseId: string
+  courseCode: string
+  courseTitle: string
+  program?: string
+  campus?: string
+  enrolledOn: string
+  status: 'active' | 'pending' | 'withdrawn'
+  progress: number
+}
+
+/* ── People ───────────────────────────────────────────────── */
+export type PersonRole =
+  | 'Student'
+  | 'Instructor'
+  | 'Admin'
+  | 'Guardian'
+  | 'Staff'
+
+export interface PersonRow {
+  id: string
+  name: string
+  email: string
+  role: PersonRole
+  department: string
+  campusId?: string
+  isDepartmentHead?: boolean
+  verificationStatus?: 'verified' | 'pending' | 'rejected'
+  addedByRole?: 'Admin' | 'Staff'
+  submittedAt?: string
+  submittedByName?: string
+  status: 'active' | 'invited' | 'suspended'
+  lastActive: string
+  initials: string
+}
+
+/* ── Reports ──────────────────────────────────────────────── */
+export interface ReportCategory {
+  id: string
+  title: string
+  description: string
+  icon: string
+  reportCount: number
+}
+
+export interface GeneratedReport {
+  id: string
+  name: string
+  category: string
+  generatedOn: string
+  format: 'PDF' | 'Excel' | 'CSV'
+  status: 'ready' | 'processing' | 'scheduled'
+}
+
+export interface TrendPoint {
+  label: string
+  value: number
+}
+
+
+/* ── Attendance ───────────────────────────────────────────── */
+
+export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused'
+export type AttendanceRiskLevel = 'good' | 'warning' | 'at-risk'
+
+export interface AttendanceSession {
+  /** ISO date, e.g. "2025-08-14" */
+  date: string
+  status: AttendanceStatus
+  note?: string
+}
+
+export interface AttendanceRecord {
+  id: string
+  studentId: string
+  studentName: string
+  studentEmail: string
+  courseId: string
+  courseCode: string
+  courseTitle: string
+  instructorId: string
+  instructorName: string
+  department: string
+  campusId: string
+  /** 0–100 */
+  attendancePercent: number
+  present: number
+  absent: number
+  late: number
+  excused: number
+  totalSessions: number
+  riskLevel: AttendanceRiskLevel
+  lastSessionDate?: string
+  history: AttendanceSession[]
+}
+
+export interface AttendanceSummary {
+  overallRate: number
+  presentToday: number
+  absentToday: number
+  lateToday: number
+  atRisk: number
+}
