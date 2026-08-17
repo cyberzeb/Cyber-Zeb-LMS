@@ -16,7 +16,28 @@ import {
 } from './readers'
 import { courseTeachesInstructor, instructorTeachingSummary } from '../../modules/institution/utils/courseAssignmentUtils'
 import { getEnrollmentProgressPercent } from '../../modules/students/utils/studentLearningProgress'
-import { readAnnouncements } from './readers'
+import {
+  readAnnouncements,
+  readAssignmentRecords,
+  readLiveSessions,
+  readQuizRecords,
+  readStudentSubmissions,
+} from './readers'
+import {
+  computeStudentAssessmentStats,
+  countUpcomingLiveSessions,
+  toAdminAssignmentSubmissions,
+  toInstructorAssignments,
+  toInstructorLiveClasses,
+  toInstructorQuizzes,
+  toInstructorUpcomingTasks,
+  toStudentAssignments,
+  toStudentLiveClasses,
+  toStudentQuizzes,
+  toStudentUpcomingDeadlines,
+  toUpcomingDeadlines,
+  toUpcomingLiveClasses,
+} from './assessmentUtils'
 import {
   filterAnnouncementsForInstructorFeed,
   filterAnnouncementsForStudent,
@@ -165,29 +186,98 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
     .filter((c) => c.studentId === student.id && c.status !== 'revoked')
     .map(certificateToStudentItem)
 
+  const liveSessions = readLiveSessions()
+  const assignments = readAssignmentRecords()
+  const quizzes = readQuizRecords()
+  const submissions = readStudentSubmissions()
+
+  const liveClasses = toStudentLiveClasses(liveSessions, student.id)
+  const studentQuizzes = toStudentQuizzes(quizzes, submissions, student.id)
+  const studentAssignments = toStudentAssignments(assignments, submissions, student.id)
+  const upcomingDeadlines = toStudentUpcomingDeadlines(
+    assignments,
+    quizzes,
+    submissions,
+    student.id,
+  )
+  const assessmentStats = computeStudentAssessmentStats(
+    studentQuizzes,
+    studentAssignments,
+    liveClasses,
+  )
+
   return {
     ...base,
     courses,
+    liveClasses,
+    quizzes: studentQuizzes,
+    assignments: studentAssignments,
+    upcomingDeadlines,
     announcements: toStudentAnnouncementItems(announcementRecords),
     certificates: studentCertificates,
     standing: `${activeCount} active course${activeCount === 1 ? '' : 's'}`,
-    kpis: { ...base.kpis, activeCourses: activeCount },
-    stats: base.stats.map((s) =>
-      s.label === 'Active Courses'
-        ? { ...s, value: String(activeCount), detail: `${courses.length} enrolled` }
-        : s,
-    ),
+    kpis: {
+      ...base.kpis,
+      activeCourses: activeCount,
+      avgQuizScore: assessmentStats.avgQuizScore,
+      dueThisWeek: assessmentStats.dueThisWeek,
+      upcomingSessions: assessmentStats.upcomingSessions,
+      assignmentsCompleted: assessmentStats.assignmentsCompleted,
+    },
+    stats: base.stats.map((s) => {
+      if (s.label === 'Active Courses') {
+        return { ...s, value: String(activeCount), detail: `${courses.length} enrolled` }
+      }
+      if (s.label === 'Due This Week') {
+        return {
+          ...s,
+          value: String(assessmentStats.dueThisWeek),
+          detail: assessmentStats.dueThisWeek === 1 ? '1 deadline' : `${assessmentStats.dueThisWeek} deadlines`,
+        }
+      }
+      if (s.label === 'Avg. Quiz Score') {
+        return {
+          ...s,
+          value: assessmentStats.avgQuizScore > 0 ? `${assessmentStats.avgQuizScore}%` : '—',
+          detail: assessmentStats.avgQuizScore > 0 ? 'From completed quizzes' : 'No quizzes yet',
+        }
+      }
+      return s
+    }),
     progressOverview: [
-      { label: 'In Progress', count: activeCount, tone: 'info' },
-      { label: 'Completed', count: 0, tone: 'success' },
-      { label: 'Due Soon', count: 0, tone: 'warning' },
-      { label: 'Overdue', count: 0, tone: 'danger' },
+      {
+        label: 'In Progress',
+        count: studentAssignments.filter((a) => a.status === 'Ready to submit').length,
+        tone: 'info' as const,
+      },
+      {
+        label: 'Completed',
+        count: studentAssignments.filter((a) => a.status !== 'Ready to submit').length,
+        tone: 'success' as const,
+      },
+      {
+        label: 'Due Soon',
+        count: upcomingDeadlines.filter((d) => d.status === 'upcoming' || d.status === 'today').length,
+        tone: 'warning' as const,
+      },
+      {
+        label: 'Overdue',
+        count: upcomingDeadlines.filter((d) => d.status === 'overdue').length,
+        tone: 'danger' as const,
+      },
     ],
-    recentActivity: courses.slice(0, 3).map((c, i) => ({
-      id: `act-${i}`,
-      text: `Enrolled in ${c.code} — ${c.title}`,
-      timestamp: 'From admin enrollments',
-    })),
+    recentActivity: [
+      ...studentAssignments.slice(0, 2).map((a, i) => ({
+        id: `asg-act-${i}`,
+        text: `Assignment “${a.title}” — ${a.status}`,
+        timestamp: a.dueAt,
+      })),
+      ...courses.slice(0, 2).map((c, i) => ({
+        id: `act-${i}`,
+        text: `Enrolled in ${c.code} — ${c.title}`,
+        timestamp: 'From admin enrollments',
+      })),
+    ],
   }
 }
 
@@ -302,7 +392,6 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
     })
 
   const activeCourses = teachingCourses.filter((c) => c.status === 'active').length
-  const pendingApproval = myCourses.filter((c) => c.approvalStatus === 'pending').length
   const teachingSummary = instructorTeachingSummary(
     allCourses,
     instructor.id,
@@ -317,6 +406,40 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
     teachingCourseIds,
   )
 
+  const liveSessions = readLiveSessions()
+  const assignments = readAssignmentRecords()
+  const quizzes = readQuizRecords()
+  const submissions = readStudentSubmissions()
+
+  const liveClasses = toInstructorLiveClasses(
+    liveSessions,
+    instructor.id,
+    instructor.name,
+  )
+  const instructorQuizzes = toInstructorQuizzes(
+    quizzes,
+    submissions,
+    instructor.id,
+    instructor.name,
+  )
+  const instructorAssignments = toInstructorAssignments(
+    assignments,
+    submissions,
+    instructor.id,
+    instructor.name,
+  )
+  const pendingGrading = instructorAssignments.reduce(
+    (sum, a) => sum + a.pendingCount,
+    0,
+  )
+  const assessmentTasks = toInstructorUpcomingTasks(
+    assignments,
+    quizzes,
+    liveSessions,
+    instructor.id,
+    instructor.name,
+  )
+
   return {
     ...base,
     department: teachingSummary.label,
@@ -326,6 +449,9 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
         : 'No courses assigned yet',
     courses: teachingCourses,
     students,
+    liveClasses,
+    quizzes: instructorQuizzes,
+    assignments: instructorAssignments,
     announcements: toInstructorAnnouncementItems(
       announcementRecords,
       instructor.id,
@@ -334,30 +460,64 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
       ...base.kpis,
       activeCourses,
       totalStudents: students.length,
-      pendingGrading: pendingApproval,
+      pendingGrading,
+      ungradedSubmissions: pendingGrading,
+      upcomingSessions: liveClasses.filter((s) => s.status === 'upcoming').length,
     },
-    upcomingTasks: myCourses
-      .filter((c) => c.approvalStatus === 'pending')
-      .map((c) => ({
-        id: c.id,
-        title: `Awaiting approval: ${c.title}`,
-        course: c.code,
-        dueIn: c.submittedAt ?? 'Pending',
-        status: 'upcoming' as const,
-        type: 'announcement' as const,
+    workloadOverview: [
+      {
+        label: 'Graded',
+        count: instructorAssignments.filter((a) => a.status === 'Graded').length,
+        tone: 'success' as const,
+      },
+      {
+        label: 'Pending review',
+        count: pendingGrading,
+        tone: 'warning' as const,
+      },
+      {
+        label: 'Upcoming deadlines',
+        count: assessmentTasks.filter((t) => t.type !== 'session').length,
+        tone: 'info' as const,
+      },
+      {
+        label: 'Overdue grading',
+        count: instructorAssignments.filter((a) => a.pendingCount > 0).length,
+        tone: 'danger' as const,
+      },
+    ],
+    upcomingTasks: [
+      ...assessmentTasks,
+      ...myCourses
+        .filter((c) => c.approvalStatus === 'pending')
+        .map((c) => ({
+          id: c.id,
+          title: `Awaiting approval: ${c.title}`,
+          course: c.code,
+          dueIn: c.submittedAt ?? 'Pending',
+          status: 'upcoming' as const,
+          type: 'announcement' as const,
+        })),
+    ],
+    recentActivity: [
+      ...instructorAssignments.slice(0, 2).map((a, i) => ({
+        id: `asg-act-${i}`,
+        text: `${a.pendingCount} submission${a.pendingCount === 1 ? '' : 's'} pending for “${a.title}”`,
+        timestamp: a.dueAt,
       })),
-    recentActivity: myCourses.slice(0, 4).map((c, i) => ({
-      id: `act-${i}`,
-      text:
-        c.approvalStatus === 'pending'
-          ? `Course proposal “${c.title}” pending admin approval.`
-          : `Teaching ${c.code} — ${
-              enrollments.filter(
-                (e) => e.courseId === c.id && e.status === 'active',
-              ).length
-            } students enrolled.`,
-      timestamp: c.submittedAt ?? 'Active',
-    })),
+      ...myCourses.slice(0, 2).map((c, i) => ({
+        id: `act-${i}`,
+        text:
+          c.approvalStatus === 'pending'
+            ? `Course proposal “${c.title}” pending admin approval.`
+            : `Teaching ${c.code} — ${
+                enrollments.filter(
+                  (e) => e.courseId === c.id && e.status === 'active',
+                ).length
+              } students enrolled.`,
+        timestamp: c.submittedAt ?? 'Active',
+      })),
+    ],
   }
 }
 
@@ -444,6 +604,12 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
 
   const setupDone = setupSteps.filter((s) => s.done).length
 
+  const liveSessions = readLiveSessions()
+  const assignments = readAssignmentRecords()
+  const quizzes = readQuizRecords()
+  const submissions = readStudentSubmissions()
+  const upcomingLiveCount = countUpcomingLiveSessions(liveSessions)
+
   return {
     institutionName: readInstitutionName(),
     institutionSubtitle:
@@ -461,7 +627,7 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
       instructors: instructors.length,
       completionRate,
       pendingApprovals,
-      upcomingLiveSessions: 0,
+      upcomingLiveSessions: upcomingLiveCount,
       certificatesIssued,
     },
     kpiTrends: {
@@ -471,7 +637,7 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
       instructors: sparklineFrom(instructors.length),
       completionRate: sparklineFrom(completionRate),
       pendingApprovals: sparklineFrom(pendingApprovals),
-      upcomingLiveSessions: [0],
+      upcomingLiveSessions: sparklineFrom(upcomingLiveCount),
       certificatesIssued: sparklineFrom(certificatesIssued),
     },
     enrollmentTrend: [
@@ -537,8 +703,8 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
         subtitle: `Proposed by ${c.submittedByName ?? c.instructor}`,
         severity: 'high' as const,
       })),
-    upcomingLiveClasses: [],
-    upcomingDeadlines: [],
+    upcomingLiveClasses: toUpcomingLiveClasses(liveSessions),
+    upcomingDeadlines: toUpcomingDeadlines(assignments, quizzes),
     recentActivity: [
       ...people.slice(-3).map((p, i) => ({
         id: `person-${i}`,
@@ -560,7 +726,7 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
     ).slice(0, 5),
     calendarEvents: [],
     helpDeskTickets: [],
-    assignmentSubmissions: [],
+    assignmentSubmissions: toAdminAssignmentSubmissions(assignments, submissions),
     integrationStatus: [],
     statTotals: {
       campusCount: campusRecords.length,

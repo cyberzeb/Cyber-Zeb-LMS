@@ -16,6 +16,10 @@ import { VerifyPeoplePage } from '../modules/institution/pages/VerifyPeoplePage'
 import { EnrollmentsPage } from '../modules/institution/pages/EnrollmentsPage'
 import { CertificatesPage } from '../modules/institution/pages/CertificatesPage'
 import { AttendanceAdminPage } from '../modules/institution/pages/AttendanceAdminPage'
+import { LiveClassesAdminPage } from '../modules/institution/pages/LiveClassesAdminPage'
+import { AssignmentsAdminPage } from '../modules/institution/pages/AssignmentsAdminPage'
+import { QuizzesExamsAdminPage } from '../modules/institution/pages/QuizzesExamsAdminPage'
+import { QuestionBankAdminPage } from '../modules/institution/pages/QuestionBankAdminPage'
 import { ReportsPage } from '../modules/institution/pages/ReportsPage'
 import { AdminAnnouncementsPage } from '../modules/institution/pages/AdminAnnouncementsPage'
 import { AdminDiscussionForumPage } from '../modules/institution/pages/AdminDiscussionForumPage'
@@ -253,19 +257,19 @@ export const router = createBrowserRouter([
       },
       {
         path: 'live-classes',
-        element: <CoursesPage />,
+        element: <LiveClassesAdminPage />,
       },
       {
         path: 'assignments',
-        element: <CoursesPage />,
+        element: <AssignmentsAdminPage />,
       },
       {
         path: 'quizzes-exams',
-        element: <CoursesPage />,
+        element: <QuizzesExamsAdminPage />,
       },
       {
         path: 'question-bank',
-        element: <CoursesPage />,
+        element: <QuestionBankAdminPage />,
       },
       {
         path: 'students',

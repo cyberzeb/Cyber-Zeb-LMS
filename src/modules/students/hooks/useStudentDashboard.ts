@@ -13,6 +13,11 @@ const RELOAD_KEYS = new Set<string>([
   STORAGE_KEYS.session,
   STORAGE_KEYS.announcements,
   STORAGE_KEYS.certificates,
+  STORAGE_KEYS.liveSessions,
+  STORAGE_KEYS.assignments,
+  STORAGE_KEYS.quizzes,
+  STORAGE_KEYS.questionBank,
+  STORAGE_KEYS.studentSubmissions,
 ])
 
 export function useStudentDashboard() {
@@ -57,6 +62,7 @@ export function useStudentDashboard() {
     window.addEventListener(STORAGE_EVENTS.lessonProgressUpdated, onCustom)
     window.addEventListener(STORAGE_EVENTS.announcementsUpdated, onCustom)
     window.addEventListener(STORAGE_EVENTS.certificatesUpdated, onCustom)
+    window.addEventListener(STORAGE_EVENTS.assessmentsUpdated, onCustom)
     document.addEventListener('visibilitychange', onVisible)
     return () => {
       window.removeEventListener('storage', onStorage)
@@ -66,6 +72,7 @@ export function useStudentDashboard() {
       window.removeEventListener(STORAGE_EVENTS.lessonProgressUpdated, onCustom)
       window.removeEventListener(STORAGE_EVENTS.announcementsUpdated, onCustom)
       window.removeEventListener(STORAGE_EVENTS.certificatesUpdated, onCustom)
+      window.removeEventListener(STORAGE_EVENTS.assessmentsUpdated, onCustom)
       document.removeEventListener('visibilitychange', onVisible)
     }
   }, [reload])
