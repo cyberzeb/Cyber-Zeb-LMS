@@ -1,99 +1,348 @@
 import { Sidebar } from '../shared/layout/Sidebar'
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import { AdminTopHeader } from '../shared/layout/AdminTopHeader'
+import { AdminFooter } from '../shared/layout/AdminFooter'
+import { Outlet, useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import brandLogo from '../assets/Logo.jpg'
+import { CampusProvider, useCampusContext } from '../modules/institution/context/CampusContext'
+import { readPeopleFromStorage } from '../modules/institution/hooks/usePeople'
+import {
+  countPendingVerifications,
+  PEOPLE_UPDATED_EVENT,
+} from '../modules/institution/utils/peopleVerification'
+import {
+  BookCheck,
+  LayoutDashboard,
+  BookOpen,
+  CalendarDays,
+  ClipboardList,
+  FileText,
+  GraduationCap,
+  Headset,
+  Library,
+  Megaphone,
+  MonitorPlay,
+  Network,
+  Puzzle,
+  Settings,
+  ShieldQuestion,
+  SquarePen,
+  UserRoundCheck,
+  UserRoundCog,
+  Users,
+  Wallet,
+  Briefcase,
+  HeartHandshake,
+  Shield,
+  ShieldCheck,
+  UserCog,
+} from 'lucide-react'
+
+const ICON_SIZE = 17
+
+const breadcrumbLabels: Record<string, string> = {
+  '/admin': 'Dashboard',
+  '/admin/institution/overview': 'Dashboard',
+  '/admin/institution/dashboard': 'Dashboard',
+  '/admin/courses': 'Courses',
+  '/admin/institution/programs': 'Learning Paths',
+  '/admin/institution/structure': 'Organization',
+  '/admin/institution/profile': 'Campus Profile',
+  '/admin/students': 'Students',
+  '/admin/instructors': 'Instructors',
+  '/admin/staff': 'Staff',
+  '/admin/guardians': 'Guardians',
+  '/admin/admins': 'Administrators',
+  '/admin/verify-people': 'Verify People',
+  '/admin/people': 'People & Users',
+  '/admin/institution/departments': 'Departments',
+  '/admin/enrollments': 'Enrollments',
+  '/admin/live-classes': 'Live Classes',
+  '/admin/assignments': 'Assignments',
+  '/admin/quizzes-exams': 'Quizzes & Exams',
+  '/admin/question-bank': 'Question Bank',
+  '/admin/certificates': 'Certificates',
+  '/admin/attendance': 'Attendance',
+  '/admin/announcements': 'Announcements',
+  '/admin/discussion-forum': 'Discussion Forum',
+  '/admin/resources': 'Library / Resources',
+  '/admin/calendar': 'Calendar',
+  '/admin/payments': 'Payments',
+  '/admin/reports': 'Reports & Analytics',
+  '/admin/api-integrations': 'API Integrations',
+  '/admin/help-desk': 'Help Desk',
+  '/admin/settings': 'Settings',
+}
 
 export function InstitutionAdminLayout() {
+  return (
+    <CampusProvider>
+      <InstitutionAdminShell />
+    </CampusProvider>
+  )
+}
+
+function InstitutionAdminShell() {
   const location = useLocation()
-  const navigate = useNavigate()
+  const path = location.pathname
+  const {
+    campuses,
+    selectedCampusId,
+    setSelectedCampusId,
+    institutionName,
+  } = useCampusContext()
+  const [pendingVerifications, setPendingVerifications] = useState(0)
 
-  const isOverviewActive = location.pathname === '/admin/institution/overview'
-  const isCampusesActive = location.pathname === '/admin' || location.pathname === '/admin/'
-
-  const linkItem = (text: string, to: string) => {
-    const element = (
-      <Link to={to} className="flex-1 text-inherit">
-        {text}
-      </Link>
-    )
-    const elementProps = element as unknown as {
-      $$typeof: unknown
-      type: unknown
-      props: unknown
-      ref: unknown
-      _owner: unknown
-      _store: unknown
+  useEffect(() => {
+    const refresh = () => {
+      setPendingVerifications(countPendingVerifications(readPeopleFromStorage()))
     }
-    return {
-      $$typeof: elementProps.$$typeof,
-      type: elementProps.type,
-      props: elementProps.props,
-      key: text,
-      ref: elementProps.ref,
-      _owner: elementProps._owner,
-      _store: elementProps._store,
-      toString: () => text,
-    } as unknown as string
-  }
+    refresh()
+    window.addEventListener(PEOPLE_UPDATED_EVENT, refresh)
+    return () => window.removeEventListener(PEOPLE_UPDATED_EVENT, refresh)
+  }, [path])
+
+  const isActive = (routes: string[]) => routes.some((route) => path === route)
 
   const navSections = [
     {
-      title: 'Institution',
+      title: 'Main',
       items: [
-        { label: linkItem('Overview', '/admin/institution/overview'), active: isOverviewActive },
-        { label: linkItem('Campuses & Colleges', '/admin'), active: isCampusesActive },
-        { label: 'Departments' },
-        { label: 'Programs' },
+        {
+          label: 'Dashboard',
+          to: '/admin/institution/overview',
+          active: isActive(['/admin', '/admin/institution/overview', '/admin/institution/dashboard']),
+          icon: <LayoutDashboard size={ICON_SIZE} />,
+        },
+        {
+          label: 'Organization',
+          to: '/admin/institution/structure',
+          active: isActive(['/admin/institution/structure', '/admin/institution/profile']),
+          icon: <Network size={ICON_SIZE} />,
+        },
       ],
     },
     {
-      title: 'Platform',
+      title: 'Academic',
       items: [
-        { label: 'Courses' },
-        { label: 'People' },
-        { label: linkItem('Service Requests', '/admin/leads') },
-        { label: 'Reports' },
-        { label: 'Settings' },
+        {
+          label: 'Departments',
+          to: '/admin/institution/departments',
+          active: isActive(['/admin/institution/departments']),
+          icon: <UserCog size={ICON_SIZE} />,
+        },
+        {
+          label: 'Courses',
+          to: '/admin/courses',
+          active: isActive(['/admin/courses']),
+          icon: <BookOpen size={ICON_SIZE} />,
+        },
+        {
+          label: 'Live Classes',
+          to: '/admin/live-classes',
+          active: isActive(['/admin/live-classes']),
+          icon: <MonitorPlay size={ICON_SIZE} />,
+        },
+        {
+          label: 'Assignments',
+          to: '/admin/assignments',
+          active: isActive(['/admin/assignments']),
+          icon: <SquarePen size={ICON_SIZE} />,
+        },
+        {
+          label: 'Quizzes & Exams',
+          to: '/admin/quizzes-exams',
+          active: isActive(['/admin/quizzes-exams']),
+          icon: <ClipboardList size={ICON_SIZE} />,
+        },
+        {
+          label: 'Question Bank',
+          to: '/admin/question-bank',
+          active: isActive(['/admin/question-bank']),
+          icon: <ShieldQuestion size={ICON_SIZE} />,
+        },
+      ],
+    },
+    {
+      title: 'People',
+      items: [
+        {
+          label: 'Students',
+          to: '/admin/students',
+          active: isActive(['/admin/students']),
+          icon: <GraduationCap size={ICON_SIZE} />,
+        },
+        {
+          label: 'Instructors',
+          to: '/admin/instructors',
+          active: isActive(['/admin/instructors']),
+          icon: <UserRoundCog size={ICON_SIZE} />,
+        },
+        {
+          label: 'Staff',
+          to: '/admin/staff',
+          active: isActive(['/admin/staff']),
+          icon: <Briefcase size={ICON_SIZE} />,
+        },
+        {
+          label: 'Guardians',
+          to: '/admin/guardians',
+          active: isActive(['/admin/guardians']),
+          icon: <HeartHandshake size={ICON_SIZE} />,
+        },
+        {
+          label: 'Administrators',
+          to: '/admin/admins',
+          active: isActive(['/admin/admins']),
+          icon: <Shield size={ICON_SIZE} />,
+        },
+        {
+          label: 'Verify People',
+          to: '/admin/verify-people',
+          active: isActive(['/admin/verify-people']),
+          icon: <ShieldCheck size={ICON_SIZE} />,
+          badge: pendingVerifications,
+        },
+        {
+          label: 'All People',
+          to: '/admin/people',
+          active: isActive(['/admin/people']),
+          icon: <Users size={ICON_SIZE} />,
+        },
+        {
+          label: 'Enrollments',
+          to: '/admin/enrollments',
+          active: isActive(['/admin/enrollments']),
+          icon: <UserRoundCheck size={ICON_SIZE} />,
+        },
+      ],
+    },
+    {
+      title: 'Engagement',
+      items: [
+        {
+          label: 'Certificates',
+          to: '/admin/certificates',
+          active: isActive(['/admin/certificates']),
+          icon: <BookCheck size={ICON_SIZE} />,
+        },
+        {
+          label: 'Attendance',
+          to: '/admin/attendance',
+          active: isActive(['/admin/attendance']),
+          icon: <UserRoundCheck size={ICON_SIZE} />,
+        },
+        {
+          label: 'Announcements',
+          to: '/admin/announcements',
+          active: isActive(['/admin/announcements']),
+          icon: <Megaphone size={ICON_SIZE} />,
+        },
+        {
+          label: 'Discussion Forum',
+          to: '/admin/discussion-forum',
+          active: isActive(['/admin/discussion-forum']),
+          icon: <Users size={ICON_SIZE} />,
+        },
+      ],
+    },
+    {
+      title: 'Resources',
+      items: [
+        {
+          label: 'Library / Resources',
+          to: '/admin/resources',
+          active: isActive(['/admin/resources']),
+          icon: <Library size={ICON_SIZE} />,
+        },
+        {
+          label: 'Calendar',
+          to: '/admin/calendar',
+          active: isActive(['/admin/calendar']),
+          icon: <CalendarDays size={ICON_SIZE} />,
+        },
+      ],
+    },
+    {
+      title: 'Administration',
+      items: [
+        {
+          label: 'Payments',
+          to: '/admin/payments',
+          active: isActive(['/admin/payments']),
+          icon: <Wallet size={ICON_SIZE} />,
+        },
+        {
+          label: 'Reports & Analytics',
+          to: '/admin/reports',
+          active: isActive(['/admin/reports']),
+          icon: <FileText size={ICON_SIZE} />,
+        },
+        {
+          label: 'API Integrations',
+          to: '/admin/api-integrations',
+          active: isActive(['/admin/api-integrations']),
+          icon: <Puzzle size={ICON_SIZE} />,
+        },
+        {
+          label: 'Help Desk',
+          to: '/admin/help-desk',
+          active: isActive(['/admin/help-desk']),
+          icon: <Headset size={ICON_SIZE} />,
+        },
+        {
+          label: 'Settings',
+          to: '/admin/settings',
+          active: isActive(['/admin/settings']),
+          icon: <Settings size={ICON_SIZE} />,
+        },
       ],
     },
   ]
 
-  return (
-    <div
-      className="flex min-h-screen bg-canvas font-sans overflow-hidden"
-      onClick={(e) => {
-        const target = e.target as HTMLElement
-        const link = target.closest('a')
-        if (link) return
+  const breadcrumb =
+    breadcrumbLabels[path] ??
+    (path.startsWith('/admin/institution/profile') ? 'Campus Profile' : '')
 
-        const sidebarItem = target.closest('.cursor-pointer')
-        if (sidebarItem) {
-          const text = sidebarItem.textContent?.trim()
-          if (text === 'Overview') {
-            navigate('/admin/institution/overview')
-          } else if (text === 'Campuses & Colleges') {
-            navigate('/admin')
-          } else if (text === 'Service Requests') {
-            navigate('/admin/leads')
-          }
-        }
-      }}
-    >
-      {/* Left Sidebar */}
+  const isForumPage = path === '/admin/discussion-forum'
+
+  return (
+    <div className="flex h-screen app-shell-bg font-sans overflow-hidden">
       <Sidebar
         sections={navSections}
-        userName="Abel Tesfaye"
-        userRole="Campus Director"
+        brandLogoSrc={brandLogo}
+        brandName="Brana LMS"
+        brandSubtitle="Cyber-Zeb"
       />
 
-      {/* Right Scrollable Content Area */}
-      <main className="flex-1 h-screen overflow-y-auto flex flex-col p-6 md:p-8 gap-6 md:gap-8">
-        {/* Breadcrumb line */}
-        <div className="text-[12px] text-secondary-text font-medium tracking-wide">
-          Berana University &middot; Campuses &amp; Colleges &middot; Main Campus
-        </div>
+      <div className="flex flex-col flex-1 min-w-0">
+        <AdminTopHeader
+          userName="Abel Tesfaye"
+          userRole="Institution Admin"
+          institutionName={institutionName}
+          breadcrumb={breadcrumb}
+          campuses={campuses}
+          selectedCampusId={selectedCampusId}
+          onCampusChange={setSelectedCampusId}
+        />
 
-        {/* Dynamic page content */}
-        <Outlet />
-      </main>
+        <main
+          className={`page-content flex-1 min-h-0 ${
+            isForumPage
+              ? 'overflow-hidden flex flex-col p-0'
+              : 'app-scroll overflow-y-auto p-5 md:p-6'
+          }`}
+        >
+          <div
+            key={path}
+            className={isForumPage ? 'flex-1 min-h-0 flex flex-col' : 'animate-fade-in-up'}
+          >
+            <Outlet />
+          </div>
+        </main>
+
+        <AdminFooter />
+      </div>
     </div>
   )
 }

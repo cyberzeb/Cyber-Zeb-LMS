@@ -1,12 +1,14 @@
+import { Check } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import type { SetupStep } from '../types'
 
 interface SetupProgressCardProps {
   steps: SetupStep[]
   percent: number
+  onStepClick?: (step: SetupStep) => void
 }
 
-export function SetupProgressCard({ steps, percent }: SetupProgressCardProps) {
+export function SetupProgressCard({ steps, percent, onStepClick }: SetupProgressCardProps) {
   return (
     <GlassCard className="p-6 h-full flex flex-col justify-between">
       <div>
@@ -26,10 +28,18 @@ export function SetupProgressCard({ steps, percent }: SetupProgressCardProps) {
         {/* Steps list */}
         <div className="flex flex-col gap-4">
           {steps.map((step) => (
-            <div key={step.id} className="flex items-start gap-3 pb-3 border-b border-divider/40 last:border-0 last:pb-0">
+            <button
+              key={step.id}
+              type="button"
+              onClick={() => onStepClick?.(step)}
+              disabled={!onStepClick}
+              className={`flex items-start gap-3 pb-3 border-b border-divider/40 last:border-0 last:pb-0 text-left w-full bg-transparent border-x-0 border-t-0 p-0 ${
+                onStepClick ? 'cursor-pointer hover:opacity-90' : 'cursor-default'
+              }`}
+            >
               {step.done ? (
-                <div className="w-5 h-5 rounded-full bg-lemon-500 flex items-center justify-center text-[10px] text-navy-900 shrink-0 font-extrabold">
-                  ✓
+                <div className="w-5 h-5 rounded-full bg-lemon-500 flex items-center justify-center text-navy-900 shrink-0">
+                  <Check size={12} strokeWidth={3.5} />
                 </div>
               ) : (
                 <div className="w-5 h-5 rounded-full border border-secondary-text/40 flex items-center justify-center shrink-0" />
@@ -42,7 +52,7 @@ export function SetupProgressCard({ steps, percent }: SetupProgressCardProps) {
                   {step.subtitle}
                 </p>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>

@@ -1,0 +1,232 @@
+import { useMemo, useState } from 'react'
+import { BrainCircuit, Plus, Trash2 } from 'lucide-react'
+import { Button } from '../../../shared/components/Button'
+import { FilterTabs } from '../../../shared/components/FilterTabs'
+import { FormField } from '../../../shared/components/FormField'
+import { Modal } from '../../../shared/components/Modal'
+import { PageHeader } from '../../../shared/components/PageHeader'
+import { SearchInput } from '../../../shared/components/SearchInput'
+import { SelectMenu } from '../../../shared/components/SelectMenu'
+import { StatBlock } from '../../../shared/components/StatBlock'
+import { StatusPill } from '../../../shared/components/StatusPill'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
+import { GlassCard } from '../../../shared/layout/GlassCard'
+import { readCourses } from '../../../shared/storage/readers'
+import { formatAssessmentDateTime, formatDurationMinutes } from '../../../shared/storage/assessmentUtils'
+import { useCampusContext } from '../context/CampusContext'
+import { useSyncCampusFilter } from '../hooks/useSyncCampusFilter'
+import { useQuizzes, useQuestionBank } from '../hooks/useAssessments'
+import type { AssessmentPublishStatus } from '../types/assessments'
+
+const tabs = ['All', 'Published', 'Draft', 'Closed']
+
+const statusTone: Record<AssessmentPublishStatus, 'success' | 'info' | 'neutral'> = {
+  published: 'success',
+  draft: 'info',
+  closed: 'neutral',
+}
+
+export function QuizzesExamsAdminPage() {
+  const { notify } = useToast()
+  const { activeCampuses, selectedCampusId } = useCampusContext()
+  const { records, createQuiz, updateQuiz, deleteQuiz } = useQuizzes()
+  const { records: questions } = useQuestionBank()
+  const [activeTab, setActiveTab] = useState('All')
+  const [query, setQuery] = useState('')
+  const [campusFilter, setCampusFilter] = useState('all')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [form, setForm] = useState({
+    title: '',
+    courseId: '',
+    dueAt: '',
+    durationMinutes: '30',
+    maxPoints: '10',
+  })
+
+  useSyncCampusFilter(selectedCampusId, setCampusFilter)
+
+  const courses = useMemo(
+    () => readCourses().filter((c) => c.status !== 'archived'),
+    [],
+  )
+
+  const campusOptions = useMemo(
+    () => [
+      { value: 'all', label: 'All campuses' },
+      ...activeCampuses.map((c) => ({ value: c.id, label: c.name })),
+    ],
+    [activeCampuses],
+  )
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return records.filter((r) => {
+      if (activeTab !== 'All' && r.status !== activeTab.toLowerCase()) return false
+      if (campusFilter !== 'all' && r.campusId !== campusFilter) return false
+      if (!q) return true
+      return (
+        r.title.toLowerCase().includes(q) ||
+        r.courseCode.toLowerCase().includes(q) ||
+        r.instructorName.toLowerCase().includes(q)
+      )
+    })
+  }, [records, activeTab, query, campusFilter])
+
+  const stats = useMemo(
+    () => ({
+      total: records.length,
+      published: records.filter((r) => r.status === 'published').length,
+      questions: questions.length,
+    }),
+    [records, questions],
+  )
+
+  const handleCreate = () => {
+    const course = courses.find((c) => c.id === form.courseId)
+    if (!course || !form.title.trim() || !form.dueAt) {
+      notify('Fill in title, course, and due date.', 'error')
+      return
+    }
+
+    const courseQuestions = questions
+      .filter((q) => !q.courseId || q.courseId === course.id)
+      .slice(0, 3)
+      .map((q) => q.id)
+
+    createQuiz({
+      title: form.title.trim(),
+      courseId: course.id,
+      courseCode: course.code,
+      courseTitle: course.title,
+      instructorId: course.instructorId ?? '',
+      instructorName: course.instructor,
+      campusId: 'c1',
+      department: course.department,
+      dueAt: new Date(form.dueAt).toISOString(),
+      durationMinutes: Number(form.durationMinutes) || 30,
+      questionIds: courseQuestions,
+      status: 'published',
+      maxPoints: Number(form.maxPoints) || 10,
+    })
+
+    notify('Quiz published.')
+    setModalOpen(false)
+    setForm({ title: '', courseId: '', dueAt: '', durationMinutes: '30', maxPoints: '10' })
+  }
+
+  return (
+    <div className="flex flex-col gap-6 md:gap-8">
+      <PageHeader
+        title="Quizzes & Exams"
+        subtitle="Build timed assessments linked to your question bank."
+        actions={
+          <Button variant="primary" onClick={() => setModalOpen(true)}>
+            <Plus size={15} />
+            Create quiz
+          </Button>
+        }
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatBlock label="Quizzes" value={stats.total} sub="All assessments" icon={<BrainCircuit size={17} />} iconBg="bg-navy-50 text-navy-600" />
+        <StatBlock label="Published" value={stats.published} sub="Open to students" icon={<BrainCircuit size={17} />} iconBg="bg-success-bg text-success" />
+        <StatBlock label="Question bank" value={stats.questions} sub="Reusable questions" icon={<BrainCircuit size={17} />} iconBg="bg-lemon-100 text-lemon-800" />
+      </div>
+
+      <GlassCard className="p-4 flex flex-col gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3 justify-between">
+          <FilterTabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+            <SearchInput value={query} onChange={setQuery} placeholder="Search quizzes…" className="sm:w-56" />
+            <SelectMenu value={campusFilter} onChange={setCampusFilter} options={campusOptions} />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-[13px]">
+            <thead>
+              <tr className="border-b border-divider text-[11px] uppercase tracking-wider text-secondary-text">
+                <th className="py-2.5 pr-4 font-semibold">Quiz</th>
+                <th className="py-2.5 pr-4 font-semibold">Course</th>
+                <th className="py-2.5 pr-4 font-semibold">Questions</th>
+                <th className="py-2.5 pr-4 font-semibold">Duration</th>
+                <th className="py-2.5 pr-4 font-semibold">Due</th>
+                <th className="py-2.5 pr-4 font-semibold">Status</th>
+                <th className="py-2.5 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((quiz) => (
+                <tr key={quiz.id} className="border-b border-divider/60 hover:bg-navy-50/40">
+                  <td className="py-3 pr-4 font-semibold text-navy-900">{quiz.title}</td>
+                  <td className="py-3 pr-4">{quiz.courseCode}</td>
+                  <td className="py-3 pr-4">{quiz.questionIds.length}</td>
+                  <td className="py-3 pr-4">{formatDurationMinutes(quiz.durationMinutes)}</td>
+                  <td className="py-3 pr-4 text-secondary-text">{formatAssessmentDateTime(quiz.dueAt)}</td>
+                  <td className="py-3 pr-4">
+                    <StatusPill label={quiz.status} tone={statusTone[quiz.status]} />
+                  </td>
+                  <td className="py-3 text-right">
+                    <div className="flex justify-end gap-2">
+                      {quiz.status === 'draft' ? (
+                        <Button variant="ghost" size="sm" onClick={() => { updateQuiz(quiz.id, { status: 'published' }); notify('Quiz published.') }}>
+                          Publish
+                        </Button>
+                      ) : null}
+                      {quiz.status === 'published' ? (
+                        <Button variant="ghost" size="sm" onClick={() => { updateQuiz(quiz.id, { status: 'closed' }); notify('Quiz closed.') }}>
+                          Close
+                        </Button>
+                      ) : null}
+                      <Button variant="ghost" size="sm" onClick={() => { deleteQuiz(quiz.id); notify('Quiz removed.') }}>
+                        <Trash2 size={13} />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {filtered.length === 0 ? (
+            <div className="py-12 text-center">
+              <BrainCircuit size={28} className="mx-auto text-navy-300 mb-2" />
+              <p className="text-[13px] font-semibold text-navy-900">No quizzes match your filters</p>
+            </div>
+          ) : null}
+        </div>
+      </GlassCard>
+
+      <Modal
+        open={modalOpen}
+        title="Create quiz"
+        description="Questions are pulled from the question bank for the selected course."
+        icon={<BrainCircuit size={18} />}
+        onClose={() => setModalOpen(false)}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Button>
+            <Button variant="primary" onClick={handleCreate}>Publish</Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <FormField label="Title" value={form.title} onChange={(v) => setForm((f) => ({ ...f, title: v }))} placeholder="Quiz title" />
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[12px] font-semibold text-navy-900">Course</span>
+            <select value={form.courseId} onChange={(e) => setForm((f) => ({ ...f, courseId: e.target.value }))} className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px]">
+              <option value="">Select course…</option>
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>{c.code} — {c.title}</option>
+              ))}
+            </select>
+          </label>
+          <FormField label="Due date" value={form.dueAt} onChange={(v) => setForm((f) => ({ ...f, dueAt: v }))} placeholder="2026-08-25T23:59" />
+          <FormField label="Duration (minutes)" value={form.durationMinutes} onChange={(v) => setForm((f) => ({ ...f, durationMinutes: v }))} type="number" />
+          <FormField label="Max points" value={form.maxPoints} onChange={(v) => setForm((f) => ({ ...f, maxPoints: v }))} type="number" />
+        </div>
+      </Modal>
+    </div>
+  )
+}
+
+export default QuizzesExamsAdminPage
