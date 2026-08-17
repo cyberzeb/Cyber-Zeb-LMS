@@ -20,6 +20,7 @@ export function Navbar({ onRequestServiceClick }: NavbarProps) {
       <div className="max-w-7xl mx-auto px-6 md:px-8 h-[72px] flex items-center justify-between">
         <a href="#top" className="flex items-center gap-2.5">
           <img src={brandLogo} alt="Berana LMS" className="h-10 w-auto rounded-lg object-contain" />
+
           <span className="text-white font-extrabold text-lg tracking-tight">
             Berana <span className="text-lemon-500">LMS</span>
           </span>
