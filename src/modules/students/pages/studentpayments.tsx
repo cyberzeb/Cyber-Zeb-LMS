@@ -4,7 +4,9 @@ import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
+import { usePayments } from '../../institution/hooks/usePlatformStorage'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
 import type { PaymentItem } from '../types'
@@ -28,7 +30,9 @@ const statusAccent: Record<PaymentItem['status'], string> = {
 }
 
 export function StudentPaymentsPage() {
-  const { data, isLoading, isError } = useStudentDashboard()
+  const { notify } = useToast()
+  const { markPaid } = usePayments()
+  const { data, isLoading, isError, reload } = useStudentDashboard()
 
   const stats = useMemo(() => {
     if (!data) return { pending: 0, paid: 0, overdue: 0 }
@@ -44,6 +48,12 @@ export function StudentPaymentsPage() {
 
   const outstanding = data.payments.filter((p) => p.status !== 'paid')
   const nextDue = outstanding[0]
+
+  const handlePay = (paymentId: string, label: string) => {
+    markPaid(paymentId)
+    notify(`Payment for "${label}" submitted successfully.`)
+    void reload()
+  }
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
@@ -76,7 +86,7 @@ export function StudentPaymentsPage() {
             </div>
             <div className="text-left md:text-right">
               <div className="text-[28px] font-extrabold text-navy-900 leading-none">{nextDue.amount}</div>
-              <Button variant="primary" size="sm" className="mt-3">
+              <Button variant="primary" size="sm" className="mt-3" onClick={() => handlePay(nextDue.id, nextDue.label)}>
                 Pay now
               </Button>
             </div>
@@ -148,7 +158,11 @@ export function StudentPaymentsPage() {
               <div className="flex items-center gap-4 shrink-0">
                 <div className="text-[22px] font-extrabold text-navy-900">{payment.amount}</div>
                 {payment.status !== 'paid' ? (
-                  <Button variant={payment.status === 'overdue' ? 'primary' : 'secondary'} size="sm">
+                  <Button
+                    variant={payment.status === 'overdue' ? 'primary' : 'secondary'}
+                    size="sm"
+                    onClick={() => handlePay(payment.id, payment.label)}
+                  >
                     Pay now
                   </Button>
                 ) : null}

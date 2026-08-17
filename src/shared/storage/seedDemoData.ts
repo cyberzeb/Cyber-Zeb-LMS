@@ -18,6 +18,12 @@ import {
   seedStudentSubmissions,
 } from '../../modules/institution/data/assessmentSeedData'
 import {
+  seedHelpDeskTickets,
+  seedIntegrations,
+  seedPayments,
+} from '../../modules/institution/data/platformSeedData'
+import { defaultInstitutionSettings, normalizeInstitutionSettings } from './settingsUtils'
+import {
   readCampusRecords,
   readCourses,
   readDepartments,
@@ -199,9 +205,7 @@ export function ensureDemoSeedData() {
     if (!window.localStorage.getItem(STORAGE_KEYS.settings)) {
       window.localStorage.setItem(
         STORAGE_KEYS.settings,
-        JSON.stringify({
-          general: { name: 'Berana University' },
-        }),
+        JSON.stringify(defaultInstitutionSettings),
       )
       changed = true
     }
@@ -211,8 +215,47 @@ export function ensureDemoSeedData() {
     }
 
     seedAssessmentDataIfEmpty()
+    seedPlatformDataIfEmpty()
+    migrateSettingsIfPartial()
   } catch {
     /* storage blocked */
+  }
+}
+
+function migrateSettingsIfPartial() {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEYS.settings)
+    if (!raw) return
+    const parsed = JSON.parse(raw) as Partial<typeof defaultInstitutionSettings>
+    if (!parsed.branding || !parsed.modules || !parsed.integrations) {
+      window.localStorage.setItem(
+        STORAGE_KEYS.settings,
+        JSON.stringify(normalizeInstitutionSettings(parsed)),
+      )
+    }
+  } catch {
+    /* ignore corrupt settings */
+  }
+}
+
+function seedPlatformDataIfEmpty() {
+  let changed = false
+
+  if (!window.localStorage.getItem(STORAGE_KEYS.payments)) {
+    window.localStorage.setItem(STORAGE_KEYS.payments, JSON.stringify(seedPayments))
+    changed = true
+  }
+  if (!window.localStorage.getItem(STORAGE_KEYS.helpDeskTickets)) {
+    window.localStorage.setItem(STORAGE_KEYS.helpDeskTickets, JSON.stringify(seedHelpDeskTickets))
+    changed = true
+  }
+  if (!window.localStorage.getItem(STORAGE_KEYS.integrations)) {
+    window.localStorage.setItem(STORAGE_KEYS.integrations, JSON.stringify(seedIntegrations))
+    changed = true
+  }
+
+  if (changed) {
+    window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.platformUpdated))
   }
 }
 

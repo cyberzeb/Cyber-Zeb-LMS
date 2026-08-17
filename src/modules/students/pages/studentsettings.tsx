@@ -6,13 +6,14 @@ import { Monogram } from '../../../shared/components/Monogram'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useLocalStorageState } from '../../../shared/hooks/useLocalStorageState'
+import { STORAGE_KEYS } from '../../../shared/storage/keys'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { SettingsSection } from '../../institution/components/settings/SettingsSection'
 import { SettingField } from '../../institution/components/settings/SettingField'
 import { ToggleRow } from '../../institution/components/settings/ToggleRow'
-import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
-import { useStudentDashboard } from '../hooks/useStudentDashboard'
+import { PortalUserPicker } from '../../../shared/components/PortalUserPicker'
 import { getSessionPerson } from '../../../shared/storage/session'
+import { readEnrollments } from '../../../shared/storage/readers'
 
 const SEC = 17
 
@@ -54,10 +55,9 @@ const defaultSettings = (person?: { name: string; email: string }): StudentSetti
 
 export function StudentSettingsPage() {
   const { notify } = useToast()
-  const { data, isLoading, isError } = useStudentDashboard()
   const sessionPerson = getSessionPerson()
   const [stored, setStored] = useLocalStorageState<StudentSettingsState>(
-    'berana:student-settings',
+    STORAGE_KEYS.studentSettings,
     defaultSettings(sessionPerson ?? undefined),
   )
   const [draft, setDraft] = useState<StudentSettingsState>(stored)
@@ -67,13 +67,18 @@ export function StudentSettingsPage() {
     [draft, stored],
   )
 
-  if (isLoading) return <StudentPageLoading />
-  if (isError || !data) return <StudentPageError message="Failed to load settings." />
-
-  const mergedProfile = {
-    ...draft.profile,
-    displayName: data.studentName,
+  if (!sessionPerson) {
+    return (
+      <PortalUserPicker role="Student" portalLabel="Student Portal" />
+    )
   }
+
+  const displayName = sessionPerson.name
+  const program = sessionPerson.department
+  const term = 'Fall 2026'
+  const activeCourses = readEnrollments().filter(
+    (e) => e.studentId === sessionPerson.id && e.status === 'active',
+  ).length
 
   const handleSave = () => {
     setStored(draft)
@@ -106,12 +111,12 @@ export function StudentSettingsPage() {
         <div className="absolute right-0 top-0 w-64 h-64 rounded-full bg-lemon-500/10 blur-3xl" />
         <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6">
           <Monogram
-            label={data.studentName}
+            label={displayName}
             size="md"
             className="w-16 h-16 text-[18px] rounded-2xl ring-4 ring-lemon-500/30"
           />
           <div className="flex-1 min-w-0 text-white">
-            <h2 className="text-[22px] font-bold leading-tight">{data.studentName}</h2>
+            <h2 className="text-[22px] font-bold leading-tight">{displayName}</h2>
             <p className="mt-1 text-[13px] text-navy-200 flex items-center gap-2">
               <Mail size={14} />
               {draft.profile.email}
@@ -119,21 +124,21 @@ export function StudentSettingsPage() {
             <div className="mt-3 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-[11.5px]">
                 <Building2 size={12} />
-                {data.department}
+                {sessionPerson.department}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-[11.5px]">
                 <GraduationCap size={12} />
-                {data.program}
+                {program}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-[11.5px]">
                 <CalendarDays size={12} />
-                {data.term}
+                {term}
               </span>
             </div>
           </div>
           <div className="shrink-0 flex flex-col gap-2">
             <StatusPill label="Active student" tone="success" />
-            <span className="text-[11px] text-navy-300 text-center">GPA {data.kpis.gpa.toFixed(2)}</span>
+            <span className="text-[11px] text-navy-300 text-center">{activeCourses} course{activeCourses === 1 ? '' : 's'}</span>
           </div>
         </div>
       </GlassCard>
@@ -154,7 +159,7 @@ export function StudentSettingsPage() {
           </div>
           <div>
             <div className="text-[11px] text-secondary-text">Active courses</div>
-            <div className="text-[18px] font-bold text-navy-900">{data.kpis.activeCourses}</div>
+            <div className="text-[18px] font-bold text-navy-900">{activeCourses}</div>
           </div>
         </GlassCard>
         <GlassCard className="p-4 flex items-center gap-3">
@@ -173,7 +178,7 @@ export function StudentSettingsPage() {
         title="Profile"
         description="Your personal information visible to instructors."
       >
-        <SettingField label="Display name" value={mergedProfile.displayName} onChange={() => {}} />
+        <SettingField label="Display name" value={displayName} onChange={() => {}} />
         <SettingField
           label="Email"
           value={draft.profile.email}

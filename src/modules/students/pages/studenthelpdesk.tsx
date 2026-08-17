@@ -2,10 +2,16 @@ import { useMemo, useState } from 'react'
 import { Clock, Headset, MessageCircle, Plus, Shield } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
+import { FormField } from '../../../shared/components/FormField'
+import { Modal } from '../../../shared/components/Modal'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
+import { getSessionPerson } from '../../../shared/storage/session'
+import { useHelpDesk } from '../../institution/hooks/usePlatformStorage'
+import type { HelpDeskPriority } from '../../institution/types/platform'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
 import type { HelpDeskTicket } from '../types'
@@ -37,8 +43,18 @@ const statusAccent: Record<HelpDeskTicket['status'], string> = {
 }
 
 export function StudentHelpDeskPage() {
-  const { data, isLoading, isError } = useStudentDashboard()
+  const { notify } = useToast()
+  const { createTicket } = useHelpDesk()
+  const sessionPerson = getSessionPerson()
+  const { data, isLoading, isError, reload } = useStudentDashboard()
   const [activeTab, setActiveTab] = useState('All')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [form, setForm] = useState({
+    subject: '',
+    description: '',
+    category: 'Technical',
+    priority: 'medium' as HelpDeskPriority,
+  })
 
   const stats = useMemo(() => {
     if (!data) return { open: 0, inReview: 0, resolved: 0 }
@@ -60,13 +76,36 @@ export function StudentHelpDeskPage() {
   if (isLoading) return <StudentPageLoading />
   if (isError || !data) return <StudentPageError message="Failed to load help desk tickets." />
 
+  const handleCreate = () => {
+    if (!sessionPerson || !form.subject.trim()) {
+      notify('Enter a subject for your ticket.', 'error')
+      return
+    }
+
+    createTicket({
+      subject: form.subject.trim(),
+      description: form.description.trim() || 'No additional details provided.',
+      category: form.category,
+      priority: form.priority,
+      status: 'open',
+      requesterId: sessionPerson.id,
+      requesterName: sessionPerson.name,
+      requesterRole: 'Student',
+    })
+
+    notify('Support ticket submitted.')
+    setModalOpen(false)
+    setForm({ subject: '', description: '', category: 'Technical', priority: 'medium' })
+    void reload()
+  }
+
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Help Desk"
         subtitle="Get support for technical issues, grades, payments, and campus services."
         actions={
-          <Button variant="primary">
+          <Button variant="primary" onClick={() => setModalOpen(true)}>
             <Plus size={15} />
             New ticket
           </Button>
@@ -155,6 +194,27 @@ export function StudentHelpDeskPage() {
           </GlassCard>
         ) : null}
       </div>
+
+      <Modal
+        open={modalOpen}
+        title="New support ticket"
+        description="Describe your issue and our team will respond shortly."
+        icon={<Headset size={18} />}
+        onClose={() => setModalOpen(false)}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Button>
+            <Button variant="primary" onClick={handleCreate}>Submit ticket</Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <FormField label="Subject" value={form.subject} onChange={(v) => setForm((f) => ({ ...f, subject: v }))} placeholder="Brief summary of your issue" />
+          <FormField label="Description" value={form.description} onChange={(v) => setForm((f) => ({ ...f, description: v }))} type="textarea" placeholder="Provide details to help us assist you" />
+          <FormField label="Category" value={form.category} onChange={(v) => setForm((f) => ({ ...f, category: v }))} type="select" options={['Technical', 'Grades', 'Payments', 'Enrollment', 'Other']} />
+          <FormField label="Priority" value={form.priority} onChange={(v) => setForm((f) => ({ ...f, priority: v as HelpDeskPriority }))} type="select" options={['low', 'medium', 'high']} />
+        </div>
+      </Modal>
     </div>
   )
 }
