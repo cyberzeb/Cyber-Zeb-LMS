@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Building2,
   Palette,
@@ -11,78 +11,32 @@ import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useLocalStorageState } from '../../../shared/hooks/useLocalStorageState'
+import { STORAGE_KEYS } from '../../../shared/storage/keys'
+import {
+  defaultInstitutionSettings,
+  normalizeInstitutionSettings,
+  type InstitutionSettingsState,
+} from '../../../shared/storage/settingsUtils'
 import { SettingsSection } from '../components/settings/SettingsSection'
 import { SettingField } from '../components/settings/SettingField'
 import { ToggleRow } from '../components/settings/ToggleRow'
 
 const SEC = 17
 
-interface ToggleState {
-  [key: string]: boolean
-}
-
-interface SettingsState {
-  general: {
-    name: string
-    timezone: string
-    language: string
-    currency: string
-  }
-  branding: {
-    domain: string
-    sender: string
-    primary: string
-  }
-  academic: {
-    grading: string
-    attendance: string
-    completion: string
-  }
-  modules: ToggleState
-  integrations: ToggleState
-}
-
-const defaultSettings: SettingsState = {
-  general: {
-    name: 'Berana University',
-    timezone: '(GMT+3) East Africa Time',
-    language: 'English',
-    currency: 'ETB — Ethiopian Birr',
-  },
-  branding: {
-    domain: 'learn.berana.edu',
-    sender: 'no-reply@berana.edu',
-    primary: 'Lemon / Navy',
-  },
-  academic: {
-    grading: 'Letter Grade (A–F)',
-    attendance: '75% minimum',
-    completion: 'All modules + passing grade',
-  },
-  modules: {
-    virtualClassroom: true,
-    attendance: true,
-    assessments: true,
-    payments: false,
-    certificates: true,
-    parentPortal: false,
-  },
-  integrations: {
-    zoom: true,
-    googleSso: true,
-    microsoftSso: false,
-    stripe: false,
-    emailSms: true,
-  },
-}
+type SettingsState = InstitutionSettingsState
 
 export function SettingsPage() {
   const { notify } = useToast()
-  const [stored, setStored] = useLocalStorageState<SettingsState>(
-    'berana:settings',
-    defaultSettings,
+  const [storedRaw, setStoredRaw] = useLocalStorageState<SettingsState>(
+    STORAGE_KEYS.settings,
+    defaultInstitutionSettings,
   )
+  const stored = useMemo(() => normalizeInstitutionSettings(storedRaw), [storedRaw])
   const [draft, setDraft] = useState<SettingsState>(stored)
+
+  useEffect(() => {
+    setDraft(stored)
+  }, [stored])
 
   const { general, branding, academic, modules, integrations } = draft
 
@@ -106,7 +60,7 @@ export function SettingsPage() {
     }))
 
   const handleSave = () => {
-    setStored(draft)
+    setStoredRaw(draft)
     notify('Settings saved successfully.')
   }
 

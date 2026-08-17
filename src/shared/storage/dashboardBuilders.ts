@@ -5,24 +5,25 @@ import type { StudentDashboardData } from '../../modules/students/types'
 import type { InstructorDashboardData, InstructorCertificateRow } from '../../modules/instructors/types'
 import type { InstitutionOverviewData } from '../../modules/institution/types'
 import {
+  readAnnouncements,
+  readAssignmentRecords,
   readCampusRecords,
   readCertificates,
   readCourses,
   readDepartments,
   readEnrollments,
+  readHelpDeskTickets,
   readInstitutionName,
+  readIntegrations,
+  readLiveSessions,
+  readPayments,
   readPeople,
   readPublishedApprovedCourses,
-} from './readers'
-import { courseTeachesInstructor, instructorTeachingSummary } from '../../modules/institution/utils/courseAssignmentUtils'
-import { getEnrollmentProgressPercent } from '../../modules/students/utils/studentLearningProgress'
-import {
-  readAnnouncements,
-  readAssignmentRecords,
-  readLiveSessions,
   readQuizRecords,
   readStudentSubmissions,
 } from './readers'
+import { courseTeachesInstructor, instructorTeachingSummary } from '../../modules/institution/utils/courseAssignmentUtils'
+import { getEnrollmentProgressPercent } from '../../modules/students/utils/studentLearningProgress'
 import {
   computeStudentAssessmentStats,
   countUpcomingLiveSessions,
@@ -38,6 +39,13 @@ import {
   toUpcomingDeadlines,
   toUpcomingLiveClasses,
 } from './assessmentUtils'
+import {
+  toAdminHelpDeskTickets,
+  toInstructorHelpDeskTickets,
+  toIntegrationStatusItems,
+  toStudentHelpDeskTickets,
+  toStudentPayments,
+} from './platformUtils'
 import {
   filterAnnouncementsForInstructorFeed,
   filterAnnouncementsForStudent,
@@ -165,8 +173,13 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
       .filter((c) => c.studentId === student.id && c.status !== 'revoked')
       .map(certificateToStudentItem)
 
+    const paymentRecords = readPayments()
+    const helpDeskRecords = readHelpDeskTickets()
+
     return {
       ...base,
+      payments: toStudentPayments(paymentRecords, student.id),
+      helpDeskTickets: toStudentHelpDeskTickets(helpDeskRecords, student.id),
       announcements: toStudentAnnouncementItems(announcementRecords),
       certificates: studentCertificates,
     }
@@ -206,12 +219,17 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
     liveClasses,
   )
 
+  const paymentRecords = readPayments()
+  const helpDeskRecords = readHelpDeskTickets()
+
   return {
     ...base,
     courses,
     liveClasses,
     quizzes: studentQuizzes,
     assignments: studentAssignments,
+    payments: toStudentPayments(paymentRecords, student.id),
+    helpDeskTickets: toStudentHelpDeskTickets(helpDeskRecords, student.id),
     upcomingDeadlines,
     announcements: toStudentAnnouncementItems(announcementRecords),
     certificates: studentCertificates,
@@ -440,6 +458,8 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
     instructor.name,
   )
 
+  const helpDeskRecords = readHelpDeskTickets()
+
   return {
     ...base,
     department: teachingSummary.label,
@@ -452,6 +472,7 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
     liveClasses,
     quizzes: instructorQuizzes,
     assignments: instructorAssignments,
+    helpDeskTickets: toInstructorHelpDeskTickets(helpDeskRecords, instructor.id),
     announcements: toInstructorAnnouncementItems(
       announcementRecords,
       instructor.id,
@@ -609,6 +630,11 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
   const quizzes = readQuizRecords()
   const submissions = readStudentSubmissions()
   const upcomingLiveCount = countUpcomingLiveSessions(liveSessions)
+  const helpDeskRecords = readHelpDeskTickets()
+  const integrationRecords = readIntegrations()
+  const connectedIntegrations = integrationRecords.filter(
+    (i) => i.enabled && i.status === 'connected',
+  ).length
 
   return {
     institutionName: readInstitutionName(),
@@ -725,9 +751,9 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
       readAnnouncements(),
     ).slice(0, 5),
     calendarEvents: [],
-    helpDeskTickets: [],
+    helpDeskTickets: toAdminHelpDeskTickets(helpDeskRecords).slice(0, 6),
     assignmentSubmissions: toAdminAssignmentSubmissions(assignments, submissions),
-    integrationStatus: [],
+    integrationStatus: toIntegrationStatusItems(integrationRecords).slice(0, 6),
     statTotals: {
       campusCount: campusRecords.length,
       activeCampusCount: campusRecords.filter(
@@ -735,8 +761,8 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
       ).length,
       totalUsers: people.length,
       pendingInvitations: people.filter((p) => p.status === 'invited').length,
-      activeIntegrations: 0,
-      totalIntegrations: 2,
+      activeIntegrations: connectedIntegrations,
+      totalIntegrations: integrationRecords.length,
       setupProgressPercent: Math.round(
         (setupDone / setupSteps.length) * 100,
       ),

@@ -16,6 +16,9 @@ import { VerifyPeoplePage } from '../modules/institution/pages/VerifyPeoplePage'
 import { EnrollmentsPage } from '../modules/institution/pages/EnrollmentsPage'
 import { CertificatesPage } from '../modules/institution/pages/CertificatesPage'
 import { AttendanceAdminPage } from '../modules/institution/pages/AttendanceAdminPage'
+import { PaymentsAdminPage } from '../modules/institution/pages/PaymentsAdminPage'
+import { HelpDeskAdminPage } from '../modules/institution/pages/HelpDeskAdminPage'
+import { ApiIntegrationsAdminPage } from '../modules/institution/pages/ApiIntegrationsAdminPage'
 import { LiveClassesAdminPage } from '../modules/institution/pages/LiveClassesAdminPage'
 import { AssignmentsAdminPage } from '../modules/institution/pages/AssignmentsAdminPage'
 import { QuizzesExamsAdminPage } from '../modules/institution/pages/QuizzesExamsAdminPage'
@@ -325,15 +328,15 @@ export const router = createBrowserRouter([
       },
       {
         path: 'payments',
-        element: <ReportsPage />,
+        element: <PaymentsAdminPage />,
       },
       {
         path: 'api-integrations',
-        element: <SettingsPage />,
+        element: <ApiIntegrationsAdminPage />,
       },
       {
         path: 'help-desk',
-        element: <SettingsPage />,
+        element: <HelpDeskAdminPage />,
       },
     ],
   },

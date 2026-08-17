@@ -18,6 +18,9 @@ const RELOAD_KEYS = new Set<string>([
   STORAGE_KEYS.quizzes,
   STORAGE_KEYS.questionBank,
   STORAGE_KEYS.studentSubmissions,
+  STORAGE_KEYS.payments,
+  STORAGE_KEYS.helpDeskTickets,
+  STORAGE_KEYS.integrations,
 ])
 
 export function useStudentDashboard() {
@@ -63,6 +66,7 @@ export function useStudentDashboard() {
     window.addEventListener(STORAGE_EVENTS.announcementsUpdated, onCustom)
     window.addEventListener(STORAGE_EVENTS.certificatesUpdated, onCustom)
     window.addEventListener(STORAGE_EVENTS.assessmentsUpdated, onCustom)
+    window.addEventListener(STORAGE_EVENTS.platformUpdated, onCustom)
     document.addEventListener('visibilitychange', onVisible)
     return () => {
       window.removeEventListener('storage', onStorage)
@@ -73,6 +77,7 @@ export function useStudentDashboard() {
       window.removeEventListener(STORAGE_EVENTS.announcementsUpdated, onCustom)
       window.removeEventListener(STORAGE_EVENTS.certificatesUpdated, onCustom)
       window.removeEventListener(STORAGE_EVENTS.assessmentsUpdated, onCustom)
+      window.removeEventListener(STORAGE_EVENTS.platformUpdated, onCustom)
       document.removeEventListener('visibilitychange', onVisible)
     }
   }, [reload])

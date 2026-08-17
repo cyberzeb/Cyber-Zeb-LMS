@@ -112,6 +112,34 @@ export function readStudentSubmissions() {
   )
 }
 
+export function readAttendances() {
+  return readJson<import('../../modules/institution/types').AttendanceRecord[]>(
+    STORAGE_KEYS.attendances,
+    [],
+  )
+}
+
+export function readPayments() {
+  return readJson<import('../../modules/institution/types/platform').PaymentRecord[]>(
+    STORAGE_KEYS.payments,
+    [],
+  )
+}
+
+export function readHelpDeskTickets() {
+  return readJson<import('../../modules/institution/types/platform').HelpDeskTicketRecord[]>(
+    STORAGE_KEYS.helpDeskTickets,
+    [],
+  )
+}
+
+export function readIntegrations() {
+  return readJson<import('../../modules/institution/types/platform').ApiIntegrationRecord[]>(
+    STORAGE_KEYS.integrations,
+    [],
+  )
+}
+
 export function readForumChats(): ForumChatRecord[] {
   return readJson<ForumChatRecord[]>(STORAGE_KEYS.forumChats, [])
 }

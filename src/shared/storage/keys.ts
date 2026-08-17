@@ -1,5 +1,5 @@
 /** Bump to reset all Berana localStorage (fresh demo). */
-export const STORAGE_VERSION = 5
+export const STORAGE_VERSION = 6
 
 export const STORAGE_KEYS = {
   version: 'berana:storage-version',
@@ -30,6 +30,9 @@ export const STORAGE_KEYS = {
   quizzes: 'berana:quizzes',
   questionBank: 'berana:question-bank',
   studentSubmissions: 'berana:student-submissions',
+  payments: 'berana:payments',
+  helpDeskTickets: 'berana:help-desk-tickets',
+  integrations: 'berana:integrations',
 } as const
 
 export const STORAGE_EVENTS = {
@@ -44,4 +47,5 @@ export const STORAGE_EVENTS = {
   announcementsUpdated: 'berana:announcements-updated',
   forumUpdated: 'berana:forum-updated',
   assessmentsUpdated: 'berana:assessments-updated',
+  platformUpdated: 'berana:platform-updated',
 } as const
