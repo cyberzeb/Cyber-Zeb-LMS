@@ -15,6 +15,14 @@ import {
 } from './readers'
 import { courseTeachesInstructor, instructorTeachingSummary } from '../../modules/institution/utils/courseAssignmentUtils'
 import { getEnrollmentProgressPercent } from '../../modules/students/utils/studentLearningProgress'
+import { readAnnouncements } from './readers'
+import {
+  filterAnnouncementsForInstructorFeed,
+  filterAnnouncementsForStudent,
+  toAdminAnnouncementItems,
+  toInstructorAnnouncementItems,
+  toStudentAnnouncementItems,
+} from './announcementUtils'
 
 function emptyStudentDashboard(student: PersonRow): StudentDashboardData {
   return {
@@ -117,13 +125,31 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
     })
     .filter((c) => c.code)
 
-  if (courses.length === 0) return base
+  if (courses.length === 0) {
+    const enrolledCourseIds = enrollments.map((e) => e.courseId)
+    const announcementRecords = filterAnnouncementsForStudent(
+      readAnnouncements(),
+      student.id,
+      enrolledCourseIds,
+    )
+    return {
+      ...base,
+      announcements: toStudentAnnouncementItems(announcementRecords),
+    }
+  }
 
   const activeCount = courses.filter((c) => c.status === 'active').length
+  const enrolledCourseIds = enrollments.map((e) => e.courseId)
+  const announcementRecords = filterAnnouncementsForStudent(
+    readAnnouncements(),
+    student.id,
+    enrolledCourseIds,
+  )
 
   return {
     ...base,
     courses,
+    announcements: toStudentAnnouncementItems(announcementRecords),
     standing: `${activeCount} active course${activeCount === 1 ? '' : 's'}`,
     kpis: { ...base.kpis, activeCourses: activeCount },
     stats: base.stats.map((s) =>
@@ -251,6 +277,12 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
   const activeCourses = teachingCourses.filter((c) => c.status === 'active').length
   const pendingApproval = myCourses.filter((c) => c.approvalStatus === 'pending').length
   const teachingSummary = instructorTeachingSummary(allCourses, instructor.id, instructor.name)
+  const teachingCourseIds = myCourses.map((course) => course.id)
+  const announcementRecords = filterAnnouncementsForInstructorFeed(
+    readAnnouncements(),
+    instructor.id,
+    teachingCourseIds,
+  )
 
   return {
     ...base,
@@ -261,6 +293,7 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
         : 'No courses assigned yet',
     courses: teachingCourses,
     students,
+    announcements: toInstructorAnnouncementItems(announcementRecords, instructor.id),
     kpis: {
       ...base.kpis,
       activeCourses,
@@ -438,7 +471,7 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
         type: 'course' as const,
       })),
     ],
-    recentAnnouncements: [],
+    recentAnnouncements: toAdminAnnouncementItems(readAnnouncements()).slice(0, 5),
     calendarEvents: [],
     helpDeskTickets: [],
     assignmentSubmissions: [],

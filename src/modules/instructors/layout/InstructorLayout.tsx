@@ -164,6 +164,7 @@ export function InstructorLayout() {
   ]
 
   const breadcrumb = breadcrumbLabels[path] ?? 'Dashboard'
+  const isForumPage = path === '/instructor/forum'
 
   return (
     <div className="flex h-screen app-shell-bg font-sans overflow-hidden">
@@ -183,8 +184,17 @@ export function InstructorLayout() {
           breadcrumb={breadcrumb}
         />
 
-        <main className="page-content app-scroll flex-1 overflow-y-auto p-5 md:p-6">
-          <div key={path} className="animate-fade-in-up">
+        <main
+          className={`page-content flex-1 min-h-0 ${
+            isForumPage
+              ? 'overflow-hidden flex flex-col p-0'
+              : 'app-scroll overflow-y-auto p-5 md:p-6'
+          }`}
+        >
+          <div
+            key={path}
+            className={isForumPage ? 'flex-1 min-h-0 flex flex-col' : 'animate-fade-in-up'}
+          >
             <Outlet />
           </div>
         </main>

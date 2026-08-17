@@ -22,6 +22,7 @@ import { useInstitutionOverview } from '../hooks/useInstitution'
 import { useCampusContext } from '../context/CampusContext'
 import { Button } from '../../../shared/components/Button'
 import { DashboardSummaryCard } from '../../../shared/components/DashboardSummaryCard'
+import { AnnouncementDashboardList } from '../../../shared/components/announcements/AnnouncementFeedCard'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { ZoomIcon } from '../../../shared/components/ZoomIcon'
@@ -242,7 +243,7 @@ export function InstitutionOverviewPage() {
             <CalendarClock size={15} />
             Schedule Class
           </Button>
-          <Button variant="secondary" onClick={() => navigate('/admin/reports')}>
+          <Button variant="secondary" onClick={() => navigate('/admin/announcements')}>
             <Megaphone size={15} />
             Create Announcement
           </Button>
@@ -509,24 +510,17 @@ export function InstitutionOverviewPage() {
           </DashboardSummaryCard>
 
           <DashboardSummaryCard title="Announcements" onViewAll={() => navigate('/admin/announcements')}>
-            <div className="space-y-2">
-              {data.recentAnnouncements.map((announcement) => (
-                <div key={announcement.id} className="rounded-lg border border-divider p-2.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-[12px] font-semibold text-navy-900 truncate">{announcement.title}</p>
-                      <p className="text-[10.5px] text-secondary-text mt-0.5">
-                        {announcement.audience} · {announcement.postedAt}
-                      </p>
-                    </div>
-                    <StatusPill
-                      label={announcement.priority === 'important' ? 'Important' : 'Normal'}
-                      tone={announcement.priority === 'important' ? 'warning' : 'neutral'}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+            <AnnouncementDashboardList
+              items={data.recentAnnouncements.map((announcement) => ({
+                id: announcement.id,
+                title: announcement.title,
+                body: announcement.body ?? '',
+                postedAt: announcement.postedAt,
+                priority: announcement.priority,
+                audience: announcement.audience,
+              }))}
+              emptyMessage="No announcements yet. Publish one from the announcements page."
+            />
           </DashboardSummaryCard>
 
           <DashboardSummaryCard title="Upcoming Live Sessions" onViewAll={() => navigate('/admin/live-classes')}>

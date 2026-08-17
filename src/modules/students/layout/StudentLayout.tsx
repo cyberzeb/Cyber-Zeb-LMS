@@ -44,6 +44,8 @@ export function StudentLayout() {
     ? 'Learning'
     : breadcrumbLabels[path] ?? 'Dashboard'
 
+  const isForumPage = path === '/student/forum'
+
   if (!session || session.role !== 'Student' || !person) {
     return <PortalUserPicker role="Student" portalLabel="Student Portal" />
   }
@@ -187,8 +189,17 @@ export function StudentLayout() {
           breadcrumb={breadcrumb}
         />
 
-        <main ref={mainRef} className="page-content app-scroll flex-1 overflow-y-auto p-5 md:p-6">
-          <Outlet key={location.pathname} />
+        <main
+          ref={mainRef}
+          className={`page-content flex-1 min-h-0 ${
+            isForumPage
+              ? 'overflow-hidden flex flex-col p-0'
+              : 'app-scroll overflow-y-auto p-5 md:p-6'
+          }`}
+        >
+          <div className={isForumPage ? 'flex-1 min-h-0 flex flex-col' : undefined}>
+            <Outlet key={location.pathname} />
+          </div>
         </main>
 
         <AdminFooter />
