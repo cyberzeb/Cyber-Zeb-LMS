@@ -103,7 +103,7 @@ export function InstitutionAdminLayout() {
         userName="Abel Tesfaye"
         userRole="Institution Admin"
         brandLogoSrc={brandLogo}
-        brandName="Brana LMS"
+        brandName="Berana LMS"
         brandSubtitle="Cyber-Zeb"
       />
 

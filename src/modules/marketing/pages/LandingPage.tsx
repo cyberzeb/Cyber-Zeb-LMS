@@ -33,7 +33,7 @@ export function LandingPage() {
             </h2>
             <p className="mt-3 text-[14.5px] text-secondary-text max-w-lg mx-auto">
               Fill in the form below. Our team will send you a custom
-              proposal and invoice, and set up your dedicated Brana LMS
+              proposal and invoice, and set up your dedicated Berana LMS
               once payment and the agreement are confirmed.
             </p>
           </div>

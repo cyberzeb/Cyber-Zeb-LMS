@@ -26,11 +26,11 @@ export function AboutSection() {
               About Us
             </span>
             <h2 className="mt-3 text-[30px] md:text-[38px] font-extrabold text-navy-900 leading-tight">
-              We&rsquo;re Cyber-Zeb Consulting — and Brana LMS is how we bring
+              We&rsquo;re Cyber-Zeb Consulting — and Berana LMS is how we bring
               modern learning technology home.
             </h2>
             <p className="mt-5 text-[15px] text-secondary-text leading-relaxed">
-              Brana LMS is a secure, modular, integration-ready learning
+              Berana LMS is a secure, modular, integration-ready learning
               platform built to help universities, schools, businesses,
               government institutions and NGOs manage learners, instructors,
               parents, courses, live classes, payments and reporting — all

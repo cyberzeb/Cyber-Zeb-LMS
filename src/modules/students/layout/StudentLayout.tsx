@@ -78,7 +78,7 @@ export function StudentLayout() {
         userName="Amina Lemma"
         userRole="Student"
         brandLogoSrc={brandLogo}
-        brandName="Brana LMS"
+        brandName="Berana LMS"
         brandSubtitle="Cyber-Zeb"
       />
       <main className="page-content app-scroll flex-1 h-screen overflow-y-auto flex flex-col p-6 md:p-8 gap-6 md:gap-8">

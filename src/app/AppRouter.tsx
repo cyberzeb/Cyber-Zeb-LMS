@@ -9,6 +9,7 @@ import { PeoplePage } from '../modules/institution/pages/PeoplePage'
 import { ReportsPage } from '../modules/institution/pages/ReportsPage'
 import { SettingsPage } from '../modules/institution/pages/SettingsPage'
 import { LandingPage } from '../modules/marketing/pages/LandingPage'
+import { InstitutionLandingPage } from '../modules/marketing/pages/InstitutionLandingPage'
 import { StudentLayout } from '../modules/students/layout/StudentLayout'
 import { StudentDashboardPage } from '../modules/students/pages/studentdashboard'
 import { StudentResourcesPage } from '../modules/students/pages/studentresources'
@@ -16,11 +17,35 @@ import { StudentQuizzesPage } from '../modules/students/pages/studentquizzes'
 import { StudentAssignmentsPage } from '../modules/students/pages/studentassignments'
 import { StudentCalendarPage } from '../modules/students/pages/studentcalendar'
 import { StudentGradesPage } from '../modules/students/pages/studentgrades'
+import { SuperAdminLayout } from '../modules/superadmin/layout/SuperAdminLayout'
+import { SuperAdminLoginPage } from '../modules/superadmin/pages/SuperAdminLoginPage'
+import { ServiceRequestsListPage } from '../modules/superadmin/pages/ServiceRequestsListPage'
+import { ServiceRequestDetailPage } from '../modules/superadmin/pages/ServiceRequestDetailPage'
+import { ManageModulesPage } from '../modules/superadmin/pages/ManageModulesPage'
+import { AddOnRequestsPage } from '../modules/superadmin/pages/AddOnRequestsPage'
+import { RenewalsPage } from '../modules/superadmin/pages/RenewalsPage'
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
+  },
+  {
+    // Local fallback only; production tenant lookup is by subdomain host.
+    path: '/institution/:slug',
+    element: <InstitutionLandingPage />,
+  },
+  {
+    path: '/super-admin',
+    element: <SuperAdminLayout />,
+    children: [
+      { index: true, element: <ServiceRequestsListPage /> },
+      { path: 'requests/:id', element: <ServiceRequestDetailPage /> },
+      { path: 'addons', element: <AddOnRequestsPage /> },
+      { path: 'modules', element: <ManageModulesPage /> },
+      { path: 'renewals', element: <RenewalsPage /> },
+      { path: 'login', element: <SuperAdminLoginPage /> },
+    ],
   },
   {
     path: '/student',

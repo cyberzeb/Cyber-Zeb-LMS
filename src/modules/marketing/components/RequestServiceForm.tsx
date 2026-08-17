@@ -1,6 +1,12 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
-import type { InstitutionType, RequestedModule, ServiceRequestPayload } from '../types'
-import { submitServiceRequest } from '../api/leadApi'
+import { useQuery } from '@tanstack/react-query'
+import type { InstitutionType, ModuleKey, ServiceRequestPayload } from '../types'
+import {
+  ALWAYS_ON_MODULES,
+  MODULE_GROUPS,
+  MODULE_LABELS,
+} from '../types'
+import { listPublicModules, submitAddOnModuleRequest, submitServiceRequest } from '../api/leadApi'
 
 const INSTITUTION_TYPES: { value: InstitutionType; label: string }[] = [
   { value: 'university', label: 'University / College' },
@@ -11,13 +17,6 @@ const INSTITUTION_TYPES: { value: InstitutionType; label: string }[] = [
   { value: 'training_provider', label: 'Training Provider' },
 ]
 
-const MODULE_OPTIONS: { value: RequestedModule; label: string; icon: string }[] = [
-  { value: 'academic', label: 'Academic & Courses', icon: '📚' },
-  { value: 'assessment', label: 'Assessment & Gradebook', icon: '📝' },
-  { value: 'payments', label: 'Payments & Invoicing', icon: '💳' },
-  { value: 'reports_ai', label: 'Reports & AI Insights', icon: '📊' },
-]
-
 const EMPTY_FORM: ServiceRequestPayload = {
   institutionName: '',
   institutionType: 'university',
@@ -26,24 +25,38 @@ const EMPTY_FORM: ServiceRequestPayload = {
   phone: '',
   estimatedUsers: '',
   preferredSubdomain: '',
-  modules: [],
+  modules: [...ALWAYS_ON_MODULES],
   message: '',
 }
 
 const TOTAL_STEPS = 3
 
 export function RequestServiceForm() {
+  const [requestMode, setRequestMode] = useState<'new_institution' | 'add_modules'>('new_institution')
   const [step, setStep] = useState(1)
   const [form, setForm] = useState<ServiceRequestPayload>(EMPTY_FORM)
+  const [tenantLookup, setTenantLookup] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
+  const { data: catalog = [] } = useQuery({
+    queryKey: ['public-modules'],
+    queryFn: listPublicModules,
+  })
+
+  const catalogByKey = new Map(catalog.map((item) => [item.key, item]))
+  const total = form.modules.reduce((sum, key) => {
+    const item = catalogByKey.get(key)
+    return sum + Number(item?.annual_price ?? 0)
+  }, 0)
+  const currency = catalog.find((item) => item.currency)?.currency ?? 'USD'
 
   function update<K extends keyof ServiceRequestPayload>(key: K, value: ServiceRequestPayload[K]) {
     setForm((f) => ({ ...f, [key]: value }))
   }
 
-  function toggleModule(mod: RequestedModule) {
+  function toggleModule(mod: ModuleKey) {
+    if (ALWAYS_ON_MODULES.includes(mod)) return
     setForm((f) => ({
       ...f,
       modules: f.modules.includes(mod)
@@ -54,8 +67,12 @@ export function RequestServiceForm() {
 
   function validateStep(current: number): string {
     if (current === 1) {
-      if (!form.institutionName.trim()) return 'Please enter your institution name.'
-      if (!form.institutionType) return 'Please select your institution type.'
+      if (requestMode === 'add_modules') {
+        if (!tenantLookup.trim()) return 'Please enter your institution subdomain or setup email.'
+      } else {
+        if (!form.institutionName.trim()) return 'Please enter your institution name.'
+        if (!form.institutionType) return 'Please select your institution type.'
+      }
     }
     if (current === 2) {
       if (!form.contactName.trim()) return 'Please enter a contact person.'
@@ -86,10 +103,22 @@ export function RequestServiceForm() {
     setSubmitting(true)
     setError('')
     try {
-      await submitServiceRequest(form)
+      if (requestMode === 'add_modules') {
+        await submitAddOnModuleRequest({
+          requestKind: 'add_modules',
+          tenantLookup,
+          contactName: form.contactName,
+          email: form.email,
+          phone: form.phone,
+          modules: form.modules.filter((m) => !ALWAYS_ON_MODULES.includes(m)),
+          message: form.message,
+        })
+      } else {
+        await submitServiceRequest(form)
+      }
       setSubmitted(true)
-    } catch {
-      setError('Something went wrong sending your request. Please try again.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong sending your request.')
     } finally {
       setSubmitting(false)
     }
@@ -104,14 +133,15 @@ export function RequestServiceForm() {
         <h3 className="text-[22px] font-extrabold text-navy-900">Request received!</h3>
         <p className="mt-3 text-[14px] text-secondary-text max-w-md mx-auto leading-relaxed">
           Thank you, {form.contactName.split(' ')[0] || 'there'}. Our team has been notified
-          and will review <strong>{form.institutionName}</strong>&rsquo;s request. You&rsquo;ll
+          and will review <strong>{requestMode === 'add_modules' ? tenantLookup : form.institutionName}</strong>&rsquo;s request. You&rsquo;ll
           receive a custom proposal and invoice at <strong>{form.email}</strong> within 1
           business day. Once payment and the agreement are confirmed, we&rsquo;ll email you
-          your dedicated Brana LMS link.
+          your dedicated Berana LMS link.
         </p>
         <button
           onClick={() => {
-            setForm(EMPTY_FORM)
+            setForm({ ...EMPTY_FORM, modules: [...ALWAYS_ON_MODULES] })
+            setTenantLookup('')
             setStep(1)
             setSubmitted(false)
           }}
@@ -125,7 +155,6 @@ export function RequestServiceForm() {
 
   return (
     <div className="bg-white rounded-3xl p-7 md:p-10 border border-divider shadow-[0_20px_50px_rgba(27,35,64,0.1)]">
-      {/* progress */}
       <div className="flex items-center gap-2 mb-8">
         {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
           <div key={i} className="flex-1 h-1.5 rounded-full bg-divider overflow-hidden">
@@ -140,57 +169,93 @@ export function RequestServiceForm() {
       <form onSubmit={handleSubmit}>
         {step === 1 && (
           <div className="space-y-5">
+            <div className="grid grid-cols-2 gap-2 rounded-2xl bg-canvas p-1">
+              {[
+                ['new_institution', 'New Institution'],
+                ['add_modules', 'Add Modules'],
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => {
+                    setRequestMode(value as 'new_institution' | 'add_modules')
+                    setForm({ ...EMPTY_FORM, modules: value === 'new_institution' ? [...ALWAYS_ON_MODULES] : [] })
+                    setTenantLookup('')
+                  }}
+                  className={`rounded-xl px-3 py-2 text-[12.5px] font-extrabold transition-colors ${
+                    requestMode === value ? 'bg-white text-navy-900 shadow-sm' : 'text-secondary-text'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
             <div>
-              <h3 className="text-[19px] font-extrabold text-navy-900">Tell us about your institution</h3>
+              <h3 className="text-[19px] font-extrabold text-navy-900">
+                {requestMode === 'add_modules' ? 'Find your institution' : 'Tell us about your institution'}
+              </h3>
               <p className="text-[13px] text-secondary-text mt-1">Step 1 of {TOTAL_STEPS}</p>
             </div>
 
-            <Field label="Institution name">
-              <input
-                value={form.institutionName}
-                onChange={(e) => update('institutionName', e.target.value)}
-                placeholder="e.g. Addis Ababa University"
-                className={inputClass}
-              />
-            </Field>
-
-            <Field label="Institution type">
-              <select
-                value={form.institutionType}
-                onChange={(e) => update('institutionType', e.target.value as InstitutionType)}
-                className={inputClass}
-              >
-                {INSTITUTION_TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-            </Field>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="Estimated users">
+            {requestMode === 'add_modules' ? (
+              <Field label="Institution subdomain or setup email">
                 <input
-                  value={form.estimatedUsers}
-                  onChange={(e) => update('estimatedUsers', e.target.value)}
-                  placeholder="e.g. 2,000 students"
+                  value={tenantLookup}
+                  onChange={(e) => setTenantLookup(e.target.value)}
+                  placeholder="aau or admin@institution.edu.et"
                   className={inputClass}
                 />
               </Field>
-              <Field label="Preferred subdomain">
-                <div className="flex items-center">
+            ) : (
+              <>
+                <Field label="Institution name">
                   <input
-                    value={form.preferredSubdomain}
-                    onChange={(e) => update('preferredSubdomain', e.target.value)}
-                    placeholder="aau"
-                    className={`${inputClass} rounded-r-none`}
+                    value={form.institutionName}
+                    onChange={(e) => update('institutionName', e.target.value)}
+                    placeholder="e.g. Addis Ababa University"
+                    className={inputClass}
                   />
-                  <span className="text-[12.5px] text-secondary-text bg-canvas border border-l-0 border-divider rounded-r-lg px-3 py-2.5 whitespace-nowrap">
-                    .brana-lms.com
-                  </span>
+                </Field>
+
+                <Field label="Institution type">
+                  <select
+                    value={form.institutionType}
+                    onChange={(e) => update('institutionType', e.target.value as InstitutionType)}
+                    className={inputClass}
+                  >
+                    {INSTITUTION_TYPES.map((t) => (
+                      <option key={t.value} value={t.value}>
+                        {t.label}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Estimated users">
+                    <input
+                      value={form.estimatedUsers}
+                      onChange={(e) => update('estimatedUsers', e.target.value)}
+                      placeholder="e.g. 2,000 students"
+                      className={inputClass}
+                    />
+                  </Field>
+                  <Field label="Preferred subdomain">
+                    <div className="flex items-center">
+                      <input
+                        value={form.preferredSubdomain}
+                        onChange={(e) => update('preferredSubdomain', e.target.value)}
+                        placeholder="aau"
+                        className={`${inputClass} rounded-r-none`}
+                      />
+                      <span className="text-[12.5px] text-secondary-text bg-canvas border border-l-0 border-divider rounded-r-lg px-3 py-2.5 whitespace-nowrap">
+                        .berana-lms.com
+                      </span>
+                    </div>
+                  </Field>
                 </div>
-              </Field>
-            </div>
+              </>
+            )}
           </div>
         )}
 
@@ -231,25 +296,64 @@ export function RequestServiceForm() {
             </Field>
 
             <Field label="Which modules do you need?">
-              <div className="grid grid-cols-2 gap-2.5">
-                {MODULE_OPTIONS.map((m) => {
-                  const active = form.modules.includes(m.value)
-                  return (
-                    <button
-                      type="button"
-                      key={m.value}
-                      onClick={() => toggleModule(m.value)}
-                      className={`flex items-center gap-2 text-left text-[12.5px] font-semibold px-3.5 py-2.5 rounded-xl border transition-all cursor-pointer ${
-                        active
-                          ? 'bg-lemon-50 border-lemon-500 text-navy-900'
-                          : 'bg-white border-divider text-secondary-text hover:border-navy-200'
-                      }`}
-                    >
-                      <span>{m.icon}</span>
-                      {m.label}
-                    </button>
-                  )
-                })}
+              <div className="mb-3 rounded-xl border border-divider bg-canvas px-4 py-3">
+                <p className="text-[12px] font-extrabold text-navy-900">
+                  Estimated annual cost: {currency} {total.toLocaleString()}
+                </p>
+                <p className="text-[11.5px] text-secondary-text mt-0.5">
+                  Final invoice can be adjusted by Cyber-Zeb before payment.
+                </p>
+              </div>
+              <div className="space-y-4 max-h-[320px] overflow-y-auto pr-1">
+                {MODULE_GROUPS.map((group) => (
+                  <div key={group.title}>
+                    <p className="text-[11px] font-extrabold uppercase tracking-wide text-secondary-text mb-2">
+                      {group.title}
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {group.keys.map((key) => {
+                        const locked = ALWAYS_ON_MODULES.includes(key)
+                        const catalogItem = catalogByKey.get(key)
+                        if (catalog.length && !catalogItem?.is_active) return null
+                        if (requestMode === 'add_modules' && locked) return null
+                        const active = form.modules.includes(key) || locked
+                        return (
+                          <button
+                            type="button"
+                            key={key}
+                            disabled={locked}
+                            onClick={() => toggleModule(key)}
+                            className={`flex items-start gap-2 text-left text-[12.5px] font-semibold px-3.5 py-2.5 rounded-xl border transition-all ${
+                              locked ? 'cursor-not-allowed opacity-90' : 'cursor-pointer'
+                            } ${
+                              active
+                                ? 'bg-lemon-50 border-lemon-500 text-navy-900'
+                                : 'bg-white border-divider text-secondary-text hover:border-navy-200'
+                            }`}
+                          >
+                            <span
+                              className={`mt-0.5 w-3.5 h-3.5 rounded border flex-shrink-0 ${
+                                active ? 'bg-lemon-500 border-lemon-700' : 'border-divider bg-white'
+                              }`}
+                            />
+                            <span>
+                              {MODULE_LABELS[key]}
+                              <span className="block text-[10.5px] font-semibold text-secondary-text">
+                                {catalogItem?.currency ?? 'USD'}{' '}
+                                {Number(catalogItem?.annual_price ?? 0).toLocaleString()} / year
+                              </span>
+                              {locked && (
+                                <span className="block text-[10.5px] font-semibold text-secondary-text">
+                                  Always included
+                                </span>
+                              )}
+                            </span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             </Field>
 
@@ -281,28 +385,29 @@ export function RequestServiceForm() {
               <Row label="Contact" value={`${form.contactName || '—'} · ${form.email || '—'}`} />
               <Row label="Phone" value={form.phone || '—'} />
               <Row
-                label="Subdomain"
+                label="Institution path"
                 value={
-                  form.preferredSubdomain
-                    ? `${form.preferredSubdomain}.brana-lms.com`
-                    : 'To be assigned'
+                  requestMode === 'add_modules'
+                    ? tenantLookup || '—'
+                    : form.preferredSubdomain
+                      ? `${form.preferredSubdomain}.berana-lms.com`
+                      : 'To be assigned'
                 }
               />
               <Row
                 label="Modules"
                 value={
                   form.modules.length
-                    ? form.modules
-                        .map((m) => MODULE_OPTIONS.find((o) => o.value === m)?.label)
-                        .join(', ')
+                    ? form.modules.map((m) => MODULE_LABELS[m]).join(', ')
                     : '—'
                 }
               />
+              <Row label="Estimated annual cost" value={`${currency} ${total.toLocaleString()}`} />
             </div>
 
             <p className="text-[12.5px] text-secondary-text leading-relaxed">
               By submitting, our team will contact you with a custom proposal and invoice.
-              This is a demo request form — no payment is collected here.
+              No payment is collected on this form.
             </p>
           </div>
         )}
@@ -364,7 +469,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4">
-      <span className="text-secondary-text font-semibold">{label}</span>
+      <span className="text-secondary-text font-semibold shrink-0">{label}</span>
       <span className="text-navy-900 font-bold text-right">{value}</span>
     </div>
   )
