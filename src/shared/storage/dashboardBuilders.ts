@@ -2,10 +2,11 @@ import type { PersonRow } from '../../modules/institution/types'
 import type { CourseRecord } from '../../modules/institution/types'
 import type { CourseEnrollment } from '../../modules/institution/types'
 import type { StudentDashboardData } from '../../modules/students/types'
-import type { InstructorDashboardData } from '../../modules/instructors/types'
+import type { InstructorDashboardData, InstructorCertificateRow } from '../../modules/instructors/types'
 import type { InstitutionOverviewData } from '../../modules/institution/types'
 import {
   readCampusRecords,
+  readCertificates,
   readCourses,
   readDepartments,
   readEnrollments,
@@ -23,6 +24,7 @@ import {
   toInstructorAnnouncementItems,
   toStudentAnnouncementItems,
 } from './announcementUtils'
+import { certificateToStudentItem } from '../../modules/institution/api/certificatesApi'
 
 function emptyStudentDashboard(student: PersonRow): StudentDashboardData {
   return {
@@ -95,6 +97,7 @@ function enrollmentToCourse(
     ? getEnrollmentProgressPercent(studentId, course)
     : enrollment.progress
   const allComplete = course && progress >= 100
+
   return {
     id: enrollment.courseId,
     code: enrollment.courseCode,
@@ -114,10 +117,13 @@ function enrollmentToCourse(
 
 export function buildStudentDashboard(student: PersonRow): StudentDashboardData {
   const base = emptyStudentDashboard(student)
+
   const enrollments = readEnrollments().filter(
     (e) => e.studentId === student.id && e.status === 'active',
   )
+
   const coursesCatalog = readPublishedApprovedCourses()
+
   const courses = enrollments
     .map((e) => {
       const course = coursesCatalog.find((c) => c.id === e.courseId)
@@ -127,29 +133,43 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
 
   if (courses.length === 0) {
     const enrolledCourseIds = enrollments.map((e) => e.courseId)
+
     const announcementRecords = filterAnnouncementsForStudent(
       readAnnouncements(),
       student.id,
       enrolledCourseIds,
     )
+
+    const studentCertificates = readCertificates()
+      .filter((c) => c.studentId === student.id && c.status !== 'revoked')
+      .map(certificateToStudentItem)
+
     return {
       ...base,
       announcements: toStudentAnnouncementItems(announcementRecords),
+      certificates: studentCertificates,
     }
   }
 
   const activeCount = courses.filter((c) => c.status === 'active').length
+
   const enrolledCourseIds = enrollments.map((e) => e.courseId)
+
   const announcementRecords = filterAnnouncementsForStudent(
     readAnnouncements(),
     student.id,
     enrolledCourseIds,
   )
 
+  const studentCertificates = readCertificates()
+    .filter((c) => c.studentId === student.id && c.status !== 'revoked')
+    .map(certificateToStudentItem)
+
   return {
     ...base,
     courses,
     announcements: toStudentAnnouncementItems(announcementRecords),
+    certificates: studentCertificates,
     standing: `${activeCount} active course${activeCount === 1 ? '' : 's'}`,
     kpis: { ...base.kpis, activeCourses: activeCount },
     stats: base.stats.map((s) =>
@@ -229,13 +249,18 @@ function emptyInstructorDashboard(instructor: PersonRow): InstructorDashboardDat
 export function buildInstructorDashboard(instructor: PersonRow): InstructorDashboardData {
   const base = emptyInstructorDashboard(instructor)
   const allCourses = readCourses()
+
   const myCourses = allCourses.filter((c) =>
     courseTeachesInstructor(c, instructor.id, instructor.name),
   )
 
   const enrollments = readEnrollments()
+
   const teachingCourses = myCourses.map((c) => {
-    const enrolled = enrollments.filter((e) => e.courseId === c.id && e.status === 'active')
+    const enrolled = enrollments.filter(
+      (e) => e.courseId === c.id && e.status === 'active',
+    )
+
     return {
       id: c.id,
       code: c.code,
@@ -257,11 +282,13 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
 
   const courseIds = new Set(myCourses.map((c) => c.id))
   const people = readPeople()
+
   const students = enrollments
     .filter((e) => courseIds.has(e.courseId) && e.status === 'active')
     .map((enrollment) => {
       const person = people.find((p) => p.id === enrollment.studentId)
       const course = myCourses.find((c) => c.id === enrollment.courseId)
+
       return {
         id: `${enrollment.studentId}-${enrollment.courseId}`,
         name: person?.name ?? enrollment.studentName,
@@ -276,8 +303,14 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
 
   const activeCourses = teachingCourses.filter((c) => c.status === 'active').length
   const pendingApproval = myCourses.filter((c) => c.approvalStatus === 'pending').length
-  const teachingSummary = instructorTeachingSummary(allCourses, instructor.id, instructor.name)
+  const teachingSummary = instructorTeachingSummary(
+    allCourses,
+    instructor.id,
+    instructor.name,
+  )
+
   const teachingCourseIds = myCourses.map((course) => course.id)
+
   const announcementRecords = filterAnnouncementsForInstructorFeed(
     readAnnouncements(),
     instructor.id,
@@ -293,7 +326,10 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
         : 'No courses assigned yet',
     courses: teachingCourses,
     students,
-    announcements: toInstructorAnnouncementItems(announcementRecords, instructor.id),
+    announcements: toInstructorAnnouncementItems(
+      announcementRecords,
+      instructor.id,
+    ),
     kpis: {
       ...base.kpis,
       activeCourses,
@@ -315,7 +351,11 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
       text:
         c.approvalStatus === 'pending'
           ? `Course proposal “${c.title}” pending admin approval.`
-          : `Teaching ${c.code} — ${enrollments.filter((e) => e.courseId === c.id && e.status === 'active').length} students enrolled.`,
+          : `Teaching ${c.code} — ${
+              enrollments.filter(
+                (e) => e.courseId === c.id && e.status === 'active',
+              ).length
+            } students enrolled.`,
       timestamp: c.submittedAt ?? 'Active',
     })),
   }
@@ -323,7 +363,9 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
 
 function sparklineFrom(value: number, points = 6): number[] {
   return Array.from({ length: points }, (_, i) =>
-    i === points - 1 ? value : Math.max(0, Math.round(value * (0.7 + i * 0.05))),
+    i === points - 1
+      ? value
+      : Math.max(0, Math.round(value * (0.7 + i * 0.05))),
   )
 }
 
@@ -331,6 +373,7 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
   const people = readPeople()
   const courses = readCourses()
   const enrollments = readEnrollments()
+  const certificates = readCertificates()
   const departments = readDepartments()
   const campusRecords = readCampusRecords()
 
@@ -338,11 +381,23 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
   const instructors = people.filter((p) => p.role === 'Instructor')
   const activeStudents = students.filter((p) => p.status === 'active').length
   const activeCourses = courses.filter((c) => c.status === 'published').length
-  const pendingApprovals = courses.filter((c) => c.approvalStatus === 'pending').length
-  const pendingEnrollmentRows = enrollments.filter((e) => e.status === 'pending')
+  const pendingApprovals = courses.filter(
+    (c) => c.approvalStatus === 'pending',
+  ).length
+  const pendingEnrollmentRows = enrollments.filter(
+    (e) => e.status === 'pending',
+  )
+
   const completionRate = enrollments.length
-    ? Math.round(enrollments.reduce((sum, e) => sum + e.progress, 0) / enrollments.length)
+    ? Math.round(
+        enrollments.reduce((sum, e) => sum + e.progress, 0) /
+          enrollments.length,
+      )
     : 0
+
+  const certificatesIssued = certificates.filter(
+    (c) => c.status === 'issued',
+  ).length
 
   const campuses = campusRecords.map((campus) => ({
     ...campus,
@@ -393,7 +448,11 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
     institutionName: readInstitutionName(),
     institutionSubtitle:
       departments.length > 0
-        ? `${departments.length} department${departments.length === 1 ? '' : 's'} · ${campusRecords.length} campus${campusRecords.length === 1 ? '' : 'es'}`
+        ? `${departments.length} department${
+            departments.length === 1 ? '' : 's'
+          } · ${campusRecords.length} campus${
+            campusRecords.length === 1 ? '' : 'es'
+          }`
         : 'Complete setup to get started',
     kpis: {
       totalStudents: students.length,
@@ -403,7 +462,7 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
       completionRate,
       pendingApprovals,
       upcomingLiveSessions: 0,
-      certificatesIssued: 0,
+      certificatesIssued,
     },
     kpiTrends: {
       totalStudents: sparklineFrom(students.length),
@@ -413,30 +472,53 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
       completionRate: sparklineFrom(completionRate),
       pendingApprovals: sparklineFrom(pendingApprovals),
       upcomingLiveSessions: [0],
-      certificatesIssued: [0],
+      certificatesIssued: sparklineFrom(certificatesIssued),
     },
-    enrollmentTrend: [{ label: 'Now', totalStudents: students.length, activeStudents }],
+    enrollmentTrend: [
+      {
+        label: 'Now',
+        totalStudents: students.length,
+        activeStudents,
+      },
+    ],
     progressOverview: [
       {
         label: 'Active enrollments',
         count: enrollments.filter((e) => e.status === 'active').length,
         tone: 'success',
       },
-      { label: 'Pending enrollments', count: pendingEnrollmentRows.length, tone: 'warning' },
-      { label: 'Published courses', count: activeCourses, tone: 'info' },
-      { label: 'Course proposals', count: pendingApprovals, tone: 'danger' },
+      {
+        label: 'Pending enrollments',
+        count: pendingEnrollmentRows.length,
+        tone: 'warning',
+      },
+      {
+        label: 'Published courses',
+        count: activeCourses,
+        tone: 'info',
+      },
+      {
+        label: 'Course proposals',
+        count: pendingApprovals,
+        tone: 'danger',
+      },
     ],
     coursePerformance: courses.slice(0, 6).map((c) => ({
       id: c.id,
       courseCode: c.code,
       title: c.title,
       instructor: c.instructor,
-      enrolled: enrollments.filter((e) => e.courseId === c.id && e.status === 'active').length,
+      enrolled: enrollments.filter(
+        (e) => e.courseId === c.id && e.status === 'active',
+      ).length,
       completionRate: c.progressPercent,
-      status: (c.progressPercent >= 80 ? 'healthy' : c.progressPercent >= 50 ? 'watch' : 'critical') as
-        | 'healthy'
-        | 'watch'
-        | 'critical',
+      status: (
+        c.progressPercent >= 80
+          ? 'healthy'
+          : c.progressPercent >= 50
+            ? 'watch'
+            : 'critical'
+      ) as 'healthy' | 'watch' | 'critical',
     })),
     pendingEnrollments: pendingEnrollmentRows.slice(0, 5).map((e) => ({
       id: e.id,
@@ -466,30 +548,48 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
       })),
       ...courses.slice(-2).map((c, i) => ({
         id: `course-${i}`,
-        text: `Course ${c.code} — ${c.status}${c.approvalStatus === 'pending' ? ' (pending approval)' : ''}`,
+        text: `Course ${c.code} — ${c.status}${
+          c.approvalStatus === 'pending' ? ' (pending approval)' : ''
+        }`,
         timestamp: c.submittedAt ?? 'Catalog',
         type: 'course' as const,
       })),
     ],
-    recentAnnouncements: toAdminAnnouncementItems(readAnnouncements()).slice(0, 5),
+    recentAnnouncements: toAdminAnnouncementItems(
+      readAnnouncements(),
+    ).slice(0, 5),
     calendarEvents: [],
     helpDeskTickets: [],
     assignmentSubmissions: [],
     integrationStatus: [],
     statTotals: {
       campusCount: campusRecords.length,
-      activeCampusCount: campusRecords.filter((c) => c.status === 'active').length,
+      activeCampusCount: campusRecords.filter(
+        (c) => c.status === 'active',
+      ).length,
       totalUsers: people.length,
       pendingInvitations: people.filter((p) => p.status === 'invited').length,
       activeIntegrations: 0,
       totalIntegrations: 2,
-      setupProgressPercent: Math.round((setupDone / setupSteps.length) * 100),
+      setupProgressPercent: Math.round(
+        (setupDone / setupSteps.length) * 100,
+      ),
     },
     campuses,
     setupSteps,
     ssoProviders: [
-      { id: 'google', name: 'Google Workspace', subtitle: 'SSO', status: 'not-configured' as const },
-      { id: 'microsoft', name: 'Microsoft Entra', subtitle: 'SSO', status: 'not-configured' as const },
+      {
+        id: 'google',
+        name: 'Google Workspace',
+        subtitle: 'SSO',
+        status: 'not-configured' as const,
+      },
+      {
+        id: 'microsoft',
+        name: 'Microsoft Entra',
+        subtitle: 'SSO',
+        status: 'not-configured' as const,
+      },
     ],
     auditLogEntries: recentActivityToAudit(
       people,
@@ -505,6 +605,7 @@ function recentActivityToAudit(
   enrollments: CourseEnrollment[],
 ) {
   const entries = []
+
   if (people.length) {
     entries.push({
       id: 'audit-people',
@@ -513,6 +614,7 @@ function recentActivityToAudit(
       timestamp: 'Now',
     })
   }
+
   if (courses.length) {
     entries.push({
       id: 'audit-courses',
@@ -521,6 +623,7 @@ function recentActivityToAudit(
       timestamp: 'Now',
     })
   }
+
   if (enrollments.length) {
     entries.push({
       id: 'audit-enroll',
@@ -529,5 +632,105 @@ function recentActivityToAudit(
       timestamp: 'Now',
     })
   }
+
   return entries
+}
+
+// ─── Instructor Certificates ──────────────────────────────────────────────────
+
+/**
+ * Builds the certificate view rows for the instructor-scoped certificates page.
+ *
+ * Logic:
+ *   - Only enrollments in courses taught by this instructor are included.
+ *   - For each enrollment we join with CertificateRecord (if one exists).
+ *   - certStatus derivation:
+ *       'issued'      — a CertificateRecord with status='issued' exists
+ *       'pending'     — a CertificateRecord with status='pending' exists
+ *       'eligible'    — progress >= 80 and no certificate record yet
+ *       'not-eligible'— progress < 80 and no certificate record
+ */
+export function buildInstructorCertificates(
+  instructor: PersonRow,
+): InstructorCertificateRow[] {
+  const allCourses = readCourses()
+
+  const myCourses = allCourses.filter((c) =>
+    courseTeachesInstructor(c, instructor.id, instructor.name),
+  )
+
+  if (myCourses.length === 0) return []
+
+  const courseIds = new Set(myCourses.map((c) => c.id))
+  const people = readPeople()
+
+  const enrollments = readEnrollments().filter(
+    (e) => courseIds.has(e.courseId) && e.status === 'active',
+  )
+
+  const certificates = readCertificates()
+  const institutionName = readInstitutionName()
+
+  return enrollments.map((enrollment): InstructorCertificateRow => {
+    const person = people.find((p) => p.id === enrollment.studentId)
+    const course = myCourses.find((c) => c.id === enrollment.courseId)
+
+    const certRecord = certificates.find(
+      (c) =>
+        c.studentId === enrollment.studentId &&
+        c.courseId === enrollment.courseId &&
+        c.status !== 'revoked',
+    )
+
+    const progress = enrollment.progress
+    const gradeDisplay = progress > 0 ? `${progress}%` : '—'
+
+    let certStatus: InstructorCertificateRow['certStatus']
+
+    if (certRecord?.status === 'issued') {
+      certStatus = 'issued'
+    } else if (certRecord?.status === 'pending') {
+      certStatus = 'pending'
+    } else if (progress >= 80) {
+      certStatus = 'eligible'
+    } else {
+      certStatus = 'not-eligible'
+    }
+
+    const completionDateDisplay = certRecord?.completionDate
+      ? new Date(certRecord.completionDate).toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })
+      : progress >= 100
+        ? 'Completed'
+        : undefined
+
+    const issuedAtDisplay = certRecord?.issueDate
+      ? new Date(certRecord.issueDate).toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })
+      : undefined
+
+    return {
+      id: `${enrollment.studentId}-${enrollment.courseId}`,
+      studentId: enrollment.studentId,
+      studentName: person?.name ?? enrollment.studentName,
+      studentEmail: person?.email ?? '',
+      courseId: enrollment.courseId,
+      courseCode: course?.code ?? enrollment.courseCode,
+      courseTitle: course?.title ?? enrollment.courseTitle,
+      completionPercent: progress,
+      finalGrade: gradeDisplay,
+      completionDate: completionDateDisplay,
+      certStatus,
+      certificateId: certRecord?.certificateId,
+      issuedAt: issuedAtDisplay,
+      certRecordId: certRecord?.id,
+      institution: institutionName,
+    }
+  })
 }

@@ -371,6 +371,35 @@ export type CourseCreateInput = Omit<
   instructorId?: string
 }
 
+/* ── Certificates ─────────────────────────────────────────── */
+export type CertificateStatus = 'issued' | 'pending' | 'revoked'
+
+export interface CertificateTemplate {
+  id: string
+  name: string
+}
+
+export interface CertificateRecord {
+  id: string
+  certificateId: string
+  studentId: string
+  studentName: string
+  courseId: string
+  courseCode: string
+  courseTitle: string
+  instructorId?: string
+  instructorName: string
+  department: string
+  campusId: string
+  completionDate?: string
+  issueDate?: string
+  expirationDate?: string
+  templateId: string
+  templateName: string
+  status: CertificateStatus
+  revokedAt?: string
+}
+
 /* ── Enrollments ──────────────────────────────────────────── */
 export interface CourseEnrollment {
   id: string
@@ -434,3 +463,47 @@ export interface TrendPoint {
   value: number
 }
 
+
+/* ── Attendance ───────────────────────────────────────────── */
+
+export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused'
+export type AttendanceRiskLevel = 'good' | 'warning' | 'at-risk'
+
+export interface AttendanceSession {
+  /** ISO date, e.g. "2025-08-14" */
+  date: string
+  status: AttendanceStatus
+  note?: string
+}
+
+export interface AttendanceRecord {
+  id: string
+  studentId: string
+  studentName: string
+  studentEmail: string
+  courseId: string
+  courseCode: string
+  courseTitle: string
+  instructorId: string
+  instructorName: string
+  department: string
+  campusId: string
+  /** 0–100 */
+  attendancePercent: number
+  present: number
+  absent: number
+  late: number
+  excused: number
+  totalSessions: number
+  riskLevel: AttendanceRiskLevel
+  lastSessionDate?: string
+  history: AttendanceSession[]
+}
+
+export interface AttendanceSummary {
+  overallRate: number
+  presentToday: number
+  absentToday: number
+  lateToday: number
+  atRisk: number
+}
