@@ -21,8 +21,12 @@ from app.modules.parent_portal.router import router as parent_portal_router
 from app.modules.reports.router import router as reports_router
 from app.modules.integrations.router import router as integrations_router
 from app.modules.admin.router import router as admin_router
+from app.modules.onboarding.router import router as onboarding_router
 
 api_router = APIRouter()
+
+# Onboarding / Super Admin (public service requests + platform console)
+api_router.include_router(onboarding_router)
 
 # Sprint 1 (Blueprint Section 19)
 api_router.include_router(tenants_router, prefix="/tenants", tags=["Tenants & Organization"])

@@ -2,27 +2,31 @@
 Password hashing and JWT helpers.
 
 Blueprint Section 16 requirements enforced here:
-- Strong password hashing (bcrypt via passlib)
+- Strong password hashing (bcrypt)
 - Short-lived access tokens + longer-lived refresh tokens
 - No secrets ever hardcoded (pulled from app.core.config.settings)
 """
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from app.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 def hash_password(plain_password: str) -> str:
-    return pwd_context.hash(plain_password)
+    # bcrypt has a 72-byte input limit
+    raw = plain_password.encode("utf-8")[:72]
+    return bcrypt.hashpw(raw, bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    raw = plain_password.encode("utf-8")[:72]
+    try:
+        return bcrypt.checkpw(raw, hashed_password.encode("utf-8"))
+    except (ValueError, TypeError):
+        return False
 
 
 def create_access_token(subject: str, extra_claims: Optional[dict[str, Any]] = None) -> str:

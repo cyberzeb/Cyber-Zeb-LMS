@@ -7,9 +7,9 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5">
-              <img src={brandLogo} alt="Brana LMS" className="h-10 w-auto rounded-lg object-contain" />
+              <img src={brandLogo} alt="Berana LMS" className="h-10 w-auto rounded-lg object-contain" />
               <span className="text-white font-extrabold text-lg">
-                Brana <span className="text-lemon-500">LMS</span>
+                Berana <span className="text-lemon-500">LMS</span>
               </span>
             </div>
             <p className="mt-4 text-[13px] text-navy-200 max-w-sm leading-relaxed">
@@ -42,7 +42,7 @@ export function Footer() {
           <p className="text-[12px] text-navy-200">
             © {new Date().getFullYear()} Cyber-Zeb Consulting. All rights reserved.
           </p>
-          <p className="text-[12px] text-navy-200">Brana LMS · Version 1.0</p>
+          <p className="text-[12px] text-navy-200">Berana LMS · Version 1.0</p>
         </div>
       </div>
     </footer>

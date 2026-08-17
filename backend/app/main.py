@@ -1,5 +1,5 @@
 """
-Brana LMS API - application entrypoint.
+Berana LMS API - application entrypoint.
 
 This wires together: CORS, correlation-id middleware, global exception
 handlers, and the versioned API router. Individual business logic lives
@@ -16,7 +16,7 @@ from app.core.exceptions import register_exception_handlers
 app = FastAPI(
     title=settings.APP_NAME,
     version="0.1.0",
-    description="Brana LMS - modular monolith backend (Cyber-Zeb Consulting)",
+    description="Berana LMS - modular monolith backend (Cyber-Zeb Consulting)",
 )
 
 app.add_middleware(CorrelationIdMiddleware)

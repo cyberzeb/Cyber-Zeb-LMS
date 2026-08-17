@@ -1,107 +1,105 @@
-import type { LeadStatus, ServiceLead, ServiceRequestPayload } from '../types'
+import { axiosClient } from '../../../lib/axiosClient'
+import type {
+  AddOnModuleRequestPayload,
+  ModuleCatalogItem,
+  ServiceLead,
+  ServiceRequestPayload,
+} from '../types'
 
-/**
- * MOCK / DEMO API ONLY.
- *
- * This simulates the backend behaviour described in the blueprint:
- *  1. A prospective institution fills the "Request Service" form on the landing page.
- *  2. The request is saved as a "Lead" and the Super Admin is notified (email/SMS).
- *  3. The Super Admin reviews it on /admin/leads, sends an invoice, confirms payment
- *     + signed agreement, then activates the institution's dedicated subdomain link
- *     (e.g. aau.brana-lms.com), which is emailed to the institution.
- *
- * Replace this file's internals with real axios calls to the FastAPI backend
- * (e.g. POST /api/v1/leads, PATCH /api/v1/leads/{id}/status) once that endpoint
- * exists. Every function below is already async so swapping localStorage for
- * axios later does not require changing any component code.
- */
+interface ApiServiceRequest {
+  id: string
+  institution_name: string
+  institution_type: ServiceLead['institutionType']
+  contact_name: string
+  email: string
+  phone: string
+  estimated_users: string
+  preferred_slug: string | null
+  requested_modules: ServiceLead['modules']
+  message: string | null
+  status: ServiceLead['status']
+  created_at: string
+  tenant?: { institution_link?: string; slug?: string } | null
+}
 
-const STORAGE_KEY = 'brana_service_leads'
-
-function readAll(): ServiceLead[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as ServiceLead[]) : []
-  } catch {
-    return []
+function mapLead(row: ApiServiceRequest): ServiceLead {
+  return {
+    id: row.id,
+    institutionName: row.institution_name,
+    institutionType: row.institution_type,
+    contactName: row.contact_name,
+    email: row.email,
+    phone: row.phone,
+    estimatedUsers: row.estimated_users,
+    preferredSubdomain: row.preferred_slug ?? '',
+    modules: row.requested_modules,
+    message: row.message ?? '',
+    createdAt: row.created_at,
+    status: row.status,
+    subdomainLink: row.tenant?.institution_link,
   }
 }
 
-function writeAll(leads: ServiceLead[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(leads))
-}
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-    .slice(0, 24) || 'institution'
-}
-
-/** Simulates the notification Cyber-Zeb's Super Admin receives (email + SMS). */
-function notifySuperAdmin(lead: ServiceLead) {
-  // In production this becomes a backend job: send email via SMTP provider
-  // and SMS via a provider adapter, per Section 12 of the blueprint.
-  console.info(
-    `[MOCK NOTIFICATION] Super Admin alerted → New service request from "${lead.institutionName}" ` +
-      `(${lead.contactName}, ${lead.email}, ${lead.phone}). Modules: ${lead.modules.join(', ')}.`,
-  )
-}
-
-/** Simulates the "link delivered to institution" email once activated. */
-function notifyInstitutionActivated(lead: ServiceLead) {
-  console.info(
-    `[MOCK NOTIFICATION] Email sent to ${lead.email} → "Your Brana LMS is ready: ${lead.subdomainLink}"`,
-  )
-}
-
+/**
+ * Public landing-page submission → POST /api/v1/service-requests
+ * Client generates a UUID Idempotency-Key per form submission.
+ */
 export async function submitServiceRequest(
   payload: ServiceRequestPayload,
 ): Promise<ServiceLead> {
-  await new Promise((r) => setTimeout(r, 500)) // simulate network latency
-
-  const lead: ServiceLead = {
-    ...payload,
-    id: crypto.randomUUID(),
-    createdAt: new Date().toISOString(),
-    status: 'new',
-  }
-
-  const leads = readAll()
-  leads.unshift(lead)
-  writeAll(leads)
-  notifySuperAdmin(lead)
-
-  return lead
+  const idempotencyKey = crypto.randomUUID()
+  const { data } = await axiosClient.post<ApiServiceRequest>(
+    '/service-requests',
+    {
+      institution_name: payload.institutionName,
+      institution_type: payload.institutionType,
+      contact_name: payload.contactName,
+      email: payload.email,
+      phone: payload.phone,
+      estimated_users: payload.estimatedUsers,
+      preferred_slug: payload.preferredSubdomain || null,
+      requested_modules: payload.modules,
+      message: payload.message || null,
+    },
+    {
+      headers: { 'Idempotency-Key': idempotencyKey },
+    },
+  )
+  return mapLead(data)
 }
 
-export async function getLeads(): Promise<ServiceLead[]> {
-  await new Promise((r) => setTimeout(r, 150))
-  return readAll()
+export async function listPublicModules(): Promise<ModuleCatalogItem[]> {
+  const { data } = await axiosClient.get<ModuleCatalogItem[]>('/modules')
+  return data
 }
 
-export async function advanceLeadStatus(
-  id: string,
-  status: LeadStatus,
-): Promise<ServiceLead | null> {
-  await new Promise((r) => setTimeout(r, 250))
-  const leads = readAll()
-  const idx = leads.findIndex((l) => l.id === id)
-  if (idx === -1) return null
+export async function submitAddOnModuleRequest(payload: AddOnModuleRequestPayload) {
+  const { data } = await axiosClient.post(
+    '/addon-module-requests',
+    {
+      tenant_lookup: payload.tenantLookup,
+      contact_name: payload.contactName,
+      email: payload.email,
+      phone: payload.phone || null,
+      requested_modules: payload.modules,
+      message: payload.message || null,
+    },
+    {
+      headers: { 'Idempotency-Key': crypto.randomUUID() },
+    },
+  )
+  return data
+}
 
-  const updated: ServiceLead = { ...leads[idx], status }
-
-  if (status === 'subdomain_activated' && !updated.subdomainLink) {
-    const slug = updated.preferredSubdomain
-      ? slugify(updated.preferredSubdomain)
-      : slugify(updated.institutionName)
-    updated.subdomainLink = `${slug}.brana-lms.com`
-    notifyInstitutionActivated(updated)
-  }
-
-  leads[idx] = updated
-  writeAll(leads)
-  return updated
+export async function resolveTenantBySubdomain(slug: string) {
+  const { data } = await axiosClient.get<{
+    id: string
+    name: string
+    slug: string
+    status: string
+    enabled_modules: string[]
+    renewal_date: string | null
+    institution_link: string
+  }>(`/tenants/by-subdomain/${slug}`)
+  return data
 }

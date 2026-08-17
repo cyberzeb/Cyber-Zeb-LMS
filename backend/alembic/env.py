@@ -18,6 +18,7 @@ from app.core.database import Base
 # --- Import every module's models so Base.metadata is complete ---
 from app.modules.tenants import models as tenants_models  # noqa: F401
 from app.modules.identity import models as identity_models  # noqa: F401
+from app.modules.onboarding import models as onboarding_models  # noqa: F401
 from app.common import audit as audit_models  # noqa: F401
 # TODO: as each module's models.py gains real tables, import it here too:
 # from app.modules.academic import models as academic_models  # noqa: F401
@@ -53,7 +54,16 @@ def do_run_migrations(connection):
 
 
 async def run_migrations_online() -> None:
-    connectable = create_async_engine(settings.DATABASE_URL, poolclass=pool.NullPool)
+    connect_args: dict = {}
+    if settings.DATABASE_URL.startswith("postgresql+asyncpg://") and "neon.tech" in settings.DATABASE_URL:
+        import ssl as _ssl
+
+        connect_args["ssl"] = _ssl.create_default_context()
+    connectable = create_async_engine(
+        settings.DATABASE_URL,
+        poolclass=pool.NullPool,
+        connect_args=connect_args,
+    )
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
     await connectable.dispose()
