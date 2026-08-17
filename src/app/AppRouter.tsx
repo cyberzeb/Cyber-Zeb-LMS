@@ -15,6 +15,8 @@ import { AdministratorsPage } from '../modules/institution/pages/AdministratorsP
 import { VerifyPeoplePage } from '../modules/institution/pages/VerifyPeoplePage'
 import { EnrollmentsPage } from '../modules/institution/pages/EnrollmentsPage'
 import { ReportsPage } from '../modules/institution/pages/ReportsPage'
+import { AdminAnnouncementsPage } from '../modules/institution/pages/AdminAnnouncementsPage'
+import { AdminDiscussionForumPage } from '../modules/institution/pages/AdminDiscussionForumPage'
 import { SettingsPage } from '../modules/institution/pages/SettingsPage'
 import { LandingPage } from '../modules/marketing/pages/LandingPage'
 import { StudentLayout } from '../modules/students/layout/StudentLayout'
@@ -292,11 +294,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'announcements',
-        element: <ReportsPage />,
+        element: <AdminAnnouncementsPage />,
       },
       {
         path: 'discussion-forum',
-        element: <ReportsPage />,
+        element: <AdminDiscussionForumPage />,
       },
       {
         path: 'certificates',

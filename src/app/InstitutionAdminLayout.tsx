@@ -304,6 +304,8 @@ function InstitutionAdminShell() {
     breadcrumbLabels[path] ??
     (path.startsWith('/admin/institution/profile') ? 'Campus Profile' : '')
 
+  const isForumPage = path === '/admin/discussion-forum'
+
   return (
     <div className="flex h-screen app-shell-bg font-sans overflow-hidden">
       <Sidebar
@@ -324,8 +326,17 @@ function InstitutionAdminShell() {
           onCampusChange={setSelectedCampusId}
         />
 
-        <main className="page-content app-scroll flex-1 overflow-y-auto p-5 md:p-6">
-          <div key={path} className="animate-fade-in-up">
+        <main
+          className={`page-content flex-1 min-h-0 ${
+            isForumPage
+              ? 'overflow-hidden flex flex-col p-0'
+              : 'app-scroll overflow-y-auto p-5 md:p-6'
+          }`}
+        >
+          <div
+            key={path}
+            className={isForumPage ? 'flex-1 min-h-0 flex flex-col' : 'animate-fade-in-up'}
+          >
             <Outlet />
           </div>
         </main>

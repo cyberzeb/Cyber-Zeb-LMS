@@ -17,6 +17,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../../shared/components/Button'
 import { DashboardSummaryCard } from '../../../shared/components/DashboardSummaryCard'
+import { AnnouncementDashboardList } from '../../../shared/components/announcements/AnnouncementFeedCard'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { ZoomIcon } from '../../../shared/components/ZoomIcon'
@@ -456,24 +457,11 @@ export function StudentDashboardPage() {
 
         <div className="space-y-4">
           <DashboardSummaryCard title="Announcements" onViewAll={() => navigate('/student/announcements')}>
-            <div className="space-y-2">
-              {data.announcements.slice(0, 3).map((announcement) => (
-                <div key={announcement.id} className="rounded-lg border border-divider p-2.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-[12px] font-semibold text-navy-900 truncate">{announcement.title}</p>
-                      <p className="text-[10.5px] text-secondary-text mt-0.5">
-                        {announcement.author} · {announcement.postedAt}
-                      </p>
-                    </div>
-                    <StatusPill
-                      label={announcement.priority === 'important' ? 'Important' : 'Update'}
-                      tone={announcement.priority === 'important' ? 'warning' : 'neutral'}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+            <AnnouncementDashboardList
+              items={data.announcements.slice(0, 3)}
+              showAuthor
+              emptyMessage="No announcements yet — check back soon."
+            />
           </DashboardSummaryCard>
 
           <DashboardSummaryCard title="Upcoming Live Sessions" onViewAll={() => navigate('/student/live-classes')}>

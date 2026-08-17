@@ -6,6 +6,9 @@ import type {
   ProgramRow,
   CourseEnrollment,
 } from '../../modules/institution/types'
+import type { AnnouncementRecord } from '../types/announcements'
+import type { ForumChatRecord, ForumMessageRecord } from '../types/forum'
+import { normalizeAnnouncementRecord } from './announcementUtils'
 import { STORAGE_KEYS } from './keys'
 
 function readJson<T>(key: string, fallback: T): T {
@@ -63,4 +66,20 @@ export function readPublishedApprovedCourses(): CourseRecord[] {
       c.status !== 'archived' &&
       (!c.approvalStatus || c.approvalStatus === 'approved'),
   )
+}
+
+export function readAnnouncements(): AnnouncementRecord[] {
+  return readJson<AnnouncementRecord[]>(STORAGE_KEYS.announcements, []).map(normalizeAnnouncementRecord)
+}
+
+export function readForumChats(): ForumChatRecord[] {
+  return readJson<ForumChatRecord[]>(STORAGE_KEYS.forumChats, [])
+}
+
+export function readForumMessages(): ForumMessageRecord[] {
+  return readJson<ForumMessageRecord[]>(STORAGE_KEYS.forumMessages, [])
+}
+
+export function readForumReadState(): Record<string, Record<string, string>> {
+  return readJson<Record<string, Record<string, string>>>(STORAGE_KEYS.forumReadState, {})
 }

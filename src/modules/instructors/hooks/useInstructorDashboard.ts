@@ -10,6 +10,7 @@ const RELOAD_KEYS = new Set<string>([
   STORAGE_KEYS.people,
   STORAGE_KEYS.departments,
   STORAGE_KEYS.session,
+  STORAGE_KEYS.announcements,
 ])
 
 export function useInstructorDashboard() {
@@ -51,12 +52,14 @@ export function useInstructorDashboard() {
     window.addEventListener(STORAGE_EVENTS.enrollmentsUpdated, onCustom)
     window.addEventListener(STORAGE_EVENTS.coursesUpdated, onCustom)
     window.addEventListener(STORAGE_EVENTS.peopleUpdated, onCustom)
+    window.addEventListener(STORAGE_EVENTS.announcementsUpdated, onCustom)
     document.addEventListener('visibilitychange', onVisible)
     return () => {
       window.removeEventListener('storage', onStorage)
       window.removeEventListener(STORAGE_EVENTS.enrollmentsUpdated, onCustom)
       window.removeEventListener(STORAGE_EVENTS.coursesUpdated, onCustom)
       window.removeEventListener(STORAGE_EVENTS.peopleUpdated, onCustom)
+      window.removeEventListener(STORAGE_EVENTS.announcementsUpdated, onCustom)
       document.removeEventListener('visibilitychange', onVisible)
     }
   }, [reload])

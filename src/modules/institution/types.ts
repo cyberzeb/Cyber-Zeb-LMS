@@ -150,9 +150,14 @@ export interface ActivityItem {
 export interface AnnouncementItem {
   id: string
   title: string
+  body?: string
   audience: string
   postedAt: string
   priority: 'normal' | 'important'
+  author?: string
+  authorRole?: 'admin' | 'instructor'
+  course?: string
+  views?: number
 }
 
 export interface HelpDeskTicket {

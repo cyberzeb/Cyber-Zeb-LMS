@@ -20,6 +20,7 @@ export function useInstitutionOverview() {
         STORAGE_KEYS.departments,
         STORAGE_KEYS.campuses,
         STORAGE_KEYS.settings,
+        STORAGE_KEYS.announcements,
       ])
       if (reloadKeys.has(event.key)) invalidate()
     }
@@ -27,6 +28,7 @@ export function useInstitutionOverview() {
     window.addEventListener('storage', onStorage)
     window.addEventListener(STORAGE_EVENTS.enrollmentsUpdated, invalidate)
     window.addEventListener(STORAGE_EVENTS.peopleUpdated, invalidate)
+    window.addEventListener(STORAGE_EVENTS.announcementsUpdated, invalidate)
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') invalidate()
     })
@@ -34,6 +36,7 @@ export function useInstitutionOverview() {
       window.removeEventListener('storage', onStorage)
       window.removeEventListener(STORAGE_EVENTS.enrollmentsUpdated, invalidate)
       window.removeEventListener(STORAGE_EVENTS.peopleUpdated, invalidate)
+      window.removeEventListener(STORAGE_EVENTS.announcementsUpdated, invalidate)
     }
   }, [query])
 

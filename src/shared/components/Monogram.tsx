@@ -1,10 +1,11 @@
 interface MonogramProps {
   label: string
-  size?: 'sm' | 'md'
+  size?: 'xs' | 'sm' | 'md'
   className?: string
 }
 
 const sizeClasses = {
+  xs: 'w-8 h-8 text-[10px] rounded-lg',
   sm: 'w-9 h-9 text-[12px] rounded-lg',
   md: 'w-11 h-11 text-[13.5px] rounded-xl',
 }

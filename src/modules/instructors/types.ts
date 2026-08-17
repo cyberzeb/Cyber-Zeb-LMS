@@ -106,6 +106,8 @@ export interface AnnouncementItem {
   priority: 'normal' | 'important'
   course?: string
   views: number
+  authorName?: string
+  isOwn?: boolean
 }
 
 export interface ForumThread {
