@@ -77,6 +77,41 @@ export function readAnnouncements(): AnnouncementRecord[] {
   return readJson<AnnouncementRecord[]>(STORAGE_KEYS.announcements, []).map(normalizeAnnouncementRecord)
 }
 
+export function readLiveSessions() {
+  return readJson<import('../../modules/institution/types/assessments').LiveSessionRecord[]>(
+    STORAGE_KEYS.liveSessions,
+    [],
+  )
+}
+
+export function readAssignmentRecords() {
+  return readJson<import('../../modules/institution/types/assessments').AssignmentRecord[]>(
+    STORAGE_KEYS.assignments,
+    [],
+  )
+}
+
+export function readQuizRecords() {
+  return readJson<import('../../modules/institution/types/assessments').QuizRecord[]>(
+    STORAGE_KEYS.quizzes,
+    [],
+  )
+}
+
+export function readQuestionBank() {
+  return readJson<import('../../modules/institution/types/assessments').QuestionRecord[]>(
+    STORAGE_KEYS.questionBank,
+    [],
+  )
+}
+
+export function readStudentSubmissions() {
+  return readJson<import('../../modules/institution/types/assessments').StudentSubmissionRecord[]>(
+    STORAGE_KEYS.studentSubmissions,
+    [],
+  )
+}
+
 export function readForumChats(): ForumChatRecord[] {
   return readJson<ForumChatRecord[]>(STORAGE_KEYS.forumChats, [])
 }

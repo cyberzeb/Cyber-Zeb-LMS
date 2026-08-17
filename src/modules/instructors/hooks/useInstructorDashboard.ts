@@ -11,6 +11,11 @@ const RELOAD_KEYS = new Set<string>([
   STORAGE_KEYS.departments,
   STORAGE_KEYS.session,
   STORAGE_KEYS.announcements,
+  STORAGE_KEYS.liveSessions,
+  STORAGE_KEYS.assignments,
+  STORAGE_KEYS.quizzes,
+  STORAGE_KEYS.questionBank,
+  STORAGE_KEYS.studentSubmissions,
 ])
 
 export function useInstructorDashboard() {
@@ -53,6 +58,7 @@ export function useInstructorDashboard() {
     window.addEventListener(STORAGE_EVENTS.coursesUpdated, onCustom)
     window.addEventListener(STORAGE_EVENTS.peopleUpdated, onCustom)
     window.addEventListener(STORAGE_EVENTS.announcementsUpdated, onCustom)
+    window.addEventListener(STORAGE_EVENTS.assessmentsUpdated, onCustom)
     document.addEventListener('visibilitychange', onVisible)
     return () => {
       window.removeEventListener('storage', onStorage)
@@ -60,6 +66,7 @@ export function useInstructorDashboard() {
       window.removeEventListener(STORAGE_EVENTS.coursesUpdated, onCustom)
       window.removeEventListener(STORAGE_EVENTS.peopleUpdated, onCustom)
       window.removeEventListener(STORAGE_EVENTS.announcementsUpdated, onCustom)
+      window.removeEventListener(STORAGE_EVENTS.assessmentsUpdated, onCustom)
       document.removeEventListener('visibilitychange', onVisible)
     }
   }, [reload])

@@ -11,6 +11,13 @@ import { ensureDemoStudentInPeople } from '../data/demoStudent'
 import { createId } from '../hooks/useLocalStorageState'
 import { STORAGE_EVENTS, STORAGE_KEYS } from './keys'
 import {
+  seedAssignments,
+  seedLiveSessions,
+  seedQuestions,
+  seedQuizzes,
+  seedStudentSubmissions,
+} from '../../modules/institution/data/assessmentSeedData'
+import {
   readCampusRecords,
   readCourses,
   readDepartments,
@@ -202,7 +209,38 @@ export function ensureDemoSeedData() {
     if (changed) {
       dispatchSeedEvents()
     }
+
+    seedAssessmentDataIfEmpty()
   } catch {
     /* storage blocked */
+  }
+}
+
+function seedAssessmentDataIfEmpty() {
+  let changed = false
+
+  if (!window.localStorage.getItem(STORAGE_KEYS.liveSessions)) {
+    window.localStorage.setItem(STORAGE_KEYS.liveSessions, JSON.stringify(seedLiveSessions))
+    changed = true
+  }
+  if (!window.localStorage.getItem(STORAGE_KEYS.assignments)) {
+    window.localStorage.setItem(STORAGE_KEYS.assignments, JSON.stringify(seedAssignments))
+    changed = true
+  }
+  if (!window.localStorage.getItem(STORAGE_KEYS.quizzes)) {
+    window.localStorage.setItem(STORAGE_KEYS.quizzes, JSON.stringify(seedQuizzes))
+    changed = true
+  }
+  if (!window.localStorage.getItem(STORAGE_KEYS.questionBank)) {
+    window.localStorage.setItem(STORAGE_KEYS.questionBank, JSON.stringify(seedQuestions))
+    changed = true
+  }
+  if (!window.localStorage.getItem(STORAGE_KEYS.studentSubmissions)) {
+    window.localStorage.setItem(STORAGE_KEYS.studentSubmissions, JSON.stringify(seedStudentSubmissions))
+    changed = true
+  }
+
+  if (changed) {
+    window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.assessmentsUpdated))
   }
 }
