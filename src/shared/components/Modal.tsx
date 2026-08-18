@@ -2,17 +2,35 @@ import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import type { ReactNode } from 'react'
 
+type ModalSize = 'md' | 'lg' | 'xl'
+
 interface ModalProps {
   open: boolean
   title: string
   description?: string
   icon?: ReactNode
+  size?: ModalSize
   onClose: () => void
   children: ReactNode
   footer?: ReactNode
 }
 
-export function Modal({ open, title, description, icon, onClose, children, footer }: ModalProps) {
+const sizeClasses: Record<ModalSize, string> = {
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
+}
+
+export function Modal({
+  open,
+  title,
+  description,
+  icon,
+  size = 'md',
+  onClose,
+  children,
+  footer,
+}: ModalProps) {
   useEffect(() => {
     if (!open) return
 
@@ -41,7 +59,7 @@ export function Modal({ open, title, description, icon, onClose, children, foote
       {/* Transparent click-catcher — the blur lives on the page layer, not here */}
       <div onClick={onClose} className="absolute inset-0" />
 
-      <div className="animate-modal-in relative z-10 w-full max-w-lg max-h-[86vh] flex flex-col bg-white rounded-2xl border border-white/80 ring-1 ring-navy-900/5 shadow-[0_24px_70px_-12px_rgba(27,35,64,0.45),0_8px_24px_-8px_rgba(27,35,64,0.25)] overflow-hidden">
+      <div className={`animate-modal-in relative z-10 w-full ${sizeClasses[size]} max-h-[86vh] flex flex-col bg-white rounded-2xl border border-white/80 ring-1 ring-navy-900/5 shadow-[0_24px_70px_-12px_rgba(27,35,64,0.45),0_8px_24px_-8px_rgba(27,35,64,0.25)] overflow-hidden`}>
         {/* Gradient accent strip */}
         <div className="h-1 w-full bg-gradient-to-r from-lemon-500 via-lemon-500 to-navy-900 shrink-0" />
 

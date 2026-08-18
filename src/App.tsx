@@ -17,7 +17,7 @@ const mockCampus: InstitutionEntity = {
   subtitle: 'College of Computing, Business & Sciences · Established 2011',
   status: 'active',
   departmentsCount: 6,
-  programsCount: 18,
+  collegesCount: 3,
   studentsCount: 2066,
   facultyCount: 142,
   completionRate: 94,
@@ -26,11 +26,13 @@ const mockCampus: InstitutionEntity = {
 const mockDepartments: Department[] = [
   {
     id: 'd1',
-    name: 'Computer Science & IT',
+    name: 'Computer Science',
     headName: 'Dr. Aaron Selassie',
     studentsCount: 840,
     facultyCount: 42,
     icon: '💻',
+    campusId: 'c1',
+    collegeId: 'col1',
   },
   {
     id: 'd2',
@@ -39,22 +41,28 @@ const mockDepartments: Department[] = [
     studentsCount: 620,
     facultyCount: 35,
     icon: '📊',
+    campusId: 'c1',
+    collegeId: 'col2',
   },
   {
     id: 'd3',
-    name: 'Engineering & Technology',
+    name: 'Civil Engineering',
     headName: 'Prof. Elias Hailu',
     studentsCount: 410,
     facultyCount: 38,
     icon: '⚙️',
+    campusId: 'c1',
+    collegeId: 'col3',
   },
   {
     id: 'd4',
-    name: 'Social Sciences',
+    name: 'Sociology',
     headName: 'Dr. Tigist Assefa',
     studentsCount: 196,
     facultyCount: 27,
     icon: '🌍',
+    campusId: 'c2',
+    collegeId: 'col4',
   },
 ]
 
@@ -140,7 +148,7 @@ function App() {
       <InstitutionHero
         entity={mockCampus}
         onEdit={() => console.log('Edit Campus')}
-        onAddProgram={() => console.log('Add Program')}
+        onAddDepartment={() => console.log('Add Department')}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 items-start">

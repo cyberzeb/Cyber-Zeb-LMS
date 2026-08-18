@@ -5,6 +5,8 @@ import type { PersonRow } from '../types'
 
 interface PeopleTableProps {
   people: PersonRow[]
+  hideRoleColumn?: boolean
+  departmentLabel?: string
   onSelect?: (person: PersonRow) => void
   onDelete?: (person: PersonRow) => void
 }
@@ -19,7 +21,7 @@ const roleColors: Record<PersonRow['role'], string> = {
   Student: 'bg-info-bg text-info',
   Instructor: 'bg-lemon-50 text-lemon-900',
   Admin: 'bg-navy-50 text-navy-700',
-  Parent: 'bg-warning-bg text-[#8A6D00]',
+  Guardian: 'bg-warning-bg text-[#8A6D00]',
   Staff: 'bg-navy-50 text-navy-500',
 }
 
@@ -30,11 +32,26 @@ const avatarColors = [
   'bg-info text-white',
 ]
 
-export function PeopleTable({ people, onSelect, onDelete }: PeopleTableProps) {
+export function PeopleTable({
+  people,
+  hideRoleColumn = false,
+  departmentLabel = 'Department',
+  onSelect,
+  onDelete,
+}: PeopleTableProps) {
+  const gridCols = hideRoleColumn
+    ? 'md:grid-cols-[2.4fr_1.6fr_1fr_0.9fr]'
+    : 'md:grid-cols-[2.4fr_1.2fr_1.4fr_1fr_0.9fr]'
+  const headers = hideRoleColumn
+    ? ['Name', departmentLabel, 'Last Active', 'Status']
+    : ['Name', 'Role', departmentLabel, 'Last Active', 'Status']
+
   return (
     <GlassCard className="p-0 overflow-hidden">
-      <div className="hidden md:grid grid-cols-[2.4fr_1.2fr_1.4fr_1fr_0.9fr] gap-4 px-6 py-3.5 border-b border-divider/60 bg-gradient-to-b from-white/70 to-white/30">
-        {['Name', 'Role', 'Department', 'Last Active', 'Status'].map((h) => (
+      <div
+        className={`hidden md:grid ${gridCols} gap-4 px-6 py-3.5 border-b border-divider/60 bg-gradient-to-b from-white/70 to-white/30`}
+      >
+        {headers.map((h) => (
           <span
             key={h}
             className="text-[10.5px] font-bold uppercase tracking-wider text-secondary-text"
@@ -51,7 +68,7 @@ export function PeopleTable({ people, onSelect, onDelete }: PeopleTableProps) {
             <div
               key={person.id}
               onClick={() => onSelect?.(person)}
-              className="group grid grid-cols-1 md:grid-cols-[2.4fr_1.2fr_1.4fr_1fr_0.9fr] gap-2 md:gap-4 px-6 py-3.5 items-center cursor-pointer transition-all hover:bg-white/60 hover:shadow-[inset_3px_0_0_var(--color-lemon-500)]"
+              className={`group grid grid-cols-1 ${gridCols} gap-2 md:gap-4 px-6 py-3.5 items-center cursor-pointer transition-all hover:bg-white/60 hover:shadow-[inset_3px_0_0_var(--color-lemon-500)]`}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div
@@ -67,13 +84,15 @@ export function PeopleTable({ people, onSelect, onDelete }: PeopleTableProps) {
                 </div>
               </div>
 
-              <div>
-                <span
-                  className={`inline-block text-[10.5px] font-bold px-2.5 py-1 rounded-md ${roleColors[person.role]}`}
-                >
-                  {person.role}
-                </span>
-              </div>
+              {!hideRoleColumn && (
+                <div>
+                  <span
+                    className={`inline-block text-[10.5px] font-bold px-2.5 py-1 rounded-md ${roleColors[person.role]}`}
+                  >
+                    {person.role}
+                  </span>
+                </div>
+              )}
 
               <div className="text-[12.5px] text-navy-700 truncate">{person.department}</div>
 

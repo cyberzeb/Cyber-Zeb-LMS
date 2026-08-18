@@ -2,7 +2,7 @@ interface FormFieldProps {
   label: string
   value: string
   onChange: (value: string) => void
-  type?: 'text' | 'number' | 'select'
+  type?: 'text' | 'number' | 'select' | 'textarea'
   options?: string[]
   placeholder?: string
   hint?: string
@@ -27,7 +27,7 @@ export function FormField({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`${baseClass} cursor-pointer`}
+          className={`${baseClass} cursor-pointer [color-scheme:light]`}
         >
           {options.map((opt) => (
             <option key={opt} value={opt}>
@@ -35,6 +35,14 @@ export function FormField({
             </option>
           ))}
         </select>
+      ) : type === 'textarea' ? (
+        <textarea
+          value={value}
+          placeholder={placeholder}
+          rows={3}
+          onChange={(e) => onChange(e.target.value)}
+          className={`${baseClass} resize-y min-h-[72px]`}
+        />
       ) : (
         <input
           type={type}

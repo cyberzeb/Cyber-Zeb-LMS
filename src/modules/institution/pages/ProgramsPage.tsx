@@ -11,111 +11,11 @@ import { FormField } from '../../../shared/components/FormField'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
 import { ProgramsTable } from '../components/ProgramsTable'
+import { useCampusContext } from '../context/CampusContext'
+import { DEFAULT_CAMPUS_ID } from '../data/orgSeedData'
 import type { ProgramLevel, ProgramRow } from '../types'
 
 const STAT = 17
-
-const seedPrograms: ProgramRow[] = [
-  {
-    id: 'p1',
-    code: 'BSC-SE',
-    name: 'Software Engineering',
-    level: 'Undergraduate',
-    department: 'Computer Science & IT',
-    duration: '4 Years',
-    enrolledCount: 350,
-    courseCount: 42,
-    status: 'active',
-  },
-  {
-    id: 'p2',
-    code: 'MSC-DS',
-    name: 'Data Science & AI',
-    level: 'Postgraduate',
-    department: 'Computer Science & IT',
-    duration: '2 Years',
-    enrolledCount: 85,
-    courseCount: 18,
-    status: 'active',
-  },
-  {
-    id: 'p3',
-    code: 'BA-IB',
-    name: 'International Business',
-    level: 'Undergraduate',
-    department: 'Business Administration',
-    duration: '3 Years',
-    enrolledCount: 240,
-    courseCount: 30,
-    status: 'active',
-  },
-  {
-    id: 'p4',
-    code: 'PHD-CS',
-    name: 'Computer Science',
-    level: 'Doctoral',
-    department: 'Computer Science & IT',
-    duration: '3–5 Years',
-    enrolledCount: 15,
-    courseCount: 8,
-    status: 'active',
-  },
-  {
-    id: 'p5',
-    code: 'BSC-CE',
-    name: 'Civil Engineering',
-    level: 'Undergraduate',
-    department: 'Engineering & Technology',
-    duration: '5 Years',
-    enrolledCount: 180,
-    courseCount: 46,
-    status: 'active',
-  },
-  {
-    id: 'p6',
-    code: 'CERT-CYB',
-    name: 'Cybersecurity Essentials',
-    level: 'Certificate',
-    department: 'Computer Science & IT',
-    duration: '6 Months',
-    enrolledCount: 128,
-    courseCount: 6,
-    status: 'active',
-  },
-  {
-    id: 'p7',
-    code: 'MBA',
-    name: 'Master of Business Administration',
-    level: 'Postgraduate',
-    department: 'Business Administration',
-    duration: '2 Years',
-    enrolledCount: 62,
-    courseCount: 16,
-    status: 'draft',
-  },
-  {
-    id: 'p8',
-    code: 'CERT-DM',
-    name: 'Digital Marketing',
-    level: 'Certificate',
-    department: 'Business Administration',
-    duration: '4 Months',
-    enrolledCount: 0,
-    courseCount: 5,
-    status: 'draft',
-  },
-  {
-    id: 'p9',
-    code: 'BA-SOC',
-    name: 'Sociology',
-    level: 'Undergraduate',
-    department: 'Social Sciences',
-    duration: '3 Years',
-    enrolledCount: 96,
-    courseCount: 24,
-    status: 'archived',
-  },
-]
 
 const tabs = ['All', 'Undergraduate', 'Postgraduate', 'Doctoral', 'Certificate']
 const levelOptions: ProgramLevel[] = [
@@ -138,15 +38,34 @@ const emptyForm = {
   code: '',
   level: 'Undergraduate' as ProgramLevel,
   department: departmentOptions[0],
+  campusId: DEFAULT_CAMPUS_ID,
   duration: '4 Years',
+}
+
+type LegacyProgramRow = ProgramRow & { campusId?: string }
+
+function migratePrograms(raw: LegacyProgramRow[]): ProgramRow[] {
+  return raw.map((program) => ({
+    ...program,
+    campusId: program.campusId ?? DEFAULT_CAMPUS_ID,
+  }))
 }
 
 export function ProgramsPage() {
   const { notify } = useToast()
-  const [programs, setPrograms] = useLocalStorageState<ProgramRow[]>(
+  const { selectedCampusId, activeCampuses, getCampusById, departments } = useCampusContext()
+  const [programsRaw, setProgramsRaw] = useLocalStorageState<LegacyProgramRow[]>(
     'berana:programs',
-    seedPrograms,
+    [],
   )
+  const programs = useMemo(() => migratePrograms(programsRaw), [programsRaw])
+  const setPrograms = (updater: ProgramRow[] | ((prev: ProgramRow[]) => ProgramRow[])) => {
+    setProgramsRaw((prev) => {
+      const current = migratePrograms(prev)
+      const next = typeof updater === 'function' ? updater(current) : updater
+      return next
+    })
+  }
   const [activeTab, setActiveTab] = useState('All')
   const [query, setQuery] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
@@ -154,27 +73,44 @@ export function ProgramsPage() {
 
   const filtered = useMemo(() => {
     return programs.filter((p) => {
+      const matchesCampus =
+        selectedCampusId === 'all' || p.campusId === selectedCampusId
       const matchesTab = activeTab === 'All' || p.level === activeTab
       const matchesQuery =
         query.trim() === '' ||
         p.name.toLowerCase().includes(query.toLowerCase()) ||
         p.code.toLowerCase().includes(query.toLowerCase()) ||
         p.department.toLowerCase().includes(query.toLowerCase())
-      return matchesTab && matchesQuery
+      return matchesCampus && matchesTab && matchesQuery
     })
-  }, [programs, activeTab, query])
+  }, [programs, activeTab, query, selectedCampusId])
+
+  const scopedPrograms = useMemo(() => {
+    if (selectedCampusId === 'all') return programs
+    return programs.filter((p) => p.campusId === selectedCampusId)
+  }, [programs, selectedCampusId])
 
   const totals = useMemo(() => {
-    const active = programs.filter((p) => p.status === 'active').length
-    const enrolled = programs.reduce((sum, p) => sum + p.enrolledCount, 0)
-    const courses = programs.reduce((sum, p) => sum + p.courseCount, 0)
-    return { total: programs.length, active, enrolled, courses }
-  }, [programs])
+    const active = scopedPrograms.filter((p) => p.status === 'active').length
+    const enrolled = scopedPrograms.reduce((sum, p) => sum + p.enrolledCount, 0)
+    const courses = scopedPrograms.reduce((sum, p) => sum + p.courseCount, 0)
+    return { total: scopedPrograms.length, active, enrolled, courses }
+  }, [scopedPrograms])
 
   const openModal = () => {
-    setForm(emptyForm)
+    const defaultCampus =
+      selectedCampusId !== 'all' ? selectedCampusId : activeCampuses[0]?.id ?? DEFAULT_CAMPUS_ID
+    setForm({ ...emptyForm, campusId: defaultCampus })
     setModalOpen(true)
   }
+
+  const campusDepartmentOptions = useMemo(() => {
+    const scoped =
+      form.campusId === 'all'
+        ? departments
+        : departments.filter((d) => d.campusId === form.campusId)
+    return scoped.length > 0 ? scoped.map((d) => d.name) : departmentOptions
+  }, [departments, form.campusId])
 
   const handleCreate = () => {
     if (!form.name.trim() || !form.code.trim()) {
@@ -187,6 +123,7 @@ export function ProgramsPage() {
       code: form.code.trim().toUpperCase(),
       level: form.level,
       department: form.department,
+      campusId: form.campusId,
       duration: form.duration.trim() || '—',
       enrolledCount: 0,
       courseCount: 0,
@@ -206,7 +143,7 @@ export function ProgramsPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Academic Programs"
-        subtitle="Manage degree programs, certificates and their curricula across all departments."
+        subtitle="Manage degree programs, certificates and their curricula across campuses and departments."
         actions={
           <>
             <Button variant="secondary" onClick={() => notify('CSV import runs once the backend is connected.', 'info')}>
@@ -296,6 +233,23 @@ export function ProgramsPage() {
             placeholder="e.g. 4 Years"
           />
         </div>
+        <FormField
+          label="Campus"
+          type="select"
+          value={getCampusById(form.campusId)?.name ?? activeCampuses[0]?.name ?? ''}
+          options={activeCampuses.map((c) => c.name)}
+          onChange={(label) => {
+            const campus = activeCampuses.find((c) => c.name === label)
+            if (campus) {
+              const firstDept = departments.find((d) => d.campusId === campus.id)
+              setForm({
+                ...form,
+                campusId: campus.id,
+                department: firstDept?.name ?? departmentOptions[0],
+              })
+            }
+          }}
+        />
         <div className="grid grid-cols-2 gap-4">
           <FormField
             label="Level"
@@ -308,7 +262,7 @@ export function ProgramsPage() {
             label="Department"
             type="select"
             value={form.department}
-            options={departmentOptions}
+            options={campusDepartmentOptions}
             onChange={(v) => setForm({ ...form, department: v })}
           />
         </div>
