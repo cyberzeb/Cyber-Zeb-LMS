@@ -13,7 +13,6 @@ interface StatBlockProps {
   sparkline?: number[]
   sparklineColor?: string
 }
-
 export function StatBlock({
   label,
   value,
@@ -28,7 +27,6 @@ export function StatBlock({
   const chipClass = iconBg ?? 'bg-navy-50 text-navy-700'
   const lineColor =
     sparklineColor ?? (trend === 'down' ? '#E53935' : trend === 'up' ? '#16A34A' : '#1976D2')
-
   return (
     <GlassCard className="p-4 flex flex-col">
       <div className="flex items-start justify-between gap-3">
