@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Users, GraduationCap, Presentation, MailPlus, Plus, Upload } from 'lucide-react'
+import { MailPlus, Plus, Upload } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
@@ -9,141 +9,19 @@ import { SearchInput } from '../../../shared/components/SearchInput'
 import { Modal } from '../../../shared/components/Modal'
 import { FormField } from '../../../shared/components/FormField'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
-import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
+import { createId } from '../../../shared/hooks/useLocalStorageState'
+import { usePeople } from '../hooks/usePeople'
+import { withAdminVerification } from '../utils/peopleVerification'
 import { PeopleTable } from '../components/PeopleTable'
+import {
+  allPeopleTabs,
+  departmentOptions,
+  peoplePageConfigs,
+  roleOptions,
+  tabToRole,
+  type PeoplePageFocus,
+} from '../data/peoplePageConfig'
 import type { PersonRole, PersonRow } from '../types'
-
-const STAT = 17
-
-const seedPeople: PersonRow[] = [
-  {
-    id: 'u1',
-    name: 'Selam Girma',
-    email: 'selam.girma@berana.edu',
-    role: 'Student',
-    department: 'Computer Science & IT',
-    status: 'active',
-    lastActive: '2 hours ago',
-    initials: 'SG',
-  },
-  {
-    id: 'u2',
-    name: 'Dr. Aaron Selassie',
-    email: 'a.selassie@berana.edu',
-    role: 'Instructor',
-    department: 'Computer Science & IT',
-    status: 'active',
-    lastActive: '10 min ago',
-    initials: 'AS',
-  },
-  {
-    id: 'u3',
-    name: 'Martha Bekele',
-    email: 'm.bekele@berana.edu',
-    role: 'Admin',
-    department: 'Business Administration',
-    status: 'active',
-    lastActive: '1 day ago',
-    initials: 'MB',
-  },
-  {
-    id: 'u4',
-    name: 'Yonas Tadesse',
-    email: 'yonas.t@gmail.com',
-    role: 'Parent',
-    department: '—',
-    status: 'active',
-    lastActive: '3 days ago',
-    initials: 'YT',
-  },
-  {
-    id: 'u5',
-    name: 'Hanna Wolde',
-    email: 'hanna.wolde@berana.edu',
-    role: 'Student',
-    department: 'Engineering & Technology',
-    status: 'invited',
-    lastActive: 'Never',
-    initials: 'HW',
-  },
-  {
-    id: 'u6',
-    name: 'Prof. Elias Hailu',
-    email: 'e.hailu@berana.edu',
-    role: 'Instructor',
-    department: 'Engineering & Technology',
-    status: 'active',
-    lastActive: '5 hours ago',
-    initials: 'EH',
-  },
-  {
-    id: 'u7',
-    name: 'Kidist Yohannes',
-    email: 'k.yohannes@berana.edu',
-    role: 'Staff',
-    department: 'Registrar Office',
-    status: 'active',
-    lastActive: 'Yesterday',
-    initials: 'KY',
-  },
-  {
-    id: 'u8',
-    name: 'Dawit Mekonnen',
-    email: 'dawit.m@berana.edu',
-    role: 'Student',
-    department: 'Business Administration',
-    status: 'suspended',
-    lastActive: '2 weeks ago',
-    initials: 'DM',
-  },
-  {
-    id: 'u9',
-    name: 'Tigist Assefa',
-    email: 't.assefa@berana.edu',
-    role: 'Instructor',
-    department: 'Social Sciences',
-    status: 'invited',
-    lastActive: 'Never',
-    initials: 'TA',
-  },
-  {
-    id: 'u10',
-    name: 'Bruk Alemu',
-    email: 'bruk.alemu@berana.edu',
-    role: 'Student',
-    department: 'Computer Science & IT',
-    status: 'active',
-    lastActive: '30 min ago',
-    initials: 'BA',
-  },
-]
-
-const tabs = ['All', 'Students', 'Instructors', 'Admins', 'Parents', 'Staff']
-
-const tabToRole: Record<string, PersonRow['role']> = {
-  Students: 'Student',
-  Instructors: 'Instructor',
-  Admins: 'Admin',
-  Parents: 'Parent',
-  Staff: 'Staff',
-}
-
-const roleOptions: PersonRole[] = ['Student', 'Instructor', 'Admin', 'Parent', 'Staff']
-const departmentOptions = [
-  'Computer Science & IT',
-  'Business Administration',
-  'Engineering & Technology',
-  'Social Sciences',
-  'Registrar Office',
-  '—',
-]
-
-const emptyForm = {
-  name: '',
-  email: '',
-  role: 'Student' as PersonRole,
-  department: departmentOptions[0],
-}
 
 function initialsFromName(name: string): string {
   return name
@@ -155,36 +33,48 @@ function initialsFromName(name: string): string {
     .toUpperCase()
 }
 
-export function PeoplePage() {
+interface PeoplePageProps {
+  focus?: PeoplePageFocus
+}
+
+export function PeoplePage({ focus = 'all' }: PeoplePageProps) {
+  const config = peoplePageConfigs[focus]
   const { notify } = useToast()
-  const [people, setPeople] = useLocalStorageState<PersonRow[]>('berana:people', seedPeople)
+  const { people, setPeople } = usePeople()
   const [activeTab, setActiveTab] = useState('All')
   const [query, setQuery] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
-  const [form, setForm] = useState(emptyForm)
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    role: config.defaultRole,
+    department: departmentOptions[0],
+  })
 
   const filtered = useMemo(() => {
     return people.filter((p) => {
-      const matchesTab = activeTab === 'All' || p.role === tabToRole[activeTab]
+      const matchesFocus = focus === 'all' || p.role === focus
+      const matchesTab =
+        !config.showRoleTabs || activeTab === 'All' || p.role === tabToRole[activeTab]
       const q = query.trim().toLowerCase()
       const matchesQuery =
         q === '' ||
         p.name.toLowerCase().includes(q) ||
         p.email.toLowerCase().includes(q) ||
         p.department.toLowerCase().includes(q)
-      return matchesTab && matchesQuery
+      return matchesFocus && matchesTab && matchesQuery
     })
-  }, [people, activeTab, query])
+  }, [people, focus, config.showRoleTabs, activeTab, query])
 
-  const totals = useMemo(() => {
-    const students = people.filter((p) => p.role === 'Student').length
-    const instructors = people.filter((p) => p.role === 'Instructor').length
-    const pending = people.filter((p) => p.status === 'invited').length
-    return { total: people.length, students, instructors, pending }
-  }, [people])
+  const stats = useMemo(() => config.getStats(people), [config, people])
 
   const openModal = () => {
-    setForm(emptyForm)
+    setForm({
+      name: '',
+      email: '',
+      role: config.defaultRole,
+      department: focus === 'Guardian' ? '—' : departmentOptions[0],
+    })
     setModalOpen(true)
   }
 
@@ -193,7 +83,7 @@ export function PeoplePage() {
       notify('Please provide a name and email.', 'error')
       return
     }
-    const newPerson: PersonRow = {
+    const newPerson = withAdminVerification({
       id: createId('user'),
       name: form.name.trim(),
       email: form.email.trim().toLowerCase(),
@@ -202,7 +92,7 @@ export function PeoplePage() {
       status: 'invited',
       lastActive: 'Never',
       initials: initialsFromName(form.name),
-    }
+    })
     setPeople((prev) => [newPerson, ...prev])
     setModalOpen(false)
     notify(`Invitation sent to ${newPerson.name}.`)
@@ -213,11 +103,21 @@ export function PeoplePage() {
     notify(`${person.name} removed.`, 'info')
   }
 
+  const departmentLabel =
+    focus === 'Staff' ? 'Office / Department' : focus === 'Guardian' ? 'Linked Student' : 'Department'
+
+  const departmentFieldOptions =
+    focus === 'Guardian'
+      ? ['—', 'Selam Girma', 'Hanna Wolde', 'Bruk Alemu', 'Dawit Mekonnen']
+      : focus === 'Staff'
+        ? departmentOptions.filter((d) => d !== '—')
+        : departmentOptions.filter((d) => d !== '—')
+
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="People & Users"
-        subtitle="Invite, import and manage every user account, role and access status in your institution."
+        title={config.title}
+        subtitle={config.subtitle}
         actions={
           <>
             <Button variant="secondary" onClick={() => notify('Bulk CSV import unlocks with the backend.', 'info')}>
@@ -226,30 +126,36 @@ export function PeoplePage() {
             </Button>
             <Button variant="primary" onClick={openModal}>
               <Plus size={16} />
-              Invite User
+              {config.inviteLabel}
             </Button>
           </>
         }
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-        <StatBlock label="Total Users" value={totals.total.toLocaleString()} icon={<Users size={STAT} />} />
-        <StatBlock label="Students" value={totals.students} icon={<GraduationCap size={STAT} />} />
-        <StatBlock label="Instructors" value={totals.instructors} icon={<Presentation size={STAT} />} />
-        <StatBlock
-          label="Pending Invites"
-          value={totals.pending}
-          sub="Awaiting activation"
-          icon={<MailPlus size={STAT} />}
-        />
+        {stats.map((stat) => (
+          <StatBlock
+            key={stat.label}
+            label={stat.label}
+            value={typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
+            sub={stat.sub}
+            icon={stat.icon}
+          />
+        ))}
       </div>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <FilterTabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
+        {config.showRoleTabs ? (
+          <FilterTabs tabs={allPeopleTabs} active={activeTab} onChange={setActiveTab} />
+        ) : (
+          <div className="text-[13px] font-semibold text-navy-700">
+            Showing {filtered.length} {config.title.toLowerCase()}
+          </div>
+        )}
         <SearchInput
           value={query}
           onChange={setQuery}
-          placeholder="Search by name, email, department..."
+          placeholder={config.searchPlaceholder}
           className="md:w-80"
         />
       </div>
@@ -257,12 +163,14 @@ export function PeoplePage() {
       {filtered.length > 0 ? (
         <PeopleTable
           people={filtered}
+          hideRoleColumn={config.hideRoleColumn}
+          departmentLabel={departmentLabel}
           onSelect={(p) => notify(`${p.name}'s profile view is coming soon.`, 'info')}
           onDelete={handleDelete}
         />
       ) : (
         <GlassCard className="p-10 text-center text-secondary-text text-[13.5px] font-medium">
-          No people match your filters.
+          {config.emptyMessage}
         </GlassCard>
       )}
 
@@ -270,8 +178,8 @@ export function PeoplePage() {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         icon={<MailPlus size={18} />}
-        title="Invite User"
-        description="Send an invitation. The user stays pending until they activate."
+        title={config.inviteTitle}
+        description={config.inviteDescription}
         footer={
           <>
             <Button variant="secondary" onClick={() => setModalOpen(false)}>
@@ -295,19 +203,21 @@ export function PeoplePage() {
           onChange={(v) => setForm({ ...form, email: v })}
           placeholder="e.g. selam.girma@berana.edu"
         />
-        <div className="grid grid-cols-2 gap-4">
+        <div className={`grid gap-4 ${config.lockRole ? 'grid-cols-1' : 'grid-cols-2'}`}>
+          {!config.lockRole && (
+            <FormField
+              label="Role"
+              type="select"
+              value={form.role}
+              options={roleOptions}
+              onChange={(v) => setForm({ ...form, role: v as PersonRole })}
+            />
+          )}
           <FormField
-            label="Role"
-            type="select"
-            value={form.role}
-            options={roleOptions}
-            onChange={(v) => setForm({ ...form, role: v as PersonRole })}
-          />
-          <FormField
-            label="Department"
+            label={departmentLabel}
             type="select"
             value={form.department}
-            options={departmentOptions}
+            options={departmentFieldOptions}
             onChange={(v) => setForm({ ...form, department: v })}
           />
         </div>

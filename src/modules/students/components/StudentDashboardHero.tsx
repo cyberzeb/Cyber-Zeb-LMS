@@ -1,63 +1,85 @@
-import { BookOpen, CalendarDays, GraduationCap, Sparkles } from 'lucide-react'
+import { Building2, CalendarDays, GraduationCap, Sparkles } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Monogram } from '../../../shared/components/Monogram'
 import type { StudentDashboardData } from '../types'
-import { GlassCard } from '../../../shared/layout/GlassCard'
 
 interface StudentDashboardHeroProps {
-  data: Pick<StudentDashboardData, 'studentName' | 'program' | 'term' | 'standing' | 'stats'>
+  data: Pick<
+    StudentDashboardData,
+    'studentName' | 'email' | 'department' | 'program' | 'term' | 'standing' | 'kpis'
+  >
 }
 
 export function StudentDashboardHero({ data }: StudentDashboardHeroProps) {
+  const firstName = data.studentName.split(' ')[0]
+
   return (
-    <GlassCard className="relative overflow-hidden bg-gradient-to-br from-navy-900 via-navy-700 to-[#202a4c] p-7 text-white">
-      <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-lemon-500/25 blur-3xl" />
-      <div className="absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
+    <div className="relative overflow-hidden rounded-[20px] bg-gradient-to-br from-navy-900 via-[#24304f] to-navy-700 p-6 md:p-7 text-white">
+      <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-lemon-500/25 blur-3xl pointer-events-none" />
 
-      <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-lemon-200">
-            <Sparkles size={12} />
-            Student Learning Hub
-          </div>
-          <h1 className="mt-4 text-3xl font-extrabold leading-tight sm:text-4xl">
-            Welcome back, {data.studentName}
-          </h1>
-          <p className="mt-3 max-w-xl text-[13px] leading-6 text-navy-200">
-            Manage your course content, assessments, assignment dropboxes, calendar events, and grade feedback from one place.
-          </p>
-
-          <div className="mt-5 flex flex-wrap gap-2.5">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold text-navy-100">
-              <BookOpen size={12} />
-              {data.program}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold text-navy-100">
-              <CalendarDays size={12} />
-              {data.term}
-            </span>
+      <div className="relative z-10 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex items-start gap-4 min-w-0">
+          <Monogram label={data.studentName} size="md" className="ring-2 ring-white/20" />
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-lemon-200">
+              Student learning hub
+            </p>
+            <h1 className="mt-1 text-2xl md:text-[28px] font-extrabold leading-tight">
+              Welcome back, {firstName}
+            </h1>
+            <p className="mt-1.5 text-[12.5px] text-navy-200 truncate">{data.email}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-2.5 py-1 text-[11px] font-semibold">
+                <Building2 size={12} />
+                {data.department}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-2.5 py-1 text-[11px] font-semibold">
+                <GraduationCap size={12} />
+                {data.program}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-2.5 py-1 text-[11px] font-semibold">
+                <CalendarDays size={12} />
+                {data.term}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-lemon-500/20 px-2.5 py-1 text-[11px] font-semibold text-lemon-200">
+                <Sparkles size={11} />
+                {data.standing}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[380px]">
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
-            <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-navy-200">
-              <GraduationCap size={12} />
-              Academic snapshot
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 xl:min-w-[420px]">
+          {[
+            { label: 'GPA', value: data.kpis.gpa.toFixed(2), sub: '/ 4.00' },
+            { label: 'Attendance', value: `${data.kpis.attendanceRate}%`, sub: 'this term' },
+            { label: 'Due soon', value: String(data.kpis.dueThisWeek), sub: 'this week' },
+            { label: 'Quiz avg', value: `${data.kpis.avgQuizScore}%`, sub: 'last 3' },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-xl border border-white/10 bg-white/10 px-3 py-3 backdrop-blur-sm"
+            >
+              <div className="text-[10px] font-bold uppercase tracking-wide text-navy-200">{stat.label}</div>
+              <div className="mt-1 text-xl font-extrabold text-lemon-500">{stat.value}</div>
+              <div className="text-[10px] text-navy-200">{stat.sub}</div>
             </div>
-            <div className="text-[24px] font-extrabold text-white">{data.stats[3].value} GPA</div>
-            <p className="mt-1 text-[12px] text-navy-200">{data.stats[3].detail}</p>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
-            <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-navy-200">
-              <CalendarDays size={12} />
-              Quick focus
-            </div>
-            <div className="text-[24px] font-extrabold text-white">{data.stats[1].value} deadlines</div>
-            <p className="mt-1 text-[12px] text-navy-200">{data.stats[1].detail}</p>
-          </div>
+          ))}
         </div>
       </div>
 
-    </GlassCard>
+      <div className="relative z-10 mt-5 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-[11.5px] text-navy-200 flex items-center gap-1.5">
+          <Sparkles size={13} className="text-lemon-400" />
+          Focus on deadlines and live sessions first — everything else is one click away.
+        </p>
+        <Link
+          to="/student/settings"
+          className="text-[12px] font-semibold text-lemon-300 hover:text-lemon-200 transition"
+        >
+          Edit profile →
+        </Link>
+      </div>
+    </div>
   )
 }
