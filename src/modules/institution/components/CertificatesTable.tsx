@@ -37,15 +37,15 @@ export function CertificatesTable({
 }: CertificatesTableProps) {
   return (
     <GlassCard className="overflow-hidden">
-      <div className="px-5 py-4 border-b border-slate-200/60">
-        <h3 className="text-sm font-semibold text-slate-800">
+      <div className="px-5 py-4 border-b border-divider/60">
+        <h3 className="text-sm font-semibold text-navy-900">
           All certificates ({certificates.length})
         </h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-xs uppercase tracking-wide text-slate-500 border-b border-slate-200/60">
+            <tr className="text-left text-xs uppercase tracking-wide text-secondary-text border-b border-divider/60">
               <th className="px-5 py-3 font-medium">Certificate ID</th>
               <th className="px-5 py-3 font-medium">Student</th>
               <th className="px-5 py-3 font-medium">Course</th>
@@ -62,17 +62,17 @@ export function CertificatesTable({
               const canRevoke = cert.status === 'issued'
 
               return (
-                <tr key={cert.id} className="border-b border-slate-100 last:border-0">
+                <tr key={cert.id} className="border-b border-divider/60 last:border-0">
                   <td className="px-5 py-3">
                     <span className="font-mono text-[12px] text-navy-700">{cert.certificateId}</span>
                   </td>
                   <td className="px-5 py-3 font-medium text-navy-900">{cert.studentName}</td>
                   <td className="px-5 py-3">
                     <div className="text-navy-900">{cert.courseCode}</div>
-                    <div className="text-xs text-slate-500">{cert.courseTitle}</div>
+                    <div className="text-xs text-secondary-text">{cert.courseTitle}</div>
                   </td>
-                  <td className="px-5 py-3 text-slate-600">{cert.instructorName}</td>
-                  <td className="px-5 py-3 text-slate-600">{formatDate(cert.issueDate)}</td>
+                  <td className="px-5 py-3 text-navy-700">{cert.instructorName}</td>
+                  <td className="px-5 py-3 text-navy-700">{formatDate(cert.issueDate)}</td>
                   <td className="px-5 py-3">
                     <StatusPill label={status.label} tone={status.tone} />
                   </td>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Bell, BookOpen, Building2, CalendarDays, GraduationCap, Lock, Mail, UserRound } from 'lucide-react'
+import { Bell, BookOpen, Building2, CalendarDays, GraduationCap, Lock, Mail, Moon, UserRound } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { Monogram } from '../../../shared/components/Monogram'
@@ -13,6 +13,7 @@ import { ToggleRow } from '../../institution/components/settings/ToggleRow'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
 import { getSessionPerson } from '../../../shared/storage/session'
+import { useTheme } from '../../../shared/context/ThemeContext'
 
 const SEC = 17
 
@@ -56,6 +57,7 @@ export function StudentSettingsPage() {
   const { notify } = useToast()
   const { data, isLoading, isError } = useStudentDashboard()
   const sessionPerson = getSessionPerson()
+  const { isDark, toggleTheme } = useTheme()
   const [stored, setStored] = useLocalStorageState<StudentSettingsState>(
     'berana:student-settings',
     defaultSettings(sessionPerson ?? undefined),
@@ -241,6 +243,19 @@ export function StudentSettingsPage() {
               notifications: { ...d.notifications, liveClasses: !d.notifications.liveClasses },
             }))
           }
+        />
+      </SettingsSection>
+
+      <SettingsSection
+        icon={<Moon size={SEC} />}
+        title="Appearance"
+        description="Customize how the student portal looks for you."
+      >
+        <ToggleRow
+          label="Dark mode"
+          description="Switch to a darker colour scheme that is easier on the eyes."
+          enabled={isDark}
+          onToggle={toggleTheme}
         />
       </SettingsSection>
 

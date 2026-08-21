@@ -27,7 +27,7 @@ export function FormField({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`${baseClass} cursor-pointer [color-scheme:light]`}
+          className={`${baseClass} cursor-pointer`}
         >
           {options.map((opt) => (
             <option key={opt} value={opt}>

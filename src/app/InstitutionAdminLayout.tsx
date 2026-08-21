@@ -5,6 +5,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import brandLogo from '../assets/Logo.jpg'
 import { CampusProvider, useCampusContext } from '../modules/institution/context/CampusContext'
+import { DarkModeToggle } from '../shared/components/DarkModeToggle'
 import { readPeopleFromStorage } from '../modules/institution/hooks/usePeople'
 import {
   countPendingVerifications,
@@ -322,6 +323,7 @@ function InstitutionAdminShell() {
           campuses={campuses}
           selectedCampusId={selectedCampusId}
           onCampusChange={setSelectedCampusId}
+          extraActions={<DarkModeToggle variant="icon" />}
         />
 
         <main className="page-content app-scroll flex-1 overflow-y-auto p-5 md:p-6">

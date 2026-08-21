@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Bell, Building2, ChevronDown, MessageSquare, Search } from 'lucide-react'
 import type { Campus } from '../../modules/institution/types'
+import type { ReactNode } from 'react'
 
 interface AdminTopHeaderProps {
   userName: string
@@ -10,6 +11,8 @@ interface AdminTopHeaderProps {
   campuses?: Campus[]
   selectedCampusId?: string | 'all'
   onCampusChange?: (campusId: string | 'all') => void
+  /** Optional extra controls rendered before the notification icons */
+  extraActions?: ReactNode
 }
 
 export function AdminTopHeader({
@@ -20,6 +23,7 @@ export function AdminTopHeader({
   campuses = [],
   selectedCampusId = 'all',
   onCampusChange,
+  extraActions,
 }: AdminTopHeaderProps) {
   const [search, setSearch] = useState('')
   const [campusMenuOpen, setCampusMenuOpen] = useState(false)
@@ -48,7 +52,7 @@ export function AdminTopHeader({
   }, [])
 
   return (
-    <header className="shrink-0 h-14 bg-[#0a1020] border-b border-white/[0.08] flex items-center gap-4 px-5">
+    <header className="shrink-0 h-14 bg-admin-dark border-b border-white/[0.08] flex items-center gap-4 px-5">
       <div className="hidden lg:flex items-center gap-2 min-w-[140px] text-[12px] text-navy-200">
         <span className="font-semibold text-white">{institutionName}</span>
         {breadcrumb ? (
@@ -131,13 +135,14 @@ export function AdminTopHeader({
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
+        {extraActions}
         <button
           type="button"
           className="relative w-9 h-9 rounded-lg flex items-center justify-center text-navy-200 hover:text-white hover:bg-white/[0.06] transition-colors"
           aria-label="Notifications"
         >
           <Bell size={17} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-lemon-500 border border-[#0a1020]" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-lemon-500 border border-admin-dark" />
         </button>
         <button
           type="button"
@@ -145,7 +150,7 @@ export function AdminTopHeader({
           aria-label="Messages"
         >
           <MessageSquare size={17} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-info border border-[#0a1020]" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-info border border-admin-dark" />
         </button>
 
         <button
