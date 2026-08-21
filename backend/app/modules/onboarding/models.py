@@ -200,6 +200,8 @@ class AddOnModuleRequest(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     last_email_error: Mapped[str | None] = mapped_column(Text, nullable=True)
 
+    email_logs: Mapped[list["EmailLog"]] = relationship(back_populates="addon_module_request")
+
 
 class InstitutionAdminAccount(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     """
@@ -251,6 +253,12 @@ class EmailLog(Base):
         nullable=True,
         index=True,
     )
+    addon_module_request_id: Mapped[uuid.UUID | None] = mapped_column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("addon_module_requests.id"),
+        nullable=True,
+        index=True,
+    )
     email_type: Mapped[EmailType] = mapped_column(
         SAEnum(EmailType, name="email_type", values_callable=_enum_values)
     )
@@ -265,3 +273,28 @@ class EmailLog(Base):
     sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     service_request: Mapped["ServiceRequest | None"] = relationship(back_populates="email_logs")
+    addon_module_request: Mapped["AddOnModuleRequest | None"] = relationship(
+        back_populates="email_logs"
+    )
+
+
+class SiteContentBlock(Base, UUIDPrimaryKeyMixin, TimestampMixin):
+    """Editable landing-page content blocks managed by Super Admin."""
+
+    __tablename__ = "site_content_blocks"
+    __table_args__ = (UniqueConstraint("key", name="uq_site_content_blocks_key"),)
+
+    key: Mapped[str] = mapped_column(String(80), index=True)
+    value: Mapped[str] = mapped_column(Text, default="")
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+
+
+class PlatformSetting(Base, UUIDPrimaryKeyMixin, TimestampMixin):
+    """Key/value platform settings editable without redeploy."""
+
+    __tablename__ = "platform_settings"
+    __table_args__ = (UniqueConstraint("key", name="uq_platform_settings_key"),)
+
+    key: Mapped[str] = mapped_column(String(80), index=True)
+    value: Mapped[str] = mapped_column(Text, default="")
+    description: Mapped[str] = mapped_column(String(300), default="")

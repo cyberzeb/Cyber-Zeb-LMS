@@ -39,9 +39,13 @@ export function RequestServiceForm() {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
+  // Catalog is only for pricing display — its failures must never become the
+  // step-3 / submit error banner ("Network Error" while the request succeeded).
   const { data: catalog = [] } = useQuery({
     queryKey: ['public-modules'],
     queryFn: listPublicModules,
+    retry: 1,
+    throwOnError: false,
   })
 
   const catalogByKey = new Map(catalog.map((item) => [item.key, item]))
@@ -116,6 +120,7 @@ export function RequestServiceForm() {
       } else {
         await submitServiceRequest(form)
       }
+      setError('')
       setSubmitted(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong sending your request.')

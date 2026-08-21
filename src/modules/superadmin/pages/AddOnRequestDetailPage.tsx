@@ -5,12 +5,11 @@ import { Button } from '../../../shared/components/Button'
 import { StatusPill, type StatusTone } from '../../../shared/components/StatusPill'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import {
-  activateRequest,
-  confirmPayment,
-  getServiceRequest,
-  rejectRequest,
-  resendServiceRequestEmail,
-  sendInvoice,
+  activateAddOnRequest,
+  confirmAddOnPayment,
+  getAddOnRequest,
+  resendAddOnRequestEmail,
+  sendAddOnInvoice,
 } from '../api/serviceRequestApi'
 import { MODULE_LABELS, STATUS_LABELS, type ModuleKey, type ServiceRequestStatus } from '../types'
 
@@ -39,79 +38,113 @@ function resolveInvoiceAmount(amount: string, estimatedTotal: string | null) {
   return Math.max(parsed || 0, 0)
 }
 
-export function ServiceRequestDetailPage() {
+export function AddOnRequestDetailPage() {
   const { id = '' } = useParams()
   const queryClient = useQueryClient()
   const [amountOverride, setAmountOverride] = useState<string | null>(null)
   const [currencyOverride, setCurrencyOverride] = useState<string | null>(null)
   const [notes, setNotes] = useState(
-    'Please transfer to Cyber-Zeb Consulting (CBE) and reply with the transfer reference.',
+    'Please complete payment using the agreed Cyber-Zeb payment channel.',
   )
-  const [rejectReason, setRejectReason] = useState('')
   const [actionError, setActionError] = useState('')
 
-  const queryKey = ['super-admin', 'service-request', id] as const
+  const queryKey = ['super-admin', 'addon-request', id] as const
 
   const { data, isLoading, error } = useQuery({
     queryKey,
-    queryFn: () => getServiceRequest(id),
+    queryFn: () => getAddOnRequest(id),
     enabled: Boolean(id),
   })
 
   const amount =
     amountOverride ?? (data?.estimated_total != null ? String(data.estimated_total) : '')
-  const currency = currencyOverride ?? data?.estimated_currency ?? 'ETB'
+  const currency = currencyOverride ?? data?.estimated_currency ?? 'USD'
 
   function setQueryDataFrom(response: typeof data) {
     if (response) queryClient.setQueryData(queryKey, response)
-    queryClient.invalidateQueries({ queryKey: ['super-admin', 'service-requests'] })
+    queryClient.invalidateQueries({ queryKey: ['super-admin', 'addon-requests'] })
+  }
+
+  async function recoverAfterNetworkGlitch(previousStatus: ServiceRequestStatus | undefined) {
+    try {
+      const fresh = await getAddOnRequest(id)
+      setQueryDataFrom(fresh)
+      // Server may have committed even if the HTTP client saw a transport error.
+      if (previousStatus && fresh.status !== previousStatus) {
+        setActionError('')
+        return true
+      }
+    } catch {
+      /* keep original error */
+    }
+    return false
   }
 
   const invoiceMutation = useMutation({
     mutationFn: () =>
-      sendInvoice(id, {
+      sendAddOnInvoice(id, {
         invoice_amount: resolveInvoiceAmount(amount, data?.estimated_total ?? null),
         invoice_currency: currency,
         invoice_notes: notes,
       }),
-    onSuccess: setQueryDataFrom,
-    onError: (err: Error) => setActionError(err.message),
+    onSuccess: (res) => {
+      setActionError('')
+      setQueryDataFrom(res)
+    },
+    onError: async (err: Error) => {
+      const recovered = await recoverAfterNetworkGlitch(data?.status)
+      if (!recovered) setActionError(err.message)
+    },
   })
 
   const payMutation = useMutation({
-    mutationFn: () => confirmPayment(id),
-    onSuccess: setQueryDataFrom,
-    onError: (err: Error) => setActionError(err.message),
+    mutationFn: () => confirmAddOnPayment(id),
+    onSuccess: (res) => {
+      setActionError('')
+      setQueryDataFrom(res)
+    },
+    onError: async (err: Error) => {
+      const recovered = await recoverAfterNetworkGlitch(data?.status)
+      if (!recovered) setActionError(err.message)
+    },
   })
 
   const activateMutation = useMutation({
-    mutationFn: () => activateRequest(id),
-    onSuccess: (res) => setQueryDataFrom(res.service_request),
-    onError: (err: Error) => setActionError(err.message),
-  })
-
-  const rejectMutation = useMutation({
-    mutationFn: () => rejectRequest(id, rejectReason),
-    onSuccess: setQueryDataFrom,
-    onError: (err: Error) => setActionError(err.message),
+    mutationFn: () => activateAddOnRequest(id),
+    onSuccess: (res) => {
+      setActionError('')
+      setQueryDataFrom(res)
+    },
+    onError: async (err: Error) => {
+      const recovered = await recoverAfterNetworkGlitch(data?.status)
+      if (!recovered) setActionError(err.message)
+    },
   })
 
   const resendMutation = useMutation({
-    mutationFn: () => resendServiceRequestEmail(id),
-    onSuccess: setQueryDataFrom,
+    mutationFn: () => resendAddOnRequestEmail(id),
+    onSuccess: (res) => {
+      setActionError('')
+      setQueryDataFrom(res)
+    },
     onError: (err: Error) => setActionError(err.message),
   })
 
-  if (isLoading) return <p className="text-[13px] text-secondary-text">Loading…</p>
-  if (error || !data) {
+  if (isLoading && !data) {
+    return <p className="text-[13px] text-secondary-text">Loading…</p>
+  }
+  // Only treat as a load failure when we have nothing to show. A background
+  // refetch error must not replace a successfully loaded request with "Network Error".
+  if (!data) {
     return (
       <p className="text-[13px] font-semibold text-danger">
-        {error instanceof Error ? error.message : 'Request not found'}
+        {error instanceof Error ? error.message : 'Add-on request not found'}
       </p>
     )
   }
 
   const status = data.status
+  const emailLogs = data.email_logs ?? []
   const estimateLabel =
     data.estimated_total != null
       ? `${data.estimated_total} ${data.estimated_currency || ''}`.trim()
@@ -121,12 +154,13 @@ export function ServiceRequestDetailPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-[24px] font-extrabold text-navy-900">{data.institution_name}</h1>
+          <h1 className="text-[24px] font-extrabold text-navy-900">{data.tenant_name}</h1>
           <p className="text-[13px] text-secondary-text mt-1">
-            {data.contact_name} · {data.email} · {data.phone}
+            {data.contact_name} · {data.email}
+            {data.phone ? ` · ${data.phone}` : ''}
           </p>
         </div>
-        <StatusPill label={STATUS_LABELS[status]} tone={statusTone(status)} />
+        <StatusPill label={`Add Modules · ${STATUS_LABELS[status]}`} tone={statusTone(status)} />
       </div>
 
       {data.last_email_error && (
@@ -158,9 +192,7 @@ export function ServiceRequestDetailPage() {
         <GlassCard className="lg:col-span-2 p-5 space-y-4">
           <h2 className="text-[14px] font-extrabold text-navy-900">Request details</h2>
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[13px]">
-            <Item label="Type" value={data.institution_type} />
-            <Item label="Estimated users" value={data.estimated_users} />
-            <Item label="Preferred slug" value={data.preferred_slug || '—'} />
+            <Item label="Tenant slug" value={data.tenant_slug} />
             <Item label="Submitted" value={new Date(data.created_at).toLocaleString()} />
             {estimateLabel && <Item label="Estimated total" value={estimateLabel} />}
           </dl>
@@ -185,20 +217,6 @@ export function ServiceRequestDetailPage() {
               </p>
             )}
           </div>
-          {data.tenant && (
-            <div className="rounded-xl bg-leaf-50 border border-leaf-200 p-3 text-[13px]">
-              <p className="font-bold text-navy-900">Activated tenant</p>
-              <p className="mt-1">
-                Slug: <code>{data.tenant.slug}</code>
-              </p>
-              <p>
-                Link:{' '}
-                <a className="text-info font-semibold underline" href={data.tenant.institution_link}>
-                  {data.tenant.institution_link}
-                </a>
-              </p>
-            </div>
-          )}
         </GlassCard>
 
         <GlassCard className="p-5 space-y-4">
@@ -278,43 +296,19 @@ export function ServiceRequestDetailPage() {
 
           {status === 'activated' && (
             <p className="text-[12.5px] font-semibold text-leaf-700">
-              Tenant activated. Credentials were emailed to the client.
+              Add-on modules activated for this tenant.
             </p>
-          )}
-
-          {(status === 'new' || status === 'invoice_sent') && (
-            <div className="pt-3 border-t border-divider space-y-2">
-              <textarea
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-                placeholder="Rejection reason"
-                rows={2}
-                className="w-full border border-divider rounded-lg px-3 py-2 text-[13px]"
-              />
-              <Button
-                type="button"
-                variant="danger"
-                disabled={!rejectReason.trim() || rejectMutation.isPending}
-                onClick={() => {
-                  setActionError('')
-                  rejectMutation.mutate()
-                }}
-                className="w-full justify-center"
-              >
-                Reject request
-              </Button>
-            </div>
           )}
         </GlassCard>
       </div>
 
       <GlassCard className="p-5">
         <h2 className="text-[14px] font-extrabold text-navy-900 mb-3">Email log</h2>
-        {data.email_logs.length === 0 ? (
+        {emailLogs.length === 0 ? (
           <p className="text-[12.5px] text-secondary-text">No emails recorded yet.</p>
         ) : (
           <ul className="space-y-3">
-            {data.email_logs.map((log) => (
+            {emailLogs.map((log) => (
               <li key={log.id} className="rounded-xl border border-divider p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-[13px] font-bold text-navy-900">{log.subject}</p>

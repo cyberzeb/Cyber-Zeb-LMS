@@ -63,11 +63,29 @@ import { InstructorHelpDeskPage } from '../modules/instructors/pages/instructorh
 import { InstructorSettingsPage } from '../modules/instructors/pages/instructorsettings'
 import { SuperAdminLayout } from '../modules/superadmin/layout/SuperAdminLayout'
 import { SuperAdminLoginPage } from '../modules/superadmin/pages/SuperAdminLoginPage'
+import { OverviewPage } from '../modules/superadmin/pages/OverviewPage'
 import { ServiceRequestsListPage } from '../modules/superadmin/pages/ServiceRequestsListPage'
 import { ServiceRequestDetailPage } from '../modules/superadmin/pages/ServiceRequestDetailPage'
 import { ManageModulesPage } from '../modules/superadmin/pages/ManageModulesPage'
 import { AddOnRequestsPage } from '../modules/superadmin/pages/AddOnRequestsPage'
+import { AddOnRequestDetailPage } from '../modules/superadmin/pages/AddOnRequestDetailPage'
 import { RenewalsPage } from '../modules/superadmin/pages/RenewalsPage'
+import { InstitutionsListPage } from '../modules/superadmin/pages/InstitutionsListPage'
+import { InstitutionDetailPage } from '../modules/superadmin/pages/InstitutionDetailPage'
+import { LandingContentPage } from '../modules/superadmin/pages/LandingContentPage'
+import { AuditLogsPage } from '../modules/superadmin/pages/AuditLogsPage'
+import { RolesPermissionsPage } from '../modules/superadmin/pages/RolesPermissionsPage'
+import { SystemSettingsPage } from '../modules/superadmin/pages/SystemSettingsPage'
+import { NotificationsPage } from '../modules/superadmin/pages/NotificationsPage'
+import { DataExportPage } from '../modules/superadmin/pages/DataExportPage'
+import {
+  AppearancePage,
+  AnalyticsPage,
+  BackupPage,
+  IntegrationsPage,
+  SecurityPage,
+  SystemHealthPage,
+} from '../modules/superadmin/pages/ComingSoonPage'
 
 export const router = createBrowserRouter([
   {
@@ -83,11 +101,27 @@ export const router = createBrowserRouter([
     path: '/super-admin',
     element: <SuperAdminLayout />,
     children: [
-      { index: true, element: <ServiceRequestsListPage /> },
+      { index: true, element: <OverviewPage /> },
+      { path: 'requests', element: <ServiceRequestsListPage /> },
       { path: 'requests/:id', element: <ServiceRequestDetailPage /> },
       { path: 'addons', element: <AddOnRequestsPage /> },
+      { path: 'addons/:id', element: <AddOnRequestDetailPage /> },
       { path: 'modules', element: <ManageModulesPage /> },
       { path: 'renewals', element: <RenewalsPage /> },
+      { path: 'institutions', element: <InstitutionsListPage /> },
+      { path: 'institutions/:id', element: <InstitutionDetailPage /> },
+      { path: 'landing-content', element: <LandingContentPage /> },
+      { path: 'audit-logs', element: <AuditLogsPage /> },
+      { path: 'roles', element: <RolesPermissionsPage /> },
+      { path: 'settings', element: <SystemSettingsPage /> },
+      { path: 'appearance', element: <AppearancePage /> },
+      { path: 'integrations', element: <IntegrationsPage /> },
+      { path: 'notifications', element: <NotificationsPage /> },
+      { path: 'system-health', element: <SystemHealthPage /> },
+      { path: 'backup', element: <BackupPage /> },
+      { path: 'security', element: <SecurityPage /> },
+      { path: 'export', element: <DataExportPage /> },
+      { path: 'analytics', element: <AnalyticsPage /> },
       { path: 'login', element: <SuperAdminLoginPage /> },
     ],
   },
