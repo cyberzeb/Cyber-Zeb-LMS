@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { AnnouncementBanner } from '../components/AnnouncementBanner'
 import { Navbar } from '../components/Navbar'
 import { Hero } from '../components/Hero'
 import { AboutSection } from '../components/AboutSection'
@@ -16,6 +17,7 @@ export function LandingPage() {
 
   return (
     <div className="font-sans">
+      <AnnouncementBanner />
       <Navbar onRequestServiceClick={scrollToForm} />
       <Hero onRequestServiceClick={scrollToForm} />
       <AboutSection />

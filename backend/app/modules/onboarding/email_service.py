@@ -59,7 +59,7 @@ def send_email_sync(*, to_email: str, subject: str, body: str) -> EmailSendResul
         message["To"] = to_email
         message.attach(MIMEText(body, "plain", "utf-8"))
 
-        with smtplib.SMTP(host, port, timeout=30) as server:
+        with smtplib.SMTP(host, port, timeout=12) as server:
             server.ehlo()
             server.starttls()
             server.ehlo()
@@ -81,12 +81,14 @@ def send_email_sync(*, to_email: str, subject: str, body: str) -> EmailSendResul
 async def persist_email_log(
     db: AsyncSession,
     *,
-    service_request_id,
     email_type: EmailType,
     result: EmailSendResult,
+    service_request_id=None,
+    addon_module_request_id=None,
 ) -> EmailLog:
     entry = EmailLog(
         service_request_id=service_request_id,
+        addon_module_request_id=addon_module_request_id,
         email_type=email_type,
         to_email=result.to_email,
         subject=result.subject,

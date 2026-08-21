@@ -47,7 +47,9 @@ class AddOnModuleRequestCreate(BaseModel):
 
 
 class SendInvoiceBody(BaseModel):
-    invoice_amount: Decimal = Field(gt=0)
+    """Amount may be omitted or 0 — service falls back to calculated estimate."""
+
+    invoice_amount: Decimal | None = Field(default=None, ge=0)
     invoice_currency: str = Field(min_length=1, max_length=10, default="ETB")
     invoice_notes: str = Field(min_length=1, max_length=4000)
 
@@ -79,6 +81,8 @@ class EmailLogOut(BaseModel):
     status: EmailStatus
     error_message: str | None
     sent_at: datetime
+    service_request_id: uuid.UUID | None = None
+    addon_module_request_id: uuid.UUID | None = None
 
 
 class ModuleCatalogItemOut(BaseModel):
@@ -149,6 +153,8 @@ class ServiceRequestOut(BaseModel):
     rejected_at: datetime | None
     rejection_reason: str | None
     last_email_error: str | None
+    estimated_total: Decimal | None = None
+    estimated_currency: str | None = None
     created_at: datetime
     updated_at: datetime
     tenant: TenantActivationOut | None = None
@@ -190,8 +196,11 @@ class AddOnModuleRequestOut(BaseModel):
     rejected_at: datetime | None
     rejection_reason: str | None
     last_email_error: str | None
+    estimated_total: Decimal | None = None
+    estimated_currency: str | None = None
     created_at: datetime
     updated_at: datetime
+    email_logs: list[EmailLogOut] = []
 
 
 class AddOnModuleRequestListOut(BaseModel):
@@ -208,6 +217,143 @@ class RenewalTenantOut(BaseModel):
     subscription_start_date: date | None = None
     renewal_date: date | None = None
     institution_link: str
+
+
+class InstitutionListItemOut(BaseModel):
+    id: uuid.UUID
+    name: str
+    slug: str | None
+    status: str
+    enabled_modules: list[str]
+    renewal_date: date | None = None
+    institution_link: str
+
+
+class InstitutionDetailOut(BaseModel):
+    id: uuid.UUID
+    name: str
+    slug: str | None
+    status: str
+    enabled_modules: list[str]
+    subscription_start_date: date | None = None
+    renewal_date: date | None = None
+    institution_link: str
+    admin_email: str | None = None
+    estimated_total: Decimal | None = None
+    estimated_currency: str | None = None
+
+
+class SiteContentBlockOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    key: str
+    value: str
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+
+
+class SiteContentBlockCreate(BaseModel):
+    key: str = Field(min_length=2, max_length=80, pattern=r"^[a-z0-9_]+$")
+    value: str = Field(default="", max_length=8000)
+    is_active: bool = True
+
+
+class SiteContentBlockPatch(BaseModel):
+    value: str | None = Field(default=None, max_length=8000)
+    is_active: bool | None = None
+
+
+class AnnouncementCreate(BaseModel):
+    """Convenience schema for the announcement_banner use case."""
+
+    value: str = Field(min_length=1, max_length=8000)
+    is_active: bool = True
+
+
+class AnnouncementOut(BaseModel):
+    key: str = "announcement_banner"
+    value: str
+    is_active: bool
+
+
+class PlatformAuditLogOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    actor_type: str
+    actor_id: uuid.UUID | None
+    actor_email: str | None = None
+    action: str
+    entity_type: str
+    entity_id: uuid.UUID
+    before: dict | None
+    after: dict | None
+    correlation_id: str | None
+    created_at: datetime
+    summary: str
+
+
+class PlatformAuditLogListOut(BaseModel):
+    items: list[PlatformAuditLogOut]
+    total: int
+
+
+class OverviewRecentRequest(BaseModel):
+    id: uuid.UUID
+    kind: str
+    name: str
+    status: str
+    created_at: datetime
+
+
+class OverviewActivityItem(BaseModel):
+    id: uuid.UUID
+    summary: str
+    created_at: datetime
+    action: str
+
+
+class SuperAdminOverviewOut(BaseModel):
+    total_institutions: int
+    active_institutions: int
+    pending_service_requests: int
+    pending_addon_requests: int
+    estimated_annual_revenue: Decimal
+    revenue_currency: str
+    renewing_within_30_days: int
+    recent_requests: list[OverviewRecentRequest]
+    upcoming_renewals: list[RenewalTenantOut]
+    recent_activity: list[OverviewActivityItem]
+
+
+class PlatformSettingOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    key: str
+    value: str
+    description: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class PlatformSettingPatch(BaseModel):
+    value: str = Field(max_length=2000)
+
+
+class PlatformAdminUserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    email: EmailStr
+    role: PlatformAdminRole
+    created_at: datetime
+
+
+class InvitePlatformAdminBody(BaseModel):
+    email: EmailStr
 
 
 class ErrorDetail(BaseModel):
