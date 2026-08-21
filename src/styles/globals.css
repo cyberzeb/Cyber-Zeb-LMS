@@ -3,9 +3,13 @@
 @theme {
   /* Lemon / Lime Green */
   --color-lemon-50: #F4FBCC;
+  --color-lemon-100: #EAF5B0;
   --color-lemon-200: #D4EE66;
+  --color-lemon-300: #C5E84A;
+  --color-lemon-400: #B8E020;
   --color-lemon-500: #A8D400;
   --color-lemon-700: #7A9C00;
+  --color-lemon-800: #6B8200;
   --color-lemon-900: #4E6400;
 
   /* Navy Blue */
@@ -13,7 +17,9 @@
   --color-navy-200: #C5CADE;
   --color-navy-300: #94A3B8;
   --color-navy-500: #4A5580;
+  --color-navy-600: #3D4A6E;
   --color-navy-700: #2A3560;
+  --color-navy-800: #222B4D;
   --color-navy-900: #1B2340;
 
   /* Neutral / Utility */
@@ -22,8 +28,8 @@
   --color-secondary-text: #64748B;
 
   /* Admin shell */
-  --color-admin-dark: #0a1020;
-  --color-admin-sidebar: #0F172A;
+  --color-admin-dark: #0b1120;
+  --color-admin-sidebar: #050914;
 
   /* Status */
   --color-info: #1976D2;
@@ -34,6 +40,14 @@
   --color-danger-bg: #FFEBEE;
   --color-success: #16A34A;
   --color-success-bg: #DCFCE7;
+
+  /* Semantic text on tinted status backgrounds */
+  --color-warning-text: #8A6D00;
+  --color-on-lemon: #1B2340;
+
+  /* Purple accent (outline buttons) */
+  --color-violet-50: #F5F3FF;
+  --color-violet-400: #A78BFA;
 
   /* Typography */
   --font-sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -56,6 +70,10 @@ body {
 /* Force light native selects in admin content (avoids dark OS dropdown lists) */
 .page-content select {
   color-scheme: light;
+}
+
+html.portal-dark .page-content select {
+  color-scheme: dark;
 }
 
 /* Blur only the main content area (sidebar stays sharp) while a dialog is open.
@@ -121,6 +139,284 @@ body {
 
 .animate-drawer-in {
   animation: drawerIn 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─── Portal Dark Mode ───────────────────────────────────────────────────────
+   Canvas is global; semantic token overrides are scoped to content surfaces
+   so the always-dark admin shell (sidebar, header, footer) keeps its intended
+   light-on-dark text hierarchy.
+─────────────────────────────────────────────────────────────────────────── */
+
+html.portal-dark {
+  --color-canvas: #0b1120;
+  --sdm-surface: #111827;
+}
+
+html.portal-dark,
+html.portal-dark body {
+  background-color: var(--color-canvas);
+}
+
+/* Content + marketing sections + portaled modals share dark content tokens */
+html.portal-dark .page-content,
+html.portal-dark .portal-content,
+html.portal-dark section.bg-canvas,
+body.sdm-portal-dark .sdm-modal-surface {
+  --color-divider: rgba(255, 255, 255, 0.08);
+  --color-navy-900: #f8fafc;
+  --color-navy-800: #e2e8f0;
+  --color-navy-700: #cbd5e1;
+  --color-navy-600: #94a3b8;
+  --color-navy-500: #94a3b8;
+  --color-navy-300: #64748b;
+  --color-navy-200: #475569;
+  --color-navy-50: rgba(255, 255, 255, 0.06);
+  --color-secondary-text: #94a3b8;
+  --color-success-bg: rgba(34, 197, 94, 0.15);
+  --color-info-bg: rgba(59, 130, 246, 0.15);
+  --color-warning-bg: rgba(245, 158, 11, 0.14);
+  --color-danger-bg: rgba(229, 57, 53, 0.18);
+  --color-lemon-50: rgba(148, 216, 45, 0.12);
+  --color-lemon-100: rgba(148, 216, 45, 0.16);
+  --color-lemon-200: rgba(148, 216, 45, 0.28);
+  --color-lemon-300: #a8d400;
+  --color-lemon-400: #94d82d;
+  --color-lemon-700: #a8d400;
+  --color-lemon-800: #c5e84a;
+  --color-lemon-900: #d4ee66;
+  --color-warning-text: #fbbf24;
+  --color-on-lemon: #1b2340;
+  --color-violet-50: rgba(139, 92, 246, 0.15);
+  --color-violet-400: #a78bfa;
+  color: var(--color-navy-900);
+}
+
+/* Navy fills used as dark chip/banner backgrounds must stay dark in content */
+html.portal-dark .page-content .bg-navy-900,
+html.portal-dark .portal-content .bg-navy-900,
+html.portal-dark section.bg-canvas .bg-navy-900,
+body.sdm-portal-dark .sdm-modal-surface .bg-navy-900 {
+  background-color: #1b2340 !important;
+}
+html.portal-dark .page-content .bg-navy-800,
+html.portal-dark section.bg-canvas .bg-navy-800 {
+  background-color: #222b4d !important;
+}
+html.portal-dark .page-content .bg-navy-700,
+html.portal-dark section.bg-canvas .bg-navy-700 {
+  background-color: #2a3560 !important;
+}
+
+/* Hero/profile banners inside content — stay dark with white text */
+html.portal-dark .page-content [class*="from-navy-900"],
+html.portal-dark .page-content [class*="to-navy-900"],
+html.portal-dark .page-content [class*="to-navy-700"],
+html.portal-dark .page-content [class*="via-navy-800"] {
+  --color-navy-900: #1b2340;
+  --color-navy-800: #243052;
+  --color-navy-700: #2a3560;
+  --color-navy-500: #4a5580;
+  --color-navy-300: #94a3b8;
+  --color-navy-200: #c5cade;
+  --color-lemon-200: #d4ee66;
+  --color-lemon-300: #c5e84a;
+  --color-lemon-400: #b8e020;
+}
+
+/* ── Surfaces: bg-white utilities inside themed content ── */
+html.portal-dark .page-content .bg-white,
+html.portal-dark .page-content .bg-white\/70,
+html.portal-dark .page-content .bg-white\/80,
+html.portal-dark .page-content .bg-white\/95,
+html.portal-dark .portal-content .bg-white,
+html.portal-dark .portal-content [class*="bg-white/"],
+html.portal-dark section.bg-canvas .bg-white,
+html.portal-dark section.bg-canvas [class*="bg-white/"],
+body.sdm-portal-dark .sdm-modal-surface .bg-white,
+body.sdm-portal-dark .sdm-modal-surface [class*="bg-white/"] {
+  background-color: var(--sdm-surface) !important;
+}
+html.portal-dark .page-content [class*="bg-white/"],
+html.portal-dark .portal-content [class*="bg-white/"],
+html.portal-dark section.bg-canvas [class*="bg-white/"] {
+  background-color: color-mix(in srgb, var(--sdm-surface) 92%, transparent) !important;
+}
+
+/* Card depth */
+html.portal-dark .page-content .rounded-xl.border,
+html.portal-dark .page-content .rounded-2xl.border,
+html.portal-dark section.bg-canvas .rounded-xl.border,
+html.portal-dark section.bg-canvas .rounded-2xl.border {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Page shell */
+html.portal-dark .app-shell-bg {
+  background: var(--color-canvas);
+}
+
+/* ── Form controls (content only) ── */
+html.portal-dark .page-content input:not([type='checkbox']):not([type='radio']):not([type='range']),
+html.portal-dark .page-content select,
+html.portal-dark .page-content textarea,
+html.portal-dark .portal-content input:not([type='checkbox']):not([type='radio']):not([type='range']),
+html.portal-dark .portal-content select,
+html.portal-dark .portal-content textarea,
+html.portal-dark section.bg-canvas input:not([type='checkbox']):not([type='radio']):not([type='range']),
+html.portal-dark section.bg-canvas select,
+html.portal-dark section.bg-canvas textarea,
+body.sdm-portal-dark .sdm-modal-surface input:not([type='checkbox']):not([type='radio']),
+body.sdm-portal-dark .sdm-modal-surface select,
+body.sdm-portal-dark .sdm-modal-surface textarea {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+  color: #f8fafc !important;
+  color-scheme: dark;
+}
+
+html.portal-dark .page-content input::placeholder,
+html.portal-dark .page-content textarea::placeholder,
+html.portal-dark .portal-content input::placeholder,
+html.portal-dark section.bg-canvas input::placeholder,
+body.sdm-portal-dark .sdm-modal-surface input::placeholder {
+  color: #64748b !important;
+}
+
+/* ── Scrollbar ── */
+html.portal-dark .app-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.13);
+}
+html.portal-dark .app-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+/* ── Modal portal ── */
+body.sdm-portal-dark .sdm-modal-surface {
+  background-color: #111827 !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+  box-shadow: 0 24px 70px -12px rgba(0, 0, 0, 0.75), 0 8px 24px -8px rgba(0, 0, 0, 0.55) !important;
+  color: #f8fafc;
+}
+body.sdm-portal-dark .sdm-modal-surface .bg-navy-50\/40,
+body.sdm-portal-dark .sdm-modal-surface [class*="bg-navy-50"] {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* ── Tables ── */
+html.portal-dark .page-content thead tr,
+html.portal-dark .portal-content thead tr,
+body.sdm-portal-dark .sdm-modal-surface thead tr {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+html.portal-dark .page-content tbody tr:hover,
+body.sdm-portal-dark .sdm-modal-surface tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* FilterTabs — inactive pills */
+html.portal-dark .page-content button[class*="bg-white/"],
+html.portal-dark .page-content button[class*="bg-white"]:not([class*="from-navy"]) {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+
+/* FilterTabs — active pill keeps readable white text on dark fill */
+html.portal-dark .page-content button[class*="from-navy-700"][class*="to-navy-900"] {
+  background-image: linear-gradient(to bottom, #475569, #334155) !important;
+  color: #ffffff !important;
+  border-color: #475569 !important;
+}
+
+/* Button variants inside content */
+html.portal-dark .page-content .bg-white.border-divider,
+html.portal-dark .page-content [class*="bg-white"][class*="border-divider"],
+html.portal-dark .portal-content .bg-white.border-divider,
+html.portal-dark section.bg-canvas .bg-white.border-divider {
+  background-color: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+}
+
+/* Lemon primary buttons/chips — keep dark text on lime fill */
+html.portal-dark .bg-lemon-500.text-navy-900,
+html.portal-dark .page-content .bg-lemon-500,
+html.portal-dark section.bg-canvas .bg-lemon-500.text-navy-900 {
+  color: var(--color-on-lemon) !important;
+}
+
+/* Toggle switch knob stays white */
+html.portal-dark .page-content button[role="switch"] > span.bg-white,
+html.portal-dark .portal-content button[role="switch"] > span.bg-white {
+  background-color: #ffffff !important;
+}
+
+/* Modal footer strip */
+body.sdm-portal-dark .sdm-modal-surface .bg-navy-50\/40 {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Toast notifications */
+html.portal-dark .fixed.z-\[100\] > div {
+  background-color: #111827 !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.55) !important;
+}
+html.portal-dark .fixed.z-\[100\] .text-navy-900 {
+  color: #f8fafc !important;
+}
+html.portal-dark .fixed.z-\[100\] .text-lemon-700 {
+  color: #a8d400 !important;
+}
+
+/* Dropdown menus */
+html.portal-dark .page-content ul[class*="bg-white"],
+html.portal-dark .page-content div[class*="bg-white"].shadow-lg,
+html.portal-dark .page-content div[class*="bg-white"].shadow-xl,
+html.portal-dark .portal-content ul[class*="bg-white"] {
+  background-color: #111827 !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+/* Hardcoded light tints */
+html.portal-dark .page-content [class*="bg-[#F5F3FF]"],
+html.portal-dark section.bg-canvas [class*="bg-[#F5F3FF]"] {
+  background-color: rgba(139, 92, 246, 0.15) !important;
+}
+html.portal-dark .page-content [class*="text-[#7C3AED]"],
+html.portal-dark section.bg-canvas [class*="text-[#7C3AED]"] {
+  color: #a78bfa !important;
+}
+html.portal-dark .page-content [class*="text-[#8A6D00]"],
+html.portal-dark .portal-content [class*="text-[#8A6D00]"],
+html.portal-dark .page-content .text-warning-text,
+html.portal-dark .portal-content .text-warning-text {
+  color: #fbbf24 !important;
+}
+
+/* Live-class ended cards and similar light gradients */
+html.portal-dark .page-content [class*="from-navy-50"],
+html.portal-dark .page-content [class*="via-white"],
+html.portal-dark .page-content [class*="to-white"]:not([class*="text-white"]) {
+  --color-navy-50: rgba(255, 255, 255, 0.04);
+}
+html.portal-dark .page-content [class*="from-navy-50"][class*="to-white"] {
+  background-image: linear-gradient(to right, rgba(255,255,255,0.04), var(--sdm-surface), var(--sdm-surface)) !important;
+}
+
+/* Selected list item highlight (portal picker) */
+html.portal-dark .portal-content [class*="bg-lemon-50"] {
+  background-color: rgba(148, 216, 45, 0.12) !important;
+}
+
+html.portal-dark .page-content .hover\:bg-violet-50:hover,
+html.portal-dark section.bg-canvas .hover\:bg-violet-50:hover {
+  background-color: rgba(139, 92, 246, 0.18) !important;
+}
+
+/* Chart ring strokes on dark surfaces */
+html.portal-dark .page-content circle[stroke="#EEF1F8"] {
+  stroke: rgba(255, 255, 255, 0.08) !important;
 }
 
 /* Slim, modern scrollbar */

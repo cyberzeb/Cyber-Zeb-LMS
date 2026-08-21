@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import brandLogo from '../../../assets/Logo.jpg'
+import { DarkModeToggle } from '../../../shared/components/DarkModeToggle'
 
 interface NavbarProps {
   onRequestServiceClick: () => void
@@ -39,6 +40,7 @@ export function Navbar({ onRequestServiceClick }: NavbarProps) {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
+          <DarkModeToggle tone="marketing" />
           <span className="text-[12px] font-semibold text-navy-200">
             A Cyber-Zeb Consulting product
           </span>
@@ -85,6 +87,9 @@ export function Navbar({ onRequestServiceClick }: NavbarProps) {
 
       {open && (
         <div className="md:hidden bg-navy-900 border-t border-white/10 px-6 py-4 flex flex-col gap-4">
+          <div className="flex justify-end">
+            <DarkModeToggle tone="marketing" />
+          </div>
           {NAV_LINKS.map((link) => (
             <a
               key={link.label}

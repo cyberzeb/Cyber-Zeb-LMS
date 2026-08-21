@@ -27,7 +27,7 @@ export function PortalUserPicker({ role, portalLabel, adminSetupHref = '/admin/p
 
   if (people.length === 0) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center p-6">
+      <div className="min-h-[60vh] flex items-center justify-center p-6 portal-content">
         <GlassCard className="max-w-lg w-full p-8 text-center">
           <div className="w-14 h-14 rounded-2xl bg-navy-50 text-navy-600 flex items-center justify-center mx-auto mb-4">
             {role === 'Student' ? <GraduationCap size={28} /> : <UserRound size={28} />}
@@ -54,7 +54,7 @@ export function PortalUserPicker({ role, portalLabel, adminSetupHref = '/admin/p
   }
 
   return (
-    <div className="min-h-[60vh] flex items-center justify-center p-6">
+    <div className="min-h-[60vh] flex items-center justify-center p-6 portal-content">
       <GlassCard className="max-w-lg w-full p-8">
         <h2 className="text-[20px] font-bold text-navy-900">Select {portalLabel} account</h2>
         <p className="mt-1 text-[13px] text-secondary-text">

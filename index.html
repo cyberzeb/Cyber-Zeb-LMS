@@ -8,6 +8,17 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('berana:theme') || localStorage.getItem('berana:student-theme');
+          if (t && JSON.parse(t) === 'dark') {
+            document.documentElement.classList.add('portal-dark');
+            document.body.classList.add('sdm-portal-dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

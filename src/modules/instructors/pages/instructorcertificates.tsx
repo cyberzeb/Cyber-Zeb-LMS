@@ -45,14 +45,6 @@ const STATUS_LABEL: Record<InstructorCertStatus, string> = {
   'not-eligible': 'Not eligible',
 }
 
-// Left border + bg gradient per status
-const STATUS_ACCENT: Record<InstructorCertStatus, string> = {
-  issued: 'border-l-success from-success-bg/40',
-  eligible: 'border-l-info from-info-bg/40',
-  pending: 'border-l-warning from-warning-bg/30',
-  'not-eligible': 'border-l-navy-200 from-navy-50/60',
-}
-
 type SortKey = 'studentName' | 'courseCode' | 'completionPercent' | 'certStatus'
 type SortDir = 'asc' | 'desc'
 

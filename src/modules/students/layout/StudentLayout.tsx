@@ -8,6 +8,7 @@ import brandLogo from '../../../assets/Logo.jpg'
 import { PortalUserPicker } from '../../../shared/components/PortalUserPicker'
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 import { readInstitutionName } from '../../../shared/storage/readers'
+import { DarkModeToggle } from '../../../shared/components/DarkModeToggle'
 
 const ICON_SIZE = 17
 
@@ -30,6 +31,10 @@ const breadcrumbLabels: Record<string, string> = {
 }
 
 export function StudentLayout() {
+  return <StudentLayoutInner />
+}
+
+function StudentLayoutInner() {
   const location = useLocation()
   const path = location.pathname
   const mainRef = useRef<HTMLElement>(null)
@@ -185,6 +190,7 @@ export function StudentLayout() {
           userRole="Student"
           institutionName={readInstitutionName()}
           breadcrumb={breadcrumb}
+          extraActions={<DarkModeToggle variant="icon" />}
         />
 
         <main ref={mainRef} className="page-content app-scroll flex-1 overflow-y-auto p-5 md:p-6">

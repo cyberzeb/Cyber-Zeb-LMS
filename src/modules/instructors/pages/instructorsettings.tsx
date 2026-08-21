@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Bell, BookOpen, Building2, CalendarDays, GraduationCap, Lock, Mail, UserRound } from 'lucide-react'
+import { Bell, BookOpen, Building2, CalendarDays, GraduationCap, Lock, Mail, Moon, UserRound } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { Monogram } from '../../../shared/components/Monogram'
@@ -13,6 +13,7 @@ import { ToggleRow } from '../../institution/components/settings/ToggleRow'
 import { InstructorPageError, InstructorPageLoading } from '../components/InstructorPageStates'
 import { useInstructorDashboard } from '../hooks/useInstructorDashboard'
 import { getSessionPerson } from '../../../shared/storage/session'
+import { useTheme } from '../../../shared/context/ThemeContext'
 
 const SEC = 17
 
@@ -58,6 +59,7 @@ export function InstructorSettingsPage() {
   const { notify } = useToast()
   const { data, isLoading, isError } = useInstructorDashboard()
   const sessionPerson = getSessionPerson()
+  const { isDark, toggleTheme } = useTheme()
   const [stored, setStored] = useLocalStorageState<InstructorSettingsState>(
     'berana:instructor-settings',
     defaultSettings(sessionPerson ?? undefined),
@@ -249,6 +251,19 @@ export function InstructorSettingsPage() {
               notifications: { ...d.notifications, liveClasses: !d.notifications.liveClasses },
             }))
           }
+        />
+      </SettingsSection>
+
+      <SettingsSection
+        icon={<Moon size={SEC} />}
+        title="Appearance"
+        description="Customize how the instructor portal looks for you."
+      >
+        <ToggleRow
+          label="Dark mode"
+          description="Switch to a darker colour scheme that is easier on the eyes."
+          enabled={isDark}
+          onToggle={toggleTheme}
         />
       </SettingsSection>
 

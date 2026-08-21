@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import {
   Building2,
+  Moon,
   Palette,
   GraduationCap,
   Blocks,
@@ -14,6 +15,7 @@ import { useLocalStorageState } from '../../../shared/hooks/useLocalStorageState
 import { SettingsSection } from '../components/settings/SettingsSection'
 import { SettingField } from '../components/settings/SettingField'
 import { ToggleRow } from '../components/settings/ToggleRow'
+import { useTheme } from '../../../shared/context/ThemeContext'
 
 const SEC = 17
 
@@ -78,6 +80,7 @@ const defaultSettings: SettingsState = {
 
 export function SettingsPage() {
   const { notify } = useToast()
+  const { isDark, toggleTheme } = useTheme()
   const [stored, setStored] = useLocalStorageState<SettingsState>(
     'berana:settings',
     defaultSettings,
@@ -200,6 +203,19 @@ export function SettingsPage() {
             value={branding.primary}
             options={['Lemon / Navy', 'Blue / Slate', 'Emerald / Charcoal']}
             onChange={(v) => setBranding({ primary: v })}
+          />
+        </SettingsSection>
+
+        <SettingsSection
+          icon={<Moon size={SEC} />}
+          title="Appearance"
+          description="Choose light or dark mode for the admin portal."
+        >
+          <ToggleRow
+            label="Dark mode"
+            description="Use the dark dashboard theme across the institution admin portal."
+            enabled={isDark}
+            onToggle={toggleTheme}
           />
         </SettingsSection>
 
