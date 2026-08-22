@@ -1,5 +1,5 @@
 /** Bump to reset all Berana localStorage (fresh demo). */
-export const STORAGE_VERSION = 6
+export const STORAGE_VERSION = 7
 
 export const STORAGE_KEYS = {
   version: 'berana:storage-version',
@@ -21,6 +21,9 @@ export const STORAGE_KEYS = {
   lmsActivity: 'berana:lms-activity',
   studentSettings: 'berana:student-settings',
   instructorSettings: 'berana:instructor-settings',
+  staffSettings: 'berana:staff-settings',
+  guardianSettings: 'berana:guardian-settings',
+  helpDeskSettings: 'berana:help-desk-settings',
   announcements: 'berana:announcements',
   forumChats: 'berana:forum-chats',
   forumMessages: 'berana:forum-messages',

@@ -17,6 +17,7 @@ const roleColors: Record<PersonRow['role'], string> = {
   Admin: 'bg-navy-50 text-navy-700',
   Guardian: 'bg-warning-bg text-[#8A6D00]',
   Staff: 'bg-navy-50 text-navy-500',
+  HelpDesk: 'bg-info-bg text-info',
 }
 
 function campusLabel(campusId: string | undefined, campuses: Campus[]): string {

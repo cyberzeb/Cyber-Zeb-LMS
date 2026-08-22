@@ -60,6 +60,21 @@ import { InstructorForumPage } from '../modules/instructors/pages/instructorforu
 import { InstructorCertificatesPage } from '../modules/instructors/pages/instructorcertificates'
 import { InstructorHelpDeskPage } from '../modules/instructors/pages/instructorhelpdesk'
 import { InstructorSettingsPage } from '../modules/instructors/pages/instructorsettings'
+import { StaffLayout } from '../modules/staff/layout/StaffLayout'
+import { StaffDashboardPage } from '../modules/staff/pages/staffdashboard'
+import { StaffSubmitPeoplePage } from '../modules/staff/pages/staffsubmitpeople'
+import { StaffSubmissionsPage } from '../modules/staff/pages/staffsubmissions'
+import { StaffAnnouncementsPage } from '../modules/staff/pages/staffannouncements'
+import { StaffSettingsPage } from '../modules/staff/pages/staffsettings'
+import { GuardianLayout } from '../modules/guardian/layout/GuardianLayout'
+import { GuardianDashboardPage } from '../modules/guardian/pages/guardiandashboard'
+import { GuardianProgressPage } from '../modules/guardian/pages/guardianprogress'
+import { GuardianAnnouncementsPage } from '../modules/guardian/pages/guardianannouncements'
+import { GuardianSettingsPage } from '../modules/guardian/pages/guardiansettings'
+import { HelpDeskLayout } from '../modules/helpdesk/layout/HelpDeskLayout'
+import { HelpDeskDashboardPage } from '../modules/helpdesk/pages/helpdeskdashboard'
+import { HelpDeskTicketsPage } from '../modules/helpdesk/pages/helpdesktickets'
+import { HelpDeskSettingsPage } from '../modules/helpdesk/pages/helpdesksettings'
 
 export const router = createBrowserRouter([
   {
@@ -204,6 +219,36 @@ export const router = createBrowserRouter([
         path: 'settings',
         element: <InstructorSettingsPage />,
       },
+    ],
+  },
+  {
+    path: '/staff',
+    element: <StaffLayout />,
+    children: [
+      { index: true, element: <StaffDashboardPage /> },
+      { path: 'submit-people', element: <StaffSubmitPeoplePage /> },
+      { path: 'submissions', element: <StaffSubmissionsPage /> },
+      { path: 'announcements', element: <StaffAnnouncementsPage /> },
+      { path: 'settings', element: <StaffSettingsPage /> },
+    ],
+  },
+  {
+    path: '/guardian',
+    element: <GuardianLayout />,
+    children: [
+      { index: true, element: <GuardianDashboardPage /> },
+      { path: 'progress', element: <GuardianProgressPage /> },
+      { path: 'announcements', element: <GuardianAnnouncementsPage /> },
+      { path: 'settings', element: <GuardianSettingsPage /> },
+    ],
+  },
+  {
+    path: '/help-desk',
+    element: <HelpDeskLayout />,
+    children: [
+      { index: true, element: <HelpDeskDashboardPage /> },
+      { path: 'tickets', element: <HelpDeskTicketsPage /> },
+      { path: 'settings', element: <HelpDeskSettingsPage /> },
     ],
   },
   {

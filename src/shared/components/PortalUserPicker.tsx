@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
+import { GraduationCap, Headset, HeartHandshake, Shield, UserRound } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { GraduationCap, Shield, UserRound } from 'lucide-react'
 import { Button } from '../components/Button'
 import { Monogram } from '../components/Monogram'
 import { GlassCard } from '../layout/GlassCard'
@@ -14,8 +14,16 @@ interface PortalUserPickerProps {
   adminSetupHref?: string
 }
 
+function roleIcon(role: PersonRole) {
+  if (role === 'Student') return <GraduationCap size={28} />
+  if (role === 'Guardian') return <HeartHandshake size={28} />
+  if (role === 'HelpDesk') return <Headset size={28} />
+  if (role === 'Staff') return <UserRound size={28} />
+  return <UserRound size={28} />
+}
+
 export function PortalUserPicker({ role, portalLabel, adminSetupHref = '/admin/people' }: PortalUserPickerProps) {
-  const people = useMemo(() => readPeople().filter((p) => p.role === role && p.status !== 'suspended'), [])
+  const people = useMemo(() => readPeople().filter((p) => p.role === role && p.status !== 'suspended'), [role])
   const [selectedId, setSelectedId] = useState(people[0]?.id ?? '')
 
   const handleContinue = () => {
@@ -30,11 +38,11 @@ export function PortalUserPicker({ role, portalLabel, adminSetupHref = '/admin/p
       <div className="min-h-[60vh] flex items-center justify-center p-6">
         <GlassCard className="max-w-lg w-full p-8 text-center">
           <div className="w-14 h-14 rounded-2xl bg-navy-50 text-navy-600 flex items-center justify-center mx-auto mb-4">
-            {role === 'Student' ? <GraduationCap size={28} /> : <UserRound size={28} />}
+            {roleIcon(role)}
           </div>
-          <h2 className="text-[20px] font-bold text-navy-900">No {role.toLowerCase()} accounts yet</h2>
+          <h2 className="text-[20px] font-bold text-navy-900">No {role === 'HelpDesk' ? 'help desk agent' : role.toLowerCase()} accounts yet</h2>
           <p className="mt-2 text-[13px] text-secondary-text leading-relaxed">
-            The {portalLabel} reads from the same local data as Institution Admin. Add {role.toLowerCase()}s in
+            The {portalLabel} reads from the same local data as Institution Admin. Add accounts in
             admin first, then return here to sign in.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">

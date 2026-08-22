@@ -422,6 +422,7 @@ export type PersonRole =
   | 'Admin'
   | 'Guardian'
   | 'Staff'
+  | 'HelpDesk'
 
 export interface PersonRow {
   id: string

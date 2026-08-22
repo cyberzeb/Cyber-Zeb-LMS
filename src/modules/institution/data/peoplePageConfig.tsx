@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import {
   GraduationCap,
+  Headset,
   MailPlus,
   Presentation,
   Shield,
@@ -148,7 +149,7 @@ export const peoplePageConfigs: Record<PeoplePageFocus, PeoplePageConfig> = {
   Staff: {
     title: 'Staff',
     subtitle:
-      'Manage non-teaching personnel — registrars, finance, IT support and campus operations teams.',
+      'Manage non-teaching personnel — registrars, finance and campus operations teams.',
     inviteLabel: 'Add Staff Member',
     inviteTitle: 'Invite Staff Member',
     inviteDescription:
@@ -173,6 +174,39 @@ export const peoplePageConfigs: Record<PeoplePageFocus, PeoplePageConfig> = {
           label: 'Offices',
           value: new Set(staff.map((p) => p.department)).size,
           sub: 'Represented',
+          icon: <UserCog size={STAT} />,
+        },
+      ]
+    },
+  },
+  HelpDesk: {
+    title: 'Help Desk Agents',
+    subtitle:
+      'Support agents who handle tickets from students, instructors and staff. Separate portal UI from general staff.',
+    inviteLabel: 'Add Help Desk Agent',
+    inviteTitle: 'Invite Help Desk Agent',
+    inviteDescription:
+      'Grant help desk portal access for ticket management and support workflows.',
+    defaultRole: 'HelpDesk',
+    lockRole: true,
+    searchPlaceholder: 'Search agents by name or email...',
+    emptyMessage: 'No help desk agents match your search.',
+    showRoleTabs: false,
+    hideRoleColumn: true,
+    getStats: (people) => {
+      const agents = filterRole(people, 'HelpDesk')
+      return [
+        { label: 'Total Agents', value: agents.length, icon: <Headset size={STAT} /> },
+        { label: 'Active', value: countByStatus(agents, 'active'), icon: <Users size={STAT} /> },
+        {
+          label: 'Pending Invites',
+          value: countByStatus(agents, 'invited'),
+          icon: <MailPlus size={STAT} />,
+        },
+        {
+          label: 'Teams',
+          value: new Set(agents.map((p) => p.department)).size,
+          sub: 'Support teams',
           icon: <UserCog size={STAT} />,
         },
       ]
@@ -246,7 +280,7 @@ export const peoplePageConfigs: Record<PeoplePageFocus, PeoplePageConfig> = {
   },
 }
 
-export const allPeopleTabs = ['All', 'Students', 'Instructors', 'Admins', 'Guardians', 'Staff']
+export const allPeopleTabs = ['All', 'Students', 'Instructors', 'Admins', 'Guardians', 'Staff', 'Help Desk']
 
 export const tabToRole: Record<string, PersonRole> = {
   Students: 'Student',
@@ -254,6 +288,7 @@ export const tabToRole: Record<string, PersonRole> = {
   Admins: 'Admin',
   Guardians: 'Guardian',
   Staff: 'Staff',
+  'Help Desk': 'HelpDesk',
 }
 
 export const roleOptions: PersonRole[] = [
@@ -262,6 +297,7 @@ export const roleOptions: PersonRole[] = [
   'Admin',
   'Guardian',
   'Staff',
+  'HelpDesk',
 ]
 
 export const departmentOptions = [
