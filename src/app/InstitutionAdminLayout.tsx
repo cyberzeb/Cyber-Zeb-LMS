@@ -65,7 +65,7 @@ const breadcrumbLabels: Record<string, string> = {
   '/admin/attendance': 'Attendance',
   '/admin/announcements': 'Announcements',
   '/admin/discussion-forum': 'Discussion Forum',
-  '/admin/resources': 'Library / Resources',
+  '/admin/resources': 'Library & Resources',
   '/admin/calendar': 'Calendar',
   '/admin/payments': 'Payments',
   '/admin/reports': 'Reports & Analytics',
@@ -250,7 +250,7 @@ function InstitutionAdminShell() {
       title: 'Resources',
       items: [
         {
-          label: 'Library / Resources',
+          label: 'Library & Resources',
           to: '/admin/resources',
           active: isActive(['/admin/resources']),
           icon: <Library size={ICON_SIZE} />,

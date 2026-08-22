@@ -26,7 +26,7 @@ export function StudentResourcesPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="Course Resources"
+        title="Library"
         subtitle="Syllabi, lecture notes, readings, and videos for your enrolled modules."
         actions={
           <>

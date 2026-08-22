@@ -6,6 +6,7 @@ import { InstitutionOverviewPage } from '../modules/institution/pages/Institutio
 import { DepartmentsPage } from '../modules/institution/pages/DepartmentsPage'
 import { ProgramsPage } from '../modules/institution/pages/ProgramsPage'
 import { CoursesPage } from '../modules/institution/pages/CoursesPage'
+import { ResourcesAdminPage } from '../modules/institution/pages/ResourcesAdminPage'
 import { PeoplePage } from '../modules/institution/pages/PeoplePage'
 import { StudentsPage } from '../modules/institution/pages/StudentsPage'
 import { InstructorsPage } from '../modules/institution/pages/InstructorsPage'
@@ -320,7 +321,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'resources',
-        element: <CoursesPage />,
+        element: <ResourcesAdminPage />,
       },
       {
         path: 'calendar',
