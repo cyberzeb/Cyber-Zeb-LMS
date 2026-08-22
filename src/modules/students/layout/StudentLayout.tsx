@@ -15,7 +15,7 @@ const breadcrumbLabels: Record<string, string> = {
   '/student': 'Dashboard',
   '/student/courses': 'My Courses',
   '/student/live-classes': 'Live Classes',
-  '/student/resources': 'Course Content & Resources',
+  '/student/resources': 'Library',
   '/student/quizzes': 'Quizzes and Assessments',
   '/student/assignments': 'Assignment Dropboxes',
   '/student/calendar': 'Schedules and Calendars',
@@ -93,7 +93,7 @@ export function StudentLayout() {
           icon: <SquarePen size={ICON_SIZE} />,
         },
         {
-          label: 'Resources',
+          label: 'Library',
           to: '/student/resources',
           active: isActive('/student/resources'),
           icon: <LibraryBig size={ICON_SIZE} />,
