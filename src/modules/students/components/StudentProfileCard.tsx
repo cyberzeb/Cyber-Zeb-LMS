@@ -25,7 +25,7 @@ function ProfileField({
 }) {
   return (
     <div className="flex items-start gap-2.5 min-w-0">
-      <div className="w-8 h-8 rounded-lg bg-navy-50 text-navy-600 flex items-center justify-center shrink-0">
+      <div className="w-8 h-8 rounded-lg surface-panel text-navy-600 flex items-center justify-center shrink-0">
         {icon}
       </div>
       <div className="min-w-0">
@@ -60,7 +60,7 @@ export function StudentProfileCard({ data }: StudentProfileCardProps) {
         <ProfileField icon={<Sparkles size={14} />} label="Standing" value={data.standing} />
       </div>
 
-      <div className="mt-5 rounded-xl bg-gradient-to-br from-navy-900 to-navy-700 p-4 text-white">
+      <div className="mt-5 profile-stat-panel p-4 text-white">
         <div className="text-[10.5px] font-semibold uppercase tracking-wide text-navy-200">Current GPA</div>
         <div className="mt-1 flex items-end gap-2">
           <span className="text-[28px] font-extrabold leading-none text-lemon-500">

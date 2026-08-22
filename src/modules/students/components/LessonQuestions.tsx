@@ -126,7 +126,7 @@ export function LessonQuestions({ studentId, courseId, lessonId, questions }: Le
                 ? saved?.isCorrect === false
                   ? 'border-danger/25 bg-danger-bg/10'
                   : 'border-success/30 bg-success-bg/15'
-                : 'border-divider bg-white/80 shadow-sm'
+                : 'border-divider soft-surface shadow-sm'
             }`}
           >
             <div className="flex items-start gap-3">

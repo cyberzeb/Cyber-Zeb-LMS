@@ -68,7 +68,7 @@ export function ResourceLibraryCard({ resources }: ResourceLibraryCardProps) {
           {visibleResources.map((resource) => (
             <GlassCard
               key={resource.id}
-              className={`p-0 overflow-hidden border-l-4 bg-gradient-to-r ${kindAccent[resource.kind]} to-white hover:shadow-md transition-shadow`}
+              className={`p-0 overflow-hidden border-l-4 bg-gradient-to-r ${kindAccent[resource.kind]} to-card-end hover:shadow-md transition-shadow`}
             >
               <div className="p-5 flex gap-4">
                 <div

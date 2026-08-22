@@ -65,7 +65,7 @@ export function StaffDashboardPage() {
           <div className="mt-4 flex flex-col gap-2">
             <Link
               to="/staff/submit-people"
-              className="flex items-center gap-3 p-3 rounded-xl border border-divider hover:border-lemon-500 hover:bg-lemon-50/40 transition-colors"
+              className="quick-action-tile"
             >
               <UserPlus size={18} className="text-navy-600" />
               <div>
@@ -75,7 +75,7 @@ export function StaffDashboardPage() {
             </Link>
             <Link
               to="/staff/submissions"
-              className="flex items-center gap-3 p-3 rounded-xl border border-divider hover:border-lemon-500 hover:bg-lemon-50/40 transition-colors"
+              className="quick-action-tile"
             >
               <ClipboardCheck size={18} className="text-navy-600" />
               <div>

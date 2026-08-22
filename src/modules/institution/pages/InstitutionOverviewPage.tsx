@@ -285,7 +285,7 @@ export function InstitutionOverviewPage() {
           sparkline={data.kpiTrends.upcomingLiveSessions}
           sparklineColor="#2563EB"
           icon={<ZoomIcon size={STAT} />}
-          iconBg="bg-[#E8F3FF] text-info"
+          iconBg="bg-info-bg text-info"
         />
         <StatBlock
           label="Certificates Issued"
@@ -356,7 +356,7 @@ export function InstitutionOverviewPage() {
                 background: `conic-gradient(${progressStops})`,
               }}
             >
-              <div className="w-24 h-24 rounded-full bg-white grid place-items-center text-center">
+              <div className="w-24 h-24 rounded-full soft-surface grid place-items-center text-center">
                 <div>
                   <div className="text-[22px] font-extrabold text-navy-900">{completedPercent}%</div>
                   <div className="text-[9px] text-secondary-text font-semibold uppercase tracking-wide">Completed</div>
@@ -528,7 +528,7 @@ export function InstitutionOverviewPage() {
               {data.upcomingLiveClasses.map((item) => (
                 <div key={item.id} className="rounded-lg border border-divider p-2.5">
                   <div className="flex items-start gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-[#E8F3FF] flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-info-bg flex items-center justify-center shrink-0">
                       <ZoomIcon size={14} />
                     </div>
                     <div className="min-w-0">

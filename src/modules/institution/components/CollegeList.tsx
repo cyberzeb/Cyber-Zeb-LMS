@@ -28,7 +28,7 @@ export function CollegeList({ colleges, departments, onViewAll }: CollegeListPro
             return (
               <div
                 key={college.id}
-                className="flex items-center gap-3 rounded-xl border border-divider/50 bg-white/50 px-4 py-3"
+                className="nested-panel-strong flex items-center gap-3 px-4 py-3"
               >
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-lemon-50 to-lemon-200 ring-1 ring-lemon-500/20 text-lemon-900 flex items-center justify-center shrink-0">
                   <GraduationCap size={16} />

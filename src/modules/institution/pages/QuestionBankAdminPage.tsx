@@ -130,7 +130,7 @@ export function QuestionBankAdminPage() {
           {filtered.map((question) => (
             <div
               key={question.id}
-              className="rounded-xl border border-divider bg-white/80 p-4 flex flex-col sm:flex-row sm:items-start gap-4 hover:shadow-sm transition-shadow"
+              className="list-row-card p-4 flex flex-col sm:flex-row sm:items-start gap-4"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
@@ -192,7 +192,7 @@ export function QuestionBankAdminPage() {
           />
           <label className="flex flex-col gap-1.5">
             <span className="text-[12px] font-semibold text-navy-900">Course (optional)</span>
-            <select value={form.courseId} onChange={(e) => setForm((f) => ({ ...f, courseId: e.target.value }))} className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px]">
+            <select value={form.courseId} onChange={(e) => setForm((f) => ({ ...f, courseId: e.target.value }))} className="w-full input-surface rounded-lg px-3 py-2 text-[13px] dark:[color-scheme:dark]">
               <option value="">General / cross-course</option>
               {courses.map((c) => (
                 <option key={c.id} value={c.id}>{c.code} — {c.title}</option>

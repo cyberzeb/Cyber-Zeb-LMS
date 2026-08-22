@@ -25,7 +25,7 @@ function ProfileField({
 }) {
   return (
     <div className="flex items-start gap-2.5 min-w-0">
-      <div className="w-8 h-8 rounded-lg bg-navy-50 text-navy-600 flex items-center justify-center shrink-0">
+      <div className="w-8 h-8 rounded-lg surface-panel text-navy-600 flex items-center justify-center shrink-0">
         {icon}
       </div>
       <div className="min-w-0">
@@ -60,15 +60,15 @@ export function InstructorProfileCard({ data }: InstructorProfileCardProps) {
         <ProfileField icon={<Clock size={14} />} label="Office hours" value={data.officeHours} />
       </div>
 
-      <div className="mt-5 rounded-xl bg-gradient-to-br from-navy-900 to-navy-700 p-4 text-white">
-        <div className="text-[10.5px] font-semibold uppercase tracking-wide text-navy-200">Teaching load</div>
+      <div className="mt-5 profile-stat-panel p-4 text-white">
+        <div className="text-[10.5px] font-semibold uppercase tracking-wide text-[#c5cade]">Teaching load</div>
         <div className="mt-1 flex items-end gap-2">
           <span className="text-[28px] font-extrabold leading-none text-lemon-500">
             {data.kpis.activeCourses}
           </span>
-          <span className="text-[12px] text-navy-200 mb-1">active courses</span>
+          <span className="text-[12px] text-[#c5cade] mb-1">active courses</span>
         </div>
-        <p className="mt-2 text-[11px] text-navy-200">
+        <p className="mt-2 text-[11px] text-[#c5cade]">
           {data.kpis.totalStudents} students · {data.kpis.pendingGrading} pending to grade
         </p>
       </div>

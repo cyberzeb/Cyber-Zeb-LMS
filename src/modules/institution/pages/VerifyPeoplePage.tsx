@@ -119,9 +119,9 @@ export function VerifyPeoplePage() {
           />
         ) : (
           <GlassCard className="p-0 overflow-hidden">
-            <div className="hidden md:grid md:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-3 px-6 py-3.5 border-b border-divider/60 bg-gradient-to-b from-white/70 to-white/30">
+            <div className="hidden md:grid md:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-3 px-6 py-3.5 table-header-bar">
               {['Person', 'Role', 'Campus', 'Added By', 'Status'].map((h) => (
-                <span key={h} className="text-[10.5px] font-bold uppercase tracking-wider text-secondary-text">
+                <span key={h} className="table-header-label">
                   {h}
                 </span>
               ))}
@@ -130,7 +130,7 @@ export function VerifyPeoplePage() {
               {filtered.map((person) => (
                 <div
                   key={person.id}
-                  className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-2 md:gap-3 px-6 py-3.5 items-center"
+                  className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-2 md:gap-3 px-6 py-3.5 items-center table-row-hover"
                 >
                   <div className="min-w-0">
                     <div className="font-bold text-navy-900 text-[13.5px] truncate">{person.name}</div>

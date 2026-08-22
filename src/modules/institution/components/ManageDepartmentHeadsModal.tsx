@@ -117,7 +117,7 @@ export function ManageDepartmentHeadsModal({
                   className={`rounded-xl border px-4 py-3.5 ${
                     selectedId
                       ? 'border-lemon-500/30 bg-lemon-500/[0.05]'
-                      : 'border-divider/70 bg-white'
+                      : 'border-divider/70 nested-panel-strong'
                   }`}
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-4">

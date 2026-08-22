@@ -55,7 +55,7 @@ export function AttendanceTable({ records, onView, onOverride }: AttendanceTable
       <div className="overflow-x-auto">
         <table className="w-full min-w-[800px] text-left">
           <thead>
-            <tr className="text-[10px] uppercase tracking-wider text-secondary-text border-b border-divider bg-navy-50/40">
+            <tr className="table-header-label border-b border-divider table-header-bar">
               <th className="py-3 pl-5 pr-3 font-semibold">Student</th>
               <th className="py-3 px-3 font-semibold">Course</th>
               <th className="py-3 px-3 font-semibold">Instructor</th>

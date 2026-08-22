@@ -45,7 +45,7 @@ export function OfficeLeadershipPanel({ staff, campuses, campusFilter }: OfficeL
             className={`rounded-xl border px-3 py-2.5 ${
               row.head
                 ? 'border-lemon-500/30 bg-lemon-500/[0.06]'
-                : 'border-divider/60 bg-white/50'
+                : 'border-divider/60 nested-panel-strong'
             }`}
           >
             <div className="flex items-start justify-between gap-2">

@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  /* Lemon / Lime Green */
+  /* Lemon / Lime Green — stakeholder accent #a3cf45 */
   --color-lemon-50: #F4FBCC;
   --color-lemon-200: #D4EE66;
   --color-lemon-500: #A8D400;
@@ -10,10 +12,12 @@
 
   /* Navy Blue */
   --color-navy-50: #EEF0F7;
+  --color-navy-100: #E2E8F0;
   --color-navy-200: #C5CADE;
   --color-navy-300: #94A3B8;
   --color-navy-500: #4A5580;
   --color-navy-700: #2A3560;
+  --color-navy-800: #1e293b;
   --color-navy-900: #1B2340;
 
   /* Neutral / Utility */
@@ -24,6 +28,8 @@
   /* Admin shell */
   --color-admin-dark: #0a1020;
   --color-admin-sidebar: #0F172A;
+  --color-shell: #020810;
+  --color-panel: #0a121e;
 
   /* Status */
   --color-info: #1976D2;
@@ -37,6 +43,70 @@
 
   /* Typography */
   --font-sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.04);
+  --shadow-card-dark: 0 1px 3px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* ── Dark theme (Berana stakeholder palette) ───────────────── */
+.dark {
+  --color-lemon-500: #a3cf45;
+  --color-lemon-200: #b8db6a;
+  --color-lemon-50: rgba(163, 207, 69, 0.12);
+  --color-lemon-700: #c5e875;
+  --color-lemon-900: #d4ee66;
+
+  --color-canvas: #020810;
+  --color-divider: #1a2332;
+  --color-secondary-text: #94a3b8;
+
+  --color-navy-50: #0a121e;
+  --color-navy-100: #111b2e;
+  --color-navy-200: #64748b;
+  --color-navy-300: #94a3b8;
+  --color-navy-500: #64748b;
+  --color-navy-700: #cbd5e1;
+  --color-navy-800: #e2e8f0;
+  --color-navy-900: #f1f5f9;
+
+  --color-admin-dark: #020810;
+  --color-admin-sidebar: #020810;
+
+  --color-info-bg: rgba(25, 118, 210, 0.18);
+  --color-warning-bg: rgba(255, 193, 7, 0.14);
+  --color-danger-bg: rgba(229, 57, 53, 0.14);
+  --color-success-bg: rgba(22, 163, 74, 0.14);
+
+  --shadow-card: var(--shadow-card-dark);
+}
+
+.dark body {
+  background-color: var(--color-canvas);
+  color: var(--color-navy-900);
+}
+
+/* Keep dark text on lime accent buttons */
+.dark .bg-lemon-500.text-navy-900,
+.dark .bg-lemon-500 .text-navy-900,
+.dark .border-lemon-500.text-navy-900 {
+  color: #020810;
+}
+
+.dark .sidebar-logo-bg {
+  background-color: #ffffff;
+}
+
+.dark .page-content select {
+  color-scheme: dark;
+}
+
+.dark .app-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.22);
+  background-clip: content-box;
+}
+.dark .app-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.38);
+  background-clip: content-box;
 }
 
 body {
@@ -46,6 +116,11 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-logo-bg {
+  background-color: #ffffff;
 }
 
 /* Clean light background for admin content area */
@@ -139,4 +214,377 @@ body {
 }
 .app-scroll::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* ── Reusable surfaces (light + dark) ─────────────────────── */
+@layer components {
+  .nested-panel {
+    border-radius: 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--color-divider) 40%, transparent);
+    background-color: color-mix(in srgb, var(--color-navy-50) 55%, transparent);
+  }
+
+  .nested-panel-strong {
+    border-radius: 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--color-divider) 45%, transparent);
+    background-color: color-mix(in srgb, var(--color-navy-50) 85%, transparent);
+  }
+
+  .list-row-card {
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-divider);
+    background-color: color-mix(in srgb, var(--color-navy-50) 70%, white);
+    transition: box-shadow 0.15s ease;
+  }
+
+  .list-row-card:hover {
+    box-shadow: var(--shadow-card);
+  }
+
+  .table-header-bar {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-navy-50) 90%, white),
+      color-mix(in srgb, var(--color-navy-50) 40%, transparent)
+    );
+  }
+
+  .table-header-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-secondary-text);
+  }
+
+  .table-row-hover {
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .table-row-hover:hover {
+    background-color: color-mix(in srgb, var(--color-navy-50) 75%, white);
+    box-shadow: inset 3px 0 0 var(--color-lemon-500);
+  }
+
+  .schedule-card {
+    overflow: hidden;
+    transition: box-shadow 0.15s ease;
+  }
+
+  .schedule-card:hover {
+    box-shadow: var(--shadow-card);
+  }
+
+  .schedule-card-end {
+    background-color: color-mix(in srgb, var(--color-navy-50) 30%, white);
+  }
+
+  .schedule-meta-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 0.5rem;
+    border: 1px solid color-mix(in srgb, var(--color-divider) 80%, transparent);
+    background-color: color-mix(in srgb, var(--color-navy-50) 80%, white);
+    padding: 0.375rem 0.75rem;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--color-navy-800);
+  }
+
+  .forum-msg-time-own {
+    color: color-mix(in srgb, var(--color-navy-900) 55%, transparent);
+  }
+
+  .forum-msg-time-other {
+    color: var(--color-navy-500);
+  }
+
+  .forum-msg-time-system {
+    color: var(--color-secondary-text);
+  }
+
+  .marketing-feature-card {
+    border-radius: 1rem;
+    border: 1px solid var(--color-divider);
+    background-color: white;
+    padding: 1.5rem;
+    box-shadow: 0 8px 28px rgba(27, 35, 64, 0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .marketing-feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(27, 35, 64, 0.1);
+  }
+
+  .marketing-form-panel {
+    border-radius: 1.5rem;
+    border: 1px solid var(--color-divider);
+    background-color: white;
+    box-shadow: 0 20px 50px rgba(27, 35, 64, 0.1);
+  }
+
+  .marketing-mockup-surface {
+    background-color: #f8fafc;
+    color: #1b2340;
+  }
+
+  .marketing-mockup-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+  }
+
+  .surface-panel {
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-divider);
+    background-color: color-mix(in srgb, var(--color-navy-50) 55%, white);
+  }
+
+  .soft-surface {
+    border: 1px solid var(--color-divider);
+    background-color: color-mix(in srgb, var(--color-navy-50) 80%, white);
+  }
+
+  .to-card-end {
+    --tw-gradient-to: color-mix(in srgb, var(--color-navy-50) 15%, white);
+    --tw-gradient-to-position: 100%;
+  }
+
+  .banner-warning {
+    background: linear-gradient(to right, color-mix(in srgb, var(--color-warning-bg) 90%, transparent), var(--color-canvas));
+  }
+
+  .banner-success {
+    background: linear-gradient(to right, color-mix(in srgb, var(--color-success-bg) 70%, transparent), var(--color-canvas));
+  }
+
+  .upload-dropzone {
+    border-radius: 0.5rem;
+    border: 2px dashed color-mix(in srgb, var(--color-divider) 80%, transparent);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .upload-dropzone-active {
+    border-color: color-mix(in srgb, var(--color-lemon-500) 55%, transparent);
+    background-color: color-mix(in srgb, var(--color-lemon-50) 50%, transparent);
+  }
+
+  .upload-dropzone-idle {
+    border-color: color-mix(in srgb, var(--color-navy-100) 80%, transparent);
+    background-color: color-mix(in srgb, var(--color-navy-50) 45%, transparent);
+  }
+
+  .profile-stat-panel {
+    border-radius: 0.75rem;
+    background: linear-gradient(to bottom right, #1b2340, #2a3560);
+  }
+
+  .hero-banner {
+    background: linear-gradient(to right, #1b2340, #243056, #1b2340);
+  }
+
+  .hero-banner-br {
+    background: linear-gradient(to bottom right, #1b2340, #243056, #1b2340);
+  }
+
+  .hero-banner-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border-radius: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 0.375rem 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .attendance-ring-track {
+    stroke: color-mix(in srgb, var(--color-navy-100) 80%, transparent);
+  }
+
+  .quick-action-tile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-divider);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .quick-action-tile:hover {
+    border-color: color-mix(in srgb, var(--color-lemon-500) 45%, transparent);
+    background-color: color-mix(in srgb, var(--color-lemon-50) 55%, transparent);
+  }
+
+  .forum-shell {
+    background-color: color-mix(in srgb, var(--color-navy-50) 75%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--color-divider) 80%, transparent);
+  }
+
+  .forum-sidebar {
+    background-color: color-mix(in srgb, var(--color-navy-100) 35%, transparent);
+    border-right: 1px solid color-mix(in srgb, var(--color-divider) 80%, transparent);
+  }
+
+  .forum-sidebar-header {
+    background-color: color-mix(in srgb, var(--color-navy-50) 65%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-divider) 80%, transparent);
+  }
+
+  .forum-chat-pane {
+    background-color: color-mix(in srgb, var(--color-navy-50) 45%, transparent);
+  }
+
+  .forum-messages-bg {
+    background: linear-gradient(180deg, #e8ecf4 0%, #eef1f7 50%, #e9edf5 100%);
+  }
+
+  .forum-chat-header {
+    background-color: color-mix(in srgb, var(--color-navy-50) 75%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-divider) 80%, transparent);
+  }
+
+  .forum-composer {
+    background-color: color-mix(in srgb, var(--color-navy-50) 75%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--color-divider) 80%, transparent);
+  }
+
+  .forum-bubble-incoming {
+    background-color: color-mix(in srgb, var(--color-navy-50) 90%, white);
+    border: 1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);
+    color: var(--color-navy-900);
+  }
+
+  .forum-list-hover:hover {
+    background-color: color-mix(in srgb, var(--color-navy-100) 40%, transparent);
+  }
+
+  .forum-list-active {
+    background-color: color-mix(in srgb, var(--color-lemon-50) 70%, transparent);
+  }
+
+  .input-surface {
+    background-color: color-mix(in srgb, var(--color-navy-50) 80%, white);
+    border: 1px solid color-mix(in srgb, var(--color-divider) 70%, transparent);
+    color: var(--color-navy-900);
+  }
+}
+
+.dark .list-row-card {
+  background-color: #0a121e;
+}
+
+.dark .nested-panel,
+.dark .nested-panel-strong {
+  background-color: #0a121e;
+  border-color: #1a2332;
+}
+
+.dark .table-header-bar {
+  background: linear-gradient(to bottom, #111b2e, #0a121e);
+  border-bottom-color: #1a2332;
+}
+
+.dark .table-header-label {
+  color: #94a3b8;
+}
+
+.dark .table-row-hover:hover {
+  background-color: #111b2e;
+  box-shadow: inset 3px 0 0 var(--color-lemon-500);
+}
+
+.dark .schedule-card-end {
+  background-color: #0a121e;
+}
+
+.dark .schedule-meta-chip {
+  background-color: #111b2e;
+  border-color: #1a2332;
+  color: #e2e8f0;
+}
+
+.dark .forum-msg-time-own {
+  color: rgba(2, 8, 16, 0.6);
+}
+
+.dark .forum-msg-time-other {
+  color: #94a3b8;
+}
+
+.dark .forum-msg-time-system {
+  color: #64748b;
+}
+
+.dark .marketing-feature-card {
+  background-color: #0a121e;
+  border-color: #1a2332;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+}
+
+.dark .marketing-feature-card:hover {
+  border-color: color-mix(in srgb, var(--color-lemon-500) 35%, transparent);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.dark .marketing-form-panel {
+  background-color: #0a121e;
+  border-color: #1a2332;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.dark .surface-panel {
+  background-color: #111b2e;
+  border-color: #1a2332;
+}
+
+.dark .soft-surface {
+  background-color: #111b2e;
+  border-color: #1a2332;
+}
+
+.dark .to-card-end {
+  --tw-gradient-to: #0a121e;
+}
+
+.dark .upload-dropzone-active {
+  border-color: color-mix(in srgb, var(--color-lemon-500) 45%, transparent);
+  background-color: rgba(163, 207, 69, 0.08);
+}
+
+.dark .upload-dropzone-idle {
+  border-color: #1a2332;
+  background-color: #111b2e;
+}
+
+.dark .attendance-ring-track {
+  stroke: rgba(148, 163, 184, 0.25);
+}
+
+.dark .ring-offset-canvas {
+  --tw-ring-offset-color: var(--color-canvas);
+}
+
+.dark .forum-messages-bg {
+  background: linear-gradient(180deg, #020810 0%, #0a121e 45%, #070d16 100%);
+}
+
+.dark .forum-bubble-incoming {
+  background-color: #111b2e;
+  border-color: #1a2332;
+}
+
+.dark .input-surface {
+  background-color: #111b2e;
+  border-color: #1a2332;
+  color: var(--color-navy-900);
+}
+
+.dark .page-content select,
+.dark .marketing-form-panel select,
+.dark .marketing-form-panel input,
+.dark .marketing-form-panel textarea {
+  color-scheme: dark;
 }

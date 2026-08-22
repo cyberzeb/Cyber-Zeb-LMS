@@ -108,7 +108,7 @@ export function ApiIntegrationsAdminPage() {
           {filtered.map((integration) => (
             <div
               key={integration.id}
-              className="rounded-xl border border-divider bg-white/80 p-5 flex flex-col gap-4 hover:shadow-sm transition-shadow"
+              className="list-row-card p-5 flex flex-col gap-4"
             >
               <div className="flex items-start gap-4">
                 <div className="w-11 h-11 rounded-xl bg-navy-50 text-navy-700 flex items-center justify-center shrink-0">

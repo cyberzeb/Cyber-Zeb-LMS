@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Bell, Building2, ChevronDown, MessageSquare, Search } from 'lucide-react'
 import type { Campus } from '../../modules/institution/types'
+import { ThemeToggle } from '../components/ThemeToggle'
 
 interface AdminTopHeaderProps {
   userName: string
@@ -48,7 +49,7 @@ export function AdminTopHeader({
   }, [])
 
   return (
-    <header className="shrink-0 h-14 bg-[#0a1020] border-b border-white/[0.08] flex items-center gap-4 px-5">
+    <header className="shrink-0 h-14 bg-admin-dark border-b border-white/[0.08] flex items-center gap-4 px-5">
       <div className="hidden lg:flex items-center gap-2 min-w-[140px] text-[12px] text-navy-200">
         <span className="font-semibold text-white">{institutionName}</span>
         {breadcrumb ? (
@@ -131,6 +132,7 @@ export function AdminTopHeader({
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
+        <ThemeToggle variant="header" />
         <button
           type="button"
           className="relative w-9 h-9 rounded-lg flex items-center justify-center text-navy-200 hover:text-white hover:bg-white/[0.06] transition-colors"

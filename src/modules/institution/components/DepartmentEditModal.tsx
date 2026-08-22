@@ -367,7 +367,7 @@ export function DepartmentEditModal({
                 </Button>
               </div>
             ) : (
-              <div className="rounded-lg border border-dashed border-divider bg-white px-4 py-3 text-[13px] text-secondary-text font-medium">
+              <div className="rounded-lg border border-dashed border-divider nested-panel px-4 py-3 text-[13px] text-secondary-text font-medium">
                 No other courses are available in the catalog.
               </div>
             )}
@@ -384,7 +384,7 @@ export function DepartmentEditModal({
                   return (
                     <div
                       key={course.id}
-                      className="flex items-center gap-3 rounded-xl border border-divider/60 bg-white px-3.5 py-3"
+                      className="nested-panel-strong flex items-center gap-3 px-3.5 py-3"
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">

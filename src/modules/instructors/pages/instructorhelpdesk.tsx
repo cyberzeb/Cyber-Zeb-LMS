@@ -112,15 +112,14 @@ export function InstructorHelpDeskPage() {
         }
       />
 
-      <GlassCard className="relative overflow-hidden p-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900" />
+      <div className="relative overflow-hidden rounded-xl border border-white/10 hero-banner-br shadow-[var(--shadow-card)]">
         <div className="relative p-6 md:p-7 flex flex-col md:flex-row md:items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-lemon-500 text-navy-900 flex items-center justify-center shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-lemon-500 text-[#020810] flex items-center justify-center shrink-0">
             <Headset size={26} />
           </div>
           <div className="flex-1 text-white">
             <h2 className="text-[18px] font-bold">Instructor support</h2>
-            <p className="mt-1 text-[13px] text-navy-200">
+            <p className="mt-1 text-[13px] text-[#c5cade]">
               Priority response for teaching staff · {stats.open + stats.inReview} active ticket
               {stats.open + stats.inReview === 1 ? '' : 's'}
             </p>
@@ -130,7 +129,7 @@ export function InstructorHelpDeskPage() {
             Start chat
           </Button>
         </div>
-      </GlassCard>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatBlock
@@ -165,7 +164,7 @@ export function InstructorHelpDeskPage() {
         {filtered.map((ticket) => (
           <GlassCard
             key={ticket.id}
-            className={`p-0 overflow-hidden border-l-4 bg-gradient-to-r ${statusAccent[ticket.status]} to-white hover:shadow-md transition-shadow`}
+            className={`p-0 overflow-hidden border-l-4 bg-gradient-to-r ${statusAccent[ticket.status]} to-card-end hover:shadow-md transition-shadow`}
           >
             <div className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="min-w-0">

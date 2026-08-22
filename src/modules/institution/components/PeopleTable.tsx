@@ -50,13 +50,10 @@ export function PeopleTable({
   return (
     <GlassCard className="p-0 overflow-hidden">
       <div
-        className={`hidden md:grid ${gridCols} gap-4 px-6 py-3.5 border-b border-divider/60 bg-gradient-to-b from-white/70 to-white/30`}
+        className={`hidden md:grid ${gridCols} gap-4 px-6 py-3.5 table-header-bar`}
       >
         {headers.map((h) => (
-          <span
-            key={h}
-            className="text-[10.5px] font-bold uppercase tracking-wider text-secondary-text"
-          >
+          <span key={h} className="table-header-label">
             {h}
           </span>
         ))}
@@ -69,7 +66,7 @@ export function PeopleTable({
             <div
               key={person.id}
               onClick={() => onSelect?.(person)}
-              className={`group grid grid-cols-1 ${gridCols} gap-2 md:gap-4 px-6 py-3.5 items-center cursor-pointer transition-all hover:bg-white/60 hover:shadow-[inset_3px_0_0_var(--color-lemon-500)]`}
+              className={`group grid grid-cols-1 ${gridCols} gap-2 md:gap-4 px-6 py-3.5 items-center cursor-pointer table-row-hover`}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div

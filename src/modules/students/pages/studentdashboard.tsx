@@ -186,7 +186,7 @@ export function StudentDashboardPage() {
           <DashboardSummaryCard title="Upcoming Deadlines" onViewAll={() => navigate('/student/calendar')}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {data.upcomingDeadlines.map((item) => (
-                <div key={item.id} className="rounded-lg border border-divider p-2.5">
+                <div key={item.id} className="rounded-lg border border-divider p-2.5 nested-panel">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-[12px] font-semibold text-navy-900 truncate">{item.title}</p>
@@ -265,7 +265,7 @@ export function StudentDashboardPage() {
           sparkline={[2, 2, 3, 2, 4, data.kpis.upcomingSessions]}
           sparklineColor="#2563EB"
           icon={<ZoomIcon size={STAT} />}
-          iconBg="bg-[#E8F3FF] text-info"
+          iconBg="bg-info-bg text-info"
         />
         <StatBlock
           label="Assignments Done"
@@ -305,7 +305,7 @@ export function StudentDashboardPage() {
               className="w-36 h-36 shrink-0 rounded-full grid place-items-center"
               style={{ background: `conic-gradient(${progressStops})` }}
             >
-              <div className="w-24 h-24 rounded-full bg-white grid place-items-center text-center">
+              <div className="w-24 h-24 rounded-full soft-surface grid place-items-center text-center">
                 <div>
                   <div className="text-[22px] font-extrabold text-navy-900">{completedPercent}%</div>
                   <div className="text-[9px] text-secondary-text font-semibold uppercase tracking-wide">
@@ -389,7 +389,7 @@ export function StudentDashboardPage() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-left">
                 <thead>
-                  <tr className="text-[10px] uppercase tracking-wider text-secondary-text border-b border-divider">
+                  <tr className="table-header-label border-b border-divider table-header-bar">
                     <th className="py-2 pr-2 font-semibold">Course</th>
                     <th className="py-2 px-2 font-semibold">Instructor</th>
                     <th className="py-2 px-2 font-semibold">Next Session</th>
@@ -431,7 +431,7 @@ export function StudentDashboardPage() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-left">
                 <thead>
-                  <tr className="text-[10px] uppercase tracking-wider text-secondary-text border-b border-divider">
+                  <tr className="table-header-label border-b border-divider table-header-bar">
                     <th className="py-2 pr-2 font-semibold">Assignment</th>
                     <th className="py-2 px-2 font-semibold">Course</th>
                     <th className="py-2 px-2 font-semibold">Due</th>
@@ -469,9 +469,9 @@ export function StudentDashboardPage() {
               {data.liveClasses
                 .filter((s) => s.status !== 'ended')
                 .map((item) => (
-                  <div key={item.id} className="rounded-lg border border-divider p-2.5">
+                  <div key={item.id} className="rounded-lg border border-divider p-2.5 nested-panel">
                     <div className="flex items-start gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-[#E8F3FF] flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-info-bg flex items-center justify-center shrink-0">
                         <ZoomIcon size={14} />
                       </div>
                       <div className="min-w-0">
@@ -535,7 +535,7 @@ export function StudentDashboardPage() {
         </div>
       </div>
 
-      <GlassCard className="p-3 bg-lemon-50/50 border-lemon-500/20">
+      <GlassCard className="p-3 nested-panel border-lemon-500/20">
         <div className="flex items-center gap-2 text-[12px] text-navy-700">
           <CheckCircle2 size={14} className="text-lemon-700" />
           Your dashboard reflects your personal learning data for {data.term}. Grades and attendance update as instructors post results.

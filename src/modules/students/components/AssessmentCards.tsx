@@ -33,9 +33,9 @@ const quizStatusTone: Record<string, 'info' | 'neutral' | 'success' | 'warning'>
 }
 
 const quizAccent: Record<string, string> = {
-  Open: 'border-l-lemon-500 bg-gradient-to-r from-lemon-50/80 to-white',
-  Locked: 'border-l-navy-300 bg-gradient-to-r from-navy-50/50 to-white opacity-90',
-  Completed: 'border-l-success bg-gradient-to-r from-success-bg/80 to-white',
+  Open: 'border-l-lemon-500 bg-gradient-to-r from-lemon-50/80 to-card-end',
+  Locked: 'border-l-navy-300 bg-gradient-to-r from-navy-50/50 to-card-end opacity-90',
+  Completed: 'border-l-success bg-gradient-to-r from-success-bg/80 to-card-end',
 }
 
 const assignmentStatusTone: Record<string, 'info' | 'neutral' | 'success' | 'warning'> = {
@@ -103,17 +103,17 @@ export function QuizAndAssessmentCard({ quizzes }: Pick<AssessmentCardsProps, 'q
               </div>
 
               <div className="mt-4 grid grid-cols-3 gap-2 text-[11px]">
-                <div className="rounded-lg bg-white/80 border border-divider px-2.5 py-2 text-center">
+                <div className="rounded-lg soft-surface px-2.5 py-2 text-center">
                   <CalendarDays size={12} className="mx-auto text-navy-400 mb-1" />
                   <span className="font-semibold text-navy-800 block truncate">{quiz.dueAt.replace('Due ', '')}</span>
                   <span className="text-secondary-text">Due</span>
                 </div>
-                <div className="rounded-lg bg-white/80 border border-divider px-2.5 py-2 text-center">
+                <div className="rounded-lg soft-surface px-2.5 py-2 text-center">
                   <Clock3 size={12} className="mx-auto text-navy-400 mb-1" />
                   <span className="font-semibold text-navy-800 block">{quiz.duration}</span>
                   <span className="text-secondary-text">Time</span>
                 </div>
-                <div className="rounded-lg bg-white/80 border border-divider px-2.5 py-2 text-center">
+                <div className="rounded-lg soft-surface px-2.5 py-2 text-center">
                   <BadgeCheck size={12} className="mx-auto text-navy-400 mb-1" />
                   <span className="font-semibold text-navy-800 block">{quiz.questions}</span>
                   <span className="text-secondary-text">Items</span>
@@ -177,7 +177,7 @@ export function AssignmentDropboxCard({ assignments }: Pick<AssessmentCardsProps
         return (
           <GlassCard
             key={assignment.id}
-            className={`p-0 overflow-hidden border-l-4 hover:shadow-md transition-shadow bg-gradient-to-r ${gradient} to-white`}
+            className={`p-0 overflow-hidden border-l-4 hover:shadow-md transition-shadow bg-gradient-to-r ${gradient} to-card-end`}
           >
             <div className="p-5 md:p-6">
               <div className="flex flex-col lg:flex-row lg:items-start gap-5">
@@ -194,7 +194,7 @@ export function AssignmentDropboxCard({ assignments }: Pick<AssessmentCardsProps
                   <p className="mt-2 text-[12.5px] leading-relaxed text-secondary-text">{assignment.brief}</p>
 
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-white border border-divider px-3 py-1 text-[11px] font-semibold text-navy-700">
+                    <span className="inline-flex items-center gap-1.5 rounded-full soft-surface px-3 py-1 text-[11px] font-semibold text-navy-700">
                       <Clock3 size={11} />
                       {assignment.dueAt}
                     </span>
@@ -211,16 +211,14 @@ export function AssignmentDropboxCard({ assignments }: Pick<AssessmentCardsProps
                   ) : null}
                 </div>
 
-                <div className="w-full lg:w-[280px] shrink-0 rounded-xl border border-dashed border-navy-200 bg-white/80 p-4 flex flex-col gap-3">
+                <div className="w-full lg:w-[280px] shrink-0 rounded-xl border border-dashed border-navy-200 soft-surface p-4 flex flex-col gap-3">
                   <div className="text-[11px] font-bold uppercase tracking-wider text-secondary-text">
                     Secure upload
                   </div>
 
                   <label
-                    className={`flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 text-center cursor-pointer transition ${
-                      isReady
-                        ? 'border-lemon-400 bg-lemon-50/50 hover:bg-lemon-50 hover:border-lemon-500'
-                        : 'border-navy-100 bg-navy-50/50 hover:border-navy-200'
+                    className={`flex flex-col items-center justify-center gap-2 rounded-lg px-4 py-6 text-center cursor-pointer transition upload-dropzone ${
+                      isReady ? 'upload-dropzone-active hover:border-lemon-500' : 'upload-dropzone-idle hover:border-navy-300'
                     }`}
                   >
                     <UploadCloud size={22} className={isReady ? 'text-lemon-700' : 'text-navy-400'} />
@@ -304,7 +302,7 @@ export function ScheduleCalendarCard({ schedule }: Pick<AssessmentCardsProps, 's
           return (
             <GlassCard
               key={item.id}
-              className={`p-0 overflow-hidden border-l-4 bg-gradient-to-r ${accent} to-white hover:shadow-md transition-shadow md:ml-2`}
+              className={`schedule-card p-0 overflow-hidden border-l-4 bg-gradient-to-r ${accent} schedule-card-end md:ml-2`}
             >
               <div className="p-5 flex gap-4">
                 <div className="relative shrink-0 hidden md:flex flex-col items-center">
@@ -331,11 +329,11 @@ export function ScheduleCalendarCard({ schedule }: Pick<AssessmentCardsProps, 's
                   <h3 className="mt-1.5 text-[16px] font-bold text-navy-900 leading-snug">{item.title}</h3>
 
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/80 border border-divider px-3 py-1.5 text-[11.5px] font-semibold text-navy-800">
+                    <span className="schedule-meta-chip">
                       <CalendarDays size={12} className="text-navy-500" />
                       {item.startAt}
                     </span>
-                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/80 border border-divider px-3 py-1.5 text-[11.5px] font-semibold text-navy-800">
+                    <span className="schedule-meta-chip">
                       <MapPin size={12} className="text-navy-500" />
                       {item.location}
                     </span>
@@ -420,7 +418,7 @@ export function GradesFeedbackCard({ grades }: Pick<AssessmentCardsProps, 'grade
               </div>
             </div>
 
-            <div className="mt-4 flex items-start gap-2 rounded-xl bg-navy-50/80 border border-divider px-4 py-3">
+            <div className="mt-4 flex items-start gap-2 rounded-xl nested-panel px-4 py-3">
               <MessageSquareText size={14} className="text-navy-500 shrink-0 mt-0.5" />
               <p className="text-[12px] leading-relaxed text-navy-800">{grade.feedback}</p>
             </div>

@@ -1,16 +1,19 @@
-const PRINCIPLES = [
+import { Globe2, Lock, Puzzle } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+
+const PRINCIPLES: { icon: LucideIcon; title: string; text: string }[] = [
   {
-    icon: '🔒',
+    icon: Lock,
     title: 'Secure by Design',
     text: 'Authentication, role-based authorization, encryption and audit logging are built into every module — not bolted on.',
   },
   {
-    icon: '🧩',
+    icon: Puzzle,
     title: 'Modular & Multi-Tenant',
     text: 'Enable only the modules your institution needs. Your data, branding and users always stay isolated from other tenants.',
   },
   {
-    icon: '🌍',
+    icon: Globe2,
     title: 'Built for Ethiopia, Ready for the World',
     text: 'Designed with low-bandwidth environments, local payment rails without limiting global reach.',
   },
@@ -21,7 +24,7 @@ export function AboutSection() {
     <section id="about" className="bg-canvas py-20 md:py-28">
       <div className="max-w-7xl mx-auto px-6 md:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-5 animate-fade-in-up">
             <span className="text-lemon-700 font-bold text-[12px] uppercase tracking-wider">
               About Us
             </span>
@@ -41,29 +44,33 @@ export function AboutSection() {
             </p>
             <a
               href="#request-service"
-              className="mt-7 inline-flex items-center gap-2 text-navy-900 font-bold text-[14px] border-b-2 border-lemon-500 pb-1 hover:gap-3 transition-all"
+              className="mt-7 inline-flex items-center gap-2 text-navy-900 font-bold text-[14px] border-b-2 border-lemon-500 pb-1 hover:gap-3 transition-all duration-300"
             >
               Start your institution&rsquo;s journey →
             </a>
           </div>
 
           <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-5">
-            {PRINCIPLES.map((p) => (
-              <div
-                key={p.title}
-                className="bg-white rounded-2xl p-6 border border-divider shadow-[0_8px_28px_rgba(27,35,64,0.06)] hover:-translate-y-1.5 transition-transform"
-              >
-                <div className="w-11 h-11 rounded-xl bg-lemon-50 flex items-center justify-center text-xl mb-4">
-                  {p.icon}
+            {PRINCIPLES.map((p, index) => {
+              const Icon = p.icon
+              return (
+                <div
+                  key={p.title}
+                  className="marketing-feature-card animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.08}s` }}
+                >
+                  <div className="w-11 h-11 rounded-xl bg-lemon-50 flex items-center justify-center text-lemon-700 mb-4 transition-transform duration-300 group-hover:scale-110">
+                    <Icon size={22} strokeWidth={2.25} />
+                  </div>
+                  <h3 className="text-[15px] font-extrabold text-navy-900 mb-2">
+                    {p.title}
+                  </h3>
+                  <p className="text-[13.5px] text-secondary-text leading-relaxed">
+                    {p.text}
+                  </p>
                 </div>
-                <h3 className="text-[15px] font-extrabold text-navy-900 mb-2">
-                  {p.title}
-                </h3>
-                <p className="text-[13.5px] text-secondary-text leading-relaxed">
-                  {p.text}
-                </p>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>

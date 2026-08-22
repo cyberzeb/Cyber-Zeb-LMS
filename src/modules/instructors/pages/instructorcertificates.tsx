@@ -168,9 +168,8 @@ function DetailsModal({ row, open, onClose }: DetailsModalProps) {
       }
     >
       {/* Student + course banner */}
-      <div className="relative rounded-xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900" />
-        <div className="absolute right-0 top-0 w-36 h-36 rounded-full bg-lemon-500/15 blur-3xl" />
+      <div className="relative rounded-xl overflow-hidden border border-white/10 hero-banner-br">
+        <div className="absolute right-0 top-0 w-36 h-36 rounded-full bg-lemon-500/15 blur-3xl pointer-events-none" />
         <div className="relative p-5 flex items-center gap-4">
           <Monogram label={row.studentName} size="md" />
           <div className="min-w-0">
@@ -180,7 +179,7 @@ function DetailsModal({ row, open, onClose }: DetailsModalProps) {
             <h3 className="mt-1 text-[17px] font-bold text-white leading-tight">
               {row.studentName}
             </h3>
-            <p className="mt-0.5 text-[12px] text-navy-200">
+            <p className="mt-0.5 text-[12px] text-[#c5cade]">
               {row.courseCode} — {row.courseTitle}
             </p>
           </div>
@@ -405,7 +404,7 @@ export function InstructorCertificatesPage() {
                 placeholder="Search student or course…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 text-[12.5px] bg-white border border-divider rounded-lg focus:outline-none focus:ring-2 focus:ring-lemon-500/40 focus:border-lemon-500/60 text-navy-900 placeholder:text-secondary-text transition"
+                className="w-full pl-8 pr-3 py-2 text-[12.5px] input-surface rounded-lg focus:outline-none focus:ring-2 focus:ring-lemon-500/40 focus:border-lemon-500/60 text-navy-900 placeholder:text-secondary-text transition"
               />
             </div>
 
@@ -413,7 +412,7 @@ export function InstructorCertificatesPage() {
             <select
               value={courseFilter}
               onChange={(e) => setCourseFilter(e.target.value)}
-              className="px-3 py-2 text-[12.5px] bg-white border border-divider rounded-lg focus:outline-none focus:ring-2 focus:ring-lemon-500/40 focus:border-lemon-500/60 text-navy-900 cursor-pointer transition"
+              className="px-3 py-2 text-[12.5px] input-surface rounded-lg focus:outline-none focus:ring-2 focus:ring-lemon-500/40 focus:border-lemon-500/60 text-navy-900 cursor-pointer transition"
             >
               {courseOptions.map((opt) => (
                 <option key={opt} value={opt}>

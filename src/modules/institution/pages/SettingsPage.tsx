@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   Building2,
   Palette,
+  Moon,
   GraduationCap,
   Blocks,
   Plug,
@@ -20,6 +21,7 @@ import {
 import { SettingsSection } from '../components/settings/SettingsSection'
 import { SettingField } from '../components/settings/SettingField'
 import { ToggleRow } from '../components/settings/ToggleRow'
+import { useTheme } from '../../../shared/theme/ThemeProvider'
 
 const SEC = 17
 
@@ -27,6 +29,7 @@ type SettingsState = InstitutionSettingsState
 
 export function SettingsPage() {
   const { notify } = useToast()
+  const { isDark, setTheme } = useTheme()
   const [storedRaw, setStoredRaw] = useLocalStorageState<SettingsState>(
     STORAGE_KEYS.settings,
     defaultInstitutionSettings,
@@ -154,6 +157,19 @@ export function SettingsPage() {
             value={branding.primary}
             options={['Lemon / Navy', 'Blue / Slate', 'Emerald / Charcoal']}
             onChange={(v) => setBranding({ primary: v })}
+          />
+        </SettingsSection>
+
+        <SettingsSection
+          icon={<Moon size={SEC} />}
+          title="Appearance"
+          description="Berana dark theme matches the stakeholder dashboard palette."
+        >
+          <ToggleRow
+            label="Dark mode"
+            description="Deep navy canvas (#020810), panel cards (#0a121e), and lime accent (#a3cf45)."
+            enabled={isDark}
+            onToggle={() => setTheme(isDark ? 'light' : 'dark')}
           />
         </SettingsSection>
 

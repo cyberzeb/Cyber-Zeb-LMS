@@ -165,7 +165,7 @@ export function StudentHelpDeskPage() {
         {filtered.map((ticket) => (
           <GlassCard
             key={ticket.id}
-            className={`p-0 overflow-hidden border-l-4 bg-gradient-to-r ${statusAccent[ticket.status]} to-white hover:shadow-md transition-shadow`}
+            className={`p-0 overflow-hidden border-l-4 bg-gradient-to-r ${statusAccent[ticket.status]} to-card-end hover:shadow-md transition-shadow`}
           >
             <div className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="min-w-0">

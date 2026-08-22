@@ -32,12 +32,9 @@ function campusLabel(campusId: string | undefined, campuses: Campus[]): string {
 export function StaffTable({ staff, campuses, onEdit, onDelete }: StaffTableProps) {
   return (
     <GlassCard className="p-0 overflow-hidden">
-      <div className="hidden md:grid md:grid-cols-[2fr_0.8fr_1.2fr_1fr_1fr_0.8fr_0.6fr] gap-3 px-6 py-3.5 border-b border-divider/60 bg-gradient-to-b from-white/70 to-white/30">
+      <div className="hidden md:grid md:grid-cols-[2fr_0.8fr_1.2fr_1fr_1fr_0.8fr_0.6fr] gap-3 px-6 py-3.5 table-header-bar">
         {['Name', 'Campus', 'Office', 'Dept. Head', 'Last Active', 'Status', ''].map((h) => (
-          <span
-            key={h || 'actions'}
-            className="text-[10.5px] font-bold uppercase tracking-wider text-secondary-text"
-          >
+          <span key={h || 'actions'} className="table-header-label">
             {h}
           </span>
         ))}
@@ -49,7 +46,7 @@ export function StaffTable({ staff, campuses, onEdit, onDelete }: StaffTableProp
           return (
             <div
               key={member.id}
-              className="group grid grid-cols-1 md:grid-cols-[2fr_0.8fr_1.2fr_1fr_1fr_0.8fr_0.6fr] gap-2 md:gap-3 px-6 py-3.5 items-center transition-all hover:bg-white/60 hover:shadow-[inset_3px_0_0_var(--color-lemon-500)]"
+              className="group grid grid-cols-1 md:grid-cols-[2fr_0.8fr_1.2fr_1fr_1fr_0.8fr_0.6fr] gap-2 md:gap-3 px-6 py-3.5 items-center table-row-hover"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div

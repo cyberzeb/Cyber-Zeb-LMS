@@ -50,7 +50,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           return (
             <div
               key={toast.id}
-              className={`animate-fade-in-up flex items-start gap-3 bg-white/95 backdrop-blur-md border border-white/70 border-l-4 ${style.accent} rounded-xl shadow-[0_12px_32px_-8px_rgba(27,35,64,0.25)] px-4 py-3`}
+              className={`animate-fade-in-up flex items-start gap-3 bg-white/95 dark:bg-[#0a121e]/95 backdrop-blur-md border border-divider dark:border-divider border-l-4 ${style.accent} rounded-xl shadow-[0_12px_32px_-8px_rgba(27,35,64,0.25)] dark:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.45)] px-4 py-3`}
             >
               <span className={`mt-0.5 shrink-0 ${style.color}`}>{style.icon}</span>
               <p className="text-[13px] font-medium text-navy-900 leading-snug">{toast.message}</p>

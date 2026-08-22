@@ -26,11 +26,11 @@ export function ProgramsTable({ programs, onManage, onDelete }: ProgramsTablePro
   return (
     <GlassCard className="p-0 overflow-hidden">
       {/* Header row (desktop) */}
-      <div className="hidden md:grid grid-cols-[2.4fr_1.2fr_1fr_0.9fr_0.9fr_0.8fr] gap-4 px-6 py-3.5 border-b border-divider/60 bg-gradient-to-b from-white/70 to-white/30">
+      <div className="hidden md:grid grid-cols-[2.4fr_1.2fr_1fr_0.9fr_0.9fr_0.8fr] gap-4 px-6 py-3.5 table-header-bar">
         {['Program', 'Department', 'Level', 'Courses', 'Enrolled', 'Status'].map((h) => (
           <span
             key={h}
-            className="text-[10.5px] font-bold uppercase tracking-wider text-secondary-text"
+            className="table-header-label"
           >
             {h}
           </span>
@@ -44,7 +44,7 @@ export function ProgramsTable({ programs, onManage, onDelete }: ProgramsTablePro
             <div
               key={program.id}
               onClick={() => onManage?.(program)}
-              className="group grid grid-cols-1 md:grid-cols-[2.4fr_1.2fr_1fr_0.9fr_0.9fr_0.8fr] gap-2 md:gap-4 px-6 py-4 items-center cursor-pointer transition-all hover:bg-white/60 hover:shadow-[inset_3px_0_0_var(--color-lemon-500)]"
+              className="group grid grid-cols-1 md:grid-cols-[2.4fr_1.2fr_1fr_0.9fr_0.9fr_0.8fr] gap-2 md:gap-4 px-6 py-4 items-center cursor-pointer table-row-hover"
             >
               <div className="min-w-0">
                 <div className="font-bold text-navy-900 text-[14px] truncate leading-tight">

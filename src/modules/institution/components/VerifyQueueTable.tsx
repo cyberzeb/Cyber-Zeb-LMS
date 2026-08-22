@@ -34,12 +34,9 @@ export function VerifyQueueTable({
 }: VerifyQueueTableProps) {
   return (
     <GlassCard className="p-0 overflow-hidden">
-      <div className="hidden md:grid md:grid-cols-[2fr_0.9fr_1fr_1.2fr_1fr_0.8fr] gap-3 px-6 py-3.5 border-b border-divider/60 bg-gradient-to-b from-white/70 to-white/30">
+      <div className="hidden md:grid md:grid-cols-[2fr_0.9fr_1fr_1.2fr_1fr_0.8fr] gap-3 px-6 py-3.5 table-header-bar">
         {['Person', 'Role', 'Campus', 'Submitted By', 'Submitted', 'Actions'].map((h) => (
-          <span
-            key={h}
-            className="text-[10.5px] font-bold uppercase tracking-wider text-secondary-text"
-          >
+          <span key={h} className="table-header-label">
             {h}
           </span>
         ))}

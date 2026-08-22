@@ -173,7 +173,7 @@ export function DiscussionForumPanel({ person }: DiscussionForumPanelProps) {
       key={id}
       type="button"
       onClick={onClick}
-      className="w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors border-b border-divider/60 hover:bg-navy-100/35"
+      className="w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors border-b border-divider/60 forum-list-hover"
     >
       <Monogram label={name} size="xs" />
       <div className="min-w-0 flex-1">
@@ -191,7 +191,7 @@ export function DiscussionForumPanel({ person }: DiscussionForumPanelProps) {
         type="button"
         onClick={() => handleSelectChat(chat.id)}
         className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors border-b border-divider/60 ${
-          isActive ? 'bg-lemon-100/50' : 'hover:bg-navy-100/35'
+          isActive ? 'forum-list-active' : 'forum-list-hover'
         }`}
       >
         <div className="shrink-0">
@@ -231,13 +231,13 @@ export function DiscussionForumPanel({ person }: DiscussionForumPanelProps) {
 
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-      <div className="flex-1 min-h-0 flex overflow-hidden bg-navy-50/70 border-t border-divider/80">
+      <div className="flex-1 min-h-0 flex overflow-hidden forum-shell">
         <aside
-          className={`w-full md:w-[300px] lg:w-[320px] shrink-0 border-r border-divider/80 flex flex-col h-full min-h-0 bg-navy-100/25 ${
+          className={`w-full md:w-[300px] lg:w-[320px] shrink-0 flex flex-col h-full min-h-0 forum-sidebar ${
             mobileShowChat ? 'hidden md:flex' : 'flex'
           }`}
         >
-          <div className="shrink-0 p-2.5 border-b border-divider/80 space-y-2.5 bg-navy-50/60">
+          <div className="shrink-0 p-2.5 space-y-2.5 forum-sidebar-header">
             <div className="flex items-center gap-2">
               <SearchInput
                 value={userSearch}
@@ -257,7 +257,7 @@ export function DiscussionForumPanel({ person }: DiscussionForumPanelProps) {
               </Button>
             </div>
             {userSearch.trim() ? (
-              <div className="rounded-lg border border-divider/80 bg-navy-50/50 overflow-hidden shadow-sm max-h-40 overflow-y-auto app-scroll">
+              <div className="nested-panel overflow-hidden shadow-sm max-h-40 overflow-y-auto app-scroll">
                 {searchResults.length === 0 ? (
                   <div className="px-3 py-3 text-[11px] text-secondary-text text-center">
                     No users found.
@@ -332,13 +332,13 @@ export function DiscussionForumPanel({ person }: DiscussionForumPanelProps) {
         </aside>
 
         <section
-          className={`flex-1 flex flex-col min-w-0 h-full min-h-0 bg-navy-50/40 ${
+          className={`flex-1 flex flex-col min-w-0 h-full min-h-0 forum-chat-pane ${
             mobileShowChat ? 'flex' : 'hidden md:flex'
           }`}
         >
           {selectedChat ? (
             <>
-              <div className="shrink-0 px-3 py-2 border-b border-divider/80 flex items-center gap-2.5 bg-navy-50/70 backdrop-blur-sm">
+              <div className="shrink-0 px-3 py-2 flex items-center gap-2.5 forum-chat-header backdrop-blur-sm">
                 <button
                   type="button"
                   className="md:hidden w-8 h-8 rounded-lg hover:bg-navy-50 text-navy-700 flex items-center justify-center"
@@ -365,7 +365,7 @@ export function DiscussionForumPanel({ person }: DiscussionForumPanelProps) {
                 </div>
               </div>
 
-              <div className="flex-1 min-h-0 overflow-y-auto app-scroll px-3 py-2 space-y-1 bg-[linear-gradient(180deg,#e8ecf4_0%,#eef1f7_50%,#e9edf5_100%)]">
+              <div className="flex-1 min-h-0 overflow-y-auto app-scroll px-3 py-2 space-y-1 forum-messages-bg">
                 {selectedChat.description ? (
                   <div className="mx-auto max-w-xl rounded-lg border border-divider/70 bg-navy-50/80 px-3 py-2 text-center">
                     <p className="text-[10.5px] text-secondary-text">{selectedChat.description}</p>
@@ -387,7 +387,7 @@ export function DiscussionForumPanel({ person }: DiscussionForumPanelProps) {
                             ? 'bg-navy-100/70 border border-divider/70 text-center mx-auto px-3'
                             : isOwn
                               ? 'bg-lemon-200/90 text-navy-900 rounded-br-sm border border-lemon-500/20'
-                              : 'bg-white/75 border border-divider/60 text-navy-900 rounded-bl-sm backdrop-blur-sm'
+                              : 'forum-bubble-incoming rounded-bl-sm backdrop-blur-sm'
                         }`}
                       >
                         {!isOwn && !isSystem ? (
@@ -400,13 +400,13 @@ export function DiscussionForumPanel({ person }: DiscussionForumPanelProps) {
                           {!isSystem ? (
                             <span
                               className={`inline-block ml-1.5 text-[10px] leading-none whitespace-nowrap align-bottom ${
-                                isOwn ? 'text-navy-700/55' : 'text-secondary-text/75'
+                                isOwn ? 'forum-msg-time-own' : 'forum-msg-time-other'
                               }`}
                             >
                               {time}
                             </span>
                           ) : (
-                            <span className="block mt-0.5 text-[9px] text-secondary-text/75">{time}</span>
+                            <span className="block mt-0.5 text-[9px] forum-msg-time-system">{time}</span>
                           )}
                         </p>
                       </div>
@@ -416,7 +416,7 @@ export function DiscussionForumPanel({ person }: DiscussionForumPanelProps) {
                 <div ref={messagesEndRef} />
               </div>
 
-              <div className="shrink-0 border-t border-divider/80 p-2 bg-navy-50/70 backdrop-blur-sm">
+              <div className="shrink-0 p-2 forum-composer backdrop-blur-sm">
                 <div className="flex items-end gap-2">
                   <textarea
                     ref={inputRef}
@@ -430,7 +430,7 @@ export function DiscussionForumPanel({ person }: DiscussionForumPanelProps) {
                     }}
                     rows={1}
                     placeholder="Write a message..."
-                    className="flex-1 resize-none rounded-lg border border-divider/70 bg-white/60 px-2.5 py-1.5 text-[11px] text-navy-900 placeholder:text-secondary-text focus:outline-none focus:border-lemon-500/40 focus:ring-2 focus:ring-lemon-500/20 min-h-[34px] max-h-24"
+                    className="flex-1 resize-none rounded-lg input-surface px-2.5 py-1.5 text-[11px] placeholder:text-secondary-text focus:outline-none focus:border-lemon-500/40 focus:ring-2 focus:ring-lemon-500/20 min-h-[34px] max-h-24"
                   />
                   <Button
                     variant="primary"
@@ -445,7 +445,7 @@ export function DiscussionForumPanel({ person }: DiscussionForumPanelProps) {
               </div>
             </>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-center px-6 bg-[linear-gradient(180deg,#e8ecf4_0%,#eef1f7_100%)]">
+            <div className="flex-1 flex flex-col items-center justify-center text-center px-6 forum-messages-bg">
               <div className="w-12 h-12 rounded-xl bg-lemon-200/60 text-lemon-800 flex items-center justify-center mb-3">
                 <MessageSquarePlus size={22} />
               </div>

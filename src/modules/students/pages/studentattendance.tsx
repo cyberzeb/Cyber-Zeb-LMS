@@ -82,7 +82,7 @@ function formatDate(iso: string): string {
 
 // ─── SVG attendance ring ───────────────────────────────────────────────────────
 
-function AttendanceRing({ rate }: { rate: number }) {
+function AttendanceRing({ rate, onDark }: { rate: number; onDark?: boolean }) {
   const circumference = 2 * Math.PI * 36
   const offset = circumference - (rate / 100) * circumference
   const color = rate >= 90 ? '#16A34A' : rate >= 75 ? '#1976D2' : '#FFC107'
@@ -90,7 +90,15 @@ function AttendanceRing({ rate }: { rate: number }) {
   return (
     <div className="relative w-20 h-20 shrink-0">
       <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
-        <circle cx="40" cy="40" r="36" fill="none" stroke="#EEF1F8" strokeWidth="6" />
+        <circle
+          cx="40"
+          cy="40"
+          r="36"
+          fill="none"
+          stroke={onDark ? 'rgba(255,255,255,0.15)' : undefined}
+          className={onDark ? undefined : 'attendance-ring-track'}
+          strokeWidth="6"
+        />
         <circle
           cx="40"
           cy="40"
@@ -104,8 +112,12 @@ function AttendanceRing({ rate }: { rate: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-[16px] font-extrabold text-navy-900 leading-none">{rate}%</span>
-        <span className="text-[8px] font-semibold uppercase text-secondary-text mt-0.5">Rate</span>
+        <span className={`text-[16px] font-extrabold leading-none ${onDark ? 'text-white' : 'text-navy-900'}`}>
+          {rate}%
+        </span>
+        <span className={`text-[8px] font-semibold uppercase mt-0.5 ${onDark ? 'text-navy-200' : 'text-secondary-text'}`}>
+          Rate
+        </span>
       </div>
     </div>
   )
@@ -118,7 +130,7 @@ function ProgressBar({ value }: { value: number }) {
     : value >= 60 ? 'bg-gradient-to-r from-lemon-500 to-lemon-700'
     : 'bg-gradient-to-r from-warning to-amber-600'
   return (
-    <div className="h-2 rounded-full bg-white/80 border border-divider overflow-hidden">
+    <div className="h-2 rounded-full soft-surface overflow-hidden">
       <div className={`h-full rounded-full ${color}`} style={{ width: `${Math.min(100, value)}%` }} />
     </div>
   )
@@ -213,7 +225,7 @@ function CalendarView({ sessions }: CalendarViewProps) {
               key={cell.iso}
               title={status ? `${formatDate(cell.iso)} — ${STATUS_CONFIG[status].label}` : formatDate(cell.iso)}
               className={`relative flex flex-col items-center justify-center h-9 rounded-lg text-[12px] font-semibold transition-colors
-                ${isToday ? 'ring-2 ring-lemon-500 ring-offset-1' : ''}
+                ${isToday ? 'ring-2 ring-lemon-500 ring-offset-1 ring-offset-canvas' : ''}
                 ${cfg
                   ? status === 'present'
                     ? 'bg-success-bg text-success'
@@ -265,9 +277,10 @@ function CourseCard({ record, selected, onClick }: CourseCardProps) {
     <button
       type="button"
       onClick={onClick}
-      className={`w-full text-left p-0 overflow-hidden rounded-xl border-l-4 bg-gradient-to-r to-white transition-all cursor-pointer
+      className={`w-full text-left p-0 overflow-hidden rounded-xl border-l-4 bg-gradient-to-r transition-all cursor-pointer
         ${cfg ? `${cfg.accent}` : 'border-l-navy-200 from-navy-50/50'}
-        ${selected ? 'ring-2 ring-lemon-500 ring-offset-1 shadow-md' : 'hover:shadow-md border border-divider'}`}
+        to-card-end
+        ${selected ? 'ring-2 ring-lemon-500 ring-offset-1 ring-offset-canvas shadow-md' : 'hover:shadow-md border border-divider'}`}
     >
       <div className="p-5">
         <div className="flex items-start gap-3">
@@ -286,7 +299,7 @@ function CourseCard({ record, selected, onClick }: CourseCardProps) {
                 { label: 'Absent', value: record.absent, color: 'text-danger' },
                 { label: 'Late', value: record.late, color: 'text-[#8A6D00]' },
               ].map(({ label, value, color }) => (
-                <div key={label} className="rounded-lg bg-white/70 border border-divider py-1.5 px-1">
+                <div key={label} className="rounded-lg soft-surface py-1.5 px-1">
                   <div className={`text-[16px] font-bold leading-none ${color}`}>{value}</div>
                   <div className="text-[9px] font-semibold uppercase tracking-wide text-secondary-text mt-0.5">
                     {label}
@@ -334,7 +347,7 @@ function HistoryTable({ record, activeTab }: HistoryTableProps) {
     <div className="overflow-x-auto">
       <table className="w-full min-w-[400px] text-left">
         <thead>
-          <tr className="text-[10px] uppercase tracking-wider text-secondary-text border-b border-divider bg-navy-50/40">
+          <tr className="table-header-label border-b border-divider table-header-bar">
             <th className="py-3 pl-5 pr-3 font-semibold">Date</th>
             <th className="py-3 px-3 font-semibold">Course</th>
             <th className="py-3 px-3 font-semibold">Status</th>
@@ -348,7 +361,7 @@ function HistoryTable({ record, activeTab }: HistoryTableProps) {
             return (
               <tr
                 key={i}
-                className="border-b border-divider last:border-0 hover:bg-navy-50/30 text-[12px] transition-colors"
+                className="border-b border-divider last:border-0 table-row-hover text-[12px]"
               >
                 <td className="py-3 pl-5 pr-3 text-navy-700 font-medium whitespace-nowrap">
                   {formatDate(session.date)}
@@ -441,7 +454,7 @@ export function StudentAttendancePage() {
         <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900" />
         <div className="absolute right-0 top-0 w-52 h-52 rounded-full bg-lemon-500/10 blur-3xl" />
         <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6">
-          <AttendanceRing rate={stats.overallRate} />
+          <AttendanceRing rate={stats.overallRate} onDark />
           <div className="flex-1 text-white min-w-0">
             <div className="text-[11px] font-bold uppercase tracking-wider text-lemon-400">
               Overall attendance

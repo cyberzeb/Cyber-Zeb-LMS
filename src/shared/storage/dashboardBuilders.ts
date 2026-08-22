@@ -750,7 +750,29 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
     recentAnnouncements: toAdminAnnouncementItems(
       readAnnouncements(),
     ).slice(0, 5),
-    calendarEvents: [],
+    calendarEvents: [
+      {
+        id: 'e1',
+        day: '12',
+        month: 'AUG',
+        title: 'Fall Semester Registration',
+        subtitle: 'Undergraduate & Postgraduate cohorts',
+      },
+      {
+        id: 'e2',
+        day: '05',
+        month: 'SEP',
+        title: 'Orientation & Induction Day',
+        subtitle: 'Freshman and transfer student meetups',
+      },
+      {
+        id: 'e3',
+        day: '18',
+        month: 'OCT',
+        title: 'Mid-term Assessment Week',
+        subtitle: 'Continuous assessment tests (CAT)',
+      },
+    ],
     helpDeskTickets: toAdminHelpDeskTickets(helpDeskRecords).slice(0, 6),
     assignmentSubmissions: toAdminAssignmentSubmissions(assignments, submissions),
     integrationStatus: toIntegrationStatusItems(integrationRecords).slice(0, 6),

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import brandLogo from '../../../assets/Logo.jpg'
+import { ThemeToggle } from '../../../shared/components/ThemeToggle'
 
 interface NavbarProps {
   onRequestServiceClick: () => void
@@ -60,6 +61,7 @@ export function Navbar({ onRequestServiceClick }: NavbarProps) {
               {portal.label}
             </Link>
           ))}
+          <ThemeToggle variant="marketing" />
           <button
             onClick={onRequestServiceClick}
             className="bg-lemon-500 text-navy-900 font-bold text-[11px] px-4 py-2 rounded-lg hover:bg-lemon-200 transition-colors cursor-pointer whitespace-nowrap"
@@ -105,6 +107,9 @@ export function Navbar({ onRequestServiceClick }: NavbarProps) {
               {portal.label}
             </Link>
           ))}
+          <div className="flex justify-center">
+            <ThemeToggle variant="marketing" />
+          </div>
           <button
             onClick={() => {
               setOpen(false)

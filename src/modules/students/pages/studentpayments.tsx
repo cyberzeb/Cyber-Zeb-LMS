@@ -72,14 +72,14 @@ export function StudentPaymentsPage() {
 
       {nextDue && nextDue.status !== 'paid' ? (
         <GlassCard className="relative overflow-hidden p-0 border-warning/30">
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-50 via-white to-white" />
+          <div className="absolute inset-0 banner-warning" />
           <div className="relative p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-warning text-navy-900 flex items-center justify-center shrink-0">
                 <Receipt size={22} />
               </div>
               <div>
-                <div className="text-[11px] font-bold uppercase tracking-wider text-amber-800">Next payment due</div>
+                <div className="text-[11px] font-bold uppercase tracking-wider text-warning">Next payment due</div>
                 <h2 className="mt-1 text-[18px] font-bold text-navy-900">{nextDue.label}</h2>
                 <p className="mt-1 text-[13px] text-secondary-text">{nextDue.dueAt}</p>
               </div>
@@ -94,7 +94,7 @@ export function StudentPaymentsPage() {
         </GlassCard>
       ) : (
         <GlassCard className="relative overflow-hidden p-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-success-bg/50 to-white" />
+          <div className="absolute inset-0 banner-success" />
           <div className="relative p-6 flex items-center gap-4">
             <CheckCircle2 size={28} className="text-success shrink-0" />
             <div>
@@ -133,7 +133,7 @@ export function StudentPaymentsPage() {
         {data.payments.map((payment) => (
           <GlassCard
             key={payment.id}
-            className={`p-0 overflow-hidden border-l-4 bg-gradient-to-r ${statusAccent[payment.status]} to-white hover:shadow-md transition-shadow`}
+            className={`p-0 overflow-hidden border-l-4 bg-gradient-to-r ${statusAccent[payment.status]} to-card-end hover:shadow-md transition-shadow`}
           >
             <div className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-start gap-4 min-w-0">

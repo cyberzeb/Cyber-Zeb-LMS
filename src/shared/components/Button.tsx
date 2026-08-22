@@ -11,19 +11,19 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    'bg-lemon-500 text-navy-900 border border-lemon-500 font-semibold hover:bg-lemon-200',
+    'bg-lemon-500 text-navy-900 border border-lemon-500 font-semibold hover:bg-lemon-200 dark:hover:bg-lemon-200',
   secondary:
-    'bg-white text-navy-900 border border-divider hover:border-navy-200 hover:bg-navy-50 font-medium',
+    'bg-white dark:bg-[#0a121e] text-navy-900 border border-divider hover:border-navy-200 hover:bg-navy-50 dark:hover:bg-[#111b2e] font-medium',
   ghost:
-    'bg-transparent text-navy-700 hover:text-navy-900 hover:bg-navy-50 border border-transparent font-medium',
+    'bg-transparent text-navy-700 dark:text-navy-300 hover:text-navy-900 hover:bg-navy-50 dark:hover:bg-[#111b2e] border border-transparent font-medium',
   danger:
     'bg-danger-bg text-danger border border-danger/25 hover:bg-danger/10 font-medium',
   'outline-green':
-    'bg-white text-navy-900 border border-lemon-500/50 hover:bg-lemon-50 font-medium',
+    'bg-white dark:bg-[#0a121e] text-navy-900 border border-lemon-500/50 hover:bg-lemon-50 dark:hover:bg-lemon-500/10 font-medium',
   'outline-blue':
-    'bg-white text-navy-900 border border-info/40 hover:bg-info-bg font-medium',
+    'bg-white dark:bg-[#0a121e] text-navy-900 border border-info/40 hover:bg-info-bg font-medium',
   'outline-purple':
-    'bg-white text-navy-900 border border-[#A78BFA]/50 hover:bg-[#F5F3FF] font-medium',
+    'bg-white dark:bg-[#0a121e] text-navy-900 border border-[#A78BFA]/50 hover:bg-[#F5F3FF] dark:hover:bg-[#1a1530] font-medium',
 }
 
 const sizeClasses: Record<Size, string> = {

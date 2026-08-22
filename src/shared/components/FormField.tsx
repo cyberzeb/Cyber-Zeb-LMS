@@ -18,7 +18,7 @@ export function FormField({
   hint,
 }: FormFieldProps) {
   const baseClass =
-    'w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 placeholder:text-secondary-text focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25 transition-all'
+    'w-full bg-white dark:bg-navy-50 border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 placeholder:text-secondary-text focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25 transition-all'
 
   return (
     <label className="flex flex-col gap-1.5">
@@ -27,7 +27,7 @@ export function FormField({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`${baseClass} cursor-pointer [color-scheme:light]`}
+          className={`${baseClass} cursor-pointer dark:[color-scheme:dark]`}
         >
           {options.map((opt) => (
             <option key={opt} value={opt}>

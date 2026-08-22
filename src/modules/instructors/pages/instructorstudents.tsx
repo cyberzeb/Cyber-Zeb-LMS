@@ -104,8 +104,8 @@ export function InstructorStudentsPage() {
             key={student.id}
             className={`p-0 overflow-hidden hover:shadow-md transition-shadow border-l-4 ${
               student.status === 'at-risk'
-                ? 'border-l-danger bg-gradient-to-r from-danger-bg/30 to-white'
-                : 'border-l-lemon-500 bg-gradient-to-r from-lemon-50/50 to-white'
+                ? 'border-l-danger bg-gradient-to-r from-danger-bg/30 to-card-end'
+                : 'border-l-lemon-500 bg-gradient-to-r from-lemon-50/50 to-card-end'
             }`}
           >
             <div className="p-5 flex gap-4">

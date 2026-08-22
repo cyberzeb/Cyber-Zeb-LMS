@@ -13,7 +13,7 @@ export function AdminDiscussionForumPage() {
 
   if (!adminPerson) {
     return (
-      <div className="rounded-2xl border border-divider bg-white p-10 text-center">
+      <div className="rounded-2xl border border-divider bg-navy-50 dark:bg-[#0a121e] p-10 text-center">
         <p className="text-[14px] font-semibold text-navy-900">No active users found</p>
         <p className="text-[12.5px] text-secondary-text mt-1">
           Add people in the admin portal to use the discussion forum.

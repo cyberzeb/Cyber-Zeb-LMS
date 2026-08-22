@@ -69,7 +69,7 @@ function todayIso(): string {
 }
 
 /** SVG ring showing attendance percentage */
-function AttendanceRing({ rate }: { rate: number }) {
+function AttendanceRing({ rate, onDark }: { rate: number; onDark?: boolean }) {
   const r = 36
   const circumference = 2 * Math.PI * r
   const offset = circumference - (rate / 100) * circumference
@@ -77,7 +77,15 @@ function AttendanceRing({ rate }: { rate: number }) {
   return (
     <div className="relative w-20 h-20 shrink-0">
       <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
-        <circle cx="40" cy="40" r={r} fill="none" stroke="#EEF1F8" strokeWidth="6" />
+        <circle
+          cx="40"
+          cy="40"
+          r={r}
+          fill="none"
+          stroke={onDark ? 'rgba(255,255,255,0.15)' : undefined}
+          className={onDark ? undefined : 'attendance-ring-track'}
+          strokeWidth="6"
+        />
         <circle
           cx="40"
           cy="40"
@@ -91,8 +99,12 @@ function AttendanceRing({ rate }: { rate: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-[16px] font-extrabold text-navy-900 leading-none">{rate}%</span>
-        <span className="text-[8px] font-semibold uppercase text-secondary-text mt-0.5">Rate</span>
+        <span className={`text-[16px] font-extrabold leading-none ${onDark ? 'text-white' : 'text-navy-900'}`}>
+          {rate}%
+        </span>
+        <span className={`text-[8px] font-semibold uppercase mt-0.5 ${onDark ? 'text-[#c5cade]' : 'text-secondary-text'}`}>
+          Rate
+        </span>
       </div>
     </div>
   )
@@ -201,7 +213,7 @@ function TakeAttendanceModal({
             value={date}
             max={todayIso()}
             onChange={(e) => onDateChange(e.target.value)}
-            className="px-2.5 py-1.5 text-[12.5px] border border-divider rounded-lg bg-white text-navy-900 focus:outline-none focus:ring-2 focus:ring-lemon-500/40 focus:border-lemon-500/60"
+            className="px-2.5 py-1.5 text-[12.5px] input-surface rounded-lg text-navy-900 focus:outline-none focus:ring-2 focus:ring-lemon-500/40 focus:border-lemon-500/60"
           />
         </div>
         <div className="flex gap-3 text-[12px] font-semibold">
@@ -254,7 +266,7 @@ function TakeAttendanceModal({
                             : s === 'late'
                               ? 'bg-warning text-navy-900 border-warning'
                               : 'bg-navy-500 text-white border-navy-500'
-                        : 'bg-white text-secondary-text border-divider hover:border-navy-200'
+                        : 'surface-panel text-secondary-text hover:border-navy-300'
                     }`}
                   >
                     {STATUS_CONFIG[s].label}
@@ -268,7 +280,7 @@ function TakeAttendanceModal({
                 placeholder="Note (optional)"
                 value={override.note}
                 onChange={(e) => setNote(r.id, e.target.value)}
-                className={`w-full sm:w-40 px-2.5 py-1.5 text-[11.5px] border border-divider rounded-lg bg-white/80 text-navy-900 placeholder:text-secondary-text focus:outline-none focus:ring-1 focus:ring-lemon-500/40`}
+                className="w-full sm:w-40 px-2.5 py-1.5 text-[11.5px] input-surface rounded-lg text-navy-900 placeholder:text-secondary-text focus:outline-none focus:ring-1 focus:ring-lemon-500/40"
               />
 
               {/* Current status badge */}
@@ -344,7 +356,7 @@ function StudentHistoryModal({
         <div className="overflow-x-auto">
           <table className="w-full text-left min-w-[360px]">
             <thead>
-              <tr className="text-[10px] uppercase tracking-wider text-secondary-text border-b border-divider bg-navy-50/40">
+              <tr className="table-header-label border-b border-divider table-header-bar">
                 <th className="py-2.5 px-4 font-semibold">Date</th>
                 <th className="py-2.5 px-4 font-semibold">Status</th>
                 <th className="py-2.5 px-4 font-semibold">Note</th>
@@ -507,11 +519,10 @@ export function InstructorAttendancePage() {
         />
 
         {/* ── Overall banner ── */}
-        <GlassCard className="relative overflow-hidden p-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900" />
-          <div className="absolute right-0 top-0 w-48 h-48 rounded-full bg-lemon-500/10 blur-3xl" />
+        <div className="relative overflow-hidden rounded-xl border border-white/10 hero-banner-br shadow-[var(--shadow-card)]">
+          <div className="absolute right-0 top-0 w-48 h-48 rounded-full bg-lemon-500/10 blur-3xl pointer-events-none" />
           <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6">
-            <AttendanceRing rate={courseStats.rate} />
+            <AttendanceRing rate={courseStats.rate} onDark />
             <div className="flex-1 text-white min-w-0">
               <div className="text-[11px] font-bold uppercase tracking-wider text-lemon-400">
                 {selectedCourse ? `${selectedCourse.code} — Attendance rate` : 'Overall attendance'}
@@ -519,7 +530,7 @@ export function InstructorAttendancePage() {
               <h2 className="mt-2 text-[28px] md:text-[32px] font-bold leading-none">
                 {courseStats.rate}%
               </h2>
-              <p className="mt-2 text-[13px] text-navy-200">
+              <p className="mt-2 text-[13px] text-[#c5cade]">
                 {courseRecords.length} student{courseRecords.length === 1 ? '' : 's'} · {data.term}
               </p>
             </div>
@@ -534,7 +545,7 @@ export function InstructorAttendancePage() {
                 <ChevronDown size={14} className={courseDropdownOpen ? 'rotate-180' : ''} />
               </button>
               {courseDropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl border border-divider shadow-lg z-30 py-1.5">
+                <div className="absolute right-0 top-full mt-2 w-64 surface-panel rounded-xl shadow-lg z-30 py-1.5">
                   {myCourses.map((c) => (
                     <button
                       key={c.id}
@@ -561,7 +572,7 @@ export function InstructorAttendancePage() {
               )}
             </div>
           </div>
-        </GlassCard>
+        </div>
 
         {/* ── Summary stats ── */}
         <div className="grid grid-cols-2 xl:grid-cols-5 gap-4">
@@ -627,7 +638,7 @@ export function InstructorAttendancePage() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] text-left">
               <thead>
-                <tr className="text-[10px] uppercase tracking-wider text-secondary-text border-b border-divider bg-navy-50/40">
+                <tr className="table-header-label border-b border-divider table-header-bar">
                   <th className="py-3 pl-5 pr-3 font-semibold">Student</th>
                   <th className="py-3 px-3 font-semibold">Attendance %</th>
                   <th className="py-3 px-3 font-semibold">Present</th>
@@ -668,7 +679,7 @@ export function InstructorAttendancePage() {
                     return (
                       <tr
                         key={record.id}
-                        className="border-b border-divider last:border-0 text-[12px] hover:bg-navy-50/40 transition-colors"
+                        className="border-b border-divider last:border-0 table-row-hover text-[12px]"
                       >
                         {/* Student */}
                         <td className="py-3 pl-5 pr-3">

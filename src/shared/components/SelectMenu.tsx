@@ -47,7 +47,7 @@ export function SelectMenu({
         aria-expanded={open}
         aria-haspopup="listbox"
         onClick={() => setOpen((prev) => !prev)}
-        className="inline-flex items-center justify-between gap-2 h-9 w-full min-w-[220px] rounded-lg border border-divider bg-white px-3 text-[12.5px] text-navy-900 hover:border-navy-200 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25 transition-colors"
+        className="inline-flex items-center justify-between gap-2 h-9 w-full min-w-[220px] rounded-lg border border-divider bg-white dark:bg-navy-50 px-3 text-[12.5px] text-navy-900 hover:border-navy-200 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25 transition-colors"
       >
         <span className="truncate text-left">{selected?.label ?? placeholder}</span>
         <ChevronDown
@@ -59,7 +59,7 @@ export function SelectMenu({
       {open ? (
         <ul
           role="listbox"
-          className="absolute top-full left-0 z-50 mt-1.5 w-full min-w-[220px] max-h-64 overflow-y-auto rounded-xl border border-divider bg-white shadow-lg py-1.5"
+          className="absolute top-full left-0 z-50 mt-1.5 w-full min-w-[220px] max-h-64 overflow-y-auto rounded-xl border border-divider bg-white dark:bg-[#0a121e] shadow-lg py-1.5"
         >
           {options.map((opt) => {
             const isSelected = opt.value === value
@@ -74,7 +74,7 @@ export function SelectMenu({
                   className={`w-full text-left px-3 py-2 text-[12.5px] transition-colors ${
                     isSelected
                       ? 'bg-lemon-500/10 text-navy-900 font-semibold'
-                      : 'text-navy-900 hover:bg-navy-50'
+                      : 'text-navy-900 hover:bg-navy-50 dark:hover:bg-[#111b2e]'
                   }`}
                 >
                   <span className="block truncate">{opt.label}</span>

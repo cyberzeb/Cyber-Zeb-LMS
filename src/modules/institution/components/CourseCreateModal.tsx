@@ -467,7 +467,7 @@ export function CourseCreateModal({
             (form.modules ?? []).map((mod, modIndex) => (
               <div
                 key={mod.id}
-                className="border border-divider rounded-xl p-4 bg-white/80 flex flex-col gap-3"
+                className="border border-divider rounded-xl p-4 soft-surface flex flex-col gap-3"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -654,7 +654,7 @@ export function CourseCreateModal({
                 {(form.videos ?? []).map((video) => (
                   <div
                     key={video.id}
-                    className="grid grid-cols-1 sm:grid-cols-2 gap-3 border border-divider rounded-xl p-3 bg-white/80"
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-3 border border-divider rounded-xl p-3 soft-surface"
                   >
                     <label className="flex flex-col gap-1.5">
                       <span className="text-[12px] font-semibold text-navy-900">Title</span>
@@ -773,7 +773,7 @@ export function CourseCreateModal({
                 {(form.resources ?? []).map((resource) => (
                   <div
                     key={resource.id}
-                    className="grid grid-cols-1 sm:grid-cols-2 gap-3 border border-divider rounded-xl p-3 bg-white/80"
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-3 border border-divider rounded-xl p-3 soft-surface"
                   >
                     <label className="flex flex-col gap-1.5">
                       <span className="text-[12px] font-semibold text-navy-900">Resource Title</span>

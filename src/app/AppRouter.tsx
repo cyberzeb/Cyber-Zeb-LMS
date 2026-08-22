@@ -26,6 +26,7 @@ import { QuestionBankAdminPage } from '../modules/institution/pages/QuestionBank
 import { ReportsPage } from '../modules/institution/pages/ReportsPage'
 import { AdminAnnouncementsPage } from '../modules/institution/pages/AdminAnnouncementsPage'
 import { AdminDiscussionForumPage } from '../modules/institution/pages/AdminDiscussionForumPage'
+import { AdminCalendarPage } from '../modules/institution/pages/AdminCalendarPage'
 import { SettingsPage } from '../modules/institution/pages/SettingsPage'
 import { LandingPage } from '../modules/marketing/pages/LandingPage'
 import { StudentLayout } from '../modules/students/layout/StudentLayout'
@@ -369,7 +370,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'calendar',
-        element: <CampusProfilePage />,
+        element: <AdminCalendarPage />,
       },
       {
         path: 'payments',

@@ -100,9 +100,8 @@ export function InstructorSettingsPage() {
         }
       />
 
-      <GlassCard className="relative overflow-hidden p-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900" />
-        <div className="absolute right-0 top-0 w-64 h-64 rounded-full bg-lemon-500/10 blur-3xl" />
+      <div className="relative overflow-hidden rounded-xl border border-white/10 hero-banner-br shadow-[var(--shadow-card)]">
+        <div className="absolute right-0 top-0 w-64 h-64 rounded-full bg-lemon-500/10 blur-3xl pointer-events-none" />
         <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6">
           <Monogram
             label={data.instructorName}
@@ -111,20 +110,20 @@ export function InstructorSettingsPage() {
           />
           <div className="flex-1 min-w-0 text-white">
             <h2 className="text-[22px] font-bold leading-tight">{data.instructorName}</h2>
-            <p className="mt-1 text-[13px] text-navy-200 flex items-center gap-2">
+            <p className="mt-1 text-[13px] text-[#c5cade] flex items-center gap-2">
               <Mail size={14} />
               {draft.profile.email}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-[11.5px]">
+              <span className="hero-banner-chip">
                 <Building2 size={12} />
                 {data.department}
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-[11.5px]">
+              <span className="hero-banner-chip">
                 <GraduationCap size={12} />
                 {data.title}
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-[11.5px]">
+              <span className="hero-banner-chip">
                 <CalendarDays size={12} />
                 {data.term}
               </span>
@@ -132,10 +131,10 @@ export function InstructorSettingsPage() {
           </div>
           <div className="shrink-0 flex flex-col gap-2">
             <StatusPill label="Active instructor" tone="success" />
-            <span className="text-[11px] text-navy-300 text-center">{data.kpis.activeCourses} courses</span>
+            <span className="text-[11px] text-[#94a3b8] text-center">{data.kpis.activeCourses} courses</span>
           </div>
         </div>
-      </GlassCard>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <GlassCard className="p-4 flex items-center gap-3">

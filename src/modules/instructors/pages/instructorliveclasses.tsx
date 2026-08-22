@@ -22,15 +22,21 @@ const statusLabel: Record<LiveClassSession['status'], string> = {
 }
 
 const sectionAccent: Record<LiveClassSession['status'], string> = {
-  live: 'from-success/20 via-lemon-50 to-white border-success/30',
-  upcoming: 'from-info-bg via-white to-white border-info/25',
-  ended: 'from-navy-50 via-white to-white border-divider',
+  live: 'from-success/20 via-lemon-50/30 to-card-end border-success/30',
+  upcoming: 'from-info-bg via-navy-50/40 to-card-end border-info/25',
+  ended: 'from-navy-50 via-navy-50/30 to-card-end border-divider',
 }
 
-function PlatformBadge({ platform }: { platform: string }) {
+function PlatformBadge({ platform, onDark }: { platform: string; onDark?: boolean }) {
   const isZoom = platform.toLowerCase().includes('zoom')
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border border-divider px-2.5 py-1 text-[11px] font-semibold text-navy-800">
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+        onDark
+          ? 'bg-white/10 border border-white/15 text-white/90'
+          : 'soft-surface text-navy-800'
+      }`}
+    >
       {isZoom ? <ZoomIcon size={14} /> : <Video size={12} className="text-navy-500" />}
       {platform}
     </span>
@@ -42,9 +48,8 @@ function LiveSessionCard({ session, featured }: { session: LiveClassSession; fea
 
   if (featured && isLive) {
     return (
-      <GlassCard className="relative overflow-hidden p-0 border-success/40 shadow-[0_8px_32px_rgba(22,163,74,0.12)]">
-        <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900" />
-        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-lemon-500/10 blur-3xl" />
+      <div className="relative overflow-hidden rounded-xl border border-success/40 hero-banner-br shadow-[0_8px_32px_rgba(22,163,74,0.12)]">
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-lemon-500/10 blur-3xl pointer-events-none" />
         <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="min-w-0 flex-1">
             <div className="inline-flex items-center gap-2 rounded-full bg-success/20 border border-success/40 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-success">
@@ -55,23 +60,23 @@ function LiveSessionCard({ session, featured }: { session: LiveClassSession; fea
               Live now
             </div>
             <h2 className="mt-4 text-[22px] md:text-[26px] font-bold text-white leading-tight">{session.title}</h2>
-            <p className="mt-2 text-[13px] text-navy-200">{session.course}</p>
+            <p className="mt-2 text-[13px] text-[#c5cade]">{session.course}</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-[11.5px] text-white/90">
+              <span className="hero-banner-chip">
                 <CalendarClock size={13} />
                 {session.startAt}
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-[11.5px] text-white/90">
+              <span className="hero-banner-chip">
                 <Clock size={13} />
                 {session.duration}
               </span>
               {session.attendees !== undefined ? (
-                <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-[11.5px] text-white/90">
+                <span className="hero-banner-chip">
                   <UserRound size={13} />
                   {session.attendees} attendees
                 </span>
               ) : null}
-              <PlatformBadge platform={session.platform} />
+              <PlatformBadge platform={session.platform} onDark />
             </div>
           </div>
           <Button variant="primary" className="shrink-0 shadow-lg shadow-lemon-500/25">
@@ -79,7 +84,7 @@ function LiveSessionCard({ session, featured }: { session: LiveClassSession; fea
             Manage session
           </Button>
         </div>
-      </GlassCard>
+      </div>
     )
   }
 
@@ -105,16 +110,16 @@ function LiveSessionCard({ session, featured }: { session: LiveClassSession; fea
           <p className="mt-1 text-[12px] text-secondary-text">{session.course}</p>
 
           <div className="mt-3 flex flex-wrap gap-2 text-[11.5px] text-secondary-text">
-            <span className="inline-flex items-center gap-1 rounded-md bg-white/70 px-2.5 py-1 border border-divider">
+            <span className="schedule-meta-chip">
               <CalendarClock size={11} />
               {session.startAt}
             </span>
-            <span className="inline-flex items-center gap-1 rounded-md bg-white/70 px-2.5 py-1 border border-divider">
+            <span className="schedule-meta-chip">
               <Clock size={11} />
               {session.duration}
             </span>
             {session.attendees !== undefined ? (
-              <span className="inline-flex items-center gap-1 rounded-md bg-white/70 px-2.5 py-1 border border-divider">
+              <span className="schedule-meta-chip">
                 <UserRound size={11} />
                 {session.attendees} attended
               </span>

@@ -1,4 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
+import { BarChart3, BookOpen, CheckCircle2, CreditCard, FileText } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import type { InstitutionType, RequestedModule, ServiceRequestPayload } from '../types'
 import { submitServiceRequest } from '../api/leadApi'
 
@@ -11,11 +13,11 @@ const INSTITUTION_TYPES: { value: InstitutionType; label: string }[] = [
   { value: 'training_provider', label: 'Training Provider' },
 ]
 
-const MODULE_OPTIONS: { value: RequestedModule; label: string; icon: string }[] = [
-  { value: 'academic', label: 'Academic & Courses', icon: '📚' },
-  { value: 'assessment', label: 'Assessment & Gradebook', icon: '📝' },
-  { value: 'payments', label: 'Payments & Invoicing', icon: '💳' },
-  { value: 'reports_ai', label: 'Reports & AI Insights', icon: '📊' },
+const MODULE_OPTIONS: { value: RequestedModule; label: string; icon: LucideIcon }[] = [
+  { value: 'academic', label: 'Academic & Courses', icon: BookOpen },
+  { value: 'assessment', label: 'Assessment & Gradebook', icon: FileText },
+  { value: 'payments', label: 'Payments & Invoicing', icon: CreditCard },
+  { value: 'reports_ai', label: 'Reports & AI Insights', icon: BarChart3 },
 ]
 
 const EMPTY_FORM: ServiceRequestPayload = {
@@ -97,9 +99,9 @@ export function RequestServiceForm() {
 
   if (submitted) {
     return (
-      <div className="bg-white rounded-3xl p-10 md:p-14 text-center border border-divider shadow-[0_20px_50px_rgba(27,35,64,0.1)]">
-        <div className="w-16 h-16 rounded-2xl bg-leaf-50 text-leaf-700 flex items-center justify-center text-3xl mx-auto mb-6">
-          ✓
+      <div className="marketing-form-panel p-10 md:p-14 text-center animate-fade-in-up">
+        <div className="w-16 h-16 rounded-2xl bg-lemon-50 text-lemon-700 flex items-center justify-center mx-auto mb-6">
+          <CheckCircle2 size={32} strokeWidth={2.25} />
         </div>
         <h3 className="text-[22px] font-extrabold text-navy-900">Request received!</h3>
         <p className="mt-3 text-[14px] text-secondary-text max-w-md mx-auto leading-relaxed">
@@ -124,7 +126,7 @@ export function RequestServiceForm() {
   }
 
   return (
-    <div className="bg-white rounded-3xl p-7 md:p-10 border border-divider shadow-[0_20px_50px_rgba(27,35,64,0.1)]">
+    <div className="marketing-form-panel p-7 md:p-10 animate-fade-in-up">
       {/* progress */}
       <div className="flex items-center gap-2 mb-8">
         {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
@@ -234,18 +236,19 @@ export function RequestServiceForm() {
               <div className="grid grid-cols-2 gap-2.5">
                 {MODULE_OPTIONS.map((m) => {
                   const active = form.modules.includes(m.value)
+                  const Icon = m.icon
                   return (
                     <button
                       type="button"
                       key={m.value}
                       onClick={() => toggleModule(m.value)}
-                      className={`flex items-center gap-2 text-left text-[12.5px] font-semibold px-3.5 py-2.5 rounded-xl border transition-all cursor-pointer ${
+                      className={`flex items-center gap-2 text-left text-[12.5px] font-semibold px-3.5 py-2.5 rounded-xl border transition-all duration-200 cursor-pointer ${
                         active
                           ? 'bg-lemon-50 border-lemon-500 text-navy-900'
-                          : 'bg-white border-divider text-secondary-text hover:border-navy-200'
+                          : 'surface-panel text-secondary-text hover:border-lemon-500/30'
                       }`}
                     >
-                      <span>{m.icon}</span>
+                      <Icon size={16} strokeWidth={2.25} className={active ? 'text-lemon-700' : 'text-navy-500'} />
                       {m.label}
                     </button>
                   )
@@ -350,7 +353,7 @@ export function RequestServiceForm() {
 }
 
 const inputClass =
-  'w-full text-[13.5px] text-navy-900 bg-white border border-divider rounded-lg px-3.5 py-2.5 outline-none focus:border-lemon-500 focus:ring-2 focus:ring-lemon-500/20 transition-all'
+  'w-full text-[13.5px] text-navy-900 input-surface rounded-lg px-3.5 py-2.5 outline-none focus:border-lemon-500 focus:ring-2 focus:ring-lemon-500/20 transition-all'
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (

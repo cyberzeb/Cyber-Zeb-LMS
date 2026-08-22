@@ -24,7 +24,7 @@ export function LandingPage() {
 
       <section id="request-service" ref={formRef} className="bg-canvas pb-20 md:pb-28">
         <div className="max-w-3xl mx-auto px-6 md:px-8">
-          <div className="text-center mb-10">
+          <div className="text-center mb-10 animate-fade-in-up">
             <span className="text-lemon-700 font-bold text-[12px] uppercase tracking-wider">
               Get Started
             </span>

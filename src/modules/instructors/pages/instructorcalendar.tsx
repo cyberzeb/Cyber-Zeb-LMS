@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
-import { CalendarClock, CalendarDays, Clock3, MapPin, MonitorPlay } from 'lucide-react'
+import { CalendarDays, Clock3, MonitorPlay } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
+import { CalendarNextUpCard, pickNextScheduleEvent } from '../../../shared/components/CalendarNextUpCard'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { StatBlock } from '../../../shared/components/StatBlock'
-import { GlassCard } from '../../../shared/layout/GlassCard'
 import { ScheduleCalendarCard } from '../../students/components/AssessmentCards'
 import { InstructorPageError, InstructorPageLoading } from '../components/InstructorPageStates'
 import { useInstructorDashboard } from '../hooks/useInstructorDashboard'
@@ -32,7 +32,10 @@ export function InstructorCalendarPage() {
     return data.schedule.filter((e) => e.type === (activeTab as EventType))
   }, [data, activeTab])
 
-  const nextEvent = data?.schedule[0]
+  const nextEvent = useMemo(
+    () => (data ? pickNextScheduleEvent(data.schedule) : undefined),
+    [data],
+  )
 
   if (isLoading) return <InstructorPageLoading />
   if (isError || !data) return <InstructorPageError message="Failed to load calendar." />
@@ -51,35 +54,15 @@ export function InstructorCalendarPage() {
       />
 
       {nextEvent ? (
-        <GlassCard className="relative overflow-hidden p-0 border-info/30">
-          <div className="absolute inset-0 bg-gradient-to-r from-navy-900 via-navy-800 to-navy-900" />
-          <div className="absolute right-0 top-0 w-48 h-48 rounded-full bg-lemon-500/10 blur-3xl" />
-          <div className="relative p-6 md:p-7 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-lemon-500 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-navy-900 shadow-sm">
-                <CalendarClock size={12} className="text-navy-900" />
-                Next up
-              </div>
-              <h2 className="mt-3 text-[20px] md:text-[22px] font-bold text-white leading-tight">{nextEvent.title}</h2>
-              <p className="mt-2 text-[13px] text-navy-200">
-                {nextEvent.course} · {nextEvent.type}
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2 text-[11.5px]">
-                <span className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-3 py-1.5 text-white/90">
-                  <Clock3 size={12} />
-                  {nextEvent.startAt}
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-3 py-1.5 text-white/90">
-                  <MapPin size={12} />
-                  {nextEvent.location}
-                </span>
-              </div>
-            </div>
-            <Button variant="primary" className="shrink-0">
-              View details
-            </Button>
-          </div>
-        </GlassCard>
+        <CalendarNextUpCard
+          event={{
+            title: nextEvent.title,
+            course: nextEvent.course,
+            type: nextEvent.type,
+            startAt: nextEvent.startAt,
+            location: nextEvent.location,
+          }}
+        />
       ) : null}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
@@ -101,7 +84,7 @@ export function InstructorCalendarPage() {
           label="Exams"
           value={stats.exams}
           sub="Assessment dates"
-          icon={<CalendarClock size={17} />}
+          icon={<CalendarDays size={17} />}
           iconBg="bg-danger-bg text-danger"
         />
         <StatBlock

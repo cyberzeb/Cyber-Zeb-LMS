@@ -22,15 +22,21 @@ const statusLabel: Record<LiveClassSession['status'], string> = {
 }
 
 const sectionAccent: Record<LiveClassSession['status'], string> = {
-  live: 'from-success/20 via-lemon-50 to-white border-success/30',
-  upcoming: 'from-info-bg via-white to-white border-info/25',
-  ended: 'from-navy-50 via-white to-white border-divider',
+  live: 'from-success/20 via-lemon-50/30 to-card-end border-success/30',
+  upcoming: 'from-info-bg via-navy-50/40 to-card-end border-info/25',
+  ended: 'from-navy-50 via-navy-50/30 to-card-end border-divider',
 }
 
-function PlatformBadge({ platform }: { platform: string }) {
+function PlatformBadge({ platform, onDark }: { platform: string; onDark?: boolean }) {
   const isZoom = platform.toLowerCase().includes('zoom')
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 border border-divider px-2.5 py-1 text-[11px] font-semibold text-navy-800">
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+        onDark
+          ? 'bg-white/10 border border-white/15 text-white/90'
+          : 'soft-surface text-navy-800'
+      }`}
+    >
       {isZoom ? <ZoomIcon size={14} /> : <Video size={12} className="text-navy-500" />}
       {platform}
     </span>
@@ -67,7 +73,7 @@ function LiveSessionCard({ session, featured }: { session: LiveClassSession; fea
                 <Clock size={13} />
                 {session.duration}
               </span>
-              <PlatformBadge platform={session.platform} />
+              <PlatformBadge platform={session.platform} onDark />
             </div>
           </div>
           <Button variant="primary" className="shrink-0 shadow-lg shadow-lemon-500/25">
@@ -107,11 +113,11 @@ function LiveSessionCard({ session, featured }: { session: LiveClassSession; fea
           </p>
 
           <div className="mt-3 flex flex-wrap gap-2 text-[11.5px] text-secondary-text">
-            <span className="inline-flex items-center gap-1 rounded-md bg-white/70 px-2.5 py-1 border border-divider">
+            <span className="schedule-meta-chip">
               <CalendarClock size={11} />
               {session.startAt}
             </span>
-            <span className="inline-flex items-center gap-1 rounded-md bg-white/70 px-2.5 py-1 border border-divider">
+            <span className="schedule-meta-chip">
               <Clock size={11} />
               {session.duration}
             </span>

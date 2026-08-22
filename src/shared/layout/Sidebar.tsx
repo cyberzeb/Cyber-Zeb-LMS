@@ -53,7 +53,7 @@ export function Sidebar({
     >
       <div className="shrink-0 flex items-center justify-center group-hover/sidebar:justify-start px-3 py-4 gap-0 group-hover/sidebar:gap-2.5 border-b border-white/[0.06] transition-all duration-300">
         {brandLogoSrc ? (
-          <div className="w-9 h-9 shrink-0 rounded-lg bg-white flex items-center justify-center overflow-hidden">
+          <div className="w-9 h-9 shrink-0 rounded-lg sidebar-logo-bg flex items-center justify-center overflow-hidden">
             <img src={brandLogoSrc} alt={`${brandName} logo`} className="w-full h-full object-cover" />
           </div>
         ) : (
