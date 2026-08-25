@@ -17,6 +17,7 @@ import { PageHeader } from '../../../shared/components/PageHeader'
 import { Modal } from '../../../shared/components/Modal'
 import { FormField } from '../../../shared/components/FormField'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
+import { getEditionPageCopy } from '../../../shared/config/editionUi'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useApiCollection } from '../../../shared/hooks/useApiCollection'
@@ -58,6 +59,7 @@ function todayLabel(): string {
 
 export function ReportsPage() {
   const { notify } = useToast()
+  const pageCopy = getEditionPageCopy('reports')
   const analytics = useMemo(() => buildReportsAnalytics(), [])
   const [reports, setReports] = useApiCollection<GeneratedReport[]>(STORAGE_KEYS.reports, [])
   const [modalOpen, setModalOpen] = useState(false)
@@ -105,8 +107,8 @@ export function ReportsPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="Reports & Analytics"
-        subtitle="Real-time institution insights, trends, and exportable reports."
+        title={pageCopy.title}
+        subtitle={pageCopy.subtitle}
         actions={
           <>
             <Button variant="secondary" onClick={() => notify('Scheduled delivery unlocks with the backend.', 'info')}>

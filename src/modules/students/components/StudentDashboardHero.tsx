@@ -1,6 +1,7 @@
 import { Building2, CalendarDays, GraduationCap, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Monogram } from '../../../shared/components/Monogram'
+import { useLearnerBasePath } from '../../../shared/hooks/useLearnerBasePath'
 import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import type { StudentDashboardData } from '../types'
 
@@ -13,6 +14,7 @@ interface StudentDashboardHeroProps {
 
 export function StudentDashboardHero({ data }: StudentDashboardHeroProps) {
   const { t } = useLanguage()
+  const basePath = useLearnerBasePath()
   const firstName = data.studentName.split(' ')[0]
 
   return (
@@ -76,7 +78,7 @@ export function StudentDashboardHero({ data }: StudentDashboardHeroProps) {
           Focus on deadlines and live sessions first — everything else is one click away.
         </p>
         <Link
-          to="/student/settings"
+          to={`${basePath}/settings`}
           className="text-[12px] font-semibold text-lemon-300 hover:text-lemon-200 transition"
         >
           Edit profile →

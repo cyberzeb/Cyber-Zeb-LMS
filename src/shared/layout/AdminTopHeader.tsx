@@ -14,6 +14,7 @@ interface AdminTopHeaderProps {
   campuses?: Campus[]
   selectedCampusId?: string | 'all'
   onCampusChange?: (campusId: string | 'all') => void
+  hideCampusSelector?: boolean
 }
 
 export function AdminTopHeader({
@@ -24,6 +25,7 @@ export function AdminTopHeader({
   campuses = [],
   selectedCampusId = 'all',
   onCampusChange,
+  hideCampusSelector = false,
 }: AdminTopHeaderProps) {
   const { t, tx } = useLanguage()
   const [search, setSearch] = useState('')
@@ -69,7 +71,7 @@ export function AdminTopHeader({
         ) : null}
       </div>
 
-      {campuses.length > 0 && onCampusChange ? (
+      {!hideCampusSelector && campuses.length > 0 && onCampusChange ? (
         <div className="relative shrink-0" ref={campusMenuRef}>
           <button
             type="button"

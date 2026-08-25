@@ -15,7 +15,6 @@ import { usePeople } from '../hooks/usePeople'
 import { useCourses } from '../hooks/useCourses'
 import { withAdminVerification } from '../utils/peopleVerification'
 import { useCampusContext } from '../context/CampusContext'
-import { peoplePageConfigs } from '../data/peoplePageConfig'
 import { DEFAULT_CAMPUS_ID } from '../data/orgSeedData'
 import {
   getCoursesForInstructor,
@@ -25,9 +24,8 @@ import {
 } from '../utils/courseAssignmentUtils'
 import { InstructorsTable } from '../components/InstructorsTable'
 import { InstructorEditModal } from '../components/InstructorEditModal'
+import { usePeoplePageConfigForEdition } from '../../../shared/config/useEditionPageCopy'
 import type { PersonRow } from '../types'
-
-const config = peoplePageConfigs.Instructor
 
 function initialsFromName(name: string): string {
   return name
@@ -41,6 +39,7 @@ function initialsFromName(name: string): string {
 
 export function InstructorsPage() {
   const { notify } = useToast()
+  const config = usePeoplePageConfigForEdition('Instructor')
   const { campuses, activeCampuses, selectedCampusId } = useCampusContext()
   const { people, setPeople } = usePeople()
   const { courses, setCourses } = useCourses()

@@ -12,6 +12,8 @@ import { CourseCreateModal } from '../components/CourseCreateModal'
 import { useCourses } from '../hooks/useCourses'
 import { useCampusContext } from '../context/CampusContext'
 import { usePeople } from '../hooks/usePeople'
+import { getEditionPageCopy } from '../../../shared/config/editionUi'
+import { isCorporateEdition } from '../../../shared/config/edition'
 import type { CourseCreateInput, CourseRecord } from '../types'
 
 const STAT = 17
@@ -20,6 +22,8 @@ const tabs = ['All', 'Pending Approval', 'Published', 'Draft', 'Archived']
 
 export function CoursesPage() {
   const { notify } = useToast()
+  const pageCopy = getEditionPageCopy('courses')
+  const corporate = isCorporateEdition()
   const { courses, addCourse, updateCourseFromInput, removeCourse, approveCourse, rejectCourse } = useCourses()
   const { departments } = useCampusContext()
   const { people } = usePeople()
@@ -107,24 +111,24 @@ export function CoursesPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="Course Catalog"
-        subtitle="Author courses and assign a teaching instructor per course. Department grouping is organizational only."
+        title={pageCopy.title}
+        subtitle={pageCopy.subtitle}
         actions={
           <>
-            <Button variant="secondary" onClick={() => notify('Course templates library is coming soon.', 'info')}>
+            <Button variant="secondary" onClick={() => notify('Templates library is coming soon.', 'info')}>
               <LayoutTemplate size={15} />
               Templates
             </Button>
             <Button variant="primary" onClick={openCreate}>
               <Plus size={16} />
-              Create Course
+              {corporate ? 'Create training' : 'Create Course'}
             </Button>
           </>
         }
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-5">
-        <StatBlock label="Total Courses" value={totals.total} icon={<BookOpen size={STAT} />} />
+        <StatBlock label={corporate ? 'Total training' : 'Total Courses'} value={totals.total} icon={<BookOpen size={STAT} />} />
         <StatBlock
           label="Pending Approval"
           value={totals.pendingApproval}

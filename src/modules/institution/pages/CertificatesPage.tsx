@@ -16,6 +16,8 @@ import { usePeople } from '../hooks/usePeople'
 import { useCourses } from '../hooks/useCourses'
 import { certificateTemplates } from '../data/certificatesSeedData'
 import { CertificatesTable } from '../components/CertificatesTable'
+import { getEditionPageCopy } from '../../../shared/config/editionUi'
+import { isCorporateEdition } from '../../../shared/config/edition'
 import { CertificateDetailsModal } from '../components/CertificateDetailsModal'
 import {
   CertificateIssueModal,
@@ -65,6 +67,8 @@ const emptyIssueForm = (): IssueCertificateForm => ({
 
 export function CertificatesPage() {
   const { notify } = useToast()
+  const pageCopy = getEditionPageCopy('certificates')
+  const corporate = isCorporateEdition()
   const { campuses, departments, activeCampuses, selectedCampusId } = useCampusContext()
   const { certificates, issueCertificate, revokeCertificate } = useCertificates()
   const { people } = usePeople()
@@ -251,12 +255,12 @@ export function CertificatesPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="Certificates"
-        subtitle="Manage and monitor certificates across your institution."
+        title={pageCopy.title}
+        subtitle={pageCopy.subtitle}
         actions={
           <Button variant="primary" onClick={openIssue}>
             <Plus size={16} />
-            Issue Certificate
+            {corporate ? 'Issue certification' : 'Issue Certificate'}
           </Button>
         }
       />

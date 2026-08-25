@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../../shared/components/Button'
+import { useLearnerBasePath, useIsEmployeePortal } from '../../../shared/hooks/useLearnerBasePath'
 import { DashboardSummaryCard } from '../../../shared/components/DashboardSummaryCard'
 import { AnnouncementDashboardList } from '../../../shared/components/announcements/AnnouncementFeedCard'
 import { StatusPill } from '../../../shared/components/StatusPill'
@@ -59,6 +60,8 @@ function assignmentStatusTone(status: AssignmentItem['status']) {
 export function StudentDashboardPage() {
   const { t } = useLanguage()
   const navigate = useNavigate()
+  const basePath = useLearnerBasePath()
+  const isEmployee = useIsEmployeePortal()
   const { data, isLoading, isError, error, reload } = useStudentDashboard()
 
   if (isLoading) return <StudentPageLoading />
@@ -69,9 +72,14 @@ export function StudentDashboardPage() {
         <div className="flex items-start gap-3">
           <AlertTriangle size={18} className="mt-0.5 shrink-0" />
           <div className="min-w-0 flex-1">
-            <h2 className="text-[15px] font-bold">Failed to load the student dashboard</h2>
+            <h2 className="text-[15px] font-bold">
+              Failed to load {isEmployee ? 'your training dashboard' : 'the student dashboard'}
+            </h2>
             <p className="mt-1 text-[13px] leading-6 text-danger/80">
-              {error?.message ?? 'Please try again to load your learning workspace.'}
+              {error?.message ??
+                (isEmployee
+                  ? 'Please try again to load your assigned training.'
+                  : 'Please try again to load your learning workspace.')}
             </p>
             <button
               type="button"
@@ -135,11 +143,13 @@ export function StudentDashboardPage() {
                 {overdueCount} overdue item{overdueCount === 1 ? '' : 's'} need attention
               </p>
               <p className="text-[12px] text-secondary-text mt-1">
-                Review your assignments and quizzes to stay on track for {data.term}.
+                {isEmployee
+                  ? 'Complete overdue mandatory training to stay compliant.'
+                  : `Review your assignments and quizzes to stay on track for ${data.term}.`}
               </p>
             </div>
-            <Button variant="primary" onClick={() => navigate('/student/assignments')}>
-              View assignments
+            <Button variant="primary" onClick={() => navigate(`${basePath}/assignments`)}>
+              {isEmployee ? 'View training tasks' : 'View assignments'}
             </Button>
           </div>
         </GlassCard>
@@ -154,38 +164,47 @@ export function StudentDashboardPage() {
               {t('common.welcomeBack')} <span className="text-navy-700">{firstName}</span>
             </h1>
             <p className="text-[13px] text-secondary-text mt-1">
-              Track your learning progress, upcoming deadlines, and performance across {data.program} · {data.term}.
+              {isEmployee
+                ? `Track assigned training, deadlines, and compliance for ${data.program} · ${data.term}.`
+                : `Track your learning progress, upcoming deadlines, and performance across ${data.program} · ${data.term}.`}
             </p>
             <p className="text-[12px] text-lemon-700 font-semibold mt-1.5">{data.standing}</p>
             <div className="flex flex-wrap items-center gap-2 mt-4">
-              <Button variant="outline-green" onClick={() => navigate('/student/quizzes')}>
+              <Button variant="outline-green" onClick={() => navigate(`${basePath}/quizzes`)}>
                 <ClipboardList size={15} />
-                Start quiz
+                {isEmployee ? 'Start assessment' : 'Start quiz'}
               </Button>
-              <Button variant="outline-blue" onClick={() => navigate('/student/assignments')}>
+              <Button variant="outline-blue" onClick={() => navigate(`${basePath}/assignments`)}>
                 <SquarePen size={15} />
-                Submit assignment
+                {isEmployee ? 'Training tasks' : 'Submit assignment'}
               </Button>
-              <Button variant="outline-purple" onClick={() => navigate('/student/live-classes')}>
+              <Button variant="outline-purple" onClick={() => navigate(`${basePath}/live-classes`)}>
                 <MonitorPlay size={15} />
-                Join live class
+                {isEmployee ? 'Live training' : 'Join live class'}
               </Button>
-              <Button variant="secondary" onClick={() => navigate('/student/calendar')}>
+              <Button variant="secondary" onClick={() => navigate(`${basePath}/calendar`)}>
                 <CalendarClock size={15} />
                 View calendar
               </Button>
-              <Button variant="secondary" onClick={() => navigate('/student/resources')}>
+              <Button variant="secondary" onClick={() => navigate(`${basePath}/resources`)}>
                 <BookOpen size={15} />
-                Browse resources
+                {isEmployee ? 'Training resources' : 'Browse resources'}
               </Button>
-              <Button variant="primary" onClick={() => navigate('/student/grades')}>
-                <GraduationCap size={15} />
-                View grades
-              </Button>
+              {!isEmployee ? (
+                <Button variant="primary" onClick={() => navigate(`${basePath}/grades`)}>
+                  <GraduationCap size={15} />
+                  View grades
+                </Button>
+              ) : (
+                <Button variant="primary" onClick={() => navigate(`${basePath}/certificates`)}>
+                  <CheckCircle2 size={15} />
+                  Certifications
+                </Button>
+              )}
             </div>
           </div>
 
-          <DashboardSummaryCard title="Upcoming Deadlines" onViewAll={() => navigate('/student/calendar')}>
+          <DashboardSummaryCard title="Upcoming Deadlines" onViewAll={() => navigate(`${basePath}/calendar`)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {data.upcomingDeadlines.map((item) => (
                 <div key={item.id} className="rounded-lg border border-divider p-2.5 nested-panel">
@@ -204,7 +223,54 @@ export function StudentDashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${isEmployee ? 'lg:grid-cols-4' : 'lg:grid-cols-4'} gap-4`}>
+        {isEmployee ? (
+          <>
+            <StatBlock
+              label="Active Training"
+              value={data.kpis.activeCourses}
+              sub="Assigned modules"
+              trend={progressTrend.trend}
+              trendValue={progressTrend.trendValue}
+              sparkline={data.kpiTrends.courseProgress}
+              sparklineColor="#2A3560"
+              icon={<BookOpen size={STAT} />}
+              iconBg="bg-navy-50 text-navy-700"
+            />
+            <StatBlock
+              label="Compliance Score"
+              value={`${Math.round(data.kpis.attendanceRate)}%`}
+              sub="Mandatory training"
+              trend={attendanceTrend.trend}
+              trendValue={attendanceTrend.trendValue}
+              sparkline={data.kpiTrends.attendanceRate}
+              sparklineColor="#A8D400"
+              icon={<CheckCircle2 size={STAT} />}
+              iconBg="bg-lemon-50 text-lemon-700"
+            />
+            <StatBlock
+              label="Assessment Avg"
+              value={`${data.kpis.avgQuizScore}%`}
+              sub="Knowledge checks"
+              trend={quizTrend.trend}
+              trendValue={quizTrend.trendValue}
+              sparkline={data.kpiTrends.quizScores}
+              sparklineColor="#1976D2"
+              icon={<ClipboardList size={STAT} />}
+              iconBg="bg-info-bg text-info"
+            />
+            <StatBlock
+              label="Due This Week"
+              value={data.kpis.dueThisWeek}
+              sub="Training deadlines"
+              sparkline={[6, 5, 5, 4, 5, data.kpis.dueThisWeek]}
+              sparklineColor="#E53935"
+              icon={<CalendarDays size={STAT} />}
+              iconBg="bg-warning-bg text-[#B45309]"
+            />
+          </>
+        ) : (
+          <>
         <StatBlock
           label="Active Courses"
           value={data.kpis.activeCourses}
@@ -291,6 +357,8 @@ export function StudentDashboardPage() {
           icon={<TrendingUp size={STAT} />}
           iconBg="bg-lemon-50 text-lemon-700"
         />
+          </>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
@@ -387,13 +455,13 @@ export function StudentDashboardPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">
         <div className="xl:col-span-2 space-y-4">
-          <DashboardSummaryCard title="My Courses" onViewAll={() => navigate('/student/courses')}>
+          <DashboardSummaryCard title={isEmployee ? 'My Training' : 'My Courses'} onViewAll={() => navigate(`${basePath}/courses`)}>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-left">
                 <thead>
                   <tr className="table-header-label border-b border-divider table-header-bar">
-                    <th className="py-2 pr-2 font-semibold">Course</th>
-                    <th className="py-2 px-2 font-semibold">Instructor</th>
+                    <th className="py-2 pr-2 font-semibold">{isEmployee ? 'Training' : 'Course'}</th>
+                    <th className="py-2 px-2 font-semibold">{isEmployee ? 'Trainer' : 'Instructor'}</th>
                     <th className="py-2 px-2 font-semibold">Next Session</th>
                     <th className="py-2 px-2 font-semibold">Progress</th>
                     <th className="py-2 pl-2 font-semibold">Status</th>
@@ -429,7 +497,7 @@ export function StudentDashboardPage() {
             </div>
           </DashboardSummaryCard>
 
-          <DashboardSummaryCard title="Recent Assignments" onViewAll={() => navigate('/student/assignments')}>
+          <DashboardSummaryCard title="Recent Assignments" onViewAll={() => navigate(`${basePath}/assignments`)}>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-left">
                 <thead>
@@ -458,7 +526,7 @@ export function StudentDashboardPage() {
         </div>
 
         <div className="space-y-4">
-          <DashboardSummaryCard title="Announcements" onViewAll={() => navigate('/student/announcements')}>
+          <DashboardSummaryCard title="Announcements" onViewAll={() => navigate(`${basePath}/announcements`)}>
             <AnnouncementDashboardList
               items={data.announcements.slice(0, 3)}
               showAuthor
@@ -466,7 +534,7 @@ export function StudentDashboardPage() {
             />
           </DashboardSummaryCard>
 
-          <DashboardSummaryCard title="Upcoming Live Sessions" onViewAll={() => navigate('/student/live-classes')}>
+          <DashboardSummaryCard title="Upcoming Live Sessions" onViewAll={() => navigate(`${basePath}/live-classes`)}>
             <div className="space-y-2">
               {data.liveClasses
                 .filter((s) => s.status !== 'ended')
@@ -491,7 +559,7 @@ export function StudentDashboardPage() {
             </div>
           </DashboardSummaryCard>
 
-          <DashboardSummaryCard title="Help Desk" onViewAll={() => navigate('/student/help-desk')}>
+          <DashboardSummaryCard title="Help Desk" onViewAll={() => navigate(`${basePath}/help-desk`)}>
             <div className="space-y-2">
               {data.helpDeskTickets.slice(0, 2).map((ticket) => (
                 <div key={ticket.id} className="rounded-lg border border-divider p-2.5">

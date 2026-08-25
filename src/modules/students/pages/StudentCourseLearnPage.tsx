@@ -19,6 +19,7 @@ import { GlassCard } from '../../../shared/layout/GlassCard'
 import { STORAGE_EVENTS } from '../../../shared/storage/keys'
 import { readCourses, readEnrollments, readPersonById } from '../../../shared/storage/readers'
 import { readPortalSession } from '../../../shared/storage/session'
+import { useLearnerBasePath } from '../../../shared/hooks/useLearnerBasePath'
 import type { CourseLesson, CourseRecord } from '../../institution/types'
 import { LessonQuestions } from '../components/LessonQuestions'
 import {
@@ -219,6 +220,7 @@ function LessonFooter({
 export function StudentCourseLearnPage() {
   const { courseId, lessonId: lessonIdParam } = useParams<{ courseId: string; lessonId?: string }>()
   const navigate = useNavigate()
+  const basePath = useLearnerBasePath()
   const { notify } = useToast()
 
   const personId = readPortalSession()?.personId ?? null
@@ -266,14 +268,14 @@ export function StudentCourseLearnPage() {
   const goToLesson = useCallback(
     (id: string) => {
       if (!course) return
-      navigate(`/student/courses/${course.id}/learn/${id}`)
+      navigate(`${basePath}/courses/${course.id}/learn/${id}`)
     },
-    [course, navigate],
+    [basePath, course, navigate],
   )
 
   const goToCoursesList = useCallback(() => {
-    navigate('/student/courses', { replace: true })
-  }, [navigate])
+    navigate(`${basePath}/courses`, { replace: true })
+  }, [basePath, navigate])
 
   if (!person || !personId) {
     return (
@@ -319,11 +321,11 @@ export function StudentCourseLearnPage() {
   }
 
   if (!lessonIdParam && firstLessonId) {
-    return <Navigate to={`/student/courses/${course.id}/learn/${firstLessonId}`} replace />
+    return <Navigate to={`${basePath}/courses/${course.id}/learn/${firstLessonId}`} replace />
   }
 
   if (lessonIdParam && !findLesson(course, lessonIdParam) && firstLessonId) {
-    return <Navigate to={`/student/courses/${course.id}/learn/${firstLessonId}`} replace />
+    return <Navigate to={`${basePath}/courses/${course.id}/learn/${firstLessonId}`} replace />
   }
 
   const resolvedLessonId = lessonIdParam ?? firstLessonId ?? lessonIds[0]

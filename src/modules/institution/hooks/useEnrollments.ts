@@ -66,6 +66,9 @@ export function useEnrollments() {
         courseTitle: string
         program?: string
         campus?: string
+        isMandatory?: boolean
+        dueDate?: string
+        assignedBy?: string
       },
     ) => {
       return addEnrollment({
@@ -79,6 +82,9 @@ export function useEnrollments() {
         enrolledOn: new Date().toISOString(),
         status: 'active',
         progress: 0,
+        isMandatory: meta.isMandatory,
+        dueDate: meta.dueDate,
+        assignedBy: meta.assignedBy,
       })
     },
     [addEnrollment],

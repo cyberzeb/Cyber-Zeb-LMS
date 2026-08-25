@@ -6,6 +6,7 @@ import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { Monogram } from '../../../shared/components/Monogram'
 import { GlassCard } from '../../../shared/layout/GlassCard'
+import { useLearnerBasePath } from '../../../shared/hooks/useLearnerBasePath'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
 import { useLanguage } from '../../../shared/i18n/LanguageProvider'
@@ -25,6 +26,7 @@ const statusLabel: Record<EnrolledCourse['status'], string> = {
 
 export function StudentCoursesPage() {
   const { t } = useLanguage()
+  const basePath = useLearnerBasePath()
   const { data, isLoading, isError } = useStudentDashboard()
 
   if (isLoading) return <StudentPageLoading />
@@ -80,7 +82,7 @@ export function StudentCoursesPage() {
           {data.courses.map((course) => (
             <Link
               key={course.id}
-              to={`/student/courses/${course.id}/learn`}
+              to={`${basePath}/courses/${course.id}/learn`}
               className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-lemon-500 rounded-2xl"
             >
             <GlassCard

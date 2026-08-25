@@ -4,6 +4,12 @@ import type { CourseEnrollment } from '../../modules/institution/types'
 import type { StudentDashboardData } from '../../modules/students/types'
 import type { InstructorDashboardData, InstructorCertificateRow } from '../../modules/instructors/types'
 import type { InstitutionOverviewData } from '../../modules/institution/types'
+import type { CorporateOverviewData } from '../../modules/corporate/types'
+import {
+  buildEmployeeComplianceRows,
+  computeOrganizationComplianceRate,
+  countOverdueEnrollments,
+} from '../../modules/corporate/utils/complianceUtils'
 import {
   readAnnouncements,
   readAssignmentRecords,
@@ -54,6 +60,9 @@ import {
   toStudentAnnouncementItems,
 } from './announcementUtils'
 import { certificateToStudentItem } from '../../modules/institution/api/certificatesApi'
+import { isCorporateEdition } from '../config/edition'
+import { getDemoStudentProfile } from '../data/demoStudent'
+import { readJobRoles } from './readers'
 
 function emptyStudentDashboard(student: PersonRow): StudentDashboardData {
   return {
@@ -145,6 +154,60 @@ function enrollmentToCourse(
 }
 
 export function buildStudentDashboard(student: PersonRow): StudentDashboardData {
+  const dashboard = buildStudentDashboardCore(student)
+  return isCorporateEdition() ? applyCorporateLearnerDashboard(dashboard, student) : dashboard
+}
+
+function applyCorporateLearnerDashboard(
+  data: StudentDashboardData,
+  student: PersonRow,
+): StudentDashboardData {
+  const demo = getDemoStudentProfile()
+  const jobRole = student.jobRoleId
+    ? readJobRoles().find((role) => role.id === student.jobRoleId)
+    : undefined
+  const complianceScore = typeof demo.gpa === 'number' && demo.gpa <= 100 ? demo.gpa : 92
+  const overdueCount = data.upcomingDeadlines.filter((d) => d.status === 'overdue').length
+
+  return {
+    ...data,
+    program: jobRole?.title ?? demo.program,
+    term: demo.term,
+    standing:
+      overdueCount > 0
+        ? `${overdueCount} overdue training item${overdueCount === 1 ? '' : 's'}`
+        : demo.standing,
+    stats: [
+      {
+        label: 'Active Training',
+        value: String(data.kpis.activeCourses),
+        detail: 'Assigned modules',
+      },
+      {
+        label: 'Due This Week',
+        value: String(data.kpis.dueThisWeek),
+        detail: data.kpis.dueThisWeek === 1 ? '1 deadline' : `${data.kpis.dueThisWeek} deadlines`,
+      },
+      {
+        label: 'Assessment Avg',
+        value: data.kpis.avgQuizScore > 0 ? `${data.kpis.avgQuizScore}%` : '—',
+        detail: 'Knowledge checks',
+      },
+      {
+        label: 'Compliance Score',
+        value: `${complianceScore}%`,
+        detail: 'Mandatory training',
+      },
+    ],
+    kpis: {
+      ...data.kpis,
+      gpa: complianceScore / 25,
+      attendanceRate: complianceScore,
+    },
+  }
+}
+
+function buildStudentDashboardCore(student: PersonRow): StudentDashboardData {
   const base = emptyStudentDashboard(student)
 
   const enrollments = readEnrollments().filter(
@@ -947,4 +1010,113 @@ export function buildInstructorCertificates(
       institution: institutionName,
     }
   })
+}
+
+export function buildCorporateOverviewData(): CorporateOverviewData {
+  const people = readPeople()
+  const enrollments = readEnrollments()
+  const certificates = readCertificates()
+  const assignments = readAssignmentRecords()
+  const announcements = readAnnouncements()
+  const institutionName = readInstitutionName()
+
+  const employees = people.filter((p) => p.role === 'Student')
+  const assignedEnrollments = enrollments.filter((e) => e.status !== 'withdrawn')
+  const completedEnrollments = assignedEnrollments.filter((e) => e.progress >= 100)
+  const inProgressEnrollments = assignedEnrollments.filter(
+    (e) => e.status === 'active' && e.progress > 0 && e.progress < 100,
+  )
+  const notStartedEnrollments = assignedEnrollments.filter(
+    (e) => e.status === 'active' && e.progress === 0,
+  )
+  const overdueTraining = countOverdueEnrollments(assignedEnrollments)
+  const complianceRows = buildEmployeeComplianceRows(employees.filter((p) => p.status === 'active'))
+  const complianceRate = computeOrganizationComplianceRate(complianceRows)
+
+  const certificationsIssued = certificates.filter((c) => c.status === 'issued').length
+  const trainingCompletionRate = assignedEnrollments.length
+    ? Math.round(
+        assignedEnrollments.reduce((sum, e) => sum + e.progress, 0) /
+          assignedEnrollments.length,
+      )
+    : 0
+
+  const kpis = {
+    totalEmployees: employees.filter((p) => p.status === 'active').length,
+    trainingAssigned: assignedEnrollments.length,
+    completedTraining: completedEnrollments.length,
+    inProgress: inProgressEnrollments.length,
+    overdueTraining,
+    complianceRate,
+    certificationsIssued,
+    trainingCompletionRate,
+  }
+
+  const attentionItems = [
+    ...complianceRows
+      .filter((row) => row.status === 'overdue')
+      .slice(0, 2)
+      .map((row, i) => ({
+        id: `corp-att-overdue-${i}`,
+        title: `${row.employeeName} — overdue training`,
+        subtitle: `${row.overdueTraining} overdue assignment${row.overdueTraining === 1 ? '' : 's'} · ${row.jobRoleTitle}`,
+        severity: 'high' as const,
+      })),
+    ...notStartedEnrollments.slice(0, 2).map((e, i) => ({
+      id: `corp-att-nostart-${i}`,
+      title: `${e.studentName} — training not started`,
+      subtitle: `${e.courseTitle} assigned but no progress recorded`,
+      severity: 'medium' as const,
+    })),
+    ...inProgressEnrollments
+      .filter((e) => e.progress < 30)
+      .slice(0, 2)
+      .map((e, i) => ({
+        id: `corp-att-risk-${i}`,
+        title: `${e.studentName} — at risk of overdue training`,
+        subtitle: `${e.courseTitle} · ${e.progress}% complete`,
+        severity: 'high' as const,
+      })),
+    ...(assignments.length === 0
+      ? [
+          {
+            id: 'corp-att-no-assignments',
+            title: 'No training tasks configured',
+            subtitle: 'Create training tasks to track practical completion',
+            severity: 'low' as const,
+          },
+        ]
+      : []),
+  ].slice(0, 4)
+
+  return {
+    organizationName: institutionName,
+    organizationSubtitle: 'Regulatory training, workforce compliance & certification tracking',
+    kpis,
+    kpiTrends: {
+      totalEmployees: sparklineFrom(kpis.totalEmployees),
+      trainingAssigned: sparklineFrom(kpis.trainingAssigned),
+      completedTraining: sparklineFrom(kpis.completedTraining),
+      inProgress: sparklineFrom(kpis.inProgress),
+      overdueTraining: sparklineFrom(kpis.overdueTraining),
+      complianceRate: sparklineFrom(kpis.complianceRate),
+      certificationsIssued: sparklineFrom(kpis.certificationsIssued),
+      trainingCompletionRate: sparklineFrom(kpis.trainingCompletionRate),
+    },
+    trainingProgress: [
+      { label: 'Completed', count: completedEnrollments.length, tone: 'success' },
+      { label: 'In progress', count: inProgressEnrollments.length, tone: 'info' },
+      { label: 'Not started', count: notStartedEnrollments.length, tone: 'warning' },
+      { label: 'Overdue / at risk', count: overdueTraining, tone: 'danger' },
+    ],
+    attentionItems,
+    recentAnnouncements: announcements.slice(0, 5).map((a) => ({
+      id: a.id,
+      title: a.title,
+      body: a.body,
+      audience: a.audience ?? 'All employees',
+      postedAt: a.postedAt,
+      priority: a.priority,
+    })),
+  }
 }

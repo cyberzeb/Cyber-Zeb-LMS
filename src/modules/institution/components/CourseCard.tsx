@@ -3,6 +3,7 @@ import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill, type StatusTone } from '../../../shared/components/StatusPill'
 import { Monogram } from '../../../shared/components/Monogram'
 import { Button } from '../../../shared/components/Button'
+import { isCorporateEdition } from '../../../shared/config/edition'
 import type { CourseApprovalStatus, CourseRecord } from '../types'
 
 interface CourseCardProps {
@@ -26,9 +27,11 @@ const approvalMap: Record<CourseApprovalStatus, { label: string; tone: StatusTon
 }
 
 export function CourseCard({ course, onOpen, onDelete, onApprove, onReject }: CourseCardProps) {
+  const corporateMode = isCorporateEdition()
   const status = statusMap[course.status]
   const approval = course.approvalStatus ? approvalMap[course.approvalStatus] : null
   const showApprovalActions = course.approvalStatus === 'pending' && onApprove && onReject
+  const trainerLabel = course.instructor !== 'Unassigned' ? course.instructor : 'No trainer assigned'
 
   return (
     <GlassCard
@@ -62,19 +65,21 @@ export function CourseCard({ course, onOpen, onDelete, onApprove, onReject }: Co
         <div className="flex items-center gap-2">
           <User size={13} className="text-navy-500 shrink-0" />
           <span className="text-navy-700 font-medium truncate">
-            {course.instructor !== 'Unassigned' ? course.instructor : 'No instructor assigned'}
+            {corporateMode ? trainerLabel : course.instructor !== 'Unassigned' ? course.instructor : 'No instructor assigned'}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <GraduationCap size={13} className="text-navy-500 shrink-0" />
-          <span className="text-navy-700 font-medium truncate">{course.level}</span>
+          <span className="text-navy-700 font-medium truncate">
+            {corporateMode ? (course.level === 'Mandatory' ? 'Mandatory training' : course.level) : course.level}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <Clock size={13} className="text-navy-500 shrink-0" />
           <span className="truncate">
-            {course.deliveryMode ?? 'Instructor-led'}
-            {course.durationWeeks ? ` · ${course.durationWeeks} weeks` : ''}
-            {course.credits ? ` · ${course.credits} credits` : ''}
+            {course.deliveryMode ?? (corporateMode ? 'Self-paced module' : 'Instructor-led')}
+            {course.durationWeeks ? ` · ${course.durationWeeks} week${course.durationWeeks === 1 ? '' : 's'}` : ''}
+            {!corporateMode && course.credits ? ` · ${course.credits} credits` : ''}
           </span>
         </div>
       </div>

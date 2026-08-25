@@ -29,6 +29,8 @@ export interface UpdateStudentInput {
   campusId: string
   departmentId: string
   status: PersonRow['status']
+  teamId?: string
+  jobRoleId?: string
 }
 
 export interface UpdateInstructorInput {
@@ -344,6 +346,9 @@ export async function updateStudent(
     role: 'Student',
     department: department.name,
     campusId: campus.id,
+    departmentId: department.id,
+    teamId: input.teamId || undefined,
+    jobRoleId: input.jobRoleId || undefined,
     status: input.status,
     lastActive: 'Just now',
     initials: initialsFromName(input.name),

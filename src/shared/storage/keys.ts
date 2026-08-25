@@ -1,5 +1,5 @@
 /** Bump to reset all Berana localStorage (fresh demo). */
-export const STORAGE_VERSION = 7
+export const STORAGE_VERSION = 10
 
 export const STORAGE_KEYS = {
   version: 'berana:storage-version',
@@ -8,6 +8,9 @@ export const STORAGE_KEYS = {
   campuses: 'berana:campuses',
   colleges: 'berana:colleges',
   departments: 'berana:departments',
+  teams: 'berana:teams',
+  jobRoles: 'berana:job-roles',
+  skills: 'berana:skills',
   programs: 'berana:programs',
   courses: 'berana:courses',
   enrollments: 'berana:enrollments',

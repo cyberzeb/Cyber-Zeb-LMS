@@ -19,6 +19,40 @@ export interface InstitutionSettingsState {
   integrations: Record<string, boolean>
 }
 
+export const defaultCorporateSettings: InstitutionSettingsState = {
+  general: {
+    name: 'Horizon Bank',
+    timezone: '(GMT+3) East Africa Time',
+    language: 'English',
+    currency: 'ETB — Ethiopian Birr',
+  },
+  branding: {
+    domain: 'learn.horizonbank.et',
+    sender: 'learning@horizonbank.et',
+    primary: 'Navy / Gold',
+  },
+  academic: {
+    grading: 'Pass / Fail with score',
+    attendance: 'Not tracked',
+    completion: 'All mandatory modules + assessment pass',
+  },
+  modules: {
+    virtualClassroom: true,
+    attendance: false,
+    assessments: true,
+    payments: false,
+    certificates: true,
+    parentPortal: false,
+  },
+  integrations: {
+    zoom: true,
+    googleSso: true,
+    microsoftSso: true,
+    stripe: false,
+    emailSms: true,
+  },
+}
+
 export const defaultInstitutionSettings: InstitutionSettingsState = {
   general: {
     name: 'Berana University',

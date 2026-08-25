@@ -8,6 +8,7 @@ import { PageHeader } from '../../../shared/components/PageHeader'
 import { SearchInput } from '../../../shared/components/SearchInput'
 import { SelectMenu } from '../../../shared/components/SelectMenu'
 import { StatBlock } from '../../../shared/components/StatBlock'
+import { getEditionPageCopy } from '../../../shared/config/editionUi'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
@@ -28,6 +29,7 @@ const statusTone: Record<AssessmentPublishStatus, 'success' | 'info' | 'neutral'
 
 export function AssignmentsAdminPage() {
   const { notify } = useToast()
+  const pageCopy = getEditionPageCopy('assignments')
   const { activeCampuses, selectedCampusId } = useCampusContext()
   const { records, createAssignment, updateAssignment, deleteAssignment } = useAssignmentRecords()
   const [activeTab, setActiveTab] = useState('All')
@@ -111,8 +113,8 @@ export function AssignmentsAdminPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="Assignments"
-        subtitle="Create and manage coursework deadlines across the institution."
+        title={pageCopy.title}
+        subtitle={pageCopy.subtitle}
         actions={
           <Button variant="primary" onClick={() => setModalOpen(true)}>
             <Plus size={15} />

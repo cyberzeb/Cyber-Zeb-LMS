@@ -7,6 +7,8 @@ import type {
   ProgramRow,
   CourseEnrollment,
 } from '../../modules/institution/types'
+import type { Team } from '../../modules/corporate/types'
+import type { JobRole, Skill } from '../../modules/corporate/types'
 import type { AnnouncementRecord } from '../types/announcements'
 import type { ForumChatRecord, ForumMessageRecord } from '../types/forum'
 import { normalizeAnnouncementRecord } from './announcementUtils'
@@ -32,6 +34,18 @@ export function readCampusRecords(): CampusRecord[] {
 
 export function readDepartments(): Department[] {
   return readCached<Department[]>(STORAGE_KEYS.departments, [])
+}
+
+export function readTeams(): Team[] {
+  return readCached<Team[]>(STORAGE_KEYS.teams, [])
+}
+
+export function readJobRoles(): JobRole[] {
+  return readCached<JobRole[]>(STORAGE_KEYS.jobRoles, [])
+}
+
+export function readSkills(): Skill[] {
+  return readCached<Skill[]>(STORAGE_KEYS.skills, [])
 }
 
 export function readPrograms(): ProgramRow[] {

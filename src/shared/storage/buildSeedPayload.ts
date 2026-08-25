@@ -26,9 +26,20 @@ import {
 } from '../../modules/institution/data/platformSeedData'
 import { seedCertificates } from '../../modules/institution/data/certificatesSeedData'
 import { seedAttendance } from '../../modules/institution/data/attendanceSeedData'
-import { defaultInstitutionSettings } from './settingsUtils'
+import { defaultCorporateSettings, defaultInstitutionSettings } from './settingsUtils'
+import { seedCorporateTeams } from '../../modules/corporate/data/teamsSeedData'
+import { seedJobRoles } from '../../modules/corporate/data/jobRolesSeedData'
+import { seedSkills } from '../../modules/corporate/data/skillsSeedData'
+import { seedCorporateCourses } from '../../modules/corporate/data/corporateCourseSeedData'
+import {
+  seedCorporateCampuses,
+  seedCorporateColleges,
+  seedCorporateDepartments,
+} from '../../modules/corporate/data/corporateOrgSeedData'
+import { buildCorporatePeopleSeed } from '../../modules/corporate/data/corporatePeopleSeedData'
+import { getActiveEdition } from '../config/edition'
 
-const INSTRUCTOR_IDS: Record<string, string> = {
+const UNIVERSITY_INSTRUCTOR_IDS: Record<string, string> = {
   'Dr. Aaron Selassie': 'u2',
   'Prof. Elias Hailu': 'u6',
   'Dr. Martha Bekele': 'u3',
@@ -36,17 +47,37 @@ const INSTRUCTOR_IDS: Record<string, string> = {
   'Dr. Tigist Assefa': 'u9',
 }
 
+const CORPORATE_INSTRUCTOR_IDS: Record<string, string> = {
+  'Sara Tadesse': 'u2',
+  'Mekonnen Alemu': 'u6',
+  'Martha Bekele': 'u3',
+  'Hanna Mekonnen': 'u9',
+  'Tewodros Alemu': 'u10',
+}
+
+function isCorporateSeed() {
+  return getActiveEdition() === 'corporate'
+}
+
+function seedSettings() {
+  return isCorporateSeed() ? defaultCorporateSettings : defaultInstitutionSettings
+}
+
 function seedCourseRecords(): CourseRecord[] {
-  return seedCourses
+  const catalog = isCorporateSeed() ? seedCorporateCourses : seedCourses
+  const instructorMap = isCorporateSeed() ? CORPORATE_INSTRUCTOR_IDS : UNIVERSITY_INSTRUCTOR_IDS
+
+  return catalog
     .filter((course) => course.status === 'published')
     .map((course) => ({
       ...course,
       approvalStatus: 'approved' as const,
-      instructorId: INSTRUCTOR_IDS[course.instructor],
+      instructorId: instructorMap[course.instructor],
       discussionForumEnabled: true,
       allowSelfEnrollment: false,
       certificateEnabled: true,
       visibility: 'private' as const,
+      deliveryMode: isCorporateSeed() ? ('Self-paced' as const) : undefined,
     }))
 }
 
@@ -55,7 +86,9 @@ function buildEnrollment(
   studentName: string,
   course: Pick<CourseRecord, 'id' | 'code' | 'title'>,
   progress = 0,
+  corporate = false,
 ): CourseEnrollment {
+  const due = new Date('2026-09-30')
   return {
     id: createId('enr'),
     studentId,
@@ -63,15 +96,52 @@ function buildEnrollment(
     courseId: course.id,
     courseCode: course.code,
     courseTitle: course.title,
-    program: 'Undergraduate',
-    campus: 'Main Campus — Addis Ababa',
+    program: corporate ? 'Mandatory compliance' : 'Undergraduate',
+    campus: corporate ? 'Head Office — Addis Ababa' : 'Main Campus — Addis Ababa',
     enrolledOn: '2026-01-10',
     status: 'active',
     progress,
+    isMandatory: corporate ? true : undefined,
+    dueDate: corporate ? due.toISOString().slice(0, 10) : undefined,
+    assignedBy: corporate ? 'HR & Learning' : undefined,
   }
 }
 
 function seedEnrollmentRecords(courses: CourseRecord[]): CourseEnrollment[] {
+  if (isCorporateSeed()) {
+    const byCode = (code: string) => courses.find((course) => course.code === code)
+    const aml = byCode('AML-101')
+    const cyb = byCode('CYB-AWR') ?? courses.find((c) => c.id === DEMO_LEARNING_COURSE_ID)
+    const priv = byCode('PRIV-001')
+    const fraud = byCode('FRAUD-201')
+    const svc = byCode('SVC-EXC')
+
+    const enrollments: CourseEnrollment[] = []
+    if (aml) {
+      enrollments.push(
+        buildEnrollment('u-demo-amina', 'Dawit Bekele', aml, 72, true),
+        buildEnrollment('u1', 'Selam Girma', aml, 100, true),
+        buildEnrollment('u18', 'Tomas Bekele', aml, 45, true),
+      )
+    }
+    if (cyb) {
+      enrollments.push(
+        buildEnrollment('u-demo-amina', 'Dawit Bekele', cyb, 18, true),
+        buildEnrollment('u10', 'Bruk Alemu', cyb, 88, true),
+      )
+    }
+    if (priv) {
+      enrollments.push(buildEnrollment('u17', 'Sara Negash', priv, 100, true))
+    }
+    if (fraud) {
+      enrollments.push(buildEnrollment('u-demo-amina', 'Dawit Bekele', fraud, 30, true))
+    }
+    if (svc) {
+      enrollments.push(buildEnrollment('u18', 'Tomas Bekele', svc, 60, true))
+    }
+    return enrollments
+  }
+
   const byCode = (code: string) => courses.find((course) => course.code === code)
   const cyber = courses.find((course) => course.id === DEMO_LEARNING_COURSE_ID) ?? byCode('CYB-101')
   const cs201 = byCode('CS-201')
@@ -119,6 +189,16 @@ function seedEnrollmentRecords(courses: CourseRecord[]): CourseEnrollment[] {
 
 function mergeDemoLearningCourse(catalog: CourseRecord[]): CourseRecord[] {
   const demo = createDemoLearningCourse()
+  if (isCorporateSeed()) {
+    demo.title = 'Cybersecurity Awareness — Interactive Module'
+    demo.code = 'CYB-AWR-LAB'
+    demo.instructor = 'Mekonnen Alemu'
+    demo.instructorId = 'u6'
+    demo.department = 'IT & Security'
+    demo.level = 'Mandatory'
+    demo.credits = undefined
+    demo.durationWeeks = 2
+  }
   const existingIndex = catalog.findIndex((c) => c.id === DEMO_LEARNING_COURSE_ID)
   if (existingIndex === -1) {
     return [demo, ...catalog]
@@ -151,18 +231,23 @@ export function buildSeedPayload(): Record<string, unknown> {
     enrolledCount: enrollmentCounts.get(course.id) ?? course.enrolledCount,
   }))
 
-  const people = ensureDemoStudentInPeople(seedPeople)
+  const people = isCorporateSeed()
+    ? ensureDemoStudentInPeople(buildCorporatePeopleSeed())
+    : ensureDemoStudentInPeople(seedPeople)
 
   return {
-    campuses: seedCampuses,
-    colleges: seedColleges,
-    departments: seedDepartments,
+    campuses: isCorporateSeed() ? seedCorporateCampuses : seedCampuses,
+    colleges: isCorporateSeed() ? seedCorporateColleges : seedColleges,
+    departments: isCorporateSeed() ? seedCorporateDepartments : seedDepartments,
+    teams: seedCorporateTeams,
+    'job-roles': seedJobRoles,
+    skills: seedSkills,
     people,
     courses,
     enrollments,
     certificates: seedCertificates,
-    attendances: seedAttendance,
-    settings: defaultInstitutionSettings,
+    attendances: isCorporateSeed() ? [] : seedAttendance,
+    settings: seedSettings(),
     selectedCampus: 'all',
     reports: [],
     'lesson-progress': {},

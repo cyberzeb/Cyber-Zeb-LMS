@@ -22,6 +22,8 @@ import { SettingsSection } from '../components/settings/SettingsSection'
 import { SettingField } from '../components/settings/SettingField'
 import { ToggleRow } from '../components/settings/ToggleRow'
 import { useTheme } from '../../../shared/theme/ThemeProvider'
+import { getEditionPageCopy } from '../../../shared/config/editionUi'
+import { isCorporateEdition } from '../../../shared/config/edition'
 
 const SEC = 17
 
@@ -29,6 +31,8 @@ type SettingsState = InstitutionSettingsState
 
 export function SettingsPage() {
   const { notify } = useToast()
+  const pageCopy = getEditionPageCopy('settings')
+  const corporate = isCorporateEdition()
   const { isDark, setTheme } = useTheme()
   const [storedRaw, setStoredRaw] = useApiCollection<SettingsState>(
     STORAGE_KEYS.settings,
@@ -75,8 +79,8 @@ export function SettingsPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="Institution Settings"
-        subtitle="Configure your institution profile, branding, identity, academic defaults and modules."
+        title={pageCopy.title}
+        subtitle={pageCopy.subtitle}
         actions={
           <>
             <Button variant="secondary" onClick={handleDiscard} disabled={!isDirty}>
@@ -93,10 +97,10 @@ export function SettingsPage() {
         <SettingsSection
           icon={<Building2 size={SEC} />}
           title="General"
-          description="Core identity and localization for your institution."
+          description={corporate ? 'Core identity and localization for your organization.' : 'Core identity and localization for your institution.'}
         >
           <SettingField
-            label="Institution Name"
+            label={corporate ? 'Organization Name' : 'Institution Name'}
             value={general.name}
             onChange={(v) => setGeneral({ name: v })}
           />
@@ -173,6 +177,7 @@ export function SettingsPage() {
           />
         </SettingsSection>
 
+        {!corporate ? (
         <SettingsSection
           icon={<GraduationCap size={SEC} />}
           title="Academic Defaults"
@@ -204,6 +209,25 @@ export function SettingsPage() {
             onChange={(v) => setAcademic({ completion: v })}
           />
         </SettingsSection>
+        ) : (
+        <SettingsSection
+          icon={<GraduationCap size={SEC} />}
+          title="Training Defaults"
+          description="Completion rules applied to new training modules."
+        >
+          <SettingField
+            label="Completion Rule"
+            type="select"
+            value={academic.completion}
+            options={[
+              'All modules + passing assessment',
+              'All modules viewed',
+              'Final assessment passed',
+            ]}
+            onChange={(v) => setAcademic({ completion: v })}
+          />
+        </SettingsSection>
+        )}
 
         <SettingsSection
           icon={<Blocks size={SEC} />}

@@ -15,16 +15,16 @@ import { sendLoginOtp, verifyLoginOtp } from '../../../shared/api/auth'
 import { setAccessToken } from '../../../shared/api/client'
 import {
   isLoginRole,
-  LOGIN_ROLES,
+  getLoginRoles,
   portalPathForRole,
   type LoginRole,
 } from '../../../shared/auth/portalRoutes'
 import { ThemeToggle } from '../../../shared/components/ThemeToggle'
 import { LanguageSwitcher } from '../../../shared/components/LanguageSwitcher'
 import {
-  DEMO_ACCOUNT_EMAILS,
-  DEMO_ACCOUNTS,
   DEMO_OTP_CODE,
+  getDemoAccountEmails,
+  getDemoAccounts,
 } from '../../../shared/data/demoAccounts'
 import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import type { TranslationKey } from '../../../shared/i18n/translations'
@@ -47,10 +47,13 @@ export function LoginPage() {
   const redirectTo = searchParams.get('redirect')
 
   const [step, setStep] = useState<'credentials' | 'code'>('credentials')
+  const loginRoles = getLoginRoles()
+  const demoAccounts = getDemoAccounts()
+
   const [role, setRole] = useState<LoginRole>(
     isLoginRole(initialRole) ? initialRole : 'Student',
   )
-  const [email, setEmail] = useState(DEMO_ACCOUNTS[isLoginRole(initialRole) ? initialRole : 'Student'].email)
+  const [email, setEmail] = useState(demoAccounts[isLoginRole(initialRole) ? initialRole : 'Student'].email)
   const [code, setCode] = useState(['', '', '', '', '', ''])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -68,12 +71,12 @@ export function LoginPage() {
 
   useEffect(() => {
     setEmail((current) => {
-      if (!current.trim() || DEMO_ACCOUNT_EMAILS.has(current.trim().toLowerCase())) {
-        return DEMO_ACCOUNTS[role].email
+      if (!current.trim() || getDemoAccountEmails().has(current.trim().toLowerCase())) {
+        return demoAccounts[role].email
       }
       return current
     })
-  }, [role])
+  }, [role, demoAccounts])
 
   if (session && person) {
     const destination =
@@ -197,7 +200,7 @@ export function LoginPage() {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder={DEMO_ACCOUNTS[role].email}
+                    placeholder={demoAccounts[role].email}
                     className="w-full ps-10 pe-3.5 py-2.5 text-[13.5px] input-surface rounded-xl outline-none focus:ring-2 focus:ring-lemon-500/25 focus:border-lemon-500/50 transition-all"
                   />
                 </div>
@@ -210,7 +213,7 @@ export function LoginPage() {
                   onChange={(e) => setRole(e.target.value as LoginRole)}
                   className="w-full px-3.5 py-2.5 text-[13.5px] input-surface rounded-xl outline-none focus:ring-2 focus:ring-lemon-500/25 cursor-pointer dark:[color-scheme:dark]"
                 >
-                  {LOGIN_ROLES.map((r) => (
+                  {loginRoles.map((r) => (
                     <option key={r.value} value={r.value}>
                       {t(`role.${r.value}` as TranslationKey)}
                     </option>
@@ -233,7 +236,7 @@ export function LoginPage() {
               </button>
 
               <p className="text-[12px] text-secondary-text text-center leading-relaxed">
-                {t('login.demoHint', { email: DEMO_ACCOUNTS[role].email, code: DEMO_OTP_CODE })}
+                {t('login.demoHint', { email: demoAccounts[role].email, code: DEMO_OTP_CODE })}
               </p>
             </form>
           ) : (

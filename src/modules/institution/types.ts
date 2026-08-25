@@ -23,6 +23,8 @@ export interface College {
   description?: string
 }
 
+export type DepartmentStatus = 'active' | 'inactive'
+
 export interface Department {
   id: string
   name: string
@@ -34,6 +36,8 @@ export interface Department {
   campusId: string
   collegeId: string
   description?: string
+  /** Corporate edition — optional lifecycle status (defaults to active). */
+  status?: DepartmentStatus
 }
 
 export interface Program {
@@ -413,6 +417,12 @@ export interface CourseEnrollment {
   enrolledOn: string
   status: 'active' | 'pending' | 'withdrawn'
   progress: number
+  /** Corporate: mandatory training assignment. */
+  isMandatory?: boolean
+  /** Corporate: ISO date when training is due. */
+  dueDate?: string
+  /** Corporate: who assigned the training (person id or label). */
+  assignedBy?: string
 }
 
 /* ── People ───────────────────────────────────────────────── */
@@ -430,6 +440,10 @@ export interface PersonRow {
   email: string
   role: PersonRole
   department: string
+  /** Future employee linkage — Phase 2B. */
+  departmentId?: string
+  teamId?: string
+  jobRoleId?: string
   campusId?: string
   isDepartmentHead?: boolean
   verificationStatus?: 'verified' | 'pending' | 'rejected'

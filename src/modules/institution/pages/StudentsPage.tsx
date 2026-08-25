@@ -15,15 +15,13 @@ import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { usePeople } from '../hooks/usePeople'
 import { withAdminVerification } from '../utils/peopleVerification'
 import { useCampusContext } from '../context/CampusContext'
-import { peoplePageConfigs } from '../data/peoplePageConfig'
 import { DEFAULT_CAMPUS_ID } from '../data/orgSeedData'
 import { migrateStudentRecord } from '../api/peopleApi'
 import { StudentsTable } from '../components/StudentsTable'
 import { StudentEditModal } from '../components/StudentEditModal'
 import { StudentImportModal } from '../components/StudentImportModal'
+import { usePeoplePageConfigForEdition, useHideCampusFiltersInEdition } from '../../../shared/config/useEditionPageCopy'
 import type { PersonRow } from '../types'
-
-const config = peoplePageConfigs.Student
 
 function initialsFromName(name: string): string {
   return name
@@ -37,6 +35,8 @@ function initialsFromName(name: string): string {
 
 export function StudentsPage() {
   const { notify } = useToast()
+  const config = usePeoplePageConfigForEdition('Student')
+  const hideCampusFilters = useHideCampusFiltersInEdition()
   const { campuses, departments, activeCampuses, selectedCampusId } = useCampusContext()
   const { people, setPeople } = usePeople()
   const [query, setQuery] = useState('')
@@ -195,26 +195,28 @@ export function StudentsPage() {
 
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-          <SelectMenu
-            value={campusFilter}
-            options={campusMenuOptions}
-            onChange={(v) => {
-              setCampusFilter(v)
-              setDepartmentFilter('all')
-            }}
-            aria-label="Filter by campus"
-            className="w-full sm:w-auto"
-          />
+          {!hideCampusFilters ? (
+            <SelectMenu
+              value={campusFilter}
+              options={campusMenuOptions}
+              onChange={(v) => {
+                setCampusFilter(v)
+                setDepartmentFilter('all')
+              }}
+              aria-label="Filter by campus"
+              className="w-full sm:w-auto"
+            />
+          ) : null}
           <DepartmentSelectMenu
             value={departmentFilter}
             departments={departments}
             campuses={campuses}
-            campusFilter={campusFilter}
+            campusFilter={hideCampusFilters ? 'all' : campusFilter}
             onChange={setDepartmentFilter}
             className="w-full sm:w-auto"
           />
           <span className="text-[13px] font-semibold text-navy-700 whitespace-nowrap">
-            {filtered.length} student{filtered.length === 1 ? '' : 's'}
+            {filtered.length} {config.title.toLowerCase()}
           </span>
         </div>
         <SearchInput
@@ -268,9 +270,10 @@ export function StudentsPage() {
           placeholder="e.g. selam.girma@berana.edu"
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <label className="flex flex-col gap-1.5">
-            <span className="text-[12px] font-semibold text-navy-900">Campus</span>
-            <select
+          {!hideCampusFilters ? (
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[12px] font-semibold text-navy-900">Campus</span>
+              <select
               value={inviteForm.campusId}
               onChange={(e) =>
                 setInviteForm({ ...inviteForm, campusId: e.target.value, departmentId: '' })
@@ -284,6 +287,7 @@ export function StudentsPage() {
               ))}
             </select>
           </label>
+          ) : null}
           <label className="flex flex-col gap-1.5">
             <span className="text-[12px] font-semibold text-navy-900">Department</span>
             <select

@@ -1,9 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom'
-import { InstitutionAdminLayout } from './InstitutionAdminLayout'
+import { AdminLayout } from './AdminLayout'
 import { CampusProfilePage } from '../modules/institution/pages/CampusProfilePage'
 import { OrgStructurePage } from '../modules/institution/pages/OrgStructurePage'
-import { InstitutionOverviewPage } from '../modules/institution/pages/InstitutionOverviewPage'
-import { DepartmentsPage } from '../modules/institution/pages/DepartmentsPage'
 import { ProgramsPage } from '../modules/institution/pages/ProgramsPage'
 import { CoursesPage } from '../modules/institution/pages/CoursesPage'
 import { PeoplePage } from '../modules/institution/pages/PeoplePage'
@@ -31,21 +29,6 @@ import { SettingsPage } from '../modules/institution/pages/SettingsPage'
 import { LandingPage } from '../modules/marketing/pages/LandingPage'
 import { LoginPage } from '../modules/auth/pages/LoginPage'
 import { StudentLayout } from '../modules/students/layout/StudentLayout'
-import { StudentDashboardPage } from '../modules/students/pages/studentdashboard'
-import { StudentResourcesPage } from '../modules/students/pages/studentresources'
-import { StudentQuizzesPage } from '../modules/students/pages/studentquizzes'
-import { StudentAssignmentsPage } from '../modules/students/pages/studentassignments'
-import { StudentCalendarPage } from '../modules/students/pages/studentcalendar'
-import { StudentGradesPage } from '../modules/students/pages/studentgrades'
-import { StudentCoursesShell } from '../modules/students/pages/StudentCoursesShell'
-import { StudentLiveClassesPage } from '../modules/students/pages/studentliveclasses'
-import { StudentAttendancePage } from '../modules/students/pages/studentattendance'
-import { StudentAnnouncementsPage } from '../modules/students/pages/studentannouncements'
-import { StudentForumPage } from '../modules/students/pages/studentforum'
-import { StudentCertificatesPage } from '../modules/students/pages/studentcertificates'
-import { StudentPaymentsPage } from '../modules/students/pages/studentpayments'
-import { StudentHelpDeskPage } from '../modules/students/pages/studenthelpdesk'
-import { StudentSettingsPage } from '../modules/students/pages/studentsettings'
 import { InstructorLayout } from '../modules/instructors/layout/InstructorLayout'
 import { InstructorDashboardPage } from '../modules/instructors/pages/instructordashboard'
 import { InstructorCoursesPage } from '../modules/instructors/pages/instructorcourses'
@@ -77,6 +60,14 @@ import { HelpDeskLayout } from '../modules/helpdesk/layout/HelpDeskLayout'
 import { HelpDeskDashboardPage } from '../modules/helpdesk/pages/helpdeskdashboard'
 import { HelpDeskTicketsPage } from '../modules/helpdesk/pages/helpdesktickets'
 import { HelpDeskSettingsPage } from '../modules/helpdesk/pages/helpdesksettings'
+import { AdminOrganizationPage } from './AdminOrganizationPage'
+import { AdminTeamsPage } from './AdminTeamsPage'
+import { AdminDashboardPage } from './AdminDashboardPage'
+import { AdminDepartmentsPage } from './AdminDepartmentsPage'
+import { AdminEmployeesPage } from './AdminEmployeesPage'
+import { AdminTrainingAssignmentsPage } from './AdminTrainingAssignmentsPage'
+import { AdminJobRolesPage, AdminSkillsPage, AdminCompliancePage } from './AdminCorporatePlaceholders'
+import { learnerPortalChildren } from './learnerPortalRoutes'
 
 export const router = createBrowserRouter([
   {
@@ -90,76 +81,12 @@ export const router = createBrowserRouter([
   {
     path: '/student',
     element: <StudentLayout />,
-    children: [
-      {
-        index: true,
-        element: <StudentDashboardPage />,
-      },
-      {
-        path: 'resources',
-        element: <StudentResourcesPage />,
-      },
-      {
-        path: 'quizzes',
-        element: <StudentQuizzesPage />,
-      },
-      {
-        path: 'assignments',
-        element: <StudentAssignmentsPage />,
-      },
-      {
-        path: 'calendar',
-        element: <StudentCalendarPage />,
-      },
-      {
-        path: 'grades',
-        element: <StudentGradesPage />,
-      },
-      {
-        path: 'courses',
-        element: <StudentCoursesShell />,
-      },
-      {
-        path: 'courses/:courseId/learn',
-        element: <StudentCoursesShell />,
-      },
-      {
-        path: 'courses/:courseId/learn/:lessonId',
-        element: <StudentCoursesShell />,
-      },
-      {
-        path: 'live-classes',
-        element: <StudentLiveClassesPage />,
-      },
-      {
-        path: 'attendance',
-        element: <StudentAttendancePage />,
-      },
-      {
-        path: 'announcements',
-        element: <StudentAnnouncementsPage />,
-      },
-      {
-        path: 'forum',
-        element: <StudentForumPage />,
-      },
-      {
-        path: 'certificates',
-        element: <StudentCertificatesPage />,
-      },
-      {
-        path: 'payments',
-        element: <StudentPaymentsPage />,
-      },
-      {
-        path: 'help-desk',
-        element: <StudentHelpDeskPage />,
-      },
-      {
-        path: 'settings',
-        element: <StudentSettingsPage />,
-      },
-    ],
+    children: learnerPortalChildren,
+  },
+  {
+    path: '/employee',
+    element: <StudentLayout />,
+    children: learnerPortalChildren,
   },
   {
     path: '/instructor',
@@ -259,19 +186,51 @@ export const router = createBrowserRouter([
   },
   {
     path: '/admin',
-    element: <InstitutionAdminLayout />,
+    element: <AdminLayout />,
     children: [
       {
         index: true,
-        element: <InstitutionOverviewPage />,
+        element: <AdminDashboardPage />,
+      },
+      {
+        path: 'organization',
+        element: <AdminOrganizationPage />,
+      },
+      {
+        path: 'teams',
+        element: <AdminTeamsPage />,
+      },
+      {
+        path: 'employees',
+        element: <AdminEmployeesPage />,
+      },
+      {
+        path: 'departments',
+        element: <AdminDepartmentsPage />,
+      },
+      {
+        path: 'training-assignments',
+        element: <AdminTrainingAssignmentsPage />,
+      },
+      {
+        path: 'job-roles',
+        element: <AdminJobRolesPage />,
+      },
+      {
+        path: 'skills',
+        element: <AdminSkillsPage />,
+      },
+      {
+        path: 'compliance',
+        element: <AdminCompliancePage />,
       },
       {
         path: 'institution/overview',
-        element: <InstitutionOverviewPage />,
+        element: <AdminDashboardPage />,
       },
       {
         path: 'institution/dashboard',
-        element: <InstitutionOverviewPage />,
+        element: <AdminDashboardPage />,
       },
       {
         path: 'institution/structure',
@@ -287,7 +246,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'institution/departments',
-        element: <DepartmentsPage />,
+        element: <AdminDepartmentsPage />,
       },
       {
         path: 'institution/programs',

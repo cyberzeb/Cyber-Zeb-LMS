@@ -8,6 +8,7 @@ import { PageHeader } from '../../../shared/components/PageHeader'
 import { SearchInput } from '../../../shared/components/SearchInput'
 import { SelectMenu } from '../../../shared/components/SelectMenu'
 import { StatBlock } from '../../../shared/components/StatBlock'
+import { getEditionPageCopy } from '../../../shared/config/editionUi'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
@@ -32,6 +33,7 @@ const statusTone: Record<string, 'success' | 'info' | 'neutral' | 'danger'> = {
 
 export function LiveClassesAdminPage() {
   const { notify } = useToast()
+  const pageCopy = getEditionPageCopy('liveClasses')
   const { activeCampuses, selectedCampusId } = useCampusContext()
   const { records, createSession, updateSession, deleteSession } = useLiveSessions()
   const [activeTab, setActiveTab] = useState('All')
@@ -123,8 +125,8 @@ export function LiveClassesAdminPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="Live Classes"
-        subtitle="Schedule and manage virtual lectures across all courses."
+        title={pageCopy.title}
+        subtitle={pageCopy.subtitle}
         actions={
           <Button variant="primary" onClick={() => setModalOpen(true)}>
             <Plus size={15} />

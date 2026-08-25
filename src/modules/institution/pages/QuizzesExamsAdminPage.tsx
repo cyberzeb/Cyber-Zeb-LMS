@@ -8,6 +8,7 @@ import { PageHeader } from '../../../shared/components/PageHeader'
 import { SearchInput } from '../../../shared/components/SearchInput'
 import { SelectMenu } from '../../../shared/components/SelectMenu'
 import { StatBlock } from '../../../shared/components/StatBlock'
+import { getEditionPageCopy } from '../../../shared/config/editionUi'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
@@ -28,6 +29,7 @@ const statusTone: Record<AssessmentPublishStatus, 'success' | 'info' | 'neutral'
 
 export function QuizzesExamsAdminPage() {
   const { notify } = useToast()
+  const pageCopy = getEditionPageCopy('assessments')
   const { activeCampuses, selectedCampusId } = useCampusContext()
   const { records, createQuiz, updateQuiz, deleteQuiz } = useQuizzes()
   const { records: questions } = useQuestionBank()
@@ -117,8 +119,8 @@ export function QuizzesExamsAdminPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="Quizzes & Exams"
-        subtitle="Build timed assessments linked to your question bank."
+        title={pageCopy.title}
+        subtitle={pageCopy.subtitle}
         actions={
           <Button variant="primary" onClick={() => setModalOpen(true)}>
             <Plus size={15} />

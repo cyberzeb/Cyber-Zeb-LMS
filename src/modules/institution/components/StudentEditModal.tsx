@@ -3,6 +3,9 @@ import { UserRoundPen } from 'lucide-react'
 import { Modal } from '../../../shared/components/Modal'
 import { Button } from '../../../shared/components/Button'
 import { FormField } from '../../../shared/components/FormField'
+import { isCorporateEdition } from '../../../shared/config/edition'
+import { useJobRoles } from '../../corporate/hooks/useJobRoles'
+import { useTeams } from '../../corporate/hooks/useTeams'
 import { updateStudent, type UpdateStudentInput } from '../api/peopleApi'
 import type { Campus, Department, PersonRow } from '../types'
 
@@ -25,6 +28,9 @@ export function StudentEditModal({
   onClose,
   onSaved,
 }: StudentEditModalProps) {
+  const corporateMode = isCorporateEdition()
+  const { jobRoles } = useJobRoles()
+  const { teams } = useTeams()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState<UpdateStudentInput>({
@@ -33,6 +39,8 @@ export function StudentEditModal({
     campusId: campuses[0]?.id ?? '',
     departmentId: '',
     status: 'active',
+    teamId: '',
+    jobRoleId: '',
   })
 
   useEffect(() => {
@@ -42,8 +50,10 @@ export function StudentEditModal({
       name: student.name,
       email: student.email,
       campusId: student.campusId ?? campuses[0]?.id ?? '',
-      departmentId: dept?.id ?? '',
+      departmentId: student.departmentId ?? dept?.id ?? '',
       status: student.status,
+      teamId: student.teamId ?? '',
+      jobRoleId: student.jobRoleId ?? '',
     })
     setError('')
   }, [student, open, campuses, departments])
@@ -51,6 +61,14 @@ export function StudentEditModal({
   const departmentOptions = useMemo(
     () => departments.filter((d) => d.campusId === form.campusId),
     [departments, form.campusId],
+  )
+
+  const teamOptions = useMemo(
+    () =>
+      teams.filter(
+        (team) => !form.departmentId || team.departmentId === form.departmentId,
+      ),
+    [teams, form.departmentId],
   )
 
   useEffect(() => {
@@ -74,13 +92,19 @@ export function StudentEditModal({
     }
   }
 
+  const entityLabel = corporateMode ? 'Employee' : 'Student'
+
   return (
     <Modal
       open={open}
       onClose={onClose}
       icon={<UserRoundPen size={18} />}
-      title="Edit Student"
-      description="Update profile details, campus placement and account status."
+      title={`Edit ${entityLabel}`}
+      description={
+        corporateMode
+          ? 'Update profile, department, team, job role and account status.'
+          : 'Update profile details, campus placement and account status.'
+      }
       footer={
         <>
           <Button variant="secondary" onClick={onClose} disabled={saving}>
@@ -105,25 +129,27 @@ export function StudentEditModal({
         placeholder="e.g. selam.girma@berana.edu"
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <label className="flex flex-col gap-1.5">
-          <span className="text-[12px] font-semibold text-navy-900">Campus</span>
-          <select
-            value={form.campusId}
-            onChange={(e) => setForm({ ...form, campusId: e.target.value, departmentId: '' })}
-            className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
-          >
-            {campuses.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name} ({c.code})
-              </option>
-            ))}
-          </select>
-        </label>
+        {!corporateMode ? (
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[12px] font-semibold text-navy-900">Campus</span>
+            <select
+              value={form.campusId}
+              onChange={(e) => setForm({ ...form, campusId: e.target.value, departmentId: '' })}
+              className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
+            >
+              {campuses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name} ({c.code})
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
         <label className="flex flex-col gap-1.5">
           <span className="text-[12px] font-semibold text-navy-900">Department</span>
           <select
             value={form.departmentId}
-            onChange={(e) => setForm({ ...form, departmentId: e.target.value })}
+            onChange={(e) => setForm({ ...form, departmentId: e.target.value, teamId: '' })}
             className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
           >
             {departmentOptions.map((d) => (
@@ -133,6 +159,40 @@ export function StudentEditModal({
             ))}
           </select>
         </label>
+        {corporateMode ? (
+          <>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[12px] font-semibold text-navy-900">Team</span>
+              <select
+                value={form.teamId ?? ''}
+                onChange={(e) => setForm({ ...form, teamId: e.target.value })}
+                className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
+              >
+                <option value="">No team</option>
+                {teamOptions.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[12px] font-semibold text-navy-900">Job Role</span>
+              <select
+                value={form.jobRoleId ?? ''}
+                onChange={(e) => setForm({ ...form, jobRoleId: e.target.value })}
+                className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
+              >
+                <option value="">No job role</option>
+                {jobRoles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
+        ) : null}
       </div>
       <FormField
         label="Status"

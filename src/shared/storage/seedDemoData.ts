@@ -29,7 +29,13 @@ import {
   readDepartments,
   readEnrollments,
   readPeople,
+  readTeams,
+  readJobRoles,
+  readSkills,
 } from './readers'
+import { seedCorporateTeams } from '../../modules/corporate/data/teamsSeedData'
+import { seedJobRoles } from '../../modules/corporate/data/jobRolesSeedData'
+import { seedSkills } from '../../modules/corporate/data/skillsSeedData'
 
 const INSTRUCTOR_IDS: Record<string, string> = {
   'Dr. Aaron Selassie': 'u2',
@@ -140,6 +146,21 @@ export function ensureDemoSeedData() {
 
     if (readDepartments().length === 0) {
       window.localStorage.setItem(STORAGE_KEYS.departments, JSON.stringify(seedDepartments))
+      changed = true
+    }
+
+    if (readTeams().length === 0) {
+      window.localStorage.setItem(STORAGE_KEYS.teams, JSON.stringify(seedCorporateTeams))
+      changed = true
+    }
+
+    if (readJobRoles().length === 0) {
+      window.localStorage.setItem(STORAGE_KEYS.jobRoles, JSON.stringify(seedJobRoles))
+      changed = true
+    }
+
+    if (readSkills().length === 0) {
+      window.localStorage.setItem(STORAGE_KEYS.skills, JSON.stringify(seedSkills))
       changed = true
     }
 

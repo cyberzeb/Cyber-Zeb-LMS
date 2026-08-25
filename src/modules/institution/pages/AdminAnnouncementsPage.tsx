@@ -17,11 +17,13 @@ import { useAnnouncements } from '../../../shared/hooks/useAnnouncements'
 import { readCourses, readPeople } from '../../../shared/storage/readers'
 import { toAdminAnnouncementItems, isCampusWideAnnouncement } from '../../../shared/storage/announcementUtils'
 import type { AnnouncementFormInput, AnnouncementRecord } from '../../../shared/types/announcements'
+import { getEditionPageCopy } from '../../../shared/config/editionUi'
 
 const tabs = ['All', 'Important', 'Updates']
 
 export function AdminAnnouncementsPage() {
   const { notify } = useToast()
+  const pageCopy = getEditionPageCopy('announcements')
   const { announcements: records, createAnnouncement, updateAnnouncement, deleteAnnouncement } =
     useAnnouncements()
   const [activeTab, setActiveTab] = useState('All')
@@ -87,8 +89,8 @@ export function AdminAnnouncementsPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="Announcements"
-        subtitle="Publish campus-wide notices and targeted updates across your institution."
+        title={pageCopy.title}
+        subtitle={pageCopy.subtitle}
         actions={<AnnouncementCreateButton onClick={() => { setEditing(null); setModalOpen(true) }} />}
       />
 
