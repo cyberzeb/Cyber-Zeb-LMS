@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { GlassCard } from '../../../../shared/layout/GlassCard'
+import { useLanguage } from '../../../../shared/i18n/LanguageProvider'
 
 interface SettingsSectionProps {
   icon: ReactNode
@@ -9,6 +10,7 @@ interface SettingsSectionProps {
 }
 
 export function SettingsSection({ icon, title, description, children }: SettingsSectionProps) {
+  const { tx } = useLanguage()
   return (
     <GlassCard className="p-6">
       <div className="flex items-start gap-3 mb-5 pb-5 border-b border-divider/50">
@@ -16,9 +18,9 @@ export function SettingsSection({ icon, title, description, children }: Settings
           {icon}
         </div>
         <div>
-          <h3 className="font-extrabold text-[15px] text-navy-900 leading-tight">{title}</h3>
+          <h3 className="font-extrabold text-[15px] text-navy-900 leading-tight">{tx(title)}</h3>
           {description && (
-            <p className="text-[12px] text-secondary-text mt-1 leading-snug">{description}</p>
+            <p className="text-[12px] text-secondary-text mt-1 leading-snug">{tx(description)}</p>
           )}
         </div>
       </div>

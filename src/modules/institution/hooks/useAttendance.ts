@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useLocalStorageState } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
 import { STORAGE_EVENTS, STORAGE_KEYS } from '../../../shared/storage/keys'
 import { seedAttendance } from '../data/attendanceSeedData'
 import type { AttendanceRecord, AttendanceStatus } from '../types'
@@ -9,7 +9,7 @@ function notifyAttendancesUpdated() {
 }
 
 export function useAttendance() {
-  const [records, setRecordsRaw] = useLocalStorageState<AttendanceRecord[]>(
+  const [records, setRecordsRaw] = useApiCollection<AttendanceRecord[]>(
     STORAGE_KEYS.attendances,
     seedAttendance,
   )

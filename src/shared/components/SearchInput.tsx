@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react'
+import { useLanguage } from '../i18n/LanguageProvider'
 
 interface SearchInputProps {
   value: string
@@ -13,18 +14,19 @@ export function SearchInput({
   placeholder = 'Search...',
   className = '',
 }: SearchInputProps) {
+  const { tx } = useLanguage()
   return (
     <div className={`relative ${className}`}>
       <Search
         size={15}
-        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-secondary-text pointer-events-none"
+        className="absolute start-3.5 top-1/2 -translate-y-1/2 text-secondary-text pointer-events-none"
       />
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full bg-white/70 dark:bg-navy-50 border border-divider rounded-full pl-10 pr-3 py-2 text-[13px] text-navy-900 placeholder:text-secondary-text shadow-sm transition-all focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25 focus:bg-navy-50 dark:focus:bg-[#111b2e]"
+        placeholder={tx(placeholder)}
+        className="w-full bg-white/70 dark:bg-navy-50 border border-divider rounded-full ps-10 pe-3 py-2 text-[13px] text-navy-900 placeholder:text-secondary-text shadow-sm transition-all focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25 focus:bg-navy-50 dark:focus:bg-[#111b2e]"
       />
     </div>
   )

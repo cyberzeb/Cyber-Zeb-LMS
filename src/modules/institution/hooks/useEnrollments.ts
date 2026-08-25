@@ -1,6 +1,8 @@
 import { useCallback } from 'react'
-import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
+import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { STORAGE_EVENTS, STORAGE_KEYS } from '../../../shared/storage/keys'
+import { readEnrollments } from '../../../shared/storage/readers'
 import type { CourseEnrollment } from '../types'
 
 function notifyEnrollmentsUpdated() {
@@ -8,7 +10,7 @@ function notifyEnrollmentsUpdated() {
 }
 
 export function useEnrollments() {
-  const [enrollments, setEnrollmentsRaw] = useLocalStorageState<CourseEnrollment[]>(
+  const [enrollments, setEnrollmentsRaw] = useApiCollection<CourseEnrollment[]>(
     STORAGE_KEYS.enrollments,
     [],
   )
@@ -95,11 +97,5 @@ export function useEnrollments() {
 }
 
 export function readEnrollmentsFromStorage(): CourseEnrollment[] {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEYS.enrollments)
-    if (stored) return JSON.parse(stored) as CourseEnrollment[]
-  } catch {
-    /* ignore */
-  }
-  return []
+  return readEnrollments()
 }

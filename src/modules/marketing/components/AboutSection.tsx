@@ -1,6 +1,8 @@
 import { Globe2, Lock, Puzzle } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
+import { AnimateInView } from '../../../shared/components/AnimateInView'
+
 const PRINCIPLES: { icon: LucideIcon; title: string; text: string }[] = [
   {
     icon: Lock,
@@ -15,24 +17,24 @@ const PRINCIPLES: { icon: LucideIcon; title: string; text: string }[] = [
   {
     icon: Globe2,
     title: 'Built for Ethiopia, Ready for the World',
-    text: 'Designed with low-bandwidth environments, local payment rails without limiting global reach.',
+    text: 'Designed with low-bandwidth environments and local payment rails without limiting global reach.',
   },
 ]
 
 export function AboutSection() {
   return (
-    <section id="about" className="bg-canvas py-20 md:py-28">
-      <div className="max-w-7xl mx-auto px-6 md:px-8">
+    <section id="about" className="bg-canvas py-20 md:py-28 relative overflow-hidden">
+      <div className="pointer-events-none absolute top-0 right-0 w-[320px] h-[320px] rounded-full bg-lemon-500/5 blur-[100px]" />
+
+      <div className="relative max-w-7xl mx-auto px-6 md:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          <div className="lg:col-span-5 animate-fade-in-up">
-            <span className="text-lemon-700 font-bold text-[12px] uppercase tracking-wider">
-              About Us
-            </span>
-            <h2 className="mt-3 text-[30px] md:text-[38px] font-extrabold text-navy-900 leading-tight">
+          <AnimateInView className="lg:col-span-5">
+            <span className="marketing-accent-label">About Us</span>
+            <h2 className="mt-3 text-[30px] md:text-[38px] marketing-section-heading">
               We&rsquo;re Cyber-Zeb Consulting — and Brana LMS is how we bring
               modern learning technology home.
             </h2>
-            <p className="mt-5 text-[15px] text-secondary-text leading-relaxed">
+            <p className="mt-5 text-[15px] marketing-body-text leading-relaxed">
               Brana LMS is a secure, modular, integration-ready learning
               platform built to help universities, schools, businesses,
               government institutions and NGOs manage learners, instructors,
@@ -48,27 +50,21 @@ export function AboutSection() {
             >
               Start your institution&rsquo;s journey →
             </a>
-          </div>
+          </AnimateInView>
 
           <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-5">
             {PRINCIPLES.map((p, index) => {
               const Icon = p.icon
               return (
-                <div
-                  key={p.title}
-                  className="marketing-feature-card animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.08}s` }}
-                >
-                  <div className="w-11 h-11 rounded-xl bg-lemon-50 flex items-center justify-center text-lemon-700 mb-4 transition-transform duration-300 group-hover:scale-110">
-                    <Icon size={22} strokeWidth={2.25} />
+                <AnimateInView key={p.title} delay={index * 0.1}>
+                  <div className="marketing-feature-card group h-full">
+                    <div className="marketing-icon-chip w-11 h-11 mb-4">
+                      <Icon size={22} strokeWidth={2.25} />
+                    </div>
+                    <h3 className="text-[15px] font-extrabold marketing-section-heading mb-2">{p.title}</h3>
+                    <p className="text-[13.5px] marketing-body-text leading-relaxed">{p.text}</p>
                   </div>
-                  <h3 className="text-[15px] font-extrabold text-navy-900 mb-2">
-                    {p.title}
-                  </h3>
-                  <p className="text-[13.5px] text-secondary-text leading-relaxed">
-                    {p.text}
-                  </p>
-                </div>
+                </AnimateInView>
               )
             })}
           </div>

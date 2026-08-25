@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { Bell, Building2, ChevronDown, MessageSquare, Search } from 'lucide-react'
+import { Bell, Building2, ChevronDown, LogOut, MessageSquare, Search } from 'lucide-react'
 import type { Campus } from '../../modules/institution/types'
+import { logout } from '../auth/logout'
+import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { ThemeToggle } from '../components/ThemeToggle'
+import { useLanguage } from '../i18n/LanguageProvider'
 
 interface AdminTopHeaderProps {
   userName: string
@@ -22,9 +25,12 @@ export function AdminTopHeader({
   selectedCampusId = 'all',
   onCampusChange,
 }: AdminTopHeaderProps) {
+  const { t, tx } = useLanguage()
   const [search, setSearch] = useState('')
   const [campusMenuOpen, setCampusMenuOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const campusMenuRef = useRef<HTMLDivElement>(null)
+  const userMenuRef = useRef<HTMLDivElement>(null)
 
   const initials = userName
     .split(' ')
@@ -35,13 +41,16 @@ export function AdminTopHeader({
 
   const selectedLabel =
     selectedCampusId === 'all'
-      ? 'All Campuses'
-      : (campuses.find((c) => c.id === selectedCampusId)?.name ?? 'All Campuses')
+      ? t('header.allCampuses')
+      : (campuses.find((c) => c.id === selectedCampusId)?.name ?? t('header.allCampuses'))
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (campusMenuRef.current && !campusMenuRef.current.contains(event.target as Node)) {
         setCampusMenuOpen(false)
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false)
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -55,7 +64,7 @@ export function AdminTopHeader({
         {breadcrumb ? (
           <>
             <span className="text-white/20">/</span>
-            <span>{breadcrumb}</span>
+            <span>{tx(breadcrumb)}</span>
           </>
         ) : null}
       </div>
@@ -73,20 +82,20 @@ export function AdminTopHeader({
           </button>
 
           {campusMenuOpen ? (
-            <div className="absolute top-full left-0 mt-1.5 w-64 rounded-xl border border-white/15 bg-[#1a2338] shadow-xl z-50 py-1.5">
+            <div className="absolute top-full start-0 mt-1.5 w-64 rounded-xl border border-white/15 bg-[#1a2338] shadow-xl z-50 py-1.5">
               <button
                 type="button"
                 onClick={() => {
                   onCampusChange('all')
                   setCampusMenuOpen(false)
                 }}
-                className={`w-full text-left px-3 py-2 text-[12px] hover:bg-white/10 transition-colors ${
+                className={`w-full text-start px-3 py-2 text-[12px] hover:bg-white/10 transition-colors ${
                   selectedCampusId === 'all'
                     ? 'text-lemon-500 font-semibold'
                     : 'text-white/90 hover:text-white'
                 }`}
               >
-                All Campuses
+                {t('header.allCampuses')}
               </button>
               <div className="my-1 border-t border-white/10" />
               {campuses.map((campus) => (
@@ -97,7 +106,7 @@ export function AdminTopHeader({
                     onCampusChange(campus.id)
                     setCampusMenuOpen(false)
                   }}
-                  className={`w-full text-left px-3 py-2 text-[12px] hover:bg-white/10 transition-colors ${
+                  className={`w-full text-start px-3 py-2 text-[12px] hover:bg-white/10 transition-colors ${
                     selectedCampusId === campus.id
                       ? 'text-lemon-500 font-semibold'
                       : 'text-white/90 hover:text-white'
@@ -105,7 +114,7 @@ export function AdminTopHeader({
                 >
                   <span className="block truncate">{campus.name}</span>
                   {campus.status === 'pending' ? (
-                    <span className="text-[10px] text-warning uppercase font-bold">Pending</span>
+                    <span className="text-[10px] text-warning uppercase font-bold">{t('header.pending')}</span>
                   ) : null}
                 </button>
               ))}
@@ -117,16 +126,16 @@ export function AdminTopHeader({
       <div className="flex-1 max-w-xl mx-auto relative">
         <Search
           size={15}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-navy-200 pointer-events-none"
+          className="absolute start-3 top-1/2 -translate-y-1/2 text-navy-200 pointer-events-none"
         />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search courses, students, reports..."
-          className="w-full h-9 bg-white/[0.06] border border-white/10 rounded-lg pl-9 pr-20 text-[12.5px] text-white placeholder:text-navy-200/70 focus:outline-none focus:border-lemon-500/40 focus:ring-1 focus:ring-lemon-500/20"
+          placeholder={t('header.search')}
+          className="w-full h-9 bg-white/[0.06] border border-white/10 rounded-lg ps-9 pe-20 text-[12.5px] text-white placeholder:text-navy-200/70 focus:outline-none focus:border-lemon-500/40 focus:ring-1 focus:ring-lemon-500/20"
         />
-        <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-white/10 bg-white/[0.04] text-[10px] text-navy-200 font-medium">
+        <kbd className="absolute end-2.5 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-white/10 bg-white/[0.04] text-[10px] text-navy-200 font-medium">
           Ctrl + K
         </kbd>
       </div>
@@ -136,37 +145,56 @@ export function AdminTopHeader({
         <button
           type="button"
           className="relative w-9 h-9 rounded-lg flex items-center justify-center text-navy-200 hover:text-white hover:bg-white/[0.06] transition-colors"
-          aria-label="Notifications"
+          aria-label={t('header.notifications')}
         >
           <Bell size={17} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-lemon-500 border border-[#0a1020]" />
+          <span className="absolute top-1.5 end-1.5 w-2 h-2 rounded-full bg-lemon-500 border border-[#0a1020]" />
         </button>
         <button
           type="button"
           className="relative w-9 h-9 rounded-lg flex items-center justify-center text-navy-200 hover:text-white hover:bg-white/[0.06] transition-colors"
-          aria-label="Messages"
+          aria-label={t('header.messages')}
         >
           <MessageSquare size={17} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-info border border-[#0a1020]" />
+          <span className="absolute top-1.5 end-1.5 w-2 h-2 rounded-full bg-info border border-[#0a1020]" />
         </button>
 
-        <button
-          type="button"
-          className="hidden sm:flex items-center gap-1.5 h-9 px-2.5 rounded-lg text-[12px] text-navy-200 hover:bg-white/[0.06] hover:text-white transition-colors"
-        >
-          English
-          <ChevronDown size={14} />
-        </button>
+        <LanguageSwitcher variant="header" />
 
-        <div className="flex items-center gap-2 pl-2 ml-1 border-l border-white/10">
-          <div className="w-8 h-8 rounded-full bg-lemon-500 text-navy-900 flex items-center justify-center text-[10px] font-bold shrink-0">
-            {initials}
-          </div>
-          <div className="hidden md:block min-w-0">
-            <div className="text-[12px] font-semibold text-white leading-tight truncate">{userName}</div>
-            <div className="text-[10px] text-navy-200 leading-tight truncate">{userRole}</div>
-          </div>
-          <ChevronDown size={14} className="hidden md:block text-navy-200 shrink-0" />
+        <div className="relative ps-2 ms-1 border-s border-white/10" ref={userMenuRef}>
+          <button
+            type="button"
+            onClick={() => setUserMenuOpen((open) => !open)}
+            className="flex items-center gap-2 h-9 px-1.5 rounded-lg text-navy-200 hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer"
+            aria-expanded={userMenuOpen}
+            aria-haspopup="menu"
+          >
+            <div className="w-8 h-8 rounded-full bg-lemon-500 text-navy-900 flex items-center justify-center text-[10px] font-bold shrink-0">
+              {initials}
+            </div>
+            <div className="hidden md:block min-w-0 text-start">
+              <div className="text-[12px] font-semibold text-white leading-tight truncate">{userName}</div>
+              <div className="text-[10px] text-navy-200 leading-tight truncate">{tx(userRole)}</div>
+            </div>
+            <ChevronDown size={14} className="hidden md:block text-navy-200 shrink-0" />
+          </button>
+
+          {userMenuOpen ? (
+            <div className="absolute top-full end-0 mt-1.5 w-52 rounded-xl border border-white/15 bg-[#1a2338] shadow-xl z-50 py-1.5">
+              <div className="px-3 py-2 border-b border-white/10 md:hidden">
+                <div className="text-[12px] font-semibold text-white truncate">{userName}</div>
+                <div className="text-[10px] text-navy-200 truncate">{tx(userRole)}</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => logout()}
+                className="w-full flex items-center gap-2 px-3 py-2.5 text-[12px] text-white/90 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+              >
+                <LogOut size={15} className="shrink-0" />
+                {t('header.signOut')}
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     </header>

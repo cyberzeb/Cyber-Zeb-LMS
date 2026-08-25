@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
-import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
+import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { STORAGE_EVENTS, STORAGE_KEYS } from '../../../shared/storage/keys'
 import {
   seedHelpDeskTickets,
@@ -17,7 +18,7 @@ function notifyPlatformUpdated() {
 }
 
 export function usePayments() {
-  const [records, setRecordsRaw] = useLocalStorageState<PaymentRecord[]>(
+  const [records, setRecordsRaw] = useApiCollection<PaymentRecord[]>(
     STORAGE_KEYS.payments,
     seedPayments,
   )
@@ -70,7 +71,7 @@ export function usePayments() {
 }
 
 export function useHelpDesk() {
-  const [records, setRecordsRaw] = useLocalStorageState<HelpDeskTicketRecord[]>(
+  const [records, setRecordsRaw] = useApiCollection<HelpDeskTicketRecord[]>(
     STORAGE_KEYS.helpDeskTickets,
     seedHelpDeskTickets,
   )
@@ -124,7 +125,7 @@ export function useHelpDesk() {
 }
 
 export function useIntegrations() {
-  const [records, setRecordsRaw] = useLocalStorageState<ApiIntegrationRecord[]>(
+  const [records, setRecordsRaw] = useApiCollection<ApiIntegrationRecord[]>(
     STORAGE_KEYS.integrations,
     seedIntegrations,
   )

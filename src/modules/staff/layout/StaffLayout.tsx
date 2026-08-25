@@ -11,9 +11,10 @@ import { Sidebar } from '../../../shared/layout/Sidebar'
 import { AdminTopHeader } from '../../../shared/layout/AdminTopHeader'
 import { AdminFooter } from '../../../shared/layout/AdminFooter'
 import brandLogo from '../../../assets/Logo.jpg'
-import { PortalUserPicker } from '../../../shared/components/PortalUserPicker'
+import { PortalAuthRedirect } from '../../../shared/components/PortalAuthRedirect'
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 import { readInstitutionName } from '../../../shared/storage/readers'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 
 const ICON_SIZE = 17
 
@@ -25,6 +26,7 @@ const breadcrumbLabels: Record<string, string> = {
 }
 
 export function StaffLayout() {
+  const { t } = useLanguage()
   const location = useLocation()
   const path = location.pathname
   const mainRef = useRef<HTMLElement>(null)
@@ -36,7 +38,7 @@ export function StaffLayout() {
   }, [location.pathname])
 
   if (!session || session.role !== 'Staff' || !person) {
-    return <PortalUserPicker role="Staff" portalLabel="Staff Portal" adminSetupHref="/admin/staff" />
+    return <PortalAuthRedirect role="Staff" />
   }
 
   const isActive = (to: string) => {
@@ -93,14 +95,14 @@ export function StaffLayout() {
         sections={navSections}
         brandLogoSrc={brandLogo}
         brandName="Brana LMS"
-        brandSubtitle={`Staff · ${person.department}`}
+        brandSubtitle={`${t('role.Staff')} · ${person.department}`}
         showSystemStatus={false}
       />
 
       <div className="flex flex-col flex-1 min-w-0">
         <AdminTopHeader
           userName={person.name}
-          userRole={`Staff · ${person.department}`}
+          userRole={`${t('role.Staff')} · ${person.department}`}
           institutionName={readInstitutionName()}
           breadcrumb={breadcrumbLabels[path] ?? 'Dashboard'}
         />

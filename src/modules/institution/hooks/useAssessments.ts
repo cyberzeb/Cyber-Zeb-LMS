@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
-import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
+import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { STORAGE_EVENTS, STORAGE_KEYS } from '../../../shared/storage/keys'
 import {
   seedAssignments,
@@ -21,7 +22,7 @@ function notifyAssessmentsUpdated() {
 }
 
 export function useLiveSessions() {
-  const [records, setRecordsRaw] = useLocalStorageState<LiveSessionRecord[]>(
+  const [records, setRecordsRaw] = useApiCollection<LiveSessionRecord[]>(
     STORAGE_KEYS.liveSessions,
     seedLiveSessions,
   )
@@ -61,7 +62,7 @@ export function useLiveSessions() {
 }
 
 export function useAssignmentRecords() {
-  const [records, setRecordsRaw] = useLocalStorageState<AssignmentRecord[]>(
+  const [records, setRecordsRaw] = useApiCollection<AssignmentRecord[]>(
     STORAGE_KEYS.assignments,
     seedAssignments,
   )
@@ -101,7 +102,7 @@ export function useAssignmentRecords() {
 }
 
 export function useQuizzes() {
-  const [records, setRecordsRaw] = useLocalStorageState<QuizRecord[]>(
+  const [records, setRecordsRaw] = useApiCollection<QuizRecord[]>(
     STORAGE_KEYS.quizzes,
     seedQuizzes,
   )
@@ -141,7 +142,7 @@ export function useQuizzes() {
 }
 
 export function useQuestionBank() {
-  const [records, setRecordsRaw] = useLocalStorageState<QuestionRecord[]>(
+  const [records, setRecordsRaw] = useApiCollection<QuestionRecord[]>(
     STORAGE_KEYS.questionBank,
     seedQuestions,
   )
@@ -185,7 +186,7 @@ export function useQuestionBank() {
 }
 
 export function useStudentSubmissions() {
-  const [records, setRecordsRaw] = useLocalStorageState<StudentSubmissionRecord[]>(
+  const [records, setRecordsRaw] = useApiCollection<StudentSubmissionRecord[]>(
     STORAGE_KEYS.studentSubmissions,
     seedStudentSubmissions,
   )

@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "export-seed": "npx tsx scripts/export-seed-data.ts",
+    "seed:backend": "npm run export-seed && cd backend && python scripts/seed_db.py"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.4",

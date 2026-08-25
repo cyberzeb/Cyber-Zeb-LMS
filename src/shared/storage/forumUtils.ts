@@ -10,6 +10,7 @@ import type {
 } from '../types/forum'
 import { CAMPUS_CHAT_ID } from '../types/forum'
 import { createId } from '../hooks/useLocalStorageState'
+import { persistCollection } from './persistCollection'
 import {
   readCourses,
   readEnrollments,
@@ -389,7 +390,7 @@ export function writeForumReadState(personId: string, chatId: string, readAt: st
       [chatId]: readAt,
     },
   }
-  window.localStorage.setItem(STORAGE_KEYS.forumReadState, JSON.stringify(next))
+  persistCollection(STORAGE_KEYS.forumReadState, next)
 }
 
 export function isGroupChatType(type: ForumChatType): boolean {

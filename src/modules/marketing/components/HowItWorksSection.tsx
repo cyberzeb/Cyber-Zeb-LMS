@@ -1,6 +1,8 @@
 import { FilePenLine, Handshake, Mail, Rocket } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
+import { AnimateInView } from '../../../shared/components/AnimateInView'
+
 const STEPS: { n: string; title: string; text: string; icon: LucideIcon }[] = [
   {
     n: '01',
@@ -30,39 +32,35 @@ const STEPS: { n: string; title: string; text: string; icon: LucideIcon }[] = [
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="bg-canvas py-20 md:py-28">
-      <div className="max-w-7xl mx-auto px-6 md:px-8">
-        <div className="max-w-2xl mx-auto text-center animate-fade-in-up">
-          <span className="text-lemon-700 font-bold text-[12px] uppercase tracking-wider">
-            How It Works
-          </span>
-          <h2 className="mt-3 text-[30px] md:text-[38px] font-extrabold text-navy-900 leading-tight">
+    <section id="how-it-works" className="bg-canvas py-20 md:py-28 relative overflow-hidden">
+      <div className="pointer-events-none absolute bottom-0 left-0 w-[280px] h-[280px] rounded-full bg-lemon-500/5 blur-[90px]" />
+
+      <div className="relative max-w-7xl mx-auto px-6 md:px-8">
+        <AnimateInView className="max-w-2xl mx-auto text-center">
+          <span className="marketing-accent-label">How It Works</span>
+          <h2 className="mt-3 text-[30px] md:text-[38px] marketing-section-heading">
             From request to a live LMS in four steps
           </h2>
-        </div>
+        </AnimateInView>
 
         <div className="mt-16 relative">
-          <div className="hidden lg:block absolute top-[38px] left-0 right-0 h-[2px] bg-divider" />
+          <div className="hidden lg:block absolute top-[38px] left-[12%] right-[12%] h-[2px] bg-divider" />
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
             {STEPS.map((s, index) => {
               const Icon = s.icon
               return (
-                <div
+                <AnimateInView
                   key={s.n}
-                  className="relative flex flex-col items-center text-center animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.1}s` }}
+                  delay={index * 0.1}
+                  className="relative flex flex-col items-center text-center"
                 >
-                  <div className="relative z-10 w-[76px] h-[76px] rounded-2xl bg-navy-900 flex items-center justify-center text-lemon-500 shadow-[0_10px_24px_rgba(27,35,64,0.25)] transition-transform duration-300 hover:scale-105 hover:-translate-y-1">
+                  <div className="marketing-step-icon relative z-10 w-[76px] h-[76px] rounded-2xl flex items-center justify-center">
                     <Icon size={28} strokeWidth={2} />
                   </div>
-                  <span className="mt-4 text-lemon-700 font-extrabold text-[12px] tracking-widest">
-                    STEP {s.n}
-                  </span>
-                  <h3 className="mt-1.5 text-[15px] font-extrabold text-navy-900">{s.title}</h3>
-                  <p className="mt-2 text-[13px] text-secondary-text leading-relaxed max-w-[240px]">
-                    {s.text}
-                  </p>
-                </div>
+                  <span className="mt-4 marketing-accent-label tracking-widest">STEP {s.n}</span>
+                  <h3 className="mt-1.5 text-[15px] font-extrabold marketing-section-heading">{s.title}</h3>
+                  <p className="mt-2 text-[13px] marketing-body-text leading-relaxed max-w-[240px]">{s.text}</p>
+                </AnimateInView>
               )
             })}
           </div>

@@ -1,3 +1,5 @@
+import { useLanguage } from '../i18n/LanguageProvider'
+
 interface FormFieldProps {
   label: string
   value: string
@@ -17,12 +19,13 @@ export function FormField({
   placeholder,
   hint,
 }: FormFieldProps) {
+  const { tx } = useLanguage()
   const baseClass =
     'w-full bg-white dark:bg-navy-50 border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 placeholder:text-secondary-text focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25 transition-all'
 
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-[12px] font-semibold text-navy-900">{label}</span>
+      <span className="text-[12px] font-semibold text-navy-900">{tx(label)}</span>
       {type === 'select' ? (
         <select
           value={value}
@@ -31,14 +34,14 @@ export function FormField({
         >
           {options.map((opt) => (
             <option key={opt} value={opt}>
-              {opt}
+              {tx(opt)}
             </option>
           ))}
         </select>
       ) : type === 'textarea' ? (
         <textarea
           value={value}
-          placeholder={placeholder}
+          placeholder={placeholder ? tx(placeholder) : undefined}
           rows={3}
           onChange={(e) => onChange(e.target.value)}
           className={`${baseClass} resize-y min-h-[72px]`}
@@ -47,12 +50,12 @@ export function FormField({
         <input
           type={type}
           value={value}
-          placeholder={placeholder}
+          placeholder={placeholder ? tx(placeholder) : undefined}
           onChange={(e) => onChange(e.target.value)}
           className={baseClass}
         />
       )}
-      {hint && <span className="text-[11px] text-secondary-text">{hint}</span>}
+      {hint && <span className="text-[11px] text-secondary-text">{tx(hint)}</span>}
     </label>
   )
 }

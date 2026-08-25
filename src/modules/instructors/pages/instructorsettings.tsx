@@ -1,12 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Bell, BookOpen, Building2, CalendarDays, GraduationCap, Lock, Mail, UserRound } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { Monogram } from '../../../shared/components/Monogram'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
-import { useLocalStorageState } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
 import { GlassCard } from '../../../shared/layout/GlassCard'
+import { mergePortalSettings } from '../../../shared/storage/settingsUtils'
 import { SettingsSection } from '../../institution/components/settings/SettingsSection'
 import { SettingField } from '../../institution/components/settings/SettingField'
 import { ToggleRow } from '../../institution/components/settings/ToggleRow'
@@ -58,11 +59,23 @@ export function InstructorSettingsPage() {
   const { notify } = useToast()
   const { data, isLoading, isError } = useInstructorDashboard()
   const sessionPerson = getSessionPerson()
-  const [stored, setStored] = useLocalStorageState<InstructorSettingsState>(
-    'berana:instructor-settings',
-    defaultSettings(sessionPerson ?? undefined),
+  const defaults = useMemo(
+    () => defaultSettings(sessionPerson ?? undefined),
+    [sessionPerson],
   )
-  const [draft, setDraft] = useState(stored)
+  const [storedRaw, setStored] = useApiCollection<InstructorSettingsState>(
+    'berana:instructor-settings',
+    defaults,
+  )
+  const stored = useMemo(
+    () => mergePortalSettings(defaults, storedRaw),
+    [defaults, storedRaw],
+  )
+  const [draft, setDraft] = useState<InstructorSettingsState>(stored)
+
+  useEffect(() => {
+    setDraft(stored)
+  }, [stored])
 
   const hasChanges = useMemo(() => JSON.stringify(draft) !== JSON.stringify(stored), [draft, stored])
 

@@ -1,0 +1,2527 @@
+{
+  "collections": {
+    "campuses": [
+      {
+        "id": "c1",
+        "name": "Main Campus — Addis Ababa",
+        "code": "MAIN",
+        "address": "Bole Sub-city, Addis Ababa, Ethiopia",
+        "subtitle": "Flagship campus · Established 2011",
+        "status": "active"
+      },
+      {
+        "id": "c2",
+        "name": "Bole Campus",
+        "code": "BOLE",
+        "address": "Bole Road, Addis Ababa, Ethiopia",
+        "subtitle": "Extension campus · Health & social sciences",
+        "status": "active"
+      },
+      {
+        "id": "c3",
+        "name": "Adama Campus",
+        "code": "ADAMA",
+        "address": "Adama, Oromia Region, Ethiopia",
+        "subtitle": "Regional extension campus · Arts & humanities",
+        "status": "active"
+      },
+      {
+        "id": "c4",
+        "name": "Hawassa Campus",
+        "code": "HAWASSA",
+        "address": "Hawassa, Sidama Region, Ethiopia",
+        "subtitle": "Southern regional campus · Opening soon",
+        "status": "pending"
+      }
+    ],
+    "colleges": [
+      {
+        "id": "col1",
+        "name": "College of Computing & IT",
+        "deanName": "Dr. Aaron Selassie",
+        "campusId": "c1",
+        "description": "Computing, software and information systems"
+      },
+      {
+        "id": "col2",
+        "name": "College of Business",
+        "deanName": "Dr. Martha Bekele",
+        "campusId": "c1",
+        "description": "Business, management and finance"
+      },
+      {
+        "id": "col3",
+        "name": "College of Engineering",
+        "deanName": "Prof. Elias Hailu",
+        "campusId": "c1",
+        "description": "Engineering and applied technology"
+      },
+      {
+        "id": "col4",
+        "name": "College of Health & Social Sciences",
+        "deanName": "Dr. Tigist Assefa",
+        "campusId": "c2",
+        "description": "Health sciences and social studies"
+      },
+      {
+        "id": "col5",
+        "name": "College of Arts & Humanities",
+        "deanName": "Wzro. Sara Girma",
+        "campusId": "c3",
+        "description": "Languages, arts and cultural studies"
+      }
+    ],
+    "departments": [
+      {
+        "id": "d1",
+        "name": "Computer Science",
+        "headName": "Dr. Aaron Selassie",
+        "studentsCount": 420,
+        "facultyCount": 22,
+        "icon": "",
+        "campusId": "c1",
+        "collegeId": "col1"
+      },
+      {
+        "id": "d2",
+        "name": "Software Engineering",
+        "headName": "Prof. Elias Hailu",
+        "studentsCount": 280,
+        "facultyCount": 14,
+        "icon": "",
+        "campusId": "c1",
+        "collegeId": "col1"
+      },
+      {
+        "id": "d3",
+        "name": "Information Technology",
+        "headName": "Wzro. Kidist Yohannes",
+        "studentsCount": 140,
+        "facultyCount": 8,
+        "icon": "",
+        "campusId": "c1",
+        "collegeId": "col1"
+      },
+      {
+        "id": "d4",
+        "name": "Business Administration",
+        "headName": "Dr. Martha Bekele",
+        "studentsCount": 380,
+        "facultyCount": 20,
+        "icon": "",
+        "campusId": "c1",
+        "collegeId": "col2"
+      },
+      {
+        "id": "d5",
+        "name": "Accounting & Finance",
+        "headName": "Dr. Samuel Tadesse",
+        "studentsCount": 240,
+        "facultyCount": 15,
+        "icon": "",
+        "campusId": "c1",
+        "collegeId": "col2"
+      },
+      {
+        "id": "d6",
+        "name": "Civil Engineering",
+        "headName": "Prof. Elias Hailu",
+        "studentsCount": 210,
+        "facultyCount": 18,
+        "icon": "",
+        "campusId": "c1",
+        "collegeId": "col3"
+      },
+      {
+        "id": "d7",
+        "name": "Electrical Engineering",
+        "headName": "Eng. Hana Bekele",
+        "studentsCount": 200,
+        "facultyCount": 20,
+        "icon": "",
+        "campusId": "c1",
+        "collegeId": "col3"
+      },
+      {
+        "id": "d8",
+        "name": "Sociology",
+        "headName": "Dr. Tigist Assefa",
+        "studentsCount": 120,
+        "facultyCount": 14,
+        "icon": "",
+        "campusId": "c2",
+        "collegeId": "col4"
+      },
+      {
+        "id": "d9",
+        "name": "Nursing",
+        "headName": "Dr. Meron Tesfaye",
+        "studentsCount": 196,
+        "facultyCount": 16,
+        "icon": "",
+        "campusId": "c2",
+        "collegeId": "col4"
+      },
+      {
+        "id": "d10",
+        "name": "English Literature",
+        "headName": "Wzro. Sara Girma",
+        "studentsCount": 148,
+        "facultyCount": 12,
+        "icon": "",
+        "campusId": "c3",
+        "collegeId": "col5"
+      }
+    ],
+    "people": [
+      {
+        "id": "u-demo-amina",
+        "name": "Amina Lemma",
+        "email": "amina.lemma@student.berana.edu",
+        "role": "Student",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "30 min ago",
+        "initials": "AL",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u1",
+        "name": "Selam Girma",
+        "email": "selam.girma@berana.edu",
+        "role": "Student",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "2 hours ago",
+        "initials": "SG"
+      },
+      {
+        "id": "u2",
+        "name": "Dr. Aaron Selassie",
+        "email": "a.selassie@berana.edu",
+        "role": "Instructor",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "10 min ago",
+        "initials": "AS"
+      },
+      {
+        "id": "u3",
+        "name": "Martha Bekele",
+        "email": "m.bekele@berana.edu",
+        "role": "Admin",
+        "department": "Business Administration",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "1 day ago",
+        "initials": "MB"
+      },
+      {
+        "id": "u4",
+        "name": "Yonas Tadesse",
+        "email": "yonas.t@gmail.com",
+        "role": "Guardian",
+        "department": "Selam Girma",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "3 days ago",
+        "initials": "YT"
+      },
+      {
+        "id": "u5",
+        "name": "Hanna Wolde",
+        "email": "hanna.wolde@berana.edu",
+        "role": "Student",
+        "department": "Engineering & Technology",
+        "campusId": "c1",
+        "status": "invited",
+        "lastActive": "Never",
+        "initials": "HW"
+      },
+      {
+        "id": "u6",
+        "name": "Prof. Elias Hailu",
+        "email": "e.hailu@berana.edu",
+        "role": "Instructor",
+        "department": "Engineering & Technology",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "5 hours ago",
+        "initials": "EH"
+      },
+      {
+        "id": "u7",
+        "name": "Kidist Yohannes",
+        "email": "k.yohannes@berana.edu",
+        "role": "Staff",
+        "department": "Registrar Office",
+        "campusId": "c1",
+        "isDepartmentHead": true,
+        "status": "active",
+        "lastActive": "Yesterday",
+        "initials": "KY"
+      },
+      {
+        "id": "u8",
+        "name": "Dawit Mekonnen",
+        "email": "dawit.m@berana.edu",
+        "role": "Student",
+        "department": "Business Administration",
+        "campusId": "c1",
+        "status": "suspended",
+        "lastActive": "2 weeks ago",
+        "initials": "DM"
+      },
+      {
+        "id": "u9",
+        "name": "Tigist Assefa",
+        "email": "t.assefa@berana.edu",
+        "role": "Instructor",
+        "department": "Social Sciences",
+        "campusId": "c2",
+        "status": "active",
+        "lastActive": "2 hours ago",
+        "initials": "TA"
+      },
+      {
+        "id": "u10",
+        "name": "Bruk Alemu",
+        "email": "bruk.alemu@berana.edu",
+        "role": "Student",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "30 min ago",
+        "initials": "BA"
+      },
+      {
+        "id": "u11",
+        "name": "Helen Desta",
+        "email": "h.desta@berana.edu",
+        "role": "Staff",
+        "department": "Finance Office",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "4 hours ago",
+        "initials": "HD"
+      },
+      {
+        "id": "u12",
+        "name": "Samuel Gebre",
+        "email": "samuel.g@gmail.com",
+        "role": "Guardian",
+        "department": "Bruk Alemu",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "Yesterday",
+        "initials": "SG"
+      },
+      {
+        "id": "u13",
+        "name": "Aster Tesfaye",
+        "email": "a.tesfaye@berana.edu",
+        "role": "Admin",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "6 hours ago",
+        "initials": "AT"
+      },
+      {
+        "id": "u14",
+        "name": "Mekdes Haile",
+        "email": "m.haile@berana.edu",
+        "role": "HelpDesk",
+        "department": "IT Support",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "1 hour ago",
+        "initials": "MH"
+      },
+      {
+        "id": "u19",
+        "name": "Solomon Bekele",
+        "email": "s.bekele@berana.edu",
+        "role": "HelpDesk",
+        "department": "IT Support",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "30 min ago",
+        "initials": "SB"
+      },
+      {
+        "id": "u15",
+        "name": "Liya Haile",
+        "email": "liya.haile@gmail.com",
+        "role": "Student",
+        "department": "Social Sciences",
+        "campusId": "c2",
+        "verificationStatus": "pending",
+        "addedByRole": "Staff",
+        "submittedAt": "2 hours ago",
+        "submittedByName": "Kidist Yohannes",
+        "status": "invited",
+        "lastActive": "Never",
+        "initials": "LH"
+      },
+      {
+        "id": "u16",
+        "name": "Daniel Tadesse",
+        "email": "daniel.tadesse@gmail.com",
+        "role": "Guardian",
+        "department": "Hanna Wolde",
+        "campusId": "c1",
+        "verificationStatus": "pending",
+        "addedByRole": "Staff",
+        "submittedAt": "Yesterday",
+        "submittedByName": "Helen Desta",
+        "status": "invited",
+        "lastActive": "Never",
+        "initials": "DT"
+      },
+      {
+        "id": "u18",
+        "name": "Tomas Bekele",
+        "email": "tomas.bekele@berana.edu",
+        "role": "Student",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "3 hours ago",
+        "initials": "TB",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u17",
+        "name": "Sara Negash",
+        "email": "sara.negash@berana.edu",
+        "role": "Student",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "1 hour ago",
+        "initials": "SN",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u21",
+        "name": "Bethlehem Kebede",
+        "email": "b.kebede@student.berana.edu",
+        "role": "Student",
+        "department": "Engineering & Technology",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "4 hours ago",
+        "initials": "BK",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u22",
+        "name": "Dr. Yared Mulugeta",
+        "email": "y.mulugeta@berana.edu",
+        "role": "Instructor",
+        "department": "Computer Science & IT",
+        "campusId": "c2",
+        "status": "active",
+        "lastActive": "20 min ago",
+        "initials": "YM"
+      },
+      {
+        "id": "u23",
+        "name": "Getachew Nega",
+        "email": "g.nega@berana.edu",
+        "role": "Staff",
+        "department": "Registrar Office",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "Today",
+        "initials": "GN"
+      },
+      {
+        "id": "u24",
+        "name": "Hana Fikru",
+        "email": "h.fikru@berana.edu",
+        "role": "HelpDesk",
+        "department": "IT Support",
+        "campusId": "c2",
+        "status": "active",
+        "lastActive": "15 min ago",
+        "initials": "HF"
+      },
+      {
+        "id": "u25",
+        "name": "Abel Worku",
+        "email": "a.worku@berana.edu",
+        "role": "Admin",
+        "department": "Engineering & Technology",
+        "campusId": "c2",
+        "status": "active",
+        "lastActive": "8 hours ago",
+        "initials": "AW"
+      },
+      {
+        "id": "u26",
+        "name": "Meseret Alemu",
+        "email": "meseret.alemu@gmail.com",
+        "role": "Guardian",
+        "department": "Amina Lemma",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "5 hours ago",
+        "initials": "MA"
+      }
+    ],
+    "courses": [
+      {
+        "id": "demo-cyber-101",
+        "code": "CYB-101",
+        "title": "Introduction to Cybersecurity",
+        "instructor": "Dr. Aaron Selassie",
+        "instructorId": "u2",
+        "department": "Computer Science",
+        "level": "Undergraduate",
+        "enrolledCount": 3,
+        "moduleCount": 3,
+        "status": "published",
+        "progressPercent": 100,
+        "icon": "🛡️",
+        "approvalStatus": "approved",
+        "shortDescription": "Learn core cybersecurity concepts through readings, videos, and hands-on checks.",
+        "description": "A complete starter course covering the CIA triad, network security fundamentals, and everyday defensive practices. Use this course to test enrollment, lesson progress, and the student learning experience.",
+        "credits": 3,
+        "durationWeeks": 8,
+        "deliveryMode": "Self-paced",
+        "language": "English",
+        "prerequisites": "Basic computer literacy",
+        "learningOutcomes": "Explain the CIA triad\nIdentify common cyber threats\nDescribe firewall and HTTPS basics\nApply password and MFA best practices\nOutline an incident response workflow",
+        "tags": [
+          "cybersecurity",
+          "demo",
+          "self-paced"
+        ],
+        "allowSelfEnrollment": false,
+        "certificateEnabled": true,
+        "discussionForumEnabled": true,
+        "visibility": "private",
+        "startDate": "2026-01-15",
+        "endDate": "2026-05-30",
+        "modules": [
+          {
+            "id": "demo-mod-1",
+            "title": "Foundations of Cybersecurity",
+            "description": "Core concepts every security professional should know.",
+            "lessons": [
+              {
+                "id": "demo-les-1-1",
+                "title": "What is Cybersecurity?",
+                "type": "reading",
+                "durationMinutes": 10,
+                "description": "Cybersecurity is the practice of protecting systems, networks, programs, and data from digital attacks.\n\nThese attacks often aim to access, change, or destroy sensitive information, extort money from users, or interrupt normal business processes.\n\n**Why it matters**\n- Organizations store personal, financial, and health data online.\n- A single breach can damage trust, finances, and operations.\n- Security is everyone's responsibility—not only IT teams.\n\n**Key takeaway:** Cybersecurity is proactive defense, not just reacting after an incident."
+              },
+              {
+                "id": "demo-les-1-2",
+                "title": "The CIA Triad Explained",
+                "type": "video",
+                "durationMinutes": 12,
+                "description": "Watch this short overview of Confidentiality, Integrity, and Availability—the three pillars of information security."
+              },
+              {
+                "id": "demo-les-1-3",
+                "title": "Common Threat Landscape",
+                "type": "reading",
+                "durationMinutes": 15,
+                "description": "Modern organizations face a wide range of threats:\n\n**Malware** — Software designed to harm or exploit systems (viruses, ransomware, spyware).\n\n**Phishing** — Fraudulent messages that trick users into revealing credentials or installing malware.\n\n**Social engineering** — Manipulating people into breaking security procedures.\n\n**Insider threats** — Risk from employees, contractors, or partners with legitimate access.\n\n**Denial of Service (DoS)** — Overwhelming a service so legitimate users cannot access it.\n\nUnderstanding these categories helps you prioritize controls and training."
+              }
+            ]
+          },
+          {
+            "id": "demo-mod-2",
+            "title": "Network Security Basics",
+            "description": "How data moves safely across networks.",
+            "lessons": [
+              {
+                "id": "demo-les-2-1",
+                "title": "Firewalls and Network Perimeters",
+                "type": "reading",
+                "durationMinutes": 12,
+                "description": "A **firewall** inspects incoming and outgoing traffic and applies rules to allow or block packets.\n\n**Types**\n- **Network firewalls** — Protect entire subnets at the edge.\n- **Host firewalls** — Run on individual devices.\n\n**Defense in depth:** Firewalls are one layer. Combine them with segmentation, monitoring, and patching for stronger protection."
+              },
+              {
+                "id": "demo-les-2-2",
+                "title": "How HTTPS Works",
+                "type": "video",
+                "durationMinutes": 14,
+                "description": "Learn how TLS encrypts web traffic so attackers cannot easily read or modify data in transit."
+              },
+              {
+                "id": "demo-les-2-3",
+                "title": "Network Security Check",
+                "type": "quiz",
+                "durationMinutes": 8,
+                "description": "Answer the questions below to check your understanding of network security basics.",
+                "questions": [
+                  {
+                    "id": "demo-q-2-3-1",
+                    "prompt": "Which layer primarily filters traffic between trusted and untrusted networks?",
+                    "type": "multiple-choice",
+                    "options": [
+                      "Firewall",
+                      "Antivirus",
+                      "Backup drive"
+                    ],
+                    "correctIndex": 0,
+                    "explanation": "Firewalls inspect and filter network traffic at the network perimeter."
+                  },
+                  {
+                    "id": "demo-q-2-3-2",
+                    "prompt": "What does HTTPS add on top of HTTP?",
+                    "type": "multiple-choice",
+                    "options": [
+                      "Faster downloads",
+                      "Encryption and authentication",
+                      "Unlimited storage"
+                    ],
+                    "correctIndex": 1,
+                    "explanation": "HTTPS uses TLS to encrypt data in transit and verify the server identity."
+                  },
+                  {
+                    "id": "demo-q-2-3-3",
+                    "prompt": "Phishing attacks most often target:",
+                    "type": "multiple-choice",
+                    "options": [
+                      "Hardware cooling systems",
+                      "Human judgment and credentials",
+                      "Printer paper trays"
+                    ],
+                    "correctIndex": 1,
+                    "explanation": "Phishing relies on social engineering to trick people into revealing secrets."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "demo-mod-3",
+            "title": "Defensive Practices",
+            "description": "Everyday habits that reduce risk.",
+            "lessons": [
+              {
+                "id": "demo-les-3-1",
+                "title": "Password Hygiene & MFA",
+                "type": "reading",
+                "durationMinutes": 10,
+                "description": "Strong authentication reduces account takeover risk.\n\n**Password hygiene**\n- Use long, unique passwords for each account.\n- Prefer a password manager over reused passwords.\n- Never share credentials in chat or email.\n\n**Multi-factor authentication (MFA)**\n- Combines something you know (password) with something you have (phone/app) or something you are (biometric).\n- Even if a password leaks, MFA often blocks unauthorized access.\n\nEnable MFA on email, banking, and work accounts first."
+              },
+              {
+                "id": "demo-les-3-2",
+                "title": "Security Audit Worksheet",
+                "type": "assignment",
+                "durationMinutes": 20,
+                "description": "Complete the prompts below based on your personal or lab environment. Confirm each response when finished.",
+                "questions": [
+                  {
+                    "id": "demo-a-3-2-1",
+                    "prompt": "List three accounts where MFA is enabled.",
+                    "type": "short-answer",
+                    "sampleAnswer": "Example: work email (Microsoft Authenticator), banking app, GitHub."
+                  },
+                  {
+                    "id": "demo-a-3-2-2",
+                    "prompt": "Name two accounts that still need MFA and why they matter.",
+                    "type": "short-answer",
+                    "sampleAnswer": "Example: personal email (password resets), cloud storage (sensitive files)."
+                  },
+                  {
+                    "id": "demo-a-3-2-3",
+                    "prompt": "Identify one software package that should be updated and why.",
+                    "type": "short-answer",
+                    "sampleAnswer": "Example: web browser — outdated versions may lack security patches for known exploits."
+                  }
+                ]
+              },
+              {
+                "id": "demo-les-3-3",
+                "title": "Incident Response Overview",
+                "type": "reading",
+                "durationMinutes": 12,
+                "description": "When a security incident occurs, a structured response limits damage.\n\n**Typical phases**\n1. **Preparation** — Policies, contacts, and tools ready before an incident.\n2. **Detection & analysis** — Identify and scope the issue.\n3. **Containment** — Isolate affected systems to prevent spread.\n4. **Eradication & recovery** — Remove the threat and restore services.\n5. **Post-incident review** — Document lessons learned and improve controls.\n\nCongratulations—you have reached the final lesson of this demo course!"
+              }
+            ]
+          }
+        ],
+        "videos": [
+          {
+            "id": "demo-vid-cia",
+            "title": "The CIA Triad Explained",
+            "url": "https://www.youtube.com/embed/inWWhr5tnEA",
+            "durationMinutes": 12,
+            "moduleId": "demo-mod-1",
+            "description": "Confidentiality, Integrity, and Availability in practice."
+          },
+          {
+            "id": "demo-vid-https",
+            "title": "How HTTPS Works",
+            "url": "https://www.youtube.com/embed/ArqcBh206Wo",
+            "durationMinutes": 14,
+            "moduleId": "demo-mod-2",
+            "description": "TLS handshake and certificate basics."
+          }
+        ],
+        "resources": [
+          {
+            "id": "demo-res-syllabus",
+            "title": "Course Syllabus (PDF)",
+            "type": "document",
+            "url": "#",
+            "fileName": "CYB-101-syllabus.pdf",
+            "description": "Weekly outline and grading policy."
+          },
+          {
+            "id": "demo-res-cheatsheet",
+            "title": "Security Terminology Cheatsheet",
+            "type": "worksheet",
+            "url": "#",
+            "fileName": "security-terms.pdf",
+            "description": "Quick reference for key terms used in this course."
+          }
+        ],
+        "gradingPolicy": "Readings & videos 40% · Quizzes 25% · Assignment 20% · Participation 15%"
+      },
+      {
+        "id": "c1",
+        "code": "CS-201",
+        "title": "Data Structures & Algorithms",
+        "instructor": "Dr. Aaron Selassie",
+        "department": "Computer Science",
+        "level": "Undergraduate",
+        "enrolledCount": 4,
+        "moduleCount": 12,
+        "status": "published",
+        "progressPercent": 100,
+        "icon": "🧮",
+        "approvalStatus": "approved",
+        "instructorId": "u2",
+        "discussionForumEnabled": true,
+        "allowSelfEnrollment": false,
+        "certificateEnabled": true,
+        "visibility": "private"
+      },
+      {
+        "id": "c2",
+        "code": "CS-340",
+        "title": "Machine Learning Foundations",
+        "instructor": "Prof. Elias Hailu",
+        "department": "Unassigned",
+        "level": "Postgraduate",
+        "enrolledCount": 3,
+        "moduleCount": 10,
+        "status": "published",
+        "progressPercent": 100,
+        "icon": "🤖",
+        "approvalStatus": "approved",
+        "instructorId": "u6",
+        "discussionForumEnabled": true,
+        "allowSelfEnrollment": false,
+        "certificateEnabled": true,
+        "visibility": "private"
+      },
+      {
+        "id": "c3",
+        "code": "BUS-110",
+        "title": "Principles of Management",
+        "instructor": "Dr. Martha Bekele",
+        "department": "Business Administration",
+        "level": "Undergraduate",
+        "enrolledCount": 1,
+        "moduleCount": 8,
+        "status": "published",
+        "progressPercent": 100,
+        "icon": "📈",
+        "approvalStatus": "approved",
+        "instructorId": "u3",
+        "discussionForumEnabled": true,
+        "allowSelfEnrollment": false,
+        "certificateEnabled": true,
+        "visibility": "private"
+      },
+      {
+        "id": "c4",
+        "code": "CYB-501",
+        "title": "Network Security & Defense",
+        "instructor": "Wzro. Kidist Yohannes",
+        "department": "Unassigned",
+        "level": "Certificate",
+        "enrolledCount": 1,
+        "moduleCount": 6,
+        "status": "published",
+        "progressPercent": 100,
+        "icon": "🛡️",
+        "approvalStatus": "approved",
+        "instructorId": "u7",
+        "discussionForumEnabled": true,
+        "allowSelfEnrollment": false,
+        "certificateEnabled": true,
+        "visibility": "private"
+      }
+    ],
+    "enrollments": [
+      {
+        "id": "enr-mt489y4e-r3jv4",
+        "studentId": "u-demo-amina",
+        "studentName": "Amina Lemma",
+        "courseId": "demo-cyber-101",
+        "courseCode": "CYB-101",
+        "courseTitle": "Introduction to Cybersecurity",
+        "program": "Undergraduate",
+        "campus": "Main Campus — Addis Ababa",
+        "enrolledOn": "2026-01-10",
+        "status": "active",
+        "progress": 18
+      },
+      {
+        "id": "enr-mt489y4e-m4ppj",
+        "studentId": "u1",
+        "studentName": "Selam Girma",
+        "courseId": "demo-cyber-101",
+        "courseCode": "CYB-101",
+        "courseTitle": "Introduction to Cybersecurity",
+        "program": "Undergraduate",
+        "campus": "Main Campus — Addis Ababa",
+        "enrolledOn": "2026-01-10",
+        "status": "active",
+        "progress": 24
+      },
+      {
+        "id": "enr-mt489y4e-azm53",
+        "studentId": "u10",
+        "studentName": "Bruk Alemu",
+        "courseId": "demo-cyber-101",
+        "courseCode": "CYB-101",
+        "courseTitle": "Introduction to Cybersecurity",
+        "program": "Undergraduate",
+        "campus": "Main Campus — Addis Ababa",
+        "enrolledOn": "2026-01-10",
+        "status": "active",
+        "progress": 12
+      },
+      {
+        "id": "enr-mt489y4e-ocxnx",
+        "studentId": "u-demo-amina",
+        "studentName": "Amina Lemma",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "program": "Undergraduate",
+        "campus": "Main Campus — Addis Ababa",
+        "enrolledOn": "2026-01-10",
+        "status": "active",
+        "progress": 42
+      },
+      {
+        "id": "enr-mt489y4e-pl8po",
+        "studentId": "u1",
+        "studentName": "Selam Girma",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "program": "Undergraduate",
+        "campus": "Main Campus — Addis Ababa",
+        "enrolledOn": "2026-01-10",
+        "status": "active",
+        "progress": 55
+      },
+      {
+        "id": "enr-mt489y4e-24p1i",
+        "studentId": "u10",
+        "studentName": "Bruk Alemu",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "program": "Undergraduate",
+        "campus": "Main Campus — Addis Ababa",
+        "enrolledOn": "2026-01-10",
+        "status": "active",
+        "progress": 38
+      },
+      {
+        "id": "enr-mt489y4e-2k73w",
+        "studentId": "u17",
+        "studentName": "Sara Negash",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "program": "Undergraduate",
+        "campus": "Main Campus — Addis Ababa",
+        "enrolledOn": "2026-01-10",
+        "status": "active",
+        "progress": 61
+      },
+      {
+        "id": "enr-mt489y4e-9fbvv",
+        "studentId": "u-demo-amina",
+        "studentName": "Amina Lemma",
+        "courseId": "c2",
+        "courseCode": "CS-340",
+        "courseTitle": "Machine Learning Foundations",
+        "program": "Undergraduate",
+        "campus": "Main Campus — Addis Ababa",
+        "enrolledOn": "2026-01-10",
+        "status": "active",
+        "progress": 20
+      },
+      {
+        "id": "enr-mt489y4e-rr2rp",
+        "studentId": "u17",
+        "studentName": "Sara Negash",
+        "courseId": "c2",
+        "courseCode": "CS-340",
+        "courseTitle": "Machine Learning Foundations",
+        "program": "Undergraduate",
+        "campus": "Main Campus — Addis Ababa",
+        "enrolledOn": "2026-01-10",
+        "status": "active",
+        "progress": 33
+      },
+      {
+        "id": "enr-mt489y4e-i8uej",
+        "studentId": "u18",
+        "studentName": "Tomas Bekele",
+        "courseId": "c2",
+        "courseCode": "CS-340",
+        "courseTitle": "Machine Learning Foundations",
+        "program": "Undergraduate",
+        "campus": "Main Campus — Addis Ababa",
+        "enrolledOn": "2026-01-10",
+        "status": "active",
+        "progress": 15
+      },
+      {
+        "id": "enr-mt489y4e-29owv",
+        "studentId": "u10",
+        "studentName": "Bruk Alemu",
+        "courseId": "c3",
+        "courseCode": "BUS-110",
+        "courseTitle": "Principles of Management",
+        "program": "Undergraduate",
+        "campus": "Main Campus — Addis Ababa",
+        "enrolledOn": "2026-01-10",
+        "status": "active",
+        "progress": 48
+      },
+      {
+        "id": "enr-mt489y4e-gljmm",
+        "studentId": "u18",
+        "studentName": "Tomas Bekele",
+        "courseId": "c4",
+        "courseCode": "CYB-501",
+        "courseTitle": "Network Security & Defense",
+        "program": "Undergraduate",
+        "campus": "Main Campus — Addis Ababa",
+        "enrolledOn": "2026-01-10",
+        "status": "active",
+        "progress": 8
+      }
+    ],
+    "certificates": [
+      {
+        "id": "cert-1",
+        "certificateId": "BER-CERT-2025-00142",
+        "studentId": "u1",
+        "studentName": "Selam Girma",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "completionDate": "2025-06-12",
+        "issueDate": "2025-06-15",
+        "templateId": "tpl-standard",
+        "templateName": "Standard Completion Certificate",
+        "status": "issued"
+      },
+      {
+        "id": "cert-2",
+        "certificateId": "BER-CERT-2025-00138",
+        "studentId": "u1",
+        "studentName": "Selam Girma",
+        "courseId": "c4",
+        "courseCode": "CYB-501",
+        "courseTitle": "Network Security & Defense",
+        "instructorId": "u7",
+        "instructorName": "Kidist Yohannes",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "completionDate": "2025-05-28",
+        "issueDate": "2025-06-01",
+        "expirationDate": "2027-06-01",
+        "templateId": "tpl-professional",
+        "templateName": "Professional Certificate",
+        "status": "issued"
+      },
+      {
+        "id": "cert-3",
+        "certificateId": "BER-CERT-2025-00201",
+        "studentId": "u5",
+        "studentName": "Hanna Wolde",
+        "courseId": "c3",
+        "courseCode": "BUS-110",
+        "courseTitle": "Principles of Management",
+        "instructorId": "u3",
+        "instructorName": "Dr. Martha Bekele",
+        "department": "Engineering & Technology",
+        "campusId": "c1",
+        "completionDate": "2025-07-20",
+        "templateId": "tpl-standard",
+        "templateName": "Standard Completion Certificate",
+        "status": "pending"
+      },
+      {
+        "id": "cert-4",
+        "certificateId": "BER-CERT-2024-00987",
+        "studentId": "u8",
+        "studentName": "Daniel Mekonnen",
+        "courseId": "c2",
+        "courseCode": "CS-340",
+        "courseTitle": "Machine Learning Foundations",
+        "instructorId": "u6",
+        "instructorName": "Prof. Elias Hailu",
+        "department": "Engineering & Technology",
+        "campusId": "c1",
+        "completionDate": "2024-11-30",
+        "issueDate": "2024-12-05",
+        "templateId": "tpl-excellence",
+        "templateName": "Course Excellence Award",
+        "status": "revoked",
+        "revokedAt": "2025-02-14"
+      },
+      {
+        "id": "cert-5",
+        "certificateId": "BER-CERT-2025-00155",
+        "studentId": "u9",
+        "studentName": "Meron Assefa",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "completionDate": "2025-08-01",
+        "issueDate": "2025-08-04",
+        "templateId": "tpl-ce",
+        "templateName": "Continuing Education Certificate",
+        "status": "issued"
+      }
+    ],
+    "attendances": [
+      {
+        "id": "att-1",
+        "studentId": "u1",
+        "studentName": "Selam Girma",
+        "studentEmail": "selam@example.com",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "history": [
+          {
+            "date": "2026-06-06",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-13",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-20",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-27",
+            "status": "late"
+          },
+          {
+            "date": "2026-07-04",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-11",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-18",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-25",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-01",
+            "status": "late"
+          },
+          {
+            "date": "2026-08-08",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-15",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-22",
+            "status": "present"
+          }
+        ],
+        "present": 10,
+        "absent": 0,
+        "late": 2,
+        "excused": 0,
+        "totalSessions": 12,
+        "attendancePercent": 100,
+        "riskLevel": "good",
+        "lastSessionDate": "2026-08-22"
+      },
+      {
+        "id": "att-2",
+        "studentId": "u1",
+        "studentName": "Selam Girma",
+        "studentEmail": "selam@example.com",
+        "courseId": "c4",
+        "courseCode": "CYB-501",
+        "courseTitle": "Network Security & Defense",
+        "instructorId": "u7",
+        "instructorName": "Kidist Yohannes",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "history": [
+          {
+            "date": "2026-06-06",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-13",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-20",
+            "status": "absent"
+          },
+          {
+            "date": "2026-06-27",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-04",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-11",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-18",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-25",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-01",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-08",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-15",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-22",
+            "status": "late"
+          }
+        ],
+        "present": 9,
+        "absent": 2,
+        "late": 1,
+        "excused": 0,
+        "totalSessions": 12,
+        "attendancePercent": 83,
+        "riskLevel": "good",
+        "lastSessionDate": "2026-08-22"
+      },
+      {
+        "id": "att-3",
+        "studentId": "u5",
+        "studentName": "Hanna Wolde",
+        "studentEmail": "hanna@example.com",
+        "courseId": "c3",
+        "courseCode": "BUS-110",
+        "courseTitle": "Principles of Management",
+        "instructorId": "u3",
+        "instructorName": "Dr. Martha Bekele",
+        "department": "Business & Management",
+        "campusId": "c1",
+        "history": [
+          {
+            "date": "2026-06-06",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-13",
+            "status": "absent"
+          },
+          {
+            "date": "2026-06-20",
+            "status": "absent"
+          },
+          {
+            "date": "2026-06-27",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-04",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-11",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-18",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-25",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-01",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-08",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-15",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-22",
+            "status": "absent"
+          }
+        ],
+        "present": 5,
+        "absent": 7,
+        "late": 0,
+        "excused": 0,
+        "totalSessions": 12,
+        "attendancePercent": 42,
+        "riskLevel": "at-risk",
+        "lastSessionDate": "2026-08-22"
+      },
+      {
+        "id": "att-4",
+        "studentId": "u8",
+        "studentName": "Daniel Mekonnen",
+        "studentEmail": "daniel@example.com",
+        "courseId": "c2",
+        "courseCode": "CS-340",
+        "courseTitle": "Machine Learning Foundations",
+        "instructorId": "u6",
+        "instructorName": "Prof. Elias Hailu",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "history": [
+          {
+            "date": "2026-06-06",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-13",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-20",
+            "status": "late"
+          },
+          {
+            "date": "2026-06-27",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-04",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-11",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-18",
+            "status": "late"
+          },
+          {
+            "date": "2026-07-25",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-01",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-08",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-15",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-22",
+            "status": "present"
+          }
+        ],
+        "present": 10,
+        "absent": 0,
+        "late": 2,
+        "excused": 0,
+        "totalSessions": 12,
+        "attendancePercent": 100,
+        "riskLevel": "good",
+        "lastSessionDate": "2026-08-22"
+      },
+      {
+        "id": "att-5",
+        "studentId": "u9",
+        "studentName": "Meron Assefa",
+        "studentEmail": "meron@example.com",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "history": [
+          {
+            "date": "2026-06-06",
+            "status": "absent"
+          },
+          {
+            "date": "2026-06-13",
+            "status": "absent"
+          },
+          {
+            "date": "2026-06-20",
+            "status": "absent"
+          },
+          {
+            "date": "2026-06-27",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-04",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-11",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-18",
+            "status": "late"
+          },
+          {
+            "date": "2026-07-25",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-01",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-08",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-15",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-22",
+            "status": "absent"
+          }
+        ],
+        "present": 2,
+        "absent": 9,
+        "late": 1,
+        "excused": 0,
+        "totalSessions": 12,
+        "attendancePercent": 25,
+        "riskLevel": "at-risk",
+        "lastSessionDate": "2026-08-22"
+      },
+      {
+        "id": "att-6",
+        "studentId": "u10",
+        "studentName": "Yonas Tadesse",
+        "studentEmail": "yonas@example.com",
+        "courseId": "c3",
+        "courseCode": "BUS-110",
+        "courseTitle": "Principles of Management",
+        "instructorId": "u3",
+        "instructorName": "Dr. Martha Bekele",
+        "department": "Business & Management",
+        "campusId": "c1",
+        "history": [
+          {
+            "date": "2026-06-06",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-13",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-20",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-27",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-04",
+            "status": "late"
+          },
+          {
+            "date": "2026-07-11",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-18",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-25",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-01",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-08",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-15",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-22",
+            "status": "present"
+          }
+        ],
+        "present": 11,
+        "absent": 0,
+        "late": 1,
+        "excused": 0,
+        "totalSessions": 12,
+        "attendancePercent": 100,
+        "riskLevel": "good",
+        "lastSessionDate": "2026-08-22"
+      },
+      {
+        "id": "att-7",
+        "studentId": "u11",
+        "studentName": "Tigist Bekele",
+        "studentEmail": "tigist@example.com",
+        "courseId": "c2",
+        "courseCode": "CS-340",
+        "courseTitle": "Machine Learning Foundations",
+        "instructorId": "u6",
+        "instructorName": "Prof. Elias Hailu",
+        "department": "Engineering & Technology",
+        "campusId": "c1",
+        "history": [
+          {
+            "date": "2026-06-06",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-13",
+            "status": "absent"
+          },
+          {
+            "date": "2026-06-20",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-27",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-04",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-11",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-18",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-25",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-01",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-08",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-15",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-22",
+            "status": "absent"
+          }
+        ],
+        "present": 7,
+        "absent": 5,
+        "late": 0,
+        "excused": 0,
+        "totalSessions": 12,
+        "attendancePercent": 58,
+        "riskLevel": "at-risk",
+        "lastSessionDate": "2026-08-22"
+      },
+      {
+        "id": "att-8",
+        "studentId": "u12",
+        "studentName": "Biruk Haile",
+        "studentEmail": "biruk@example.com",
+        "courseId": "c4",
+        "courseCode": "CYB-501",
+        "courseTitle": "Network Security & Defense",
+        "instructorId": "u7",
+        "instructorName": "Kidist Yohannes",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "history": [
+          {
+            "date": "2026-06-06",
+            "status": "absent"
+          },
+          {
+            "date": "2026-06-13",
+            "status": "absent"
+          },
+          {
+            "date": "2026-06-20",
+            "status": "late"
+          },
+          {
+            "date": "2026-06-27",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-04",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-11",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-18",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-25",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-01",
+            "status": "excused"
+          },
+          {
+            "date": "2026-08-08",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-15",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-22",
+            "status": "absent"
+          }
+        ],
+        "present": 1,
+        "absent": 9,
+        "late": 1,
+        "excused": 1,
+        "totalSessions": 12,
+        "attendancePercent": 17,
+        "riskLevel": "at-risk",
+        "lastSessionDate": "2026-08-22"
+      },
+      {
+        "id": "att-9",
+        "studentId": "u13",
+        "studentName": "Rahel Solomon",
+        "studentEmail": "rahel@example.com",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "history": [
+          {
+            "date": "2026-06-06",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-13",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-20",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-27",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-04",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-11",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-18",
+            "status": "late"
+          },
+          {
+            "date": "2026-07-25",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-01",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-08",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-15",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-22",
+            "status": "present"
+          }
+        ],
+        "present": 11,
+        "absent": 0,
+        "late": 1,
+        "excused": 0,
+        "totalSessions": 12,
+        "attendancePercent": 100,
+        "riskLevel": "good",
+        "lastSessionDate": "2026-08-22"
+      },
+      {
+        "id": "att-10",
+        "studentId": "u14",
+        "studentName": "Abel Tesfaye",
+        "studentEmail": "abel@example.com",
+        "courseId": "c3",
+        "courseCode": "BUS-110",
+        "courseTitle": "Principles of Management",
+        "instructorId": "u3",
+        "instructorName": "Dr. Martha Bekele",
+        "department": "Business & Management",
+        "campusId": "c1",
+        "history": [
+          {
+            "date": "2026-06-06",
+            "status": "excused"
+          },
+          {
+            "date": "2026-06-13",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-20",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-27",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-04",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-11",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-18",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-25",
+            "status": "late"
+          },
+          {
+            "date": "2026-08-01",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-08",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-15",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-22",
+            "status": "present"
+          }
+        ],
+        "present": 8,
+        "absent": 2,
+        "late": 1,
+        "excused": 1,
+        "totalSessions": 12,
+        "attendancePercent": 75,
+        "riskLevel": "warning",
+        "lastSessionDate": "2026-08-22"
+      },
+      {
+        "id": "att-11",
+        "studentId": "u15",
+        "studentName": "Fatuma Nuri",
+        "studentEmail": "fatuma@example.com",
+        "courseId": "c2",
+        "courseCode": "CS-340",
+        "courseTitle": "Machine Learning Foundations",
+        "instructorId": "u6",
+        "instructorName": "Prof. Elias Hailu",
+        "department": "Engineering & Technology",
+        "campusId": "c1",
+        "history": [
+          {
+            "date": "2026-06-06",
+            "status": "absent"
+          },
+          {
+            "date": "2026-06-13",
+            "status": "absent"
+          },
+          {
+            "date": "2026-06-20",
+            "status": "absent"
+          },
+          {
+            "date": "2026-06-27",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-04",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-11",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-18",
+            "status": "absent"
+          },
+          {
+            "date": "2026-07-25",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-01",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-08",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-15",
+            "status": "absent"
+          },
+          {
+            "date": "2026-08-22",
+            "status": "late"
+          }
+        ],
+        "present": 2,
+        "absent": 9,
+        "late": 1,
+        "excused": 0,
+        "totalSessions": 12,
+        "attendancePercent": 25,
+        "riskLevel": "at-risk",
+        "lastSessionDate": "2026-08-22"
+      },
+      {
+        "id": "att-12",
+        "studentId": "u16",
+        "studentName": "Dawit Alemu",
+        "studentEmail": "dawit@example.com",
+        "courseId": "c4",
+        "courseCode": "CYB-501",
+        "courseTitle": "Network Security & Defense",
+        "instructorId": "u7",
+        "instructorName": "Kidist Yohannes",
+        "department": "Computer Science & IT",
+        "campusId": "c1",
+        "history": [
+          {
+            "date": "2026-06-06",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-13",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-20",
+            "status": "present"
+          },
+          {
+            "date": "2026-06-27",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-04",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-11",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-18",
+            "status": "present"
+          },
+          {
+            "date": "2026-07-25",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-01",
+            "status": "late"
+          },
+          {
+            "date": "2026-08-08",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-15",
+            "status": "present"
+          },
+          {
+            "date": "2026-08-22",
+            "status": "present"
+          }
+        ],
+        "present": 11,
+        "absent": 0,
+        "late": 1,
+        "excused": 0,
+        "totalSessions": 12,
+        "attendancePercent": 100,
+        "riskLevel": "good",
+        "lastSessionDate": "2026-08-22"
+      }
+    ],
+    "settings": {
+      "general": {
+        "name": "Berana University",
+        "timezone": "(GMT+3) East Africa Time",
+        "language": "English",
+        "currency": "ETB — Ethiopian Birr"
+      },
+      "branding": {
+        "domain": "learn.berana.edu",
+        "sender": "no-reply@berana.edu",
+        "primary": "Lemon / Navy"
+      },
+      "academic": {
+        "grading": "Letter Grade (A–F)",
+        "attendance": "75% minimum",
+        "completion": "All modules + passing grade"
+      },
+      "modules": {
+        "virtualClassroom": true,
+        "attendance": true,
+        "assessments": true,
+        "payments": false,
+        "certificates": true,
+        "parentPortal": false
+      },
+      "integrations": {
+        "zoom": true,
+        "googleSso": true,
+        "microsoftSso": false,
+        "stripe": false,
+        "emailSms": true
+      }
+    },
+    "selectedCampus": "all",
+    "reports": [],
+    "lesson-progress": {},
+    "lesson-responses": {},
+    "announcements": [],
+    "forum-chats": [],
+    "forum-messages": [],
+    "forum-read-state": {},
+    "live-sessions": [
+      {
+        "id": "ls-1",
+        "title": "Binary Trees & Traversals — Live Lab",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "startAt": "2026-08-17T05:00:00.000Z",
+        "durationMinutes": 120,
+        "platform": "Zoom",
+        "meetingUrl": "https://zoom.us/j/demo-cs201",
+        "status": "live",
+        "attendees": 28
+      },
+      {
+        "id": "ls-2",
+        "title": "Gradient Descent Walkthrough",
+        "courseId": "c2",
+        "courseCode": "CS-340",
+        "courseTitle": "Machine Learning Foundations",
+        "instructorId": "u6",
+        "instructorName": "Prof. Elias Hailu",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "startAt": "2026-08-18T13:00:00.000Z",
+        "durationMinutes": 90,
+        "platform": "Google Meet",
+        "status": "upcoming"
+      },
+      {
+        "id": "ls-3",
+        "title": "Intro to Cybersecurity Threat Models",
+        "courseId": "demo-cyber-101",
+        "courseCode": "CYB-101",
+        "courseTitle": "Introduction to Cybersecurity",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "startAt": "2026-08-20T09:00:00.000Z",
+        "durationMinutes": 60,
+        "platform": "Zoom",
+        "status": "upcoming"
+      },
+      {
+        "id": "ls-4",
+        "title": "Sorting Algorithms Review Session",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "startAt": "2026-08-10T09:00:00.000Z",
+        "durationMinutes": 75,
+        "platform": "Zoom",
+        "status": "ended",
+        "attendees": 31
+      }
+    ],
+    "assignments": [
+      {
+        "id": "asg-1",
+        "title": "Implement AVL Tree Rotations",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "dueAt": "2026-08-24T23:59:00.000Z",
+        "brief": "Submit your Python implementation with unit tests covering insert, delete, and rebalance operations.",
+        "acceptedFormats": [
+          ".py",
+          ".zip"
+        ],
+        "status": "published",
+        "maxPoints": 100
+      },
+      {
+        "id": "asg-2",
+        "title": "Linear Regression from Scratch",
+        "courseId": "c2",
+        "courseCode": "CS-340",
+        "courseTitle": "Machine Learning Foundations",
+        "instructorId": "u6",
+        "instructorName": "Prof. Elias Hailu",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "dueAt": "2026-08-26T23:59:00.000Z",
+        "brief": "Build gradient descent for univariate linear regression. Include a brief report on convergence.",
+        "acceptedFormats": [
+          ".ipynb",
+          ".pdf"
+        ],
+        "status": "published",
+        "maxPoints": 50
+      },
+      {
+        "id": "asg-3",
+        "title": "Threat Model Analysis Report",
+        "courseId": "demo-cyber-101",
+        "courseCode": "CYB-101",
+        "courseTitle": "Introduction to Cybersecurity",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "dueAt": "2026-08-21T23:59:00.000Z",
+        "brief": "Analyze a web application of your choice using STRIDE. Submit a 2-page PDF.",
+        "acceptedFormats": [
+          ".pdf",
+          ".docx"
+        ],
+        "status": "published",
+        "maxPoints": 30
+      },
+      {
+        "id": "asg-4",
+        "title": "Graph Algorithms Worksheet",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "dueAt": "2026-08-05T23:59:00.000Z",
+        "brief": "Complete BFS/DFS exercises from the course workbook.",
+        "acceptedFormats": [
+          ".pdf"
+        ],
+        "status": "closed",
+        "maxPoints": 20
+      }
+    ],
+    "quizzes": [
+      {
+        "id": "quiz-1",
+        "title": "Week 3 — Trees & Graphs Quiz",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "dueAt": "2026-08-22T23:59:00.000Z",
+        "durationMinutes": 30,
+        "questionIds": [
+          "q-1",
+          "q-2"
+        ],
+        "status": "published",
+        "maxPoints": 8
+      },
+      {
+        "id": "quiz-2",
+        "title": "ML Fundamentals Check-in",
+        "courseId": "c2",
+        "courseCode": "CS-340",
+        "courseTitle": "Machine Learning Foundations",
+        "instructorId": "u6",
+        "instructorName": "Prof. Elias Hailu",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "dueAt": "2026-08-25T23:59:00.000Z",
+        "durationMinutes": 45,
+        "questionIds": [
+          "q-3"
+        ],
+        "status": "published",
+        "maxPoints": 10
+      },
+      {
+        "id": "quiz-3",
+        "title": "Cybersecurity Basics — Module 1",
+        "courseId": "demo-cyber-101",
+        "courseCode": "CYB-101",
+        "courseTitle": "Introduction to Cybersecurity",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "dueAt": "2026-08-19T23:59:00.000Z",
+        "durationMinutes": 20,
+        "questionIds": [
+          "q-4",
+          "q-5"
+        ],
+        "status": "published",
+        "maxPoints": 8
+      },
+      {
+        "id": "quiz-4",
+        "title": "Midterm Practice (Draft)",
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "dueAt": "2026-09-01T23:59:00.000Z",
+        "durationMinutes": 60,
+        "questionIds": [
+          "q-1",
+          "q-2"
+        ],
+        "status": "draft",
+        "maxPoints": 8
+      }
+    ],
+    "question-bank": [
+      {
+        "id": "q-1",
+        "stem": "What is the time complexity of binary search on a sorted array?",
+        "type": "mcq",
+        "options": [
+          "O(n)",
+          "O(log n)",
+          "O(n log n)",
+          "O(1)"
+        ],
+        "correctAnswer": "O(log n)",
+        "tags": [
+          "algorithms",
+          "complexity"
+        ],
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "department": "Computer Science",
+        "difficulty": "easy",
+        "points": 5,
+        "createdAt": "2026-08-01T10:00:00.000Z"
+      },
+      {
+        "id": "q-2",
+        "stem": "A stack follows the LIFO (Last In, First Out) principle.",
+        "type": "true-false",
+        "correctAnswer": "True",
+        "tags": [
+          "data-structures",
+          "stack"
+        ],
+        "courseId": "c1",
+        "courseCode": "CS-201",
+        "department": "Computer Science",
+        "difficulty": "easy",
+        "points": 3,
+        "createdAt": "2026-08-01T10:00:00.000Z"
+      },
+      {
+        "id": "q-3",
+        "stem": "Explain the difference between supervised and unsupervised learning.",
+        "type": "short-answer",
+        "tags": [
+          "machine-learning",
+          "fundamentals"
+        ],
+        "courseId": "c2",
+        "courseCode": "CS-340",
+        "department": "Computer Science",
+        "difficulty": "medium",
+        "points": 10,
+        "createdAt": "2026-08-02T10:00:00.000Z"
+      },
+      {
+        "id": "q-4",
+        "stem": "Which layer of the OSI model handles routing between networks?",
+        "type": "mcq",
+        "options": [
+          "Physical",
+          "Data Link",
+          "Network",
+          "Transport"
+        ],
+        "correctAnswer": "Network",
+        "tags": [
+          "networking",
+          "security"
+        ],
+        "courseId": "demo-cyber-101",
+        "courseCode": "CYB-101",
+        "department": "Computer Science",
+        "difficulty": "medium",
+        "points": 5,
+        "createdAt": "2026-08-03T10:00:00.000Z"
+      },
+      {
+        "id": "q-5",
+        "stem": "Cross-site scripting (XSS) attacks inject malicious scripts into trusted websites.",
+        "type": "true-false",
+        "correctAnswer": "True",
+        "tags": [
+          "security",
+          "web"
+        ],
+        "department": "Computer Science",
+        "difficulty": "easy",
+        "points": 3,
+        "createdAt": "2026-08-04T10:00:00.000Z"
+      }
+    ],
+    "student-submissions": [
+      {
+        "id": "sub-1",
+        "studentId": "u-demo-amina",
+        "assessmentType": "quiz",
+        "assessmentId": "quiz-3",
+        "status": "graded",
+        "score": 7,
+        "maxScore": 8,
+        "submittedAt": "2026-08-14T18:30:00.000Z"
+      },
+      {
+        "id": "sub-2",
+        "studentId": "u-demo-amina",
+        "assessmentType": "assignment",
+        "assessmentId": "asg-4",
+        "status": "graded",
+        "score": 18,
+        "maxScore": 20,
+        "submittedAt": "2026-08-04T20:00:00.000Z",
+        "feedback": "Strong work on DFS traversal proofs."
+      },
+      {
+        "id": "sub-3",
+        "studentId": "u-demo-amina",
+        "assessmentType": "assignment",
+        "assessmentId": "asg-3",
+        "status": "submitted",
+        "submittedAt": "2026-08-16T14:00:00.000Z"
+      },
+      {
+        "id": "sub-4",
+        "studentId": "u1",
+        "assessmentType": "assignment",
+        "assessmentId": "asg-1",
+        "status": "submitted",
+        "submittedAt": "2026-08-17T08:00:00.000Z"
+      },
+      {
+        "id": "sub-5",
+        "studentId": "u17",
+        "assessmentType": "quiz",
+        "assessmentId": "quiz-1",
+        "status": "graded",
+        "score": 6,
+        "maxScore": 8,
+        "submittedAt": "2026-08-15T11:00:00.000Z"
+      }
+    ],
+    "payments": [
+      {
+        "id": "pay-1",
+        "studentId": "u-demo-amina",
+        "studentName": "Amina Lemma",
+        "label": "Fall 2026 Tuition — Computer Science",
+        "amount": 28500,
+        "currency": "ETB",
+        "dueAt": "2026-09-01T23:59:00.000Z",
+        "status": "pending",
+        "category": "tuition",
+        "term": "Fall 2026",
+        "campusId": "c1",
+        "reference": "INV-2026-0041"
+      },
+      {
+        "id": "pay-2",
+        "studentId": "u-demo-amina",
+        "studentName": "Amina Lemma",
+        "label": "CS-201 Lab Materials Fee",
+        "amount": 1200,
+        "currency": "ETB",
+        "dueAt": "2026-08-10T23:59:00.000Z",
+        "paidAt": "2026-08-08T14:20:00.000Z",
+        "status": "paid",
+        "category": "lab-fee",
+        "term": "Fall 2026",
+        "campusId": "c1",
+        "reference": "INV-2026-0038"
+      },
+      {
+        "id": "pay-3",
+        "studentId": "u-demo-amina",
+        "studentName": "Amina Lemma",
+        "label": "Registration & ID Card",
+        "amount": 850,
+        "currency": "ETB",
+        "dueAt": "2026-08-05T23:59:00.000Z",
+        "status": "overdue",
+        "category": "registration",
+        "term": "Fall 2026",
+        "campusId": "c1",
+        "reference": "INV-2026-0032"
+      },
+      {
+        "id": "pay-4",
+        "studentId": "u1",
+        "studentName": "Selam Girma",
+        "label": "Fall 2026 Tuition",
+        "amount": 28500,
+        "currency": "ETB",
+        "dueAt": "2026-09-01T23:59:00.000Z",
+        "paidAt": "2026-08-12T09:15:00.000Z",
+        "status": "paid",
+        "category": "tuition",
+        "term": "Fall 2026",
+        "campusId": "c1",
+        "reference": "INV-2026-0055"
+      },
+      {
+        "id": "pay-5",
+        "studentId": "u17",
+        "studentName": "Sara Negash",
+        "label": "Fall 2026 Tuition",
+        "amount": 28500,
+        "currency": "ETB",
+        "dueAt": "2026-09-01T23:59:00.000Z",
+        "status": "pending",
+        "category": "tuition",
+        "term": "Fall 2026",
+        "campusId": "c1",
+        "reference": "INV-2026-0062"
+      },
+      {
+        "id": "pay-6",
+        "studentId": "u18",
+        "studentName": "Tomas Bekele",
+        "label": "CYB-501 Certificate Program Fee",
+        "amount": 15000,
+        "currency": "ETB",
+        "dueAt": "2026-08-20T23:59:00.000Z",
+        "status": "pending",
+        "category": "tuition",
+        "term": "Fall 2026",
+        "campusId": "c1",
+        "reference": "INV-2026-0071"
+      }
+    ],
+    "help-desk-tickets": [
+      {
+        "id": "hd-1",
+        "subject": "Cannot access CS-201 live session recording",
+        "description": "The recording link from yesterday’s lab returns a 404 error.",
+        "category": "Technical",
+        "priority": "medium",
+        "status": "in-review",
+        "requesterId": "u-demo-amina",
+        "requesterName": "Amina Lemma",
+        "requesterRole": "Student",
+        "assignedTo": "IT Support",
+        "createdAt": "2026-08-15T10:30:00.000Z",
+        "updatedAt": "2026-08-16T14:00:00.000Z"
+      },
+      {
+        "id": "hd-2",
+        "subject": "Grade discrepancy on Week 3 quiz",
+        "description": "My score shows 70% but I answered all questions correctly per the review sheet.",
+        "category": "Grades",
+        "priority": "high",
+        "status": "open",
+        "requesterId": "u-demo-amina",
+        "requesterName": "Amina Lemma",
+        "requesterRole": "Student",
+        "createdAt": "2026-08-17T08:00:00.000Z",
+        "updatedAt": "2026-08-17T08:00:00.000Z"
+      },
+      {
+        "id": "hd-3",
+        "subject": "Zoom integration failing for scheduled sessions",
+        "description": "OAuth token expired — new sessions cannot be created from the instructor portal.",
+        "category": "Integrations",
+        "priority": "high",
+        "status": "in-review",
+        "requesterId": "u2",
+        "requesterName": "Dr. Aaron Selassie",
+        "requesterRole": "Instructor",
+        "assignedTo": "Platform Admin",
+        "createdAt": "2026-08-14T16:00:00.000Z",
+        "updatedAt": "2026-08-17T07:30:00.000Z"
+      },
+      {
+        "id": "hd-4",
+        "subject": "Payment receipt not generated after tuition payment",
+        "description": "Paid via bank transfer on Aug 12 but no receipt appears in my payments page.",
+        "category": "Payments",
+        "priority": "medium",
+        "status": "resolved",
+        "requesterId": "u1",
+        "requesterName": "Selam Girma",
+        "requesterRole": "Student",
+        "assignedTo": "Finance Office",
+        "createdAt": "2026-08-13T11:00:00.000Z",
+        "updatedAt": "2026-08-14T09:00:00.000Z"
+      },
+      {
+        "id": "hd-5",
+        "subject": "Request bulk grade export for CS-340",
+        "description": "Need CSV export of midterm grades for departmental review meeting.",
+        "category": "Academic",
+        "priority": "low",
+        "status": "open",
+        "requesterId": "u6",
+        "requesterName": "Prof. Elias Hailu",
+        "requesterRole": "Instructor",
+        "createdAt": "2026-08-16T13:00:00.000Z",
+        "updatedAt": "2026-08-16T13:00:00.000Z"
+      }
+    ],
+    "integrations": [
+      {
+        "id": "int-1",
+        "name": "Zoom Video",
+        "provider": "Zoom",
+        "description": "OAuth connection for live class scheduling and cloud recordings.",
+        "status": "connected",
+        "category": "video",
+        "lastSync": "2026-08-17T08:45:00.000Z",
+        "apiKeyMasked": "zm_••••••••4f2a",
+        "webhookUrl": "https://learn.berana.edu/api/webhooks/zoom",
+        "enabled": true
+      },
+      {
+        "id": "int-2",
+        "name": "Google Workspace SSO",
+        "provider": "Google",
+        "description": "Single sign-on for @berana.edu Google Workspace accounts.",
+        "status": "connected",
+        "category": "identity",
+        "lastSync": "2026-08-17T08:30:00.000Z",
+        "enabled": true
+      },
+      {
+        "id": "int-3",
+        "name": "Microsoft Entra ID",
+        "provider": "Microsoft",
+        "description": "Azure AD federation for staff and faculty accounts.",
+        "status": "disconnected",
+        "category": "identity",
+        "lastSync": "Never",
+        "enabled": false
+      },
+      {
+        "id": "int-4",
+        "name": "Stripe Payments",
+        "provider": "Stripe",
+        "description": "Card checkout, invoicing, and payment webhooks.",
+        "status": "warning",
+        "category": "payments",
+        "lastSync": "2026-08-16T22:00:00.000Z",
+        "apiKeyMasked": "sk_live_••••••••9b1c",
+        "webhookUrl": "https://learn.berana.edu/api/webhooks/stripe",
+        "enabled": true
+      },
+      {
+        "id": "int-5",
+        "name": "SendGrid Email",
+        "provider": "SendGrid",
+        "description": "Transactional email for notifications, receipts, and alerts.",
+        "status": "connected",
+        "category": "communication",
+        "lastSync": "2026-08-17T08:40:00.000Z",
+        "apiKeyMasked": "SG.••••••••x7k2",
+        "enabled": true
+      },
+      {
+        "id": "int-6",
+        "name": "Twilio SMS",
+        "provider": "Twilio",
+        "description": "SMS alerts for deadlines, attendance, and urgent notices.",
+        "status": "connected",
+        "category": "communication",
+        "lastSync": "2026-08-17T07:00:00.000Z",
+        "enabled": true
+      },
+      {
+        "id": "int-7",
+        "name": "Google Analytics 4",
+        "provider": "Google",
+        "description": "Portal usage analytics and learner engagement tracking.",
+        "status": "connected",
+        "category": "analytics",
+        "lastSync": "2026-08-17T06:00:00.000Z",
+        "enabled": true
+      },
+      {
+        "id": "int-8",
+        "name": "Canvas LTI",
+        "provider": "Instructure",
+        "description": "LTI 1.3 tool provider for external LMS interoperability.",
+        "status": "disconnected",
+        "category": "lms",
+        "lastSync": "Never",
+        "enabled": false
+      }
+    ],
+    "programs": [],
+    "student-settings": {},
+    "instructor-settings": {},
+    "staff-settings": {},
+    "guardian-settings": {},
+    "help-desk-settings": {}
+  }
+}

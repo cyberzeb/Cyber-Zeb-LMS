@@ -10,7 +10,7 @@ import { Sidebar } from '../../../shared/layout/Sidebar'
 import { AdminTopHeader } from '../../../shared/layout/AdminTopHeader'
 import { AdminFooter } from '../../../shared/layout/AdminFooter'
 import brandLogo from '../../../assets/Logo.jpg'
-import { PortalUserPicker } from '../../../shared/components/PortalUserPicker'
+import { PortalAuthRedirect } from '../../../shared/components/PortalAuthRedirect'
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 import { readInstitutionName } from '../../../shared/storage/readers'
 
@@ -35,7 +35,7 @@ export function GuardianLayout() {
   }, [location.pathname])
 
   if (!session || session.role !== 'Guardian' || !person) {
-    return <PortalUserPicker role="Guardian" portalLabel="Guardian Portal" adminSetupHref="/admin/guardians" />
+    return <PortalAuthRedirect role="Guardian" />
   }
 
   const isActive = (to: string) => {

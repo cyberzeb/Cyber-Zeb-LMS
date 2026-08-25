@@ -1,3 +1,5 @@
+import { useLanguage } from '../i18n/LanguageProvider'
+
 export type StatusTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral'
 
 interface StatusPillProps {
@@ -15,13 +17,14 @@ const toneClasses: Record<StatusTone, { pill: string; dot: string }> = {
 }
 
 export function StatusPill({ label, tone = 'neutral', dot = true }: StatusPillProps) {
+  const { tx } = useLanguage()
   const classes = toneClasses[tone]
   return (
     <span
       className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${classes.pill}`}
     >
       {dot && <span className={`w-1.5 h-1.5 rounded-full ${classes.dot}`} />}
-      {label}
+      {tx(label)}
     </span>
   )
 }

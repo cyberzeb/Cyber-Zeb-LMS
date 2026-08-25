@@ -39,31 +39,6 @@ const INSTRUCTOR_IDS: Record<string, string> = {
   'Dr. Tigist Assefa': 'u9',
 }
 
-const EXTRA_STUDENTS = [
-  {
-    id: 'u17',
-    name: 'Sara Negash',
-    email: 'sara.negash@berana.edu',
-    role: 'Student' as const,
-    department: 'Computer Science',
-    campusId: 'c1',
-    status: 'active' as const,
-    lastActive: '1 hour ago',
-    initials: 'SN',
-  },
-  {
-    id: 'u18',
-    name: 'Tomas Bekele',
-    email: 'tomas.bekele@berana.edu',
-    role: 'Student' as const,
-    department: 'Computer Science',
-    campusId: 'c1',
-    status: 'active' as const,
-    lastActive: '3 hours ago',
-    initials: 'TB',
-  },
-]
-
 function dispatchSeedEvents() {
   window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.coursesUpdated))
   window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.enrollmentsUpdated))
@@ -169,7 +144,7 @@ export function ensureDemoSeedData() {
     }
 
     if (readPeople().length === 0) {
-      const people = ensureDemoStudentInPeople([...seedPeople, ...EXTRA_STUDENTS])
+      const people = ensureDemoStudentInPeople(seedPeople)
       window.localStorage.setItem(STORAGE_KEYS.people, JSON.stringify(people))
       changed = true
     }

@@ -11,7 +11,7 @@ import {
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
-import { useLocalStorageState } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
 import { STORAGE_KEYS } from '../../../shared/storage/keys'
 import {
   defaultInstitutionSettings,
@@ -30,7 +30,7 @@ type SettingsState = InstitutionSettingsState
 export function SettingsPage() {
   const { notify } = useToast()
   const { isDark, setTheme } = useTheme()
-  const [storedRaw, setStoredRaw] = useLocalStorageState<SettingsState>(
+  const [storedRaw, setStoredRaw] = useApiCollection<SettingsState>(
     STORAGE_KEYS.settings,
     defaultInstitutionSettings,
   )

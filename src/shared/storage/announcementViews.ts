@@ -1,5 +1,6 @@
 import { STORAGE_EVENTS, STORAGE_KEYS } from './keys'
 import { readAnnouncements } from './readers'
+import { persistCollection } from './persistCollection'
 
 /** Record views without triggering React state loops. Returns true if storage changed. */
 export function recordAnnouncementViews(announcementIds: string[], viewerId: string): boolean {
@@ -22,12 +23,8 @@ export function recordAnnouncementViews(announcementIds: string[], viewerId: str
 
   if (!changed) return false
 
-  try {
-    window.localStorage.setItem(STORAGE_KEYS.announcements, JSON.stringify(next))
-    window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.announcementsUpdated))
-  } catch {
-    return false
-  }
+  persistCollection(STORAGE_KEYS.announcements, next)
+  window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.announcementsUpdated))
 
   return true
 }

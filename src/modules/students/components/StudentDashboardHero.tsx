@@ -1,6 +1,7 @@
 import { Building2, CalendarDays, GraduationCap, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Monogram } from '../../../shared/components/Monogram'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import type { StudentDashboardData } from '../types'
 
 interface StudentDashboardHeroProps {
@@ -11,6 +12,7 @@ interface StudentDashboardHeroProps {
 }
 
 export function StudentDashboardHero({ data }: StudentDashboardHeroProps) {
+  const { t } = useLanguage()
   const firstName = data.studentName.split(' ')[0]
 
   return (
@@ -25,7 +27,7 @@ export function StudentDashboardHero({ data }: StudentDashboardHeroProps) {
               Student learning hub
             </p>
             <h1 className="mt-1 text-2xl md:text-[28px] font-extrabold leading-tight">
-              Welcome back, {firstName}
+              {t('common.welcomeBack')} {firstName}
             </h1>
             <p className="mt-1.5 text-[12.5px] text-navy-200 truncate">{data.email}</p>
             <div className="mt-3 flex flex-wrap gap-2">

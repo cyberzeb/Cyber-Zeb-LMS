@@ -1,17 +1,18 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Bell, BookOpen, Building2, CalendarDays, GraduationCap, Lock, Mail, UserRound } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { Monogram } from '../../../shared/components/Monogram'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
-import { useLocalStorageState } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
 import { STORAGE_KEYS } from '../../../shared/storage/keys'
+import { mergePortalSettings } from '../../../shared/storage/settingsUtils'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { SettingsSection } from '../../institution/components/settings/SettingsSection'
 import { SettingField } from '../../institution/components/settings/SettingField'
 import { ToggleRow } from '../../institution/components/settings/ToggleRow'
-import { PortalUserPicker } from '../../../shared/components/PortalUserPicker'
+import { PortalAuthRedirect } from '../../../shared/components/PortalAuthRedirect'
 import { getSessionPerson } from '../../../shared/storage/session'
 import { readEnrollments } from '../../../shared/storage/readers'
 
@@ -56,11 +57,23 @@ const defaultSettings = (person?: { name: string; email: string }): StudentSetti
 export function StudentSettingsPage() {
   const { notify } = useToast()
   const sessionPerson = getSessionPerson()
-  const [stored, setStored] = useLocalStorageState<StudentSettingsState>(
+  const defaults = useMemo(
+    () => defaultSettings(sessionPerson ?? undefined),
+    [sessionPerson],
+  )
+  const [storedRaw, setStored] = useApiCollection<StudentSettingsState>(
     STORAGE_KEYS.studentSettings,
-    defaultSettings(sessionPerson ?? undefined),
+    defaults,
+  )
+  const stored = useMemo(
+    () => mergePortalSettings(defaults, storedRaw),
+    [defaults, storedRaw],
   )
   const [draft, setDraft] = useState<StudentSettingsState>(stored)
+
+  useEffect(() => {
+    setDraft(stored)
+  }, [stored])
 
   const isDirty = useMemo(
     () => JSON.stringify(draft) !== JSON.stringify(stored),
@@ -68,9 +81,7 @@ export function StudentSettingsPage() {
   )
 
   if (!sessionPerson) {
-    return (
-      <PortalUserPicker role="Student" portalLabel="Student Portal" />
-    )
+    return <PortalAuthRedirect role="Student" />
   }
 
   const displayName = sessionPerson.name

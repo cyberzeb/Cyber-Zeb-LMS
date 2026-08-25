@@ -19,7 +19,7 @@ import { Sidebar } from '../../../shared/layout/Sidebar'
 import { AdminTopHeader } from '../../../shared/layout/AdminTopHeader'
 import { AdminFooter } from '../../../shared/layout/AdminFooter'
 import brandLogo from '../../../assets/Logo.jpg'
-import { PortalUserPicker } from '../../../shared/components/PortalUserPicker'
+import { PortalAuthRedirect } from '../../../shared/components/PortalAuthRedirect'
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 import { readInstitutionName } from '../../../shared/storage/readers'
 
@@ -50,7 +50,7 @@ export function InstructorLayout() {
   const person = getSessionPerson()
 
   if (!session || session.role !== 'Instructor' || !person) {
-    return <PortalUserPicker role="Instructor" portalLabel="Instructor Portal" />
+    return <PortalAuthRedirect role="Instructor" />
   }
 
   const isActive = (to: string) => {

@@ -21,12 +21,14 @@ from app.modules.parent_portal.router import router as parent_portal_router
 from app.modules.reports.router import router as reports_router
 from app.modules.integrations.router import router as integrations_router
 from app.modules.admin.router import router as admin_router
+from app.modules.lms_store.router import router as lms_store_router
 
 api_router = APIRouter()
 
 # Sprint 1 (Blueprint Section 19)
 api_router.include_router(tenants_router, prefix="/tenants", tags=["Tenants & Organization"])
 api_router.include_router(identity_router, prefix="/auth", tags=["Identity & Access"])
+api_router.include_router(lms_store_router, prefix="/data", tags=["LMS Data Store"])
 
 # Sprint 2-3
 api_router.include_router(academic_router, prefix="/academic", tags=["Academic Structure"])

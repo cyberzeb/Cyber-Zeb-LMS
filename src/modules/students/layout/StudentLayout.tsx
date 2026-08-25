@@ -5,7 +5,7 @@ import { Sidebar } from '../../../shared/layout/Sidebar'
 import { AdminTopHeader } from '../../../shared/layout/AdminTopHeader'
 import { AdminFooter } from '../../../shared/layout/AdminFooter'
 import brandLogo from '../../../assets/Logo.jpg'
-import { PortalUserPicker } from '../../../shared/components/PortalUserPicker'
+import { PortalAuthRedirect } from '../../../shared/components/PortalAuthRedirect'
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 import { readInstitutionName } from '../../../shared/storage/readers'
 
@@ -47,7 +47,7 @@ export function StudentLayout() {
   const isForumPage = path === '/student/forum'
 
   if (!session || session.role !== 'Student' || !person) {
-    return <PortalUserPicker role="Student" portalLabel="Student Portal" />
+    return <PortalAuthRedirect role="Student" />
   }
 
   const isActive = (to: string) => {

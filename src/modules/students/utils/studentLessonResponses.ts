@@ -1,4 +1,6 @@
 import { STORAGE_EVENTS, STORAGE_KEYS } from '../../../shared/storage/keys'
+import { readLessonResponses } from '../../../shared/storage/readers'
+import { persistCollection } from '../../../shared/storage/persistCollection'
 
 export interface LessonQuestionResponse {
   questionId: string
@@ -14,22 +16,12 @@ type ResponseStore = Record<
 >
 
 function readStore(): ResponseStore {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEYS.lessonResponses)
-    if (stored) return JSON.parse(stored) as ResponseStore
-  } catch {
-    /* ignore */
-  }
-  return {}
+  return readLessonResponses() as ResponseStore
 }
 
 function writeStore(store: ResponseStore) {
-  try {
-    window.localStorage.setItem(STORAGE_KEYS.lessonResponses, JSON.stringify(store))
-    window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.lessonResponsesUpdated))
-  } catch {
-    /* ignore */
-  }
+  persistCollection(STORAGE_KEYS.lessonResponses, store)
+  window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.lessonResponsesUpdated))
 }
 
 export function getLessonResponses(

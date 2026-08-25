@@ -53,6 +53,28 @@ export const defaultInstitutionSettings: InstitutionSettingsState = {
   },
 }
 
+/** Deep-merge partial portal settings (from API seed `{}`) with role defaults. */
+export function mergePortalSettings<T>(
+  defaults: T,
+  raw: Partial<T> | null | undefined,
+): T {
+  if (!raw || typeof raw !== 'object') return defaults
+  const result = { ...defaults }
+  for (const section of Object.keys(defaults as object) as (keyof T)[]) {
+    const defaultSection = defaults[section]
+    const rawSection = raw[section]
+    if (defaultSection && typeof defaultSection === 'object' && !Array.isArray(defaultSection)) {
+      result[section] = {
+        ...(defaultSection as object),
+        ...((rawSection as object | undefined) ?? {}),
+      } as T[keyof T]
+    } else if (rawSection !== undefined) {
+      result[section] = rawSection as T[keyof T]
+    }
+  }
+  return result
+}
+
 /** Merge partial localStorage settings with defaults (seed data may only store general.name). */
 export function normalizeInstitutionSettings(
   raw: Partial<InstitutionSettingsState> | null | undefined,

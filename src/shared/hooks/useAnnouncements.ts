@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
-import { useLocalStorageState, createId } from './useLocalStorageState'
+import { useApiCollection } from './useApiCollection'
+import { createId } from './useLocalStorageState'
 import { STORAGE_EVENTS, STORAGE_KEYS } from '../storage/keys'
 import type {
   AnnouncementAuthorRole,
@@ -86,7 +87,7 @@ function buildTargetingFields(
 }
 
 export function useAnnouncements() {
-  const [announcements, setAnnouncementsRaw] = useLocalStorageState<AnnouncementRecord[]>(
+  const [announcements, setAnnouncementsRaw] = useApiCollection<AnnouncementRecord[]>(
     STORAGE_KEYS.announcements,
     [],
   )

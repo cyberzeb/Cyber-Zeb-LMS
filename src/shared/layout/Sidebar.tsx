@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useCallback, useEffect, useRef, type ReactNode } from 'react'
 import { Activity, HardDrive } from 'lucide-react'
+import { useLanguage } from '../i18n/LanguageProvider'
 
 interface NavItem {
   label: string
@@ -30,6 +31,7 @@ export function Sidebar({
   brandSubtitle = 'Cyber-Zeb',
   showSystemStatus = true,
 }: SidebarProps) {
+  const { tx } = useLanguage()
   const location = useLocation()
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -63,7 +65,7 @@ export function Sidebar({
         )}
         <div className="min-w-0 overflow-hidden max-w-0 opacity-0 group-hover/sidebar:max-w-[10rem] group-hover/sidebar:opacity-100 transition-all duration-300">
           <div className="font-bold text-[13px] tracking-tight whitespace-nowrap">{brandName}</div>
-          <div className="text-[10px] text-navy-300 uppercase tracking-wider whitespace-nowrap">{brandSubtitle}</div>
+          <div className="text-[10px] text-navy-300 uppercase tracking-wider whitespace-nowrap">{tx(brandSubtitle)}</div>
         </div>
       </div>
 
@@ -71,7 +73,7 @@ export function Sidebar({
         {sections.map((section) => (
           <div key={section.title} className="relative">
             <div className="text-[9px] text-navy-300 uppercase tracking-[0.14em] font-semibold mx-2 mt-3 mb-1.5 overflow-hidden max-h-0 opacity-0 group-hover/sidebar:max-h-6 group-hover/sidebar:opacity-100 transition-all duration-300">
-              {section.title}
+              {tx(section.title)}
             </div>
             {section.items.map((item) => {
               const rowClass = `group/item relative flex items-center justify-center group-hover/sidebar:justify-start px-2.5 group-hover/sidebar:px-3 py-2 rounded-lg text-[13px] cursor-pointer transition-colors duration-150
@@ -81,7 +83,7 @@ export function Sidebar({
                   }`
               const indicator = (
                 <span
-                  className={`absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-full bg-lemon-500 hidden group-hover/sidebar:block
+                  className={`absolute start-0 top-1/2 -translate-y-1/2 w-[3px] rounded-full bg-lemon-500 hidden group-hover/sidebar:block
                     ${item.active ? 'h-5' : 'h-0 group-hover/item:h-3'}`}
                 />
               )
@@ -91,8 +93,8 @@ export function Sidebar({
                 </span>
               ) : null
               const label = (
-                <span className="overflow-hidden max-w-0 opacity-0 group-hover/sidebar:max-w-[12rem] group-hover/sidebar:opacity-100 group-hover/sidebar:ml-2.5 whitespace-nowrap transition-all duration-300 flex items-center gap-2">
-                  {item.label}
+                <span className="overflow-hidden max-w-0 opacity-0 group-hover/sidebar:max-w-[12rem] group-hover/sidebar:opacity-100 group-hover/sidebar:ms-2.5 whitespace-nowrap transition-all duration-300 flex items-center gap-2">
+                  {tx(item.label)}
                   {item.badge && item.badge > 0 ? (
                     <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-lemon-500 text-navy-900 text-[10px] font-extrabold flex items-center justify-center">
                       {item.badge > 99 ? '99+' : item.badge}
@@ -107,7 +109,7 @@ export function Sidebar({
                     key={item.label}
                     to={item.to}
                     className={rowClass}
-                    title={item.label}
+                    title={tx(item.label)}
                     data-nav-active={item.active ? 'true' : undefined}
                   >
                     {indicator}
@@ -118,7 +120,7 @@ export function Sidebar({
               }
 
               return (
-                <div key={item.label} className={rowClass} title={item.label}>
+                <div key={item.label} className={rowClass} title={tx(item.label)}>
                   {indicator}
                   {leading}
                   {label}
@@ -134,7 +136,7 @@ export function Sidebar({
           <div className="overflow-hidden max-h-0 opacity-0 group-hover/sidebar:max-h-16 group-hover/sidebar:opacity-100 transition-all duration-300 px-1.5 space-y-1">
             <div>
               <div className="flex items-center justify-between text-[9px] text-navy-300">
-                <span className="flex items-center gap-1"><HardDrive size={10} /> Storage</span>
+                <span className="flex items-center gap-1"><HardDrive size={10} /> {tx('Storage')}</span>
                 <span className="text-white font-medium">68%</span>
               </div>
               <div className="h-0.5 mt-0.5 rounded-full bg-white/10 overflow-hidden">
@@ -142,8 +144,8 @@ export function Sidebar({
               </div>
             </div>
             <div className="flex items-center justify-between text-[9px]">
-              <span className="flex items-center gap-1 text-navy-300"><Activity size={10} /> Platform</span>
-              <span className="text-success font-medium">Operational</span>
+              <span className="flex items-center gap-1 text-navy-300"><Activity size={10} /> {tx('Platform')}</span>
+              <span className="text-success font-medium">{tx('Operational')}</span>
             </div>
           </div>
         ) : null}

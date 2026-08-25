@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useLocalStorageState, createId } from './useLocalStorageState'
+import { useApiCollection } from './useApiCollection'
+import { createId } from './useLocalStorageState'
 import { STORAGE_EVENTS, STORAGE_KEYS } from '../storage/keys'
 import type { PersonRow } from '../../modules/institution/types'
 import type {
@@ -42,8 +43,8 @@ function chatListsEqual(a: ForumChatRecord[], b: ForumChatRecord[]) {
 }
 
 export function useForum(person: PersonRow | null) {
-  const [chats, setChatsRaw] = useLocalStorageState<ForumChatRecord[]>(STORAGE_KEYS.forumChats, [])
-  const [messages, setMessagesRaw] = useLocalStorageState<ForumMessageRecord[]>(
+  const [chats, setChatsRaw] = useApiCollection<ForumChatRecord[]>(STORAGE_KEYS.forumChats, [])
+  const [messages, setMessagesRaw] = useApiCollection<ForumMessageRecord[]>(
     STORAGE_KEYS.forumMessages,
     [],
   )

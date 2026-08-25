@@ -6,6 +6,8 @@ import { Monogram } from '../components/Monogram'
 import { GlassCard } from '../layout/GlassCard'
 import { readPeople } from '../storage/readers'
 import { writePortalSession, type PortalSession } from '../storage/session'
+import { demoLogin } from '../api/auth'
+import { setAccessToken } from '../api/client'
 import type { PersonRole } from '../../modules/institution/types'
 
 interface PortalUserPickerProps {
@@ -25,12 +27,23 @@ function roleIcon(role: PersonRole) {
 export function PortalUserPicker({ role, portalLabel, adminSetupHref = '/admin/people' }: PortalUserPickerProps) {
   const people = useMemo(() => readPeople().filter((p) => p.role === role && p.status !== 'suspended'), [role])
   const [selectedId, setSelectedId] = useState(people[0]?.id ?? '')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!selectedId) return
-    const session: PortalSession = { personId: selectedId, role }
-    writePortalSession(session)
-    window.location.reload()
+    setLoading(true)
+    setError(null)
+    try {
+      const result = await demoLogin(selectedId)
+      setAccessToken(result.access_token)
+      const session: PortalSession = { personId: selectedId, role }
+      writePortalSession(session)
+      window.location.reload()
+    } catch {
+      setError('Could not sign in. Is the backend running?')
+      setLoading(false)
+    }
   }
 
   if (people.length === 0) {
@@ -42,7 +55,7 @@ export function PortalUserPicker({ role, portalLabel, adminSetupHref = '/admin/p
           </div>
           <h2 className="text-[20px] font-bold text-navy-900">No {role === 'HelpDesk' ? 'help desk agent' : role.toLowerCase()} accounts yet</h2>
           <p className="mt-2 text-[13px] text-secondary-text leading-relaxed">
-            The {portalLabel} reads from the same local data as Institution Admin. Add accounts in
+            The {portalLabel} reads from the institution database. Add accounts in
             admin first, then return here to sign in.
           </p>
           <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
@@ -66,7 +79,7 @@ export function PortalUserPicker({ role, portalLabel, adminSetupHref = '/admin/p
       <GlassCard className="max-w-lg w-full p-8">
         <h2 className="text-[20px] font-bold text-navy-900">Select {portalLabel} account</h2>
         <p className="mt-1 text-[13px] text-secondary-text">
-          Choose who you are signing in as. Data is stored locally in your browser.
+          Choose who you are signing in as. Your session is stored securely with the API.
         </p>
 
         <div className="mt-5 space-y-2 max-h-64 overflow-y-auto app-scroll">
@@ -91,8 +104,15 @@ export function PortalUserPicker({ role, portalLabel, adminSetupHref = '/admin/p
           ))}
         </div>
 
-        <Button variant="primary" className="w-full mt-5" disabled={!selectedId} onClick={handleContinue}>
-          Continue to {portalLabel}
+        {error ? <p className="mt-3 text-[12px] text-red-600">{error}</p> : null}
+
+        <Button
+          variant="primary"
+          className="w-full mt-5"
+          disabled={!selectedId || loading}
+          onClick={() => void handleContinue()}
+        >
+          {loading ? 'Signing in…' : `Continue to ${portalLabel}`}
         </Button>
       </GlassCard>
     </div>

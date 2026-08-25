@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useLocalStorageState } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
 import { STORAGE_EVENTS, STORAGE_KEYS } from '../../../shared/storage/keys'
 import {
   buildCertificateRecord,
@@ -7,6 +7,7 @@ import {
   type IssueCertificateInput,
 } from '../api/certificatesApi'
 import { seedCertificates } from '../data/certificatesSeedData'
+import { readCertificates } from '../../../shared/storage/readers'
 import type { CertificateRecord } from '../types'
 
 function notifyCertificatesUpdated() {
@@ -14,7 +15,7 @@ function notifyCertificatesUpdated() {
 }
 
 export function useCertificates() {
-  const [certificates, setCertificatesRaw] = useLocalStorageState<CertificateRecord[]>(
+  const [certificates, setCertificatesRaw] = useApiCollection<CertificateRecord[]>(
     STORAGE_KEYS.certificates,
     seedCertificates,
   )
@@ -65,11 +66,6 @@ export function useCertificates() {
 }
 
 export function readCertificatesFromStorage(): CertificateRecord[] {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEYS.certificates)
-    if (stored) return JSON.parse(stored) as CertificateRecord[]
-  } catch {
-    /* ignore */
-  }
-  return seedCertificates
+  const cached = readCertificates()
+  return cached.length > 0 ? cached : seedCertificates
 }

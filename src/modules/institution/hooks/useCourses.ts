@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
-import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
+import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { STORAGE_KEYS } from '../../../shared/storage/keys'
 import { computeCourseProgress, courseInputToRecordFields } from '../data/courseFormOptions'
 import { applyCourseAssignmentFields, courseTeachesInstructor } from '../utils/courseAssignmentUtils'
@@ -20,7 +21,7 @@ export function isCourseApproved(course: CourseRecord) {
 }
 
 export function useCourses() {
-  const [courses, setCourses] = useLocalStorageState<CourseRecord[]>(
+  const [courses, setCourses] = useApiCollection<CourseRecord[]>(
     STORAGE_KEYS.courses,
     [],
   )

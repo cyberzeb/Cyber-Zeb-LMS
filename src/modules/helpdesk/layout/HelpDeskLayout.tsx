@@ -5,7 +5,7 @@ import { Sidebar } from '../../../shared/layout/Sidebar'
 import { AdminTopHeader } from '../../../shared/layout/AdminTopHeader'
 import { AdminFooter } from '../../../shared/layout/AdminFooter'
 import brandLogo from '../../../assets/Logo.jpg'
-import { PortalUserPicker } from '../../../shared/components/PortalUserPicker'
+import { PortalAuthRedirect } from '../../../shared/components/PortalAuthRedirect'
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 import { readInstitutionName } from '../../../shared/storage/readers'
 
@@ -29,13 +29,7 @@ export function HelpDeskLayout() {
   }, [location.pathname])
 
   if (!session || session.role !== 'HelpDesk' || !person) {
-    return (
-      <PortalUserPicker
-        role="HelpDesk"
-        portalLabel="Help Desk Portal"
-        adminSetupHref="/admin/people"
-      />
-    )
+    return <PortalAuthRedirect role="HelpDesk" />
   }
 
   const isActive = (to: string) => {

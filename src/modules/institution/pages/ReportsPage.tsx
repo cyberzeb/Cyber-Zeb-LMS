@@ -19,7 +19,8 @@ import { FormField } from '../../../shared/components/FormField'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
-import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
+import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { STORAGE_KEYS } from '../../../shared/storage/keys'
 import { buildReportsAnalytics } from '../../../shared/storage/reportsAnalytics'
@@ -58,7 +59,7 @@ function todayLabel(): string {
 export function ReportsPage() {
   const { notify } = useToast()
   const analytics = useMemo(() => buildReportsAnalytics(), [])
-  const [reports, setReports] = useLocalStorageState<GeneratedReport[]>(STORAGE_KEYS.reports, [])
+  const [reports, setReports] = useApiCollection<GeneratedReport[]>(STORAGE_KEYS.reports, [])
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState(emptyForm)
   const [activeTab, setActiveTab] = useState('Overview')

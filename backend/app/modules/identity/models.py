@@ -9,8 +9,7 @@ what roles exist in the system).
 import uuid
 from enum import Enum
 
-from sqlalchemy import Boolean, Enum as SAEnum, ForeignKey, String
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy import Boolean, Enum as SAEnum, ForeignKey, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.common.base_model import TenantScopedMixin
@@ -56,10 +55,10 @@ class UserRoleAssignment(Base, TenantScopedMixin):
     """
     __tablename__ = "user_role_assignments"
 
-    user_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("users.id"), index=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), index=True)
     role: Mapped[RoleEnum] = mapped_column(SAEnum(RoleEnum))
     scope_type: Mapped[str | None] = mapped_column(String(50), nullable=True)   # "campus" | "department" | "course" | None (tenant-wide)
-    scope_id: Mapped[uuid.UUID | None] = mapped_column(PG_UUID(as_uuid=True), nullable=True)
+    scope_id: Mapped[uuid.UUID | None] = mapped_column(Uuid(as_uuid=True), nullable=True)
 
     user: Mapped["User"] = relationship(back_populates="role_assignments")
 
@@ -72,8 +71,8 @@ class GuardianLink(Base, TenantScopedMixin):
     """
     __tablename__ = "guardian_links"
 
-    guardian_user_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("users.id"), index=True)
-    student_user_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("users.id"), index=True)
+    guardian_user_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), index=True)
+    student_user_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("users.id"), index=True)
     relationship_type: Mapped[GuardianRelationship] = mapped_column(SAEnum(GuardianRelationship))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     # visibility flags control what a guardian may see for this specific child

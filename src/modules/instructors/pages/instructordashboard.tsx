@@ -26,6 +26,7 @@ import { TrendLineChart } from '../../institution/components/TrendLineChart'
 import { InstructorPageLoading } from '../components/InstructorPageStates'
 import { InstructorProfileCard } from '../components/InstructorProfileCard'
 import { useInstructorDashboard } from '../hooks/useInstructorDashboard'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import type { AssignmentSubmission, UpcomingTask } from '../types'
 
 const STAT = 17
@@ -56,6 +57,7 @@ function assignmentStatusTone(status: AssignmentSubmission['status']) {
 }
 
 export function InstructorDashboardPage() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const { data, isLoading, isError, error, reload } = useInstructorDashboard()
 
@@ -142,7 +144,7 @@ export function InstructorDashboardPage() {
         <div className="flex flex-col gap-4 md:gap-5 min-w-0">
           <div>
             <h1 className="text-[22px] font-bold text-navy-900">
-              Welcome back, <span className="text-navy-700">{firstName}</span>
+              {t('common.welcomeBack')} <span className="text-navy-700">{firstName}</span>
             </h1>
             <p className="text-[13px] text-secondary-text mt-1">
               Manage your courses, grade submissions, and track student performance across {data.department} · {data.term}.

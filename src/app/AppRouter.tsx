@@ -29,6 +29,7 @@ import { AdminDiscussionForumPage } from '../modules/institution/pages/AdminDisc
 import { AdminCalendarPage } from '../modules/institution/pages/AdminCalendarPage'
 import { SettingsPage } from '../modules/institution/pages/SettingsPage'
 import { LandingPage } from '../modules/marketing/pages/LandingPage'
+import { LoginPage } from '../modules/auth/pages/LoginPage'
 import { StudentLayout } from '../modules/students/layout/StudentLayout'
 import { StudentDashboardPage } from '../modules/students/pages/studentdashboard'
 import { StudentResourcesPage } from '../modules/students/pages/studentresources'
@@ -81,6 +82,10 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
+  },
+  {
+    path: '/login',
+    element: <LoginPage />,
   },
   {
     path: '/student',

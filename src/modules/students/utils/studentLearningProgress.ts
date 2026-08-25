@@ -1,27 +1,18 @@
 import type { CourseRecord } from '../../institution/types'
 import { STORAGE_EVENTS, STORAGE_KEYS } from '../../../shared/storage/keys'
-import { readEnrollments } from '../../../shared/storage/readers'
+import { readEnrollments, readLessonProgress } from '../../../shared/storage/readers'
+import { persistCollection } from '../../../shared/storage/persistCollection'
 
 /** studentId → courseId → completed lesson ids */
 type LessonProgressStore = Record<string, Record<string, string[]>>
 
 function readProgressStore(): LessonProgressStore {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEYS.lessonProgress)
-    if (stored) return JSON.parse(stored) as LessonProgressStore
-  } catch {
-    /* ignore */
-  }
-  return {}
+  return readLessonProgress()
 }
 
 function writeProgressStore(store: LessonProgressStore) {
-  try {
-    window.localStorage.setItem(STORAGE_KEYS.lessonProgress, JSON.stringify(store))
-    window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.lessonProgressUpdated))
-  } catch {
-    /* ignore */
-  }
+  persistCollection(STORAGE_KEYS.lessonProgress, store)
+  window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.lessonProgressUpdated))
 }
 
 export function listCourseLessonIds(course: CourseRecord): string[] {
@@ -51,16 +42,12 @@ export function getEnrollmentProgressPercent(
 }
 
 function syncEnrollmentProgress(studentId: string, courseId: string, progress: number) {
-  try {
-    const enrollments = readEnrollments()
-    const next = enrollments.map((e) =>
-      e.studentId === studentId && e.courseId === courseId ? { ...e, progress } : e,
-    )
-    window.localStorage.setItem(STORAGE_KEYS.enrollments, JSON.stringify(next))
-    window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.enrollmentsUpdated))
-  } catch {
-    /* ignore */
-  }
+  const enrollments = readEnrollments()
+  const next = enrollments.map((e) =>
+    e.studentId === studentId && e.courseId === courseId ? { ...e, progress } : e,
+  )
+  persistCollection(STORAGE_KEYS.enrollments, next)
+  window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.enrollmentsUpdated))
 }
 
 export function markLessonComplete(studentId: string, course: CourseRecord, lessonId: string) {

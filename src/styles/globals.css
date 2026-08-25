@@ -42,7 +42,7 @@
   --color-success-bg: #DCFCE7;
 
   /* Typography */
-  --font-sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --font-sans: Inter, "Noto Sans Ethiopic", "Noto Naskh Arabic", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
   --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.04);
   --shadow-card-dark: 0 1px 3px rgba(0, 0, 0, 0.35), 0 8px 24px rgba(0, 0, 0, 0.25);
@@ -587,4 +587,288 @@ body {
 .dark .marketing-form-panel input,
 .dark .marketing-form-panel textarea {
   color-scheme: dark;
+}
+
+/* ── Marketing landing page ───────────────────────────────── */
+.marketing-page {
+  background-color: var(--color-canvas);
+  color: var(--color-navy-900);
+  scroll-behavior: smooth;
+}
+
+.marketing-brand-navy {
+  background-color: #1b2340;
+  color: #ffffff;
+}
+
+.marketing-brand-navy-muted {
+  color: #c5cade;
+}
+
+.marketing-accent-label {
+  color: var(--color-lemon-700);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dark .marketing-accent-label {
+  color: var(--color-lemon-500);
+}
+
+.marketing-section-heading {
+  color: var(--color-navy-900);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.marketing-body-text {
+  color: var(--color-secondary-text);
+}
+
+.marketing-icon-chip {
+  border-radius: 0.75rem;
+  background-color: var(--color-lemon-50);
+  color: var(--color-lemon-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.dark .marketing-icon-chip {
+  background-color: rgba(163, 207, 69, 0.12);
+  color: var(--color-lemon-500);
+}
+
+.marketing-feature-card:hover .marketing-icon-chip {
+  transform: scale(1.08);
+}
+
+.marketing-step-icon {
+  background: linear-gradient(145deg, #1b2340 0%, #243056 100%);
+  color: var(--color-lemon-500);
+  box-shadow: 0 12px 28px rgba(27, 35, 64, 0.35);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+}
+
+.dark .marketing-step-icon {
+  background: linear-gradient(145deg, #111b2e 0%, #1a2744 100%);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+.marketing-step-icon:hover {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 18px 36px rgba(27, 35, 64, 0.4);
+}
+
+.dark .marketing-nav {
+  background-color: rgba(27, 35, 64, 0.88);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .marketing-nav-scrolled {
+  background-color: rgba(2, 8, 16, 0.92);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.marketing-nav-scrolled {
+  box-shadow: 0 8px 32px rgba(27, 35, 64, 0.18);
+}
+
+.dark .marketing-review-panel {
+  background-color: #111b2e;
+  border: 1px solid #1a2332;
+}
+
+.dark .marketing-subdomain-suffix {
+  background-color: #111b2e;
+  border-color: #1a2332;
+  color: var(--color-secondary-text);
+}
+
+.dark .marketing-module-active {
+  background-color: rgba(163, 207, 69, 0.12) !important;
+  border-color: var(--color-lemon-500) !important;
+  color: var(--color-navy-900) !important;
+}
+
+.dark .marketing-success-icon {
+  background-color: rgba(163, 207, 69, 0.12);
+  color: var(--color-lemon-500);
+}
+
+.dark .marketing-hero-mockup-wrap {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark .marketing-mockup-surface {
+  background-color: #111b2e;
+  color: #f1f5f9;
+}
+
+.dark .marketing-mockup-card {
+  background-color: #0a121e;
+  border-color: #1a2332;
+}
+
+/* Scroll-triggered reveal */
+.marketing-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  will-change: opacity, transform;
+}
+
+.marketing-reveal-visible {
+  animation: marketingReveal 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes marketingReveal {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes marketingFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes marketingFloatSlow {
+  0%,
+  100% {
+    transform: translateY(0) rotate(2deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(1deg);
+  }
+}
+
+@keyframes marketingShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes marketingPulseGlow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes marketingBarGrow {
+  from {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+  to {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+}
+
+.marketing-hero-glow {
+  animation: marketingPulseGlow 6s ease-in-out infinite;
+}
+
+.marketing-hero-float {
+  animation: marketingFloatSlow 5s ease-in-out infinite;
+}
+
+.marketing-hero-badge {
+  animation: marketingReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.marketing-hero-title {
+  animation: marketingReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+}
+
+.marketing-hero-copy {
+  animation: marketingReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
+}
+
+.marketing-hero-actions {
+  animation: marketingReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+}
+
+.marketing-hero-stats {
+  animation: marketingReveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
+}
+
+.marketing-hero-mockup {
+  animation: marketingReveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both,
+    marketingFloatSlow 6s ease-in-out 1s infinite;
+}
+
+.marketing-chart-bar {
+  animation: marketingBarGrow 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.marketing-btn-primary {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+.marketing-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(168, 212, 0, 0.28);
+}
+
+.marketing-btn-ghost {
+  transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.marketing-btn-ghost:hover {
+  transform: translateY(-2px);
+}
+
+.marketing-service-card {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease,
+    background-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.marketing-service-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing-reveal,
+  .marketing-reveal-visible,
+  .marketing-hero-glow,
+  .marketing-hero-float,
+  .marketing-hero-mockup,
+  .marketing-hero-badge,
+  .marketing-hero-title,
+  .marketing-hero-copy,
+  .marketing-hero-actions,
+  .marketing-hero-stats,
+  .marketing-chart-bar {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

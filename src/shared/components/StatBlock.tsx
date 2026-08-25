@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { GlassCard } from '../layout/GlassCard'
 import { Sparkline } from './Sparkline'
+import { useLanguage } from '../i18n/LanguageProvider'
 
 interface StatBlockProps {
   label: string
@@ -25,6 +26,7 @@ export function StatBlock({
   sparkline,
   sparklineColor,
 }: StatBlockProps) {
+  const { tx } = useLanguage()
   const chipClass = iconBg ?? 'bg-navy-50 text-navy-700'
   const lineColor =
     sparklineColor ?? (trend === 'down' ? '#E53935' : trend === 'up' ? '#16A34A' : '#1976D2')
@@ -33,7 +35,7 @@ export function StatBlock({
     <GlassCard className="p-4 flex flex-col">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <span className="text-[11px] font-medium text-secondary-text">{label}</span>
+          <span className="text-[11px] font-medium text-secondary-text">{tx(label)}</span>
           <div className="flex items-end gap-2 mt-1.5">
             <div className="text-[22px] leading-none font-bold text-navy-900 tracking-tight">{value}</div>
             {trend && trendValue && (
@@ -42,7 +44,7 @@ export function StatBlock({
               </span>
             )}
           </div>
-          {sub && <div className="text-[11px] text-secondary-text mt-1">{sub}</div>}
+          {sub && <div className="text-[11px] text-secondary-text mt-1">{tx(sub)}</div>}
         </div>
         {icon && (
           <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${chipClass}`}>

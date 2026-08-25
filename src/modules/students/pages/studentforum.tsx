@@ -1,6 +1,6 @@
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 import { DiscussionForumPanel } from '../../../shared/components/forum/DiscussionForumPanel'
-import { PortalUserPicker } from '../../../shared/components/PortalUserPicker'
+import { PortalAuthRedirect } from '../../../shared/components/PortalAuthRedirect'
 import { StudentPageError } from '../components/StudentPageStates'
 
 export function StudentForumPage() {
@@ -8,7 +8,7 @@ export function StudentForumPage() {
   const person = getSessionPerson()
 
   if (!session || session.role !== 'Student' || !person) {
-    return <PortalUserPicker role="Student" portalLabel="Student Portal" />
+    return <PortalAuthRedirect role="Student" />
   }
 
   if (person.status !== 'active') {

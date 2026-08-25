@@ -11,54 +11,44 @@ import type { AnnouncementRecord } from '../types/announcements'
 import type { ForumChatRecord, ForumMessageRecord } from '../types/forum'
 import { normalizeAnnouncementRecord } from './announcementUtils'
 import { STORAGE_KEYS } from './keys'
+import { getCachedCollection } from './dataCache'
+import { toApiKey } from '../api/collectionKeys'
 
-function readJson<T>(key: string, fallback: T): T {
-  try {
-    const stored = window.localStorage.getItem(key)
-    if (stored === null) return fallback
-    return JSON.parse(stored) as T
-  } catch {
-    return fallback
-  }
+function readCached<T>(storageKey: string, fallback: T): T {
+  return getCachedCollection(toApiKey(storageKey), fallback)
 }
 
 export function readPeople(): PersonRow[] {
-  return readJson<PersonRow[]>(STORAGE_KEYS.people, [])
+  return readCached<PersonRow[]>(STORAGE_KEYS.people, [])
 }
 
 export function readCourses(): CourseRecord[] {
-  return readJson<CourseRecord[]>(STORAGE_KEYS.courses, [])
+  return readCached<CourseRecord[]>(STORAGE_KEYS.courses, [])
 }
 
 export function readCampusRecords(): CampusRecord[] {
-  return readJson<CampusRecord[]>(STORAGE_KEYS.campuses, [])
+  return readCached<CampusRecord[]>(STORAGE_KEYS.campuses, [])
 }
 
 export function readDepartments(): Department[] {
-  return readJson<Department[]>(STORAGE_KEYS.departments, [])
+  return readCached<Department[]>(STORAGE_KEYS.departments, [])
 }
 
 export function readPrograms(): ProgramRow[] {
-  return readJson<ProgramRow[]>(STORAGE_KEYS.programs, [])
+  return readCached<ProgramRow[]>(STORAGE_KEYS.programs, [])
 }
 
 export function readEnrollments(): CourseEnrollment[] {
-  return readJson<CourseEnrollment[]>(STORAGE_KEYS.enrollments, [])
+  return readCached<CourseEnrollment[]>(STORAGE_KEYS.enrollments, [])
 }
 
 export function readCertificates(): CertificateRecord[] {
-  return readJson<CertificateRecord[]>(STORAGE_KEYS.certificates, [])
+  return readCached<CertificateRecord[]>(STORAGE_KEYS.certificates, [])
 }
 
 export function readInstitutionName(): string {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEYS.settings)
-    if (!stored) return 'Berana LMS'
-    const settings = JSON.parse(stored) as { general?: { name?: string } }
-    return settings.general?.name?.trim() || 'Berana LMS'
-  } catch {
-    return 'Berana LMS'
-  }
+  const settings = readCached<{ general?: { name?: string } }>(STORAGE_KEYS.settings, {})
+  return settings.general?.name?.trim() || 'Berana LMS'
 }
 
 export function readPersonById(personId: string): PersonRow | undefined {
@@ -74,80 +64,96 @@ export function readPublishedApprovedCourses(): CourseRecord[] {
 }
 
 export function readAnnouncements(): AnnouncementRecord[] {
-  return readJson<AnnouncementRecord[]>(STORAGE_KEYS.announcements, []).map(normalizeAnnouncementRecord)
+  return readCached<AnnouncementRecord[]>(STORAGE_KEYS.announcements, []).map(normalizeAnnouncementRecord)
 }
 
 export function readLiveSessions() {
-  return readJson<import('../../modules/institution/types/assessments').LiveSessionRecord[]>(
+  return readCached<import('../../modules/institution/types/assessments').LiveSessionRecord[]>(
     STORAGE_KEYS.liveSessions,
     [],
   )
 }
 
 export function readAssignmentRecords() {
-  return readJson<import('../../modules/institution/types/assessments').AssignmentRecord[]>(
+  return readCached<import('../../modules/institution/types/assessments').AssignmentRecord[]>(
     STORAGE_KEYS.assignments,
     [],
   )
 }
 
 export function readQuizRecords() {
-  return readJson<import('../../modules/institution/types/assessments').QuizRecord[]>(
+  return readCached<import('../../modules/institution/types/assessments').QuizRecord[]>(
     STORAGE_KEYS.quizzes,
     [],
   )
 }
 
 export function readQuestionBank() {
-  return readJson<import('../../modules/institution/types/assessments').QuestionRecord[]>(
+  return readCached<import('../../modules/institution/types/assessments').QuestionRecord[]>(
     STORAGE_KEYS.questionBank,
     [],
   )
 }
 
 export function readStudentSubmissions() {
-  return readJson<import('../../modules/institution/types/assessments').StudentSubmissionRecord[]>(
+  return readCached<import('../../modules/institution/types/assessments').StudentSubmissionRecord[]>(
     STORAGE_KEYS.studentSubmissions,
     [],
   )
 }
 
 export function readAttendances() {
-  return readJson<import('../../modules/institution/types').AttendanceRecord[]>(
+  return readCached<import('../../modules/institution/types').AttendanceRecord[]>(
     STORAGE_KEYS.attendances,
     [],
   )
 }
 
 export function readPayments() {
-  return readJson<import('../../modules/institution/types/platform').PaymentRecord[]>(
+  return readCached<import('../../modules/institution/types/platform').PaymentRecord[]>(
     STORAGE_KEYS.payments,
     [],
   )
 }
 
 export function readHelpDeskTickets() {
-  return readJson<import('../../modules/institution/types/platform').HelpDeskTicketRecord[]>(
+  return readCached<import('../../modules/institution/types/platform').HelpDeskTicketRecord[]>(
     STORAGE_KEYS.helpDeskTickets,
     [],
   )
 }
 
 export function readIntegrations() {
-  return readJson<import('../../modules/institution/types/platform').ApiIntegrationRecord[]>(
+  return readCached<import('../../modules/institution/types/platform').ApiIntegrationRecord[]>(
     STORAGE_KEYS.integrations,
     [],
   )
 }
 
 export function readForumChats(): ForumChatRecord[] {
-  return readJson<ForumChatRecord[]>(STORAGE_KEYS.forumChats, [])
+  return readCached<ForumChatRecord[]>(STORAGE_KEYS.forumChats, [])
 }
 
 export function readForumMessages(): ForumMessageRecord[] {
-  return readJson<ForumMessageRecord[]>(STORAGE_KEYS.forumMessages, [])
+  return readCached<ForumMessageRecord[]>(STORAGE_KEYS.forumMessages, [])
 }
 
 export function readForumReadState(): Record<string, Record<string, string>> {
-  return readJson<Record<string, Record<string, string>>>(STORAGE_KEYS.forumReadState, {})
+  return readCached<Record<string, Record<string, string>>>(STORAGE_KEYS.forumReadState, {})
+}
+
+export function readLessonProgress(): Record<string, Record<string, string[]>> {
+  return readCached<Record<string, Record<string, string[]>>>(STORAGE_KEYS.lessonProgress, {})
+}
+
+export function readLessonResponses(): Record<string, Record<string, Record<string, unknown[]>>> {
+  return readCached<Record<string, Record<string, Record<string, unknown[]>>>>(STORAGE_KEYS.lessonResponses, {})
+}
+
+export function readSettings<T = unknown>(): T {
+  return readCached<T>(STORAGE_KEYS.settings, {} as T)
+}
+
+export function readSelectedCampus(): string {
+  return readCached<string>(STORAGE_KEYS.selectedCampus, 'all')
 }

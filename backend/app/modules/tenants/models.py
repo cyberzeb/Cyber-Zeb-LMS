@@ -8,9 +8,7 @@ Entities: Tenant, Campus, Department
 import uuid
 from enum import Enum
 
-from sqlalchemy import Enum as SAEnum
-from sqlalchemy import ForeignKey, String
-from sqlalchemy.dialects.postgresql import JSONB, UUID as PG_UUID
+from sqlalchemy import JSON, Enum as SAEnum, ForeignKey, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.common.base_model import TimestampMixin, UUIDPrimaryKeyMixin
@@ -50,7 +48,7 @@ class Tenant(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     # Branding / policy defaults stored as JSONB (Section 6.1 step 4):
     # logo_url, primary_color, custom_domain, grading_defaults,
     # attendance_defaults, completion_defaults
-    settings: Mapped[dict] = mapped_column(JSONB, default=dict)
+    settings: Mapped[dict] = mapped_column(JSON, default=dict)
 
     campuses: Mapped[list["Campus"]] = relationship(back_populates="tenant")
 
@@ -59,7 +57,7 @@ class Campus(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     """Campus / branch / business unit under a tenant."""
     __tablename__ = "campuses"
 
-    tenant_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("tenants.id"), index=True)
+    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), index=True)
     name: Mapped[str] = mapped_column(String(200))
     code: Mapped[str] = mapped_column(String(50))
     address: Mapped[str | None] = mapped_column(String(500), nullable=True)
@@ -72,8 +70,8 @@ class Department(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     """Faculty / school / department / business unit under a campus."""
     __tablename__ = "departments"
 
-    tenant_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("tenants.id"), index=True)
-    campus_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("campuses.id"), index=True)
+    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), index=True)
+    campus_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("campuses.id"), index=True)
     name: Mapped[str] = mapped_column(String(200))
     code: Mapped[str] = mapped_column(String(50))
 

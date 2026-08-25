@@ -1,4 +1,5 @@
 import { GlassCard } from '../../../shared/layout/GlassCard'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import type { TrendPoint } from '../types'
 
 interface TrendLineChartProps {
@@ -56,6 +57,7 @@ export function TrendLineChart({
   unit = '',
   compact = false,
 }: TrendLineChartProps) {
+  const { tx } = useLanguage()
   const width = 560
   const height = compact ? 260 : 220
   const geometry = buildChartGeometry(data, width, height)
@@ -63,10 +65,10 @@ export function TrendLineChart({
   return (
     <GlassCard className="p-5 flex flex-col w-full h-full">
       <div className={compact ? 'mb-2' : 'mb-3'}>
-        <h3 className={`font-bold text-navy-900 ${compact ? 'text-[13px]' : 'text-[15px]'}`}>{title}</h3>
+        <h3 className={`font-bold text-navy-900 ${compact ? 'text-[13px]' : 'text-[15px]'}`}>{tx(title)}</h3>
         {subtitle && (
           <p className={`text-secondary-text mt-0.5 ${compact ? 'text-[10.5px]' : 'text-[11.5px] mt-1'}`}>
-            {subtitle}
+            {tx(subtitle)}
           </p>
         )}
       </div>
@@ -75,7 +77,7 @@ export function TrendLineChart({
         <div
           className={`w-full flex-1 flex items-center justify-center rounded-xl border border-dashed border-divider bg-navy-50/40 text-secondary-text text-[12.5px] font-medium ${compact ? 'min-h-[260px]' : 'min-h-[220px]'}`}
         >
-          No trend data yet
+          {tx('No trend data yet')}
         </div>
       ) : (
       <div className={`w-full flex-1 ${compact ? 'min-h-[260px]' : 'min-h-[220px]'}`}>

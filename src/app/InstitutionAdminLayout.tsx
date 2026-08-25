@@ -4,6 +4,8 @@ import { AdminFooter } from '../shared/layout/AdminFooter'
 import { Outlet, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import brandLogo from '../assets/Logo.jpg'
+import { PortalAuthRedirect } from '../shared/components/PortalAuthRedirect'
+import { getSessionPerson, readPortalSession } from '../shared/storage/session'
 import { CampusProvider, useCampusContext } from '../modules/institution/context/CampusContext'
 import { readPeopleFromStorage } from '../modules/institution/hooks/usePeople'
 import {
@@ -85,6 +87,8 @@ export function InstitutionAdminLayout() {
 function InstitutionAdminShell() {
   const location = useLocation()
   const path = location.pathname
+  const session = readPortalSession()
+  const person = getSessionPerson()
   const {
     campuses,
     selectedCampusId,
@@ -101,6 +105,10 @@ function InstitutionAdminShell() {
     window.addEventListener(PEOPLE_UPDATED_EVENT, refresh)
     return () => window.removeEventListener(PEOPLE_UPDATED_EVENT, refresh)
   }, [path])
+
+  if (!session || session.role !== 'Admin' || !person) {
+    return <PortalAuthRedirect role="Admin" />
+  }
 
   const isActive = (routes: string[]) => routes.some((route) => path === route)
 
@@ -317,7 +325,7 @@ function InstitutionAdminShell() {
 
       <div className="flex flex-col flex-1 min-w-0">
         <AdminTopHeader
-          userName="Abel Tesfaye"
+          userName={person.name}
           userRole="Institution Admin"
           institutionName={institutionName}
           breadcrumb={breadcrumb}

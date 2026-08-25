@@ -1,11 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Bell, HeartHandshake, Lock, UserRound } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { Monogram } from '../../../shared/components/Monogram'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
-import { useLocalStorageState } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
 import { STORAGE_KEYS } from '../../../shared/storage/keys'
+import { mergePortalSettings } from '../../../shared/storage/settingsUtils'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { SettingsSection } from '../../institution/components/settings/SettingsSection'
 import { SettingField } from '../../institution/components/settings/SettingField'
@@ -41,11 +42,23 @@ const defaultSettings = (person?: { name: string; email: string }): GuardianSett
 export function GuardianSettingsPage() {
   const { notify } = useToast()
   const sessionPerson = getSessionPerson()
-  const [stored, setStored] = useLocalStorageState<GuardianSettingsState>(
-    STORAGE_KEYS.guardianSettings,
-    defaultSettings(sessionPerson ?? undefined),
+  const defaults = useMemo(
+    () => defaultSettings(sessionPerson ?? undefined),
+    [sessionPerson],
   )
-  const [draft, setDraft] = useState(stored)
+  const [storedRaw, setStored] = useApiCollection<GuardianSettingsState>(
+    STORAGE_KEYS.guardianSettings,
+    defaults,
+  )
+  const stored = useMemo(
+    () => mergePortalSettings(defaults, storedRaw),
+    [defaults, storedRaw],
+  )
+  const [draft, setDraft] = useState<GuardianSettingsState>(stored)
+
+  useEffect(() => {
+    setDraft(stored)
+  }, [stored])
 
   const isDirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(stored), [draft, stored])
 
@@ -124,7 +137,7 @@ export function GuardianSettingsPage() {
 
       <SettingsSection icon={<Lock size={SEC} />} title="Security" description="How your session is stored locally.">
         <p className="text-[13px] text-secondary-text">
-          Session is stored in localStorage under <code className="text-navy-700">berana:session</code>.
+          Session is stored in a secure cookie (<code className="text-navy-700">berana_session</code>).
         </p>
       </SettingsSection>
     </div>

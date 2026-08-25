@@ -1,3 +1,5 @@
+import { useLanguage } from '../i18n/LanguageProvider'
+
 interface FilterTabsProps {
   tabs: string[]
   active: string
@@ -5,6 +7,7 @@ interface FilterTabsProps {
 }
 
 export function FilterTabs({ tabs, active, onChange }: FilterTabsProps) {
+  const { tx } = useLanguage()
   return (
     <div className="flex flex-wrap gap-2">
       {tabs.map((tab) => {
@@ -19,7 +22,7 @@ export function FilterTabs({ tabs, active, onChange }: FilterTabsProps) {
                 : 'bg-white/70 dark:bg-navy-50 text-secondary-text border-divider hover:text-navy-900 hover:border-navy-200 hover:bg-navy-50 dark:hover:bg-[#111b2e]'
               }`}
           >
-            {tab}
+            {tx(tab)}
           </button>
         )
       })}

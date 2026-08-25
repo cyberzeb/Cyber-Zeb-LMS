@@ -7,12 +7,19 @@ from app.core.database import get_db
 from app.core.dependencies import Principal, get_current_principal, require_roles
 from app.core.permissions import Role
 from app.modules.identity.schemas import (
+    DemoLoginRequest,
+    DemoLoginResponse,
     LoginRequest,
+    OtpSendRequest,
+    OtpSendResponse,
+    OtpVerifyRequest,
+    OtpVerifyResponse,
     RefreshRequest,
     TokenPair,
     UserCreate,
     UserOut,
 )
+from app.modules.identity.otp_service import OtpAuthService
 from app.modules.identity.service import AuthService, UserService
 
 router = APIRouter()
@@ -22,6 +29,55 @@ router = APIRouter()
 async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
     service = AuthService(db)
     return await service.login(payload)
+
+
+@router.post("/demo-login", response_model=DemoLoginResponse)
+async def demo_login(payload: DemoLoginRequest, db: AsyncSession = Depends(get_db)):
+    from app.core.demo_auth import map_frontend_role
+    from app.core.exceptions import NotFoundError, ValidationAppError
+    from app.core.security import create_access_token, create_refresh_token
+    from app.modules.lms_store.service import LmsStoreService
+
+    service = LmsStoreService(db)
+    tenant_id = await service.resolve_tenant_id(payload.tenant_code)
+    people = await service.get_collection(tenant_id, "people", [])
+    if not isinstance(people, list):
+        raise ValidationAppError("People collection is invalid")
+
+    person = next((p for p in people if isinstance(p, dict) and p.get("id") == payload.person_id), None)
+    if not person:
+        raise NotFoundError("Person not found")
+
+    frontend_role = str(person.get("role", "Student"))
+    backend_role = map_frontend_role(frontend_role)
+    claims = {
+        "tenant_id": str(tenant_id),
+        "role": backend_role.value,
+        "frontend_role": frontend_role,
+    }
+    access = create_access_token(subject=payload.person_id, extra_claims=claims)
+    refresh = create_refresh_token(subject=payload.person_id)
+    return DemoLoginResponse(
+        access_token=access,
+        refresh_token=refresh,
+        person_id=payload.person_id,
+        frontend_role=frontend_role,
+        display_name=str(person.get("name", "")),
+    )
+
+
+@router.post("/otp/send", response_model=OtpSendResponse)
+async def send_otp(payload: OtpSendRequest, db: AsyncSession = Depends(get_db)):
+    service = OtpAuthService(db)
+    result = await service.send_code(payload.tenant_code, payload.email, payload.role)
+    return OtpSendResponse(**result)
+
+
+@router.post("/otp/verify", response_model=OtpVerifyResponse)
+async def verify_otp(payload: OtpVerifyRequest, db: AsyncSession = Depends(get_db)):
+    service = OtpAuthService(db)
+    result = await service.verify_code(payload.tenant_code, payload.email, payload.role, payload.code)
+    return OtpVerifyResponse(**result)
 
 
 @router.post("/refresh", response_model=TokenPair)

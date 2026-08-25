@@ -8,8 +8,10 @@ import { GlassCard } from '../../../shared/layout/GlassCard'
 import { Monogram } from '../../../shared/components/Monogram'
 import { getSessionPerson } from '../../../shared/storage/session'
 import { readPeople } from '../../../shared/storage/readers'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 
 export function StaffDashboardPage() {
+  const { t } = useLanguage()
   const person = getSessionPerson()
 
   const { pendingSubmissions, mySubmissions } = useMemo(() => {
@@ -24,7 +26,7 @@ export function StaffDashboardPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title={`Welcome, ${person.name.split(' ')[0]}`}
+        title={t('common.welcome', { name: person.name.split(' ')[0] })}
         subtitle={`${person.department} · Staff operations portal`}
       />
 

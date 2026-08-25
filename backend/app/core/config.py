@@ -6,13 +6,25 @@ secrets, provider keys, or environment-specific URLs anywhere else in
 the codebase (Blueprint Section 16 - Secrets).
 """
 from functools import lru_cache
+from pathlib import Path
 from typing import List
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy.engine.url import URL
+
+_BACKEND_DIR = Path(__file__).resolve().parents[2]
+_ENV_FILE = _BACKEND_DIR / ".env"
+_SQLITE_PATH = str((_BACKEND_DIR / "brana_lms.db").resolve())
+
+
+def _default_sqlite_url(driver: str) -> str:
+    return URL.create(drivername=driver, database=_SQLITE_PATH).render_as_string(
+        hide_password=False
+    )
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=str(_ENV_FILE), extra="ignore")
 
     # --- App ---
     APP_NAME: str = "Brana LMS API"
@@ -20,12 +32,12 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api/v1"
     DEBUG: bool = True
 
-    # --- Database ---
-    DATABASE_URL: str
-    DATABASE_URL_SYNC: str
+    # --- Database (SQLite by default so local startup does not require Postgres) ---
+    DATABASE_URL: str = _default_sqlite_url("sqlite+aiosqlite")
+    DATABASE_URL_SYNC: str = _default_sqlite_url("sqlite")
 
     # --- Auth ---
-    JWT_SECRET_KEY: str
+    JWT_SECRET_KEY: str = "dev-secret-change-in-production"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 14
@@ -60,7 +72,7 @@ class Settings(BaseSettings):
     SMS_PROVIDER_API_KEY: str = ""
 
     # --- CORS ---
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
 
 
 @lru_cache

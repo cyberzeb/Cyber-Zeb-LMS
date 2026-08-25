@@ -27,6 +27,7 @@ import { StatusPill } from '../../../shared/components/StatusPill'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { ZoomIcon } from '../../../shared/components/ZoomIcon'
 import { GlassCard } from '../../../shared/layout/GlassCard'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import { TrendLineChart } from '../components/TrendLineChart'
 import type {
   AssignmentSubmission,
@@ -59,6 +60,7 @@ function AttentionList({
   title: string
   items: AttentionItem[]
 }) {
+  const { tx } = useLanguage()
   const toneBySeverity = {
     low: 'info',
     medium: 'warning',
@@ -67,7 +69,7 @@ function AttentionList({
 
   return (
     <GlassCard className="p-4">
-      <h3 className="text-[14px] font-bold text-navy-900 mb-3">{title}</h3>
+      <h3 className="text-[14px] font-bold text-navy-900 mb-3">{tx(title)}</h3>
       <div className="space-y-2">
         {items.map((item) => (
           <div key={item.id} className="rounded-lg border border-divider p-3">
@@ -135,6 +137,7 @@ function integrationLabel(status: IntegrationStatusItem['status']) {
 }
 
 export function InstitutionOverviewPage() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const { setupPercent, setupSteps } = useCampusContext()
   const { data, isLoading, isError } = useInstitutionOverview()
@@ -221,7 +224,7 @@ export function InstitutionOverviewPage() {
 
       <div>
         <h1 className="text-[22px] font-bold text-navy-900">
-          Welcome back, <span className="text-navy-700">Admin</span>
+          {t('common.welcomeBack')} <span className="text-navy-700">Admin</span>
         </h1>
         <p className="text-[13px] text-secondary-text mt-1">
           Track institutional performance, learner progress and operational priorities for {data.institutionName}.

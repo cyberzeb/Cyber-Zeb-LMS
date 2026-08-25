@@ -12,6 +12,7 @@ import { CourseCreateModal } from '../../institution/components/CourseCreateModa
 import { useCourses } from '../../institution/hooks/useCourses'
 import type { CourseCreateInput, CourseRecord } from '../../institution/types'
 import { getSessionPerson } from '../../../shared/storage/session'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 
 const tabs = ['All', 'Approved', 'Pending approval', 'Rejected']
 
@@ -32,6 +33,7 @@ function resolveApprovalStatus(course: CourseRecord) {
 }
 
 export function InstructorCoursesPage() {
+  const { t } = useLanguage()
   const { notify } = useToast()
   const instructor = getSessionPerson()
   const { courses, submitInstructorCourse, updateCourseFromInput, updateCourse } = useCourses()
@@ -124,7 +126,7 @@ export function InstructorCoursesPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="My Courses"
-        subtitle={`Manage and propose courses you teach (${myCourses.length} assigned). Admin approval is required before publishing.`}
+        subtitle={t('page.coursesInstructor.sub', { count: myCourses.length })}
         actions={
           <Button variant="primary" onClick={openCreate}>
             <Plus size={15} />

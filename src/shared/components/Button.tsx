@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { useLanguage } from '../i18n/LanguageProvider'
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline-green' | 'outline-blue' | 'outline-purple'
 type Size = 'sm' | 'md'
@@ -38,12 +39,14 @@ export function Button({
   className = '',
   ...rest
 }: ButtonProps) {
+  const { tx } = useLanguage()
+  const content = typeof children === 'string' ? tx(children) : children
   return (
     <button
       className={`inline-flex items-center gap-1.5 rounded-lg cursor-pointer transition-colors duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
       {...rest}
     >
-      {children}
+      {content}
     </button>
   )
 }

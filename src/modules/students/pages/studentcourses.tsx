@@ -8,6 +8,7 @@ import { Monogram } from '../../../shared/components/Monogram'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import type { EnrolledCourse } from '../types'
 
 const statusTone: Record<EnrolledCourse['status'], 'success' | 'info' | 'neutral'> = {
@@ -23,6 +24,7 @@ const statusLabel: Record<EnrolledCourse['status'], string> = {
 }
 
 export function StudentCoursesPage() {
+  const { t } = useLanguage()
   const { data, isLoading, isError } = useStudentDashboard()
 
   if (isLoading) return <StudentPageLoading />
@@ -38,7 +40,7 @@ export function StudentCoursesPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="My Courses"
-        subtitle={`${activeCount} active course${activeCount === 1 ? '' : 's'} assigned to ${data.department}.`}
+        subtitle={t('page.coursesStudent.sub', { count: activeCount, department: data.department })}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

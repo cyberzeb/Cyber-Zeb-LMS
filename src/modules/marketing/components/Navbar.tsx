@@ -1,126 +1,298 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
 import { Link } from 'react-router-dom'
+
 import brandLogo from '../../../assets/Logo.jpg'
+
+import { portalPathForRole } from '../../../shared/auth/portalRoutes'
+
 import { ThemeToggle } from '../../../shared/components/ThemeToggle'
+import { LanguageSwitcher } from '../../../shared/components/LanguageSwitcher'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
+import type { TranslationKey } from '../../../shared/i18n/translations'
+import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
+
+
 
 interface NavbarProps {
+
   onRequestServiceClick: () => void
+
 }
 
-const PORTAL_LINKS = [
-  { label: 'Student Portal', to: '/student' },
-  { label: 'Instructor Portal', to: '/instructor' },
-  { label: 'Staff Portal', to: '/staff' },
-  { label: 'Guardian Portal', to: '/guardian' },
-  { label: 'Help Desk Portal', to: '/help-desk' },
-  { label: 'Institution Admin', to: '/admin' },
+
+
+const NAV_LINKS: { labelKey: TranslationKey; href: string }[] = [
+  { labelKey: 'nav.about', href: '#about' },
+  { labelKey: 'nav.services', href: '#services' },
+  { labelKey: 'nav.howItWorks', href: '#how-it-works' },
+  { labelKey: 'nav.contact', href: '#request-service' },
 ]
 
-const NAV_LINKS = [
-  { label: 'About', href: '#about' },
-  { label: 'Services', href: '#services' },
-  { label: 'How It Works', href: '#how-it-works' },
-  { label: 'Contact', href: '#request-service' },
-]
+
 
 export function Navbar({ onRequestServiceClick }: NavbarProps) {
+  const { t } = useLanguage()
   const [open, setOpen] = useState(false)
 
+  const [scrolled, setScrolled] = useState(false)
+
+  const session = readPortalSession()
+  const person = getSessionPerson()
+  const signedIn = Boolean(session && person)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
-    <header className="sticky top-0 z-50 bg-navy-900/80 backdrop-blur-md border-b border-white/10">
+
+    <header
+
+      className={`marketing-nav sticky top-0 z-50 backdrop-blur-md border-b transition-all duration-300 ${
+
+        scrolled
+
+          ? 'marketing-nav-scrolled bg-[#1B2340]/95 dark:bg-[#020810]/95'
+
+          : 'bg-[#1B2340]/80 dark:bg-[#020810]/80 border-white/10'
+
+      }`}
+
+    >
+
       <div className="max-w-7xl mx-auto px-6 md:px-8 h-[72px] flex items-center justify-between">
-        <a href="#top" className="flex items-center gap-2.5">
-          <img src={brandLogo} alt="Brana LMS" className="h-10 w-auto rounded-lg object-contain" />
+
+        <a href="#top" className="flex items-center gap-2.5 group">
+
+          <img
+
+            src={brandLogo}
+
+            alt="Brana LMS"
+
+            className="h-10 w-auto rounded-lg object-contain transition-transform duration-300 group-hover:scale-105"
+
+          />
+
           <span className="text-white font-extrabold text-lg tracking-tight">
+
             Brana <span className="text-lemon-500">LMS</span>
+
           </span>
+
         </a>
 
+
+
         <nav className="hidden md:flex items-center gap-8">
+
           {NAV_LINKS.map((link) => (
+
             <a
-              key={link.label}
+
+              key={link.labelKey}
+
               href={link.href}
-              className="text-[13.5px] font-semibold text-navy-200 hover:text-white transition-colors"
+
+              className="text-[13.5px] font-semibold text-navy-200 hover:text-white transition-colors duration-200 relative after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-lemon-500 after:transition-all after:duration-300 hover:after:w-full"
+
             >
-              {link.label}
+
+              {t(link.labelKey)}
+
             </a>
+
           ))}
+
         </nav>
 
-        <div className="hidden lg:flex items-center gap-2 flex-wrap justify-end max-w-[520px]">
-          <span className="text-[11px] font-semibold text-navy-300 w-full text-right mb-0.5">
+
+
+        <div className="hidden lg:flex items-center gap-3">
+
+          <span className="text-[11px] font-semibold text-navy-300 mr-1">
+
             A Cyber-Zeb Consulting product
+
           </span>
-          {PORTAL_LINKS.map((portal) => (
+
+          {signedIn && session ? (
+
             <Link
-              key={portal.to}
-              to={portal.to}
-              className="border border-white/20 text-white font-semibold text-[11px] px-3 py-2 rounded-lg hover:bg-white/10 transition-colors whitespace-nowrap"
+
+              to={portalPathForRole(session.role)}
+
+              className="border border-white/20 text-white font-semibold text-[12px] px-4 py-2 rounded-lg hover:bg-white/10 hover:border-white/30 transition-all duration-200 whitespace-nowrap"
+
             >
-              {portal.label}
+
+              {t('nav.myPortal')}
+
             </Link>
-          ))}
-          <ThemeToggle variant="marketing" />
-          <button
-            onClick={onRequestServiceClick}
-            className="bg-lemon-500 text-navy-900 font-bold text-[11px] px-4 py-2 rounded-lg hover:bg-lemon-200 transition-colors cursor-pointer whitespace-nowrap"
+
+          ) : null}
+
+          <Link
+
+            to="/login"
+
+            className="bg-lemon-500 text-navy-900 font-bold text-[12px] px-5 py-2 rounded-lg hover:bg-lemon-200 transition-all duration-200 whitespace-nowrap"
+
           >
-            Request Service
+
+            {signedIn ? t('nav.switchAccount') : t('nav.signIn')}
+
+          </Link>
+
+          <LanguageSwitcher variant="marketing" />
+
+          <ThemeToggle variant="marketing" />
+
+          <button
+
+            onClick={onRequestServiceClick}
+
+            className="marketing-btn-primary border border-white/20 text-white font-semibold text-[12px] px-4 py-2 rounded-lg hover:bg-white/10 cursor-pointer whitespace-nowrap"
+
+          >
+
+            {t('nav.requestService')}
+
           </button>
+
         </div>
+
+
 
         <button
-          className="md:hidden text-white p-2"
+
+          className="md:hidden text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+
           onClick={() => setOpen((v) => !v)}
-          aria-label="Toggle menu"
+
+          aria-label={t('nav.toggleMenu')}
+
         >
+
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+
             {open ? (
+
               <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
+
             ) : (
+
               <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
+
             )}
+
           </svg>
+
         </button>
+
       </div>
 
-      {open && (
-        <div className="md:hidden bg-navy-900 border-t border-white/10 px-6 py-4 flex flex-col gap-4">
+
+
+      <div
+
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${
+
+          open ? 'max-h-[520px] opacity-100' : 'max-h-0 opacity-0'
+
+        }`}
+
+      >
+
+        <div className="border-t border-white/10 px-6 py-4 flex flex-col gap-4 bg-[#1B2340] dark:bg-[#020810]">
+
           {NAV_LINKS.map((link) => (
+
             <a
-              key={link.label}
+
+              key={link.labelKey}
+
               href={link.href}
+
               onClick={() => setOpen(false)}
-              className="text-[14px] font-semibold text-navy-200 hover:text-white"
+
+              className="text-[14px] font-semibold text-navy-200 hover:text-white transition-colors"
+
             >
-              {link.label}
+
+              {t(link.labelKey)}
+
             </a>
+
           ))}
-          {PORTAL_LINKS.map((portal) => (
+
+          {signedIn && session ? (
+
             <Link
-              key={portal.to}
-              to={portal.to}
+
+              to={portalPathForRole(session.role)}
+
               onClick={() => setOpen(false)}
-              className="border border-white/20 text-white font-semibold text-[13.5px] px-5 py-3 rounded-lg text-center"
+
+              className="border border-white/20 text-white font-semibold text-[13.5px] px-5 py-3 rounded-lg text-center hover:bg-white/10 transition-colors"
+
             >
-              {portal.label}
+
+              {t('nav.myPortal')}
+
             </Link>
-          ))}
-          <div className="flex justify-center">
+
+          ) : null}
+
+          <Link
+
+            to="/login"
+
+            onClick={() => setOpen(false)}
+
+            className="marketing-btn-primary bg-lemon-500 text-navy-900 font-bold text-[13.5px] px-5 py-3 rounded-lg text-center"
+
+          >
+
+            {signedIn ? t('nav.switchAccount') : t('nav.signIn')}
+
+          </Link>
+
+          <div className="flex justify-center gap-2">
+            <LanguageSwitcher variant="marketing" />
             <ThemeToggle variant="marketing" />
           </div>
+
           <button
+
             onClick={() => {
+
               setOpen(false)
+
               onRequestServiceClick()
+
             }}
-            className="bg-lemon-500 text-navy-900 font-bold text-[13.5px] px-5 py-3 rounded-lg cursor-pointer"
+
+            className="border border-white/20 text-white font-semibold text-[13.5px] px-5 py-3 rounded-lg cursor-pointer"
+
           >
-            Request Service
+
+            {t('nav.requestService')}
+
           </button>
+
         </div>
-      )}
+
+      </div>
+
     </header>
+
   )
+
 }
+
+

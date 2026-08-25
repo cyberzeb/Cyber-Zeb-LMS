@@ -5,8 +5,10 @@ import { StatusPill } from '../../../shared/components/StatusPill'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { getSessionPerson } from '../../../shared/storage/session'
 import { readCourses, readEnrollments, readPeople } from '../../../shared/storage/readers'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 
 export function GuardianProgressPage() {
+  const { t } = useLanguage()
   const person = getSessionPerson()
 
   const enrollments = useMemo(() => {
@@ -36,7 +38,7 @@ export function GuardianProgressPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Student Progress"
-        subtitle={`Course enrollments and progress for ${person.department}.`}
+        subtitle={t('page.progress.sub', { department: person.department })}
       />
 
       <GlassCard className="p-0 overflow-hidden">

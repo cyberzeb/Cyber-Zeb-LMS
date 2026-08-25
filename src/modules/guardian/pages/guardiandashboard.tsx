@@ -8,8 +8,10 @@ import { GlassCard } from '../../../shared/layout/GlassCard'
 import { Monogram } from '../../../shared/components/Monogram'
 import { getSessionPerson } from '../../../shared/storage/session'
 import { readEnrollments, readPeople } from '../../../shared/storage/readers'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 
 export function GuardianDashboardPage() {
+  const { t } = useLanguage()
   const person = getSessionPerson()
 
   const linkedStudent = useMemo(() => {
@@ -29,7 +31,7 @@ export function GuardianDashboardPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title={`Welcome, ${person.name.split(' ')[0]}`}
+        title={t('common.welcome', { name: person.name.split(' ')[0] })}
         subtitle="View your linked student's learning progress and campus updates."
       />
 

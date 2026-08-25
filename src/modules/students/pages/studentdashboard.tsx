@@ -26,6 +26,7 @@ import { TrendLineChart } from '../../institution/components/TrendLineChart'
 import { StudentPageLoading } from '../components/StudentPageStates'
 import { StudentProfileCard } from '../components/StudentProfileCard'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import type { AssignmentItem, UpcomingDeadline } from '../types'
 
 const STAT = 17
@@ -56,6 +57,7 @@ function assignmentStatusTone(status: AssignmentItem['status']) {
 }
 
 export function StudentDashboardPage() {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const { data, isLoading, isError, error, reload } = useStudentDashboard()
 
@@ -149,7 +151,7 @@ export function StudentDashboardPage() {
         <div className="flex flex-col gap-4 md:gap-5 min-w-0">
           <div>
             <h1 className="text-[22px] font-bold text-navy-900">
-              Welcome back, <span className="text-navy-700">{firstName}</span>
+              {t('common.welcomeBack')} <span className="text-navy-700">{firstName}</span>
             </h1>
             <p className="text-[13px] text-secondary-text mt-1">
               Track your learning progress, upcoming deadlines, and performance across {data.program} · {data.term}.

@@ -6,8 +6,10 @@ import { StatBlock } from '../../../shared/components/StatBlock'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { getSessionPerson } from '../../../shared/storage/session'
 import { readHelpDeskTickets } from '../../../shared/storage/readers'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 
 export function HelpDeskDashboardPage() {
+  const { t } = useLanguage()
   const person = getSessionPerson()
 
   const stats = useMemo(() => {
@@ -24,7 +26,7 @@ export function HelpDeskDashboardPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title={`Welcome, ${person.name.split(' ')[0]}`}
+        title={t('common.welcome', { name: person.name.split(' ')[0] })}
         subtitle="Help desk agent workspace — manage support tickets from the institution."
       />
 

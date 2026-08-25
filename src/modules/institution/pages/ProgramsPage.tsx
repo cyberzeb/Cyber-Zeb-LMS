@@ -9,7 +9,8 @@ import { SearchInput } from '../../../shared/components/SearchInput'
 import { Modal } from '../../../shared/components/Modal'
 import { FormField } from '../../../shared/components/FormField'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
-import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
+import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { ProgramsTable } from '../components/ProgramsTable'
 import { useCampusContext } from '../context/CampusContext'
 import { DEFAULT_CAMPUS_ID } from '../data/orgSeedData'
@@ -54,7 +55,7 @@ function migratePrograms(raw: LegacyProgramRow[]): ProgramRow[] {
 export function ProgramsPage() {
   const { notify } = useToast()
   const { selectedCampusId, activeCampuses, getCampusById, departments } = useCampusContext()
-  const [programsRaw, setProgramsRaw] = useLocalStorageState<LegacyProgramRow[]>(
+  const [programsRaw, setProgramsRaw] = useApiCollection<LegacyProgramRow[]>(
     'berana:programs',
     [],
   )

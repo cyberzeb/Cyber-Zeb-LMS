@@ -1,6 +1,11 @@
 import { useCallback, useMemo } from 'react'
 
-import { useLocalStorageState, createId } from '../../../shared/hooks/useLocalStorageState'
+import { useApiCollection } from '../../../shared/hooks/useApiCollection'
+import { createId } from '../../../shared/hooks/useLocalStorageState'
+import {
+  readCourses as readCoursesFromCache,
+  readSettings as readSettingsFromCache,
+} from '../../../shared/storage/readers'
 
 import {
 
@@ -81,21 +86,7 @@ interface SettingsSnapshot {
 
 
 function readSettings(): SettingsSnapshot {
-
-  try {
-
-    const stored = window.localStorage.getItem(ORG_STORAGE_KEYS.settings)
-
-    if (stored) return JSON.parse(stored) as SettingsSnapshot
-
-  } catch {
-
-    /* ignore */
-
-  }
-
-  return {}
-
+  return readSettingsFromCache<SettingsSnapshot>()
 }
 
 
@@ -116,7 +107,7 @@ function withDeptCounts(records: CampusRecord[], departments: Department[]): Cam
 
 export function useOrgStructure() {
 
-  const [campusRecords, setCampusRecords] = useLocalStorageState<CampusRecord[]>(
+  const [campusRecords, setCampusRecords] = useApiCollection<CampusRecord[]>(
 
     ORG_STORAGE_KEYS.campuses,
 
@@ -124,7 +115,7 @@ export function useOrgStructure() {
 
   )
 
-  const [colleges, setColleges] = useLocalStorageState<College[]>(
+  const [colleges, setColleges] = useApiCollection<College[]>(
 
     ORG_STORAGE_KEYS.colleges,
 
@@ -132,7 +123,7 @@ export function useOrgStructure() {
 
   )
 
-  const [departmentsRaw, setDepartmentsRaw] = useLocalStorageState<LegacyDepartment[]>(
+  const [departmentsRaw, setDepartmentsRaw] = useApiCollection<LegacyDepartment[]>(
 
     ORG_STORAGE_KEYS.departments,
 
@@ -140,7 +131,7 @@ export function useOrgStructure() {
 
   )
 
-  const [selectedCampusId, setSelectedCampusId] = useLocalStorageState<string | 'all'>(
+  const [selectedCampusId, setSelectedCampusId] = useApiCollection<string | 'all'>(
 
     ORG_STORAGE_KEYS.selectedCampus,
 
@@ -440,21 +431,7 @@ export function useOrgStructure() {
 
       departments.some((d) => d.collegeId && d.name.trim())
 
-    const hasCourses = (() => {
-
-      try {
-
-        const stored = window.localStorage.getItem(ORG_STORAGE_KEYS.courses)
-
-        return stored ? (JSON.parse(stored) as unknown[]).length > 0 : false
-
-      } catch {
-
-        return false
-
-      }
-
-    })()
+    const hasCourses = readCoursesFromCache().length > 0
 
     const hasSso =
 
