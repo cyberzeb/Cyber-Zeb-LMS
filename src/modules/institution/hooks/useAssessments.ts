@@ -203,5 +203,121 @@ export function useStudentSubmissions() {
     [setRecordsRaw],
   )
 
-  return { records, setRecords }
+  const submitAssignment = useCallback(
+    (
+      studentId: string,
+      assignmentId: string,
+      attachmentName: string,
+      maxScore: number,
+    ) => {
+      const now = new Date().toISOString()
+      setRecords((prev) => {
+        const existing = prev.find(
+          (s) =>
+            s.studentId === studentId &&
+            s.assessmentType === 'assignment' &&
+            s.assessmentId === assignmentId,
+        )
+        if (existing) {
+          return prev.map((s) =>
+            s.id === existing.id
+              ? {
+                  ...s,
+                  status: 'submitted' as const,
+                  submittedAt: now,
+                  attachmentName,
+                  maxScore,
+                }
+              : s,
+          )
+        }
+        return [
+          {
+            id: createId('sub'),
+            studentId,
+            assessmentType: 'assignment' as const,
+            assessmentId: assignmentId,
+            status: 'submitted' as const,
+            submittedAt: now,
+            attachmentName,
+            maxScore,
+          },
+          ...prev,
+        ]
+      })
+    },
+    [setRecords],
+  )
+
+  const submitQuizAttempt = useCallback(
+    (
+      studentId: string,
+      quizId: string,
+      score: number,
+      maxScore: number,
+    ) => {
+      const now = new Date().toISOString()
+      setRecords((prev) => {
+        const existing = prev.find(
+          (s) =>
+            s.studentId === studentId &&
+            s.assessmentType === 'quiz' &&
+            s.assessmentId === quizId,
+        )
+        if (existing) {
+          return prev.map((s) =>
+            s.id === existing.id
+              ? {
+                  ...s,
+                  status: 'graded' as const,
+                  score,
+                  maxScore,
+                  submittedAt: now,
+                }
+              : s,
+          )
+        }
+        return [
+          {
+            id: createId('sub'),
+            studentId,
+            assessmentType: 'quiz' as const,
+            assessmentId: quizId,
+            status: 'graded' as const,
+            score,
+            maxScore,
+            submittedAt: now,
+          },
+          ...prev,
+        ]
+      })
+    },
+    [setRecords],
+  )
+
+  const gradeSubmission = useCallback(
+    (
+      submissionId: string,
+      score: number,
+      feedback: string,
+      maxScore: number,
+    ) => {
+      setRecords((prev) =>
+        prev.map((s) =>
+          s.id === submissionId
+            ? { ...s, status: 'graded' as const, score, feedback, maxScore }
+            : s,
+        ),
+      )
+    },
+    [setRecords],
+  )
+
+  return {
+    records,
+    setRecords,
+    submitAssignment,
+    submitQuizAttempt,
+    gradeSubmission,
+  }
 }

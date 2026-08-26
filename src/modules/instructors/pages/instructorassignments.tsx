@@ -7,6 +7,9 @@ import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { Monogram } from '../../../shared/components/Monogram'
 import { GlassCard } from '../../../shared/layout/GlassCard'
+import { readAssignmentRecords } from '../../../shared/storage/readers'
+import { CreateAssignmentModal } from '../components/CreateAssignmentModal'
+import { GradeAssignmentModal } from '../components/GradeAssignmentModal'
 import { InstructorPageError, InstructorPageLoading } from '../components/InstructorPageStates'
 import { useInstructorDashboard } from '../hooks/useInstructorDashboard'
 import type { AssignmentSubmission } from '../types'
@@ -21,8 +24,10 @@ const statusTone: Record<AssignmentSubmission['status'], 'warning' | 'success' |
 }
 
 export function InstructorAssignmentsPage() {
-  const { data, isLoading, isError } = useInstructorDashboard()
+  const { data, isLoading, isError, reload } = useInstructorDashboard()
   const [activeTab, setActiveTab] = useState('All')
+  const [createOpen, setCreateOpen] = useState(false)
+  const [gradeTarget, setGradeTarget] = useState<{ id: string; title: string; maxPoints: number } | null>(null)
 
   const stats = useMemo(() => {
     if (!data) return { pending: 0, graded: 0, total: 0 }
@@ -39,6 +44,13 @@ export function InstructorAssignmentsPage() {
     return data.assignments.filter((a) => a.status === activeTab)
   }, [data, activeTab])
 
+  const openGradeModal = (assignmentId: string) => {
+    const record = readAssignmentRecords().find((a) => a.id === assignmentId)
+    const view = data?.assignments.find((a) => a.id === assignmentId)
+    if (!record || !view) return
+    setGradeTarget({ id: assignmentId, title: view.title, maxPoints: record.maxPoints })
+  }
+
   if (isLoading) return <InstructorPageLoading />
   if (isError || !data) return <InstructorPageError message="Failed to load assignments." />
 
@@ -48,7 +60,7 @@ export function InstructorAssignmentsPage() {
         title="Assignment Submissions"
         subtitle="Review student uploads, provide feedback, and publish grades."
         actions={
-          <Button variant="primary">
+          <Button variant="primary" onClick={() => setCreateOpen(true)}>
             <Plus size={15} />
             Create assignment
           </Button>
@@ -56,27 +68,9 @@ export function InstructorAssignmentsPage() {
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatBlock
-          label="Pending review"
-          value={stats.pending}
-          sub="Assignments with submissions"
-          icon={<Clock size={17} />}
-          iconBg="bg-lemon-100 text-lemon-800"
-        />
-        <StatBlock
-          label="Graded"
-          value={stats.graded}
-          sub="Completed assignments"
-          icon={<MessageSquareText size={17} />}
-          iconBg="bg-success-bg text-success"
-        />
-        <StatBlock
-          label="Ungraded items"
-          value={stats.total}
-          sub="Individual submissions"
-          icon={<UploadCloud size={17} />}
-          iconBg="bg-warning-bg text-warning"
-        />
+        <StatBlock label="Pending review" value={stats.pending} sub="Assignments with submissions" icon={<Clock size={17} />} iconBg="bg-lemon-100 text-lemon-800" />
+        <StatBlock label="Graded" value={stats.graded} sub="Completed assignments" icon={<MessageSquareText size={17} />} iconBg="bg-success-bg text-success" />
+        <StatBlock label="Ungraded items" value={stats.total} sub="Individual submissions" icon={<UploadCloud size={17} />} iconBg="bg-warning-bg text-warning" />
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -113,7 +107,7 @@ export function InstructorAssignmentsPage() {
                     <span className="text-warning font-semibold">{assignment.pendingCount} to grade</span>
                   ) : null}
                 </div>
-                <Button variant="primary" size="sm" className="mt-3">
+                <Button variant="primary" size="sm" className="mt-3" onClick={() => openGradeModal(assignment.id)}>
                   <UploadCloud size={13} />
                   Review submissions
                 </Button>
@@ -127,7 +121,31 @@ export function InstructorAssignmentsPage() {
         <GlassCard className="p-10 text-center">
           <FileText size={32} className="mx-auto text-navy-300 mb-3" />
           <p className="text-[14px] font-semibold text-navy-900">No assignments in this view</p>
+          <Button variant="primary" className="mt-4" onClick={() => setCreateOpen(true)}>
+            <Plus size={15} />
+            Create assignment
+          </Button>
         </GlassCard>
+      ) : null}
+
+      <CreateAssignmentModal
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        courses={data.courses}
+        instructorId={data.instructorId}
+        instructorName={data.instructorName}
+        onCreated={() => void reload()}
+      />
+
+      {gradeTarget ? (
+        <GradeAssignmentModal
+          open
+          assignmentId={gradeTarget.id}
+          assignmentTitle={gradeTarget.title}
+          maxPoints={gradeTarget.maxPoints}
+          onClose={() => setGradeTarget(null)}
+          onGraded={() => void reload()}
+        />
       ) : null}
     </div>
   )

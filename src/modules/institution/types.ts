@@ -34,6 +34,14 @@ export interface Department {
   campusId: string
   collegeId: string
   description?: string
+  /** Degree / program code, e.g. BSC-CS */
+  programCode?: string
+  /** Undergraduate, Postgraduate, etc. */
+  programLevel?: ProgramLevel
+  /** How many study years (Year 1 … Year N) students progress through */
+  maxYears?: number
+  /** Semesters offered per study year (default 2: Fall + Spring) */
+  semestersPerYear?: number
 }
 
 export interface Program {
@@ -405,9 +413,13 @@ export interface CourseEnrollment {
   id: string
   studentId: string
   studentName: string
+  /** @deprecated Prefer courseOfferingId — catalog course reference kept for migration */
   courseId: string
   courseCode: string
   courseTitle: string
+  /** Term-bound offering — canonical enrollment anchor (University Edition) */
+  courseOfferingId?: string
+  academicTermId?: string
   program?: string
   campus?: string
   enrolledOn: string
@@ -430,6 +442,12 @@ export interface PersonRow {
   email: string
   role: PersonRole
   department: string
+  /** FK to department — preferred for students */
+  departmentId?: string
+  /** Study year within department program (1 … department.maxYears) */
+  studyYear?: number
+  /** Semester within the current study year (1 … department.semestersPerYear) */
+  programSemester?: number
   campusId?: string
   isDepartmentHead?: boolean
   verificationStatus?: 'verified' | 'pending' | 'rejected'

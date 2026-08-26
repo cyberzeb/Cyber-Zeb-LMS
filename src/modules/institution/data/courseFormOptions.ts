@@ -69,8 +69,6 @@ export function createEmptyCourseForm(): CourseCreateInput {
     discussionForumEnabled: true,
     gradingPolicy: '',
     visibility: 'private',
-    startDate: '',
-    endDate: '',
     department: UNASSIGNED_DEPARTMENT,
     instructorId: '',
   }
@@ -170,8 +168,6 @@ export function courseRecordToFormInput(course: CourseRecord): CourseCreateInput
     discussionForumEnabled: course.discussionForumEnabled ?? true,
     gradingPolicy: course.gradingPolicy ?? '',
     visibility: course.visibility ?? 'private',
-    startDate: course.startDate ?? '',
-    endDate: course.endDate ?? '',
     department: course.department,
     instructorId: course.instructorId ?? '',
   }
@@ -208,7 +204,5 @@ export function courseInputToRecordFields(
     discussionForumEnabled: input.discussionForumEnabled,
     gradingPolicy: input.gradingPolicy?.trim() || undefined,
     visibility: input.visibility,
-    startDate: input.startDate || undefined,
-    endDate: input.endDate || undefined,
   }
 }

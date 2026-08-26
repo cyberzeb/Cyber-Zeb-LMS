@@ -36,9 +36,10 @@ import { usePeople } from '../hooks/usePeople'
 
 import { DEFAULT_CAMPUS_ID, DEFAULT_COLLEGE_ID } from '../data/orgSeedData'
 
-import { useCourses } from '../hooks/useCourses'
+import { useAcademicCalendar } from '../hooks/useAcademicCalendar'
+import { DEFAULT_SEMESTERS_PER_YEAR } from '../utils/academicTermUtils'
 
-import type { Department } from '../types'
+import type { Department, ProgramLevel } from '../types'
 
 
 
@@ -47,15 +48,13 @@ const STAT = 17
 
 
 const emptyForm = {
-
   name: '',
-
   headName: '',
-
   campusId: DEFAULT_CAMPUS_ID,
-
   collegeId: DEFAULT_COLLEGE_ID,
-
+  programCode: '',
+  programLevel: 'Undergraduate' as ProgramLevel,
+  maxYears: '4',
 }
 
 
@@ -63,6 +62,7 @@ const emptyForm = {
 export function DepartmentsPage() {
 
   const { notify } = useToast()
+  const { ensureCalendarForProgram } = useAcademicCalendar()
 
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -115,8 +115,6 @@ export function DepartmentsPage() {
   const [form, setForm] = useState(emptyForm)
 
 
-
-  const { getCoursesForDepartment } = useCourses()
 
   const { people } = usePeople()
 
@@ -298,6 +296,9 @@ export function DepartmentsPage() {
 
     }
 
+    const maxYears = Math.max(1, Number(form.maxYears) || 4)
+    const semestersPerYear = DEFAULT_SEMESTERS_PER_YEAR
+
     const newDept: Department = {
 
       id: createId('dept'),
@@ -316,14 +317,27 @@ export function DepartmentsPage() {
 
       collegeId: form.collegeId,
 
+      programCode: form.programCode.trim() || undefined,
+
+      programLevel: form.programLevel,
+
+      maxYears,
+
+      semestersPerYear,
+
     }
 
     setDepartments((prev) => [...prev, newDept])
 
+    const termsAdded = ensureCalendarForProgram(maxYears, form.campusId, semestersPerYear)
+
     setModalOpen(false)
 
-    notify(`Department “${newDept.name}” added.`)
-
+    notify(
+      termsAdded > 0
+        ? `Department “${newDept.name}” added. ${termsAdded} semester${termsAdded === 1 ? '' : 's'} provisioned on the academic calendar.`
+        : `Department “${newDept.name}” added.`,
+    )
   }
 
 
@@ -344,7 +358,17 @@ export function DepartmentsPage() {
 
     setDepartments((prev) => prev.map((d) => (d.id === updated.id ? updated : d)))
 
-    notify(`Department “${updated.name}” updated.`)
+    const termsAdded = ensureCalendarForProgram(
+      updated.maxYears ?? 4,
+      updated.campusId,
+      updated.semestersPerYear ?? DEFAULT_SEMESTERS_PER_YEAR,
+    )
+
+    notify(
+      termsAdded > 0
+        ? `Department “${updated.name}” updated. ${termsAdded} semester${termsAdded === 1 ? '' : 's'} added to the calendar.`
+        : `Department “${updated.name}” updated.`,
+    )
 
   }
 
@@ -464,8 +488,6 @@ export function DepartmentsPage() {
 
     const campus = getCampusById(dept.campusId)
 
-    const courseCount = getCoursesForDepartment(dept.name).length
-
     return (
 
       <DepartmentCard
@@ -480,7 +502,11 @@ export function DepartmentsPage() {
 
         facultyCount={dept.facultyCount}
 
-        courseCount={courseCount}
+        programCode={dept.programCode}
+
+        maxYears={dept.maxYears}
+
+        programLevel={dept.programLevel}
 
         collegeName={college?.name}
 
@@ -506,9 +532,9 @@ export function DepartmentsPage() {
 
       <PageHeader
 
-        title="Departments"
+        title="Departments & Programs"
 
-        subtitle="Academic departments are the final organizational unit — e.g. Computer Science, Software Engineering — grouped under colleges."
+        subtitle="Each department is a degree program with a fixed duration (Year 1 … Year N). Students and course offerings are scoped by department and study year."
 
         actions={
 
@@ -771,6 +797,49 @@ export function DepartmentsPage() {
           }}
 
         />
+
+        <FormField
+
+          label="Program Code"
+
+          value={form.programCode}
+
+          onChange={(v) => setForm({ ...form, programCode: v })}
+
+          placeholder="e.g. BSC-CS"
+
+        />
+
+        <div className="grid grid-cols-2 gap-4">
+
+          <FormField
+
+            label="Program Level"
+
+            type="select"
+
+            value={form.programLevel}
+
+            options={['Undergraduate', 'Postgraduate', 'Doctoral', 'Certificate']}
+
+            onChange={(v) => setForm({ ...form, programLevel: v as ProgramLevel })}
+
+          />
+
+          <FormField
+
+            label="Program Duration (years)"
+
+            value={form.maxYears}
+
+            onChange={(v) => setForm({ ...form, maxYears: v })}
+
+            placeholder="4"
+            hint={`${DEFAULT_SEMESTERS_PER_YEAR} semesters per year are added to the academic calendar automatically.`}
+
+          />
+
+        </div>
 
         <FormField
 

@@ -84,6 +84,7 @@ export interface LiveClassSession {
   startAt: string
   duration: string
   platform: string
+  meetingUrl?: string
   status: 'live' | 'upcoming' | 'ended'
   attendees?: number
 }

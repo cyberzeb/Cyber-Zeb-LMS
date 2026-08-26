@@ -4,7 +4,9 @@ import { PageHeader } from '../../../shared/components/PageHeader'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { ZoomIcon } from '../../../shared/components/ZoomIcon'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
+import { openMeetingUrl } from '../../../shared/utils/liveSessionUtils'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
 import type { LiveClassSession } from '../types'
@@ -43,7 +45,15 @@ function PlatformBadge({ platform, onDark }: { platform: string; onDark?: boolea
   )
 }
 
-function LiveSessionCard({ session, featured }: { session: LiveClassSession; featured?: boolean }) {
+function LiveSessionCard({
+  session,
+  featured,
+  onJoin,
+}: {
+  session: LiveClassSession
+  featured?: boolean
+  onJoin: (session: LiveClassSession) => void
+}) {
   const isLive = session.status === 'live'
 
   if (featured && isLive) {
@@ -76,7 +86,7 @@ function LiveSessionCard({ session, featured }: { session: LiveClassSession; fea
               <PlatformBadge platform={session.platform} onDark />
             </div>
           </div>
-          <Button variant="primary" className="shrink-0 shadow-lg shadow-lemon-500/25">
+          <Button variant="primary" className="shrink-0 shadow-lg shadow-lemon-500/25" onClick={() => onJoin(session)}>
             <MonitorPlay size={16} />
             Join session
           </Button>
@@ -129,9 +139,10 @@ function LiveSessionCard({ session, featured }: { session: LiveClassSession; fea
             variant={session.status === 'live' ? 'primary' : 'secondary'}
             size="sm"
             className="shrink-0 self-start sm:self-center"
+            onClick={() => onJoin(session)}
           >
             <Video size={13} />
-            {session.status === 'live' ? 'Join' : 'Remind me'}
+            {session.status === 'live' ? 'Join' : session.meetingUrl ? 'Open link' : 'Join'}
           </Button>
         ) : (
           <span className="text-[11px] font-semibold text-secondary-text shrink-0">Recording available</span>
@@ -146,11 +157,13 @@ function SessionSection({
   subtitle,
   sessions,
   featuredFirst,
+  onJoin,
 }: {
   title: string
   subtitle: string
   sessions: LiveClassSession[]
   featuredFirst?: boolean
+  onJoin: (session: LiveClassSession) => void
 }) {
   if (sessions.length === 0) return null
 
@@ -162,10 +175,10 @@ function SessionSection({
         <h2 className="text-[13px] font-bold uppercase tracking-wider text-navy-900">{title}</h2>
         <p className="text-[12px] text-secondary-text mt-0.5">{subtitle}</p>
       </div>
-      {featuredFirst && first ? <LiveSessionCard session={first} featured /> : null}
+      {featuredFirst && first ? <LiveSessionCard session={first} featured onJoin={onJoin} /> : null}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {(featuredFirst ? rest : sessions).map((session) => (
-          <LiveSessionCard key={session.id} session={session} />
+          <LiveSessionCard key={session.id} session={session} onJoin={onJoin} />
         ))}
       </div>
     </section>
@@ -173,7 +186,14 @@ function SessionSection({
 }
 
 export function StudentLiveClassesPage() {
+  const { notify } = useToast()
   const { data, isLoading, isError } = useStudentDashboard()
+
+  const handleJoin = (session: LiveClassSession) => {
+    if (!openMeetingUrl(session.meetingUrl)) {
+      notify('No meeting link is set for this session yet.', 'error')
+    }
+  }
 
   if (isLoading) return <StudentPageLoading />
   if (isError || !data) return <StudentPageError message="Failed to load live classes." />
@@ -189,7 +209,7 @@ export function StudentLiveClassesPage() {
         subtitle="Join lectures and labs in real time — your virtual classroom schedule."
         actions={
           liveNow.length > 0 ? (
-            <Button variant="primary">
+            <Button variant="primary" onClick={() => handleJoin(liveNow[0])}>
               <MonitorPlay size={15} />
               Join live session
             </Button>
@@ -226,18 +246,21 @@ export function StudentLiveClassesPage() {
         subtitle="Sessions happening right now — join before they end."
         sessions={liveNow}
         featuredFirst
+        onJoin={handleJoin}
       />
 
       <SessionSection
         title="Coming up"
         subtitle="Save a reminder and be ready when class starts."
         sessions={upcoming}
+        onJoin={handleJoin}
       />
 
       <SessionSection
         title="Recent sessions"
         subtitle="Catch up with recordings from past live classes."
         sessions={ended}
+        onJoin={handleJoin}
       />
 
       {data.liveClasses.length === 0 ? (

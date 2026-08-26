@@ -23,11 +23,21 @@ export interface StudentImportResult {
   skippedDuplicates: number
 }
 
+export interface UpdateAdminInput {
+  name: string
+  email: string
+  campusId: string
+  departmentId: string
+  status: PersonRow['status']
+}
+
 export interface UpdateStudentInput {
   name: string
   email: string
   campusId: string
   departmentId: string
+  studyYear: number
+  programSemester: number
   status: PersonRow['status']
 }
 
@@ -337,12 +347,20 @@ export async function updateStudent(
   if (!input.name.trim()) throw new Error('Student name is required.')
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) throw new Error('Invalid email address.')
 
+  const maxYears = department.maxYears ?? 4
+  const semestersPerYear = department.semestersPerYear ?? 2
+  const studyYear = Math.min(Math.max(1, input.studyYear), maxYears)
+  const programSemester = Math.min(Math.max(1, input.programSemester), semestersPerYear)
+
   return {
     id: studentId,
     name: input.name.trim(),
     email: input.email.trim().toLowerCase(),
     role: 'Student',
     department: department.name,
+    departmentId: department.id,
+    studyYear,
+    programSemester,
     campusId: campus.id,
     status: input.status,
     lastActive: 'Just now',
@@ -408,7 +426,7 @@ export async function updateStaff(
 /** Simulates a backend PUT endpoint for updating an administrator record. */
 export async function updateAdmin(
   adminId: string,
-  input: UpdateStudentInput,
+  input: UpdateAdminInput,
   campuses: Campus[],
   departments: Department[],
 ): Promise<PersonRow> {

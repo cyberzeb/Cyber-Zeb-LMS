@@ -108,7 +108,7 @@ export function CoursesPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Course Catalog"
-        subtitle="Author courses and assign a teaching instructor per course. Department grouping is organizational only."
+        subtitle="Reusable course templates (code, content, credits). Create term-bound sections under Course Offerings."
         actions={
           <>
             <Button variant="secondary" onClick={() => notify('Course templates library is coming soon.', 'info')}>

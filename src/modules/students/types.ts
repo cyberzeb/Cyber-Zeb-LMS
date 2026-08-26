@@ -2,7 +2,7 @@ export type ResourceKind = 'Syllabus' | 'Lecture Notes' | 'Reading' | 'Video'
 
 export type QuizStatus = 'Open' | 'Locked' | 'Completed'
 
-export type AssignmentStatus = 'Ready to submit' | 'Submitted' | 'Awaiting review'
+export type AssignmentStatus = 'Ready to submit' | 'Submitted' | 'Graded'
 
 export type EventType = 'Live class' | 'Exam' | 'Office hour' | 'Deadline'
 
@@ -107,6 +107,7 @@ export interface LiveClassSession {
   startAt: string
   duration: string
   platform: string
+  meetingUrl?: string
   status: 'live' | 'upcoming' | 'ended'
 }
 

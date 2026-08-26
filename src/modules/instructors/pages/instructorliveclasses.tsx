@@ -1,11 +1,15 @@
 import { CalendarClock, Clock, MonitorPlay, Plus, Radio, UserRound, Video } from 'lucide-react'
+import { useState } from 'react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { ZoomIcon } from '../../../shared/components/ZoomIcon'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
+import { openMeetingUrl } from '../../../shared/utils/liveSessionUtils'
 import { InstructorPageError, InstructorPageLoading } from '../components/InstructorPageStates'
+import { ScheduleLiveSessionModal } from '../components/ScheduleLiveSessionModal'
 import { useInstructorDashboard } from '../hooks/useInstructorDashboard'
 import type { LiveClassSession } from '../types'
 
@@ -43,7 +47,15 @@ function PlatformBadge({ platform, onDark }: { platform: string; onDark?: boolea
   )
 }
 
-function LiveSessionCard({ session, featured }: { session: LiveClassSession; featured?: boolean }) {
+function LiveSessionCard({
+  session,
+  featured,
+  onJoin,
+}: {
+  session: LiveClassSession
+  featured?: boolean
+  onJoin: (session: LiveClassSession) => void
+}) {
   const isLive = session.status === 'live'
 
   if (featured && isLive) {
@@ -79,9 +91,9 @@ function LiveSessionCard({ session, featured }: { session: LiveClassSession; fea
               <PlatformBadge platform={session.platform} onDark />
             </div>
           </div>
-          <Button variant="primary" className="shrink-0 shadow-lg shadow-lemon-500/25">
+          <Button variant="primary" className="shrink-0 shadow-lg shadow-lemon-500/25" onClick={() => onJoin(session)}>
             <MonitorPlay size={16} />
-            Manage session
+            Start session
           </Button>
         </div>
       </div>
@@ -132,9 +144,10 @@ function LiveSessionCard({ session, featured }: { session: LiveClassSession; fea
             variant={session.status === 'live' ? 'primary' : 'secondary'}
             size="sm"
             className="shrink-0 self-start sm:self-center"
+            onClick={() => onJoin(session)}
           >
             <Video size={13} />
-            {session.status === 'live' ? 'Manage' : 'Edit'}
+            {session.status === 'live' ? 'Start' : session.meetingUrl ? 'Open link' : 'Start'}
           </Button>
         ) : (
           <span className="text-[11px] font-semibold text-secondary-text shrink-0">Recording saved</span>
@@ -149,11 +162,13 @@ function SessionSection({
   subtitle,
   sessions,
   featuredFirst,
+  onJoin,
 }: {
   title: string
   subtitle: string
   sessions: LiveClassSession[]
   featuredFirst?: boolean
+  onJoin: (session: LiveClassSession) => void
 }) {
   if (sessions.length === 0) return null
 
@@ -165,10 +180,10 @@ function SessionSection({
         <h2 className="text-[13px] font-bold uppercase tracking-wider text-navy-900">{title}</h2>
         <p className="text-[12px] text-secondary-text mt-0.5">{subtitle}</p>
       </div>
-      {featuredFirst && first ? <LiveSessionCard session={first} featured /> : null}
+      {featuredFirst && first ? <LiveSessionCard session={first} featured onJoin={onJoin} /> : null}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         {(featuredFirst ? rest : sessions).map((session) => (
-          <LiveSessionCard key={session.id} session={session} />
+          <LiveSessionCard key={session.id} session={session} onJoin={onJoin} />
         ))}
       </div>
     </section>
@@ -176,7 +191,15 @@ function SessionSection({
 }
 
 export function InstructorLiveClassesPage() {
-  const { data, isLoading, isError } = useInstructorDashboard()
+  const { notify } = useToast()
+  const { data, isLoading, isError, reload } = useInstructorDashboard()
+  const [modalOpen, setModalOpen] = useState(false)
+
+  const handleJoin = (session: LiveClassSession) => {
+    if (!openMeetingUrl(session.meetingUrl)) {
+      notify('No meeting link is set for this session yet.', 'error')
+    }
+  }
 
   if (isLoading) return <InstructorPageLoading />
   if (isError || !data) return <InstructorPageError message="Failed to load live classes." />
@@ -191,7 +214,7 @@ export function InstructorLiveClassesPage() {
         title="Live Classes"
         subtitle="Schedule, host, and manage virtual lectures and lab sessions."
         actions={
-          <Button variant="primary">
+          <Button variant="primary" onClick={() => setModalOpen(true)}>
             <Plus size={15} />
             Schedule session
           </Button>
@@ -227,27 +250,45 @@ export function InstructorLiveClassesPage() {
         subtitle="Sessions happening right now."
         sessions={liveNow}
         featuredFirst
+        onJoin={handleJoin}
       />
 
       <SessionSection
         title="Coming up"
         subtitle="Prepare materials before class starts."
         sessions={upcoming}
+        onJoin={handleJoin}
       />
 
       <SessionSection
         title="Recent sessions"
         subtitle="Review attendance and recordings from past sessions."
         sessions={ended}
+        onJoin={handleJoin}
       />
 
       {data.liveClasses.length === 0 ? (
         <GlassCard className="p-10 text-center">
           <MonitorPlay size={32} className="mx-auto text-navy-300 mb-3" />
           <p className="text-[14px] font-semibold text-navy-900">No live sessions scheduled</p>
-          <p className="text-[12.5px] text-secondary-text mt-1">Create a session to start teaching online.</p>
+          <p className="text-[12.5px] text-secondary-text mt-1">
+            Create a Zoom meeting and schedule a session for your students.
+          </p>
+          <Button variant="primary" className="mt-4" onClick={() => setModalOpen(true)}>
+            <Plus size={15} />
+            Schedule session
+          </Button>
         </GlassCard>
       ) : null}
+
+      <ScheduleLiveSessionModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        courses={data.courses}
+        instructorId={data.instructorId}
+        instructorName={data.instructorName}
+        onScheduled={() => void reload()}
+      />
     </div>
   )
 }

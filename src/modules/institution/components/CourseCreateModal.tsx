@@ -168,9 +168,6 @@ export function CourseCreateModal({
   const validate = (): string | null => {
     if (!form.title.trim()) return 'Course title is required.'
     if (!form.code.trim()) return 'Course code is required.'
-    if (form.startDate && form.endDate && form.startDate > form.endDate) {
-      return 'End date must be after the start date.'
-    }
     return null
   }
 
@@ -941,28 +938,6 @@ export function CourseCreateModal({
               enabled={form.discussionForumEnabled ?? true}
               onToggle={() => updateForm({ discussionForumEnabled: !form.discussionForumEnabled })}
             />
-          </div>
-
-          <SectionLabel>Schedule</SectionLabel>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[12px] font-semibold text-navy-900">Start Date</span>
-              <input
-                type="date"
-                value={form.startDate ?? ''}
-                onChange={(e) => updateForm({ startDate: e.target.value })}
-                className={inputClass}
-              />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[12px] font-semibold text-navy-900">End Date</span>
-              <input
-                type="date"
-                value={form.endDate ?? ''}
-                onChange={(e) => updateForm({ endDate: e.target.value })}
-                className={inputClass}
-              />
-            </label>
           </div>
 
           <SectionLabel>Assessment</SectionLabel>

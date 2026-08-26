@@ -1,64 +1,110 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { fetchAllCollections } from '../api/dataApi'
+import { fetchAllCollections, putCollection, seedBackendCollections } from '../api/dataApi'
+import { buildSeedPayload } from '../storage/buildSeedPayload'
 import { hydrateCache } from '../storage/dataCache'
 import { collectionQueryKey } from '../hooks/useApiCollection'
+import {
+  academicCalendarWasPatched,
+  ensureAcademicCalendarCollections,
+} from '../storage/ensureAcademicCalendar'
 
 interface AppBootstrapProps {
   children: React.ReactNode
+}
+
+function hydrateFromRecord(collections: Record<string, unknown>, queryClient: ReturnType<typeof useQueryClient>) {
+  const patched = ensureAcademicCalendarCollections(collections)
+  hydrateCache(patched)
+  for (const [key, data] of Object.entries(patched)) {
+    queryClient.setQueryData(collectionQueryKey(key), data)
+  }
+  return patched
+}
+
+function BackendErrorScreen({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-navy-950 text-white px-6">
+      <div className="max-w-md text-center flex flex-col gap-4">
+        <h1 className="text-lg font-extrabold text-white">Backend unavailable</h1>
+        <p className="text-sm text-white/70 leading-relaxed">{message}</p>
+        <p className="text-xs text-white/50 leading-relaxed">
+          Start the API server on port 8001, then run{' '}
+          <code className="text-white/70">python scripts/seed_db.py</code> from the backend folder if
+          the database is empty.
+        </p>
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mx-auto mt-2 rounded-lg bg-lemon-500 px-5 py-2.5 text-sm font-bold text-navy-900 hover:bg-lemon-400 transition-colors cursor-pointer"
+        >
+          Retry connection
+        </button>
+      </div>
+    </div>
+  )
 }
 
 export function AppBootstrap({ children }: AppBootstrapProps) {
   const queryClient = useQueryClient()
   const [ready, setReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [retryCount, setRetryCount] = useState(0)
+
+  const load = useCallback(async () => {
+    let collections = await fetchAllCollections()
+
+    if (Object.keys(collections).length === 0) {
+      await seedBackendCollections(buildSeedPayload())
+      collections = await fetchAllCollections()
+    }
+
+    const before = collections
+    const patched = hydrateFromRecord(collections, queryClient)
+    if (academicCalendarWasPatched(before, patched)) {
+      await putCollection('academic-years', patched['academic-years'])
+      await putCollection('academic-terms', patched['academic-terms'])
+    }
+
+    setError(null)
+    setReady(true)
+  }, [queryClient])
 
   useEffect(() => {
     let cancelled = false
 
-    async function load() {
+    async function bootstrap() {
+      setReady(false)
       try {
-        const collections = await fetchAllCollections()
+        await load()
         if (cancelled) return
-        hydrateCache(collections)
-        for (const [key, data] of Object.entries(collections)) {
-          queryClient.setQueryData(collectionQueryKey(key), data)
-        }
-        setReady(true)
       } catch (err) {
         if (cancelled) return
-        console.error('Failed to load data from API', err)
-        setError(err instanceof Error ? err.message : 'Failed to connect to backend')
+        console.error('Failed to load data from backend', err)
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Could not connect to the API. All data is stored on the server — local demo mode is disabled.',
+        )
+        setReady(false)
       }
     }
 
-    void load()
+    void bootstrap()
     return () => {
       cancelled = true
     }
-  }, [queryClient])
+  }, [load, retryCount])
 
   if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-8 bg-navy-950 text-white">
-        <div className="max-w-md text-center">
-          <h1 className="text-xl font-bold mb-2">Backend unavailable</h1>
-          <p className="text-sm text-white/70 mb-4">{error}</p>
-          <p className="text-xs text-white/50">
-            Start the API with <code className="text-lemon-400">uvicorn app.main:app --reload</code> in{' '}
-            <code className="text-lemon-400">backend/</code>, then run{' '}
-            <code className="text-lemon-400">npm run seed:backend</code>.
-          </p>
-        </div>
-      </div>
-    )
+    return <BackendErrorScreen message={error} onRetry={() => setRetryCount((n) => n + 1)} />
   }
 
   if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-navy-950 text-white">
-        <p className="text-sm text-white/70">Loading from server…</p>
+        <p className="text-sm text-white/70">Loading…</p>
       </div>
     )
   }

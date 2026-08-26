@@ -4,22 +4,27 @@ import { Button } from '../../../shared/components/Button'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { StatBlock } from '../../../shared/components/StatBlock'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
+import { readAssignmentRecords } from '../../../shared/storage/readers'
+import { useStudentSubmissions } from '../../institution/hooks/useAssessments'
 import { AssignmentDropboxCard } from '../components/AssessmentCards'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
 
-const tabs = ['All', 'Ready to submit', 'Submitted', 'Awaiting review']
+const tabs = ['All', 'Ready to submit', 'Submitted', 'Graded']
 
 export function StudentAssignmentsPage() {
-  const { data, isLoading, isError } = useStudentDashboard()
+  const { notify } = useToast()
+  const { submitAssignment } = useStudentSubmissions()
+  const { data, isLoading, isError, reload } = useStudentDashboard()
   const [activeTab, setActiveTab] = useState('All')
 
   const stats = useMemo(() => {
-    if (!data) return { ready: 0, submitted: 0, review: 0 }
+    if (!data) return { ready: 0, submitted: 0, graded: 0 }
     return {
       ready: data.assignments.filter((a) => a.status === 'Ready to submit').length,
       submitted: data.assignments.filter((a) => a.status === 'Submitted').length,
-      review: data.assignments.filter((a) => a.status === 'Awaiting review').length,
+      graded: data.assignments.filter((a) => a.status === 'Graded').length,
     }
   }, [data])
 
@@ -28,6 +33,19 @@ export function StudentAssignmentsPage() {
     if (activeTab === 'All') return data.assignments
     return data.assignments.filter((a) => a.status === activeTab)
   }, [data, activeTab])
+
+  const handleSubmitAssignment = (assignmentId: string, fileName: string) => {
+    if (!data) return
+    const assignment = readAssignmentRecords().find((a) => a.id === assignmentId)
+    if (!assignment) {
+      notify('Assignment not found.', 'error')
+      return
+    }
+
+    submitAssignment(data.studentId, assignmentId, fileName, assignment.maxPoints)
+    notify('Assignment submitted successfully.')
+    void reload()
+  }
 
   if (isLoading) return <StudentPageLoading />
   if (isError || !data) return <StudentPageError message="Failed to load assignments." />
@@ -40,35 +58,19 @@ export function StudentAssignmentsPage() {
         title="Assignment Dropboxes"
         subtitle="Upload coursework, track submissions, and read instructor feedback."
         actions={
-          <Button variant="primary">
-            <UploadCloud size={15} />
-            {nextDue ? `Upload: ${nextDue.title.split(' ').slice(0, 2).join(' ')}…` : 'Upload assignment'}
-          </Button>
+          nextDue ? (
+            <Button variant="primary" onClick={() => notify('Choose a file on the assignment card below.', 'info')}>
+              <UploadCloud size={15} />
+              Upload: {nextDue.title.split(' ').slice(0, 2).join(' ')}…
+            </Button>
+          ) : undefined
         }
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatBlock
-          label="Due soon"
-          value={stats.ready}
-          sub="Waiting for your upload"
-          icon={<Clock size={17} />}
-          iconBg="bg-lemon-100 text-lemon-800"
-        />
-        <StatBlock
-          label="Submitted"
-          value={stats.submitted}
-          sub="In instructor queue"
-          icon={<UploadCloud size={17} />}
-          iconBg="bg-info-bg text-info"
-        />
-        <StatBlock
-          label="Under review"
-          value={stats.review}
-          sub="Feedback may be ready"
-          icon={<MessageSquareText size={17} />}
-          iconBg="bg-warning-bg text-warning"
-        />
+        <StatBlock label="Due soon" value={stats.ready} sub="Waiting for your upload" icon={<Clock size={17} />} iconBg="bg-lemon-100 text-lemon-800" />
+        <StatBlock label="Submitted" value={stats.submitted} sub="In instructor queue" icon={<UploadCloud size={17} />} iconBg="bg-info-bg text-info" />
+        <StatBlock label="Graded" value={stats.graded} sub="Feedback available" icon={<MessageSquareText size={17} />} iconBg="bg-success-bg text-success" />
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -79,7 +81,7 @@ export function StudentAssignmentsPage() {
         </span>
       </div>
 
-      <AssignmentDropboxCard assignments={filtered} />
+      <AssignmentDropboxCard assignments={filtered} onSubmitAssignment={handleSubmitAssignment} />
     </div>
   )
 }

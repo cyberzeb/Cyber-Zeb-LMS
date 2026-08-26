@@ -1,6 +1,11 @@
 import { Pencil, Trash2 } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill, type StatusTone } from '../../../shared/components/StatusPill'
+import {
+  formatProgramSemester,
+  formatStudyYear,
+  resolveStudentProgramSemester,
+} from '../utils/studyYearUtils'
 import type { Campus, PersonRow } from '../types'
 
 interface StudentsTableProps {
@@ -32,8 +37,8 @@ function campusLabel(campusId: string | undefined, campuses: Campus[]): string {
 export function StudentsTable({ students, campuses, onEdit, onDelete }: StudentsTableProps) {
   return (
     <GlassCard className="p-0 overflow-hidden">
-      <div className="hidden md:grid md:grid-cols-[2.2fr_0.9fr_1.4fr_1fr_0.9fr_0.7fr] gap-4 px-6 py-3.5 table-header-bar">
-        {['Name', 'Campus', 'Department', 'Last Active', 'Status', ''].map((h) => (
+      <div className="hidden md:grid md:grid-cols-[2fr_0.8fr_1.5fr_1fr_0.9fr_0.7fr] gap-4 px-6 py-3.5 table-header-bar">
+        {['Name', 'Campus', 'Program', 'Last Active', 'Status', ''].map((h) => (
           <span key={h || 'actions'} className="table-header-label">
             {h}
           </span>
@@ -46,7 +51,7 @@ export function StudentsTable({ students, campuses, onEdit, onDelete }: Students
           return (
             <div
               key={student.id}
-              className="group grid grid-cols-1 md:grid-cols-[2.2fr_0.9fr_1.4fr_1fr_0.9fr_0.7fr] gap-2 md:gap-4 px-6 py-3.5 items-center table-row-hover"
+              className="group grid grid-cols-1 md:grid-cols-[2fr_0.8fr_1.5fr_1fr_0.9fr_0.7fr] gap-2 md:gap-4 px-6 py-3.5 items-center table-row-hover"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div
@@ -68,7 +73,15 @@ export function StudentsTable({ students, campuses, onEdit, onDelete }: Students
                 </span>
               </div>
 
-              <div className="text-[12.5px] text-navy-700 truncate">{student.department}</div>
+              <div className="min-w-0">
+                <div className="text-[12.5px] font-semibold text-navy-800 truncate">
+                  {student.department}
+                </div>
+                <div className="text-[11px] text-secondary-text mt-0.5">
+                  {formatStudyYear(student.studyYear ?? 1)} ·{' '}
+                  {formatProgramSemester(resolveStudentProgramSemester(student))}
+                </div>
+              </div>
               <div className="text-[12px] text-secondary-text">{student.lastActive}</div>
 
               <div>

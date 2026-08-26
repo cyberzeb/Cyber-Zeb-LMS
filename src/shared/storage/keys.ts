@@ -1,14 +1,14 @@
-/** Bump to reset all Berana localStorage (fresh demo). */
-export const STORAGE_VERSION = 7
-
+/** Collection keys used by useApiCollection (berana: prefix is legacy naming). */
 export const STORAGE_KEYS = {
-  version: 'berana:storage-version',
   session: 'berana:session',
   people: 'berana:people',
   campuses: 'berana:campuses',
   colleges: 'berana:colleges',
   departments: 'berana:departments',
   programs: 'berana:programs',
+  academicYears: 'berana:academic-years',
+  academicTerms: 'berana:academic-terms',
+  courseOfferings: 'berana:course-offerings',
   courses: 'berana:courses',
   enrollments: 'berana:enrollments',
   certificates: 'berana:certificates',
@@ -47,6 +47,7 @@ export const STORAGE_EVENTS = {
   lessonProgressUpdated: 'berana:lesson-progress-updated',
   lessonResponsesUpdated: 'berana:lesson-responses-updated',
   orgUpdated: 'berana:org-updated',
+  academicUpdated: 'berana:academic-updated',
   announcementsUpdated: 'berana:announcements-updated',
   forumUpdated: 'berana:forum-updated',
   assessmentsUpdated: 'berana:assessments-updated',

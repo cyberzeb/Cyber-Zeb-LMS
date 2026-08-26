@@ -41,16 +41,21 @@ const quizAccent: Record<string, string> = {
 const assignmentStatusTone: Record<string, 'info' | 'neutral' | 'success' | 'warning'> = {
   'Ready to submit': 'success',
   Submitted: 'info',
-  'Awaiting review': 'warning',
+  Graded: 'success',
 }
 
 const assignmentAccent: Record<string, string> = {
   'Ready to submit': 'border-l-lemon-500 from-lemon-50/70',
   Submitted: 'border-l-info from-info-bg/60',
-  'Awaiting review': 'border-l-warning from-warning-bg/60',
+  Graded: 'border-l-success from-success-bg/60',
 }
 
-export function QuizAndAssessmentCard({ quizzes }: Pick<AssessmentCardsProps, 'quizzes'>) {
+export function QuizAndAssessmentCard({
+  quizzes,
+  onStartQuiz,
+}: Pick<AssessmentCardsProps, 'quizzes'> & {
+  onStartQuiz?: (quizId: string) => void
+}) {
   if (quizzes.length === 0) {
     return (
       <GlassCard className="p-10 text-center">
@@ -127,6 +132,9 @@ export function QuizAndAssessmentCard({ quizzes }: Pick<AssessmentCardsProps, 'q
                   size="sm"
                   className="w-full"
                   disabled={isLocked}
+                  onClick={() => {
+                    if (isOpen || isCompleted) onStartQuiz?.(quiz.id)
+                  }}
                 >
                   {isOpen ? (
                     <>
@@ -154,7 +162,12 @@ export function QuizAndAssessmentCard({ quizzes }: Pick<AssessmentCardsProps, 'q
   )
 }
 
-export function AssignmentDropboxCard({ assignments }: Pick<AssessmentCardsProps, 'assignments'>) {
+export function AssignmentDropboxCard({
+  assignments,
+  onSubmitAssignment,
+}: Pick<AssessmentCardsProps, 'assignments'> & {
+  onSubmitAssignment?: (assignmentId: string, fileName: string) => void
+}) {
   const [uploads, setUploads] = useState<Record<string, string>>({})
 
   if (assignments.length === 0) {
@@ -172,6 +185,7 @@ export function AssignmentDropboxCard({ assignments }: Pick<AssessmentCardsProps
       {assignments.map((assignment) => {
         const selectedFile = uploads[assignment.id]
         const isReady = assignment.status === 'Ready to submit'
+        const isGraded = assignment.status === 'Graded'
         const gradient = assignmentAccent[assignment.status] ?? 'from-navy-50/50'
 
         return (
@@ -244,15 +258,29 @@ export function AssignmentDropboxCard({ assignments }: Pick<AssessmentCardsProps
                     variant={selectedFile && isReady ? 'primary' : 'secondary'}
                     size="sm"
                     className="w-full"
-                    disabled={!isReady && !selectedFile}
+                    disabled={isGraded && !selectedFile}
+                    onClick={() => {
+                      if (selectedFile && isReady) {
+                        onSubmitAssignment?.(assignment.id, selectedFile)
+                        setUploads((current) => {
+                          const next = { ...current }
+                          delete next[assignment.id]
+                          return next
+                        })
+                        return
+                      }
+                      if (isGraded) return
+                    }}
                   >
-                    {assignment.status === 'Submitted'
-                      ? 'Replace submission'
-                      : selectedFile
-                        ? 'Submit to dropbox'
-                        : isReady
-                          ? 'Choose file first'
-                          : 'View submission'}
+                    {isGraded
+                      ? 'Graded'
+                      : assignment.status === 'Submitted'
+                        ? 'Submitted'
+                        : selectedFile
+                          ? 'Submit to dropbox'
+                          : isReady
+                            ? 'Choose file first'
+                            : 'View submission'}
                     <ChevronRight size={13} />
                   </Button>
                 </div>

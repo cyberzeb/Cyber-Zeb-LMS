@@ -108,6 +108,7 @@ export function toStudentLiveClasses(
       startAt: formatAssessmentDateTime(s.startAt),
       duration: formatDurationMinutes(s.durationMinutes),
       platform: s.platform,
+      meetingUrl: s.meetingUrl,
       status: resolveLiveSessionStatus(s),
     }))
     .sort((a, b) => {
@@ -135,6 +136,7 @@ export function toInstructorLiveClasses(
       startAt: formatAssessmentDateTime(s.startAt),
       duration: formatDurationMinutes(s.durationMinutes),
       platform: s.platform,
+      meetingUrl: s.meetingUrl,
       status: resolveLiveSessionStatus(s),
       attendees: s.attendees,
     }))
@@ -247,7 +249,7 @@ export function toStudentAssignments(
       let feedback: string | undefined
 
       if (submission?.status === 'graded') {
-        status = 'Awaiting review'
+        status = 'Graded'
         feedback = submission.feedback
       } else if (submission?.status === 'submitted' || submission?.status === 'late') {
         status = 'Submitted'
@@ -520,7 +522,7 @@ export function computeStudentAssessmentStats(
       : 0
 
   const submittedAssignments = assignments.filter(
-    (a) => a.status === 'Submitted' || a.status === 'Awaiting review',
+    (a) => a.status === 'Submitted' || a.status === 'Graded',
   ).length
 
   return {

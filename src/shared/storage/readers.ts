@@ -1,4 +1,9 @@
 import type {
+  AcademicTermRecord,
+  AcademicYearRecord,
+  CourseOfferingRecord,
+} from '../../modules/institution/types/academic'
+import type {
   CampusRecord,
   CertificateRecord,
   CourseRecord,
@@ -36,6 +41,22 @@ export function readDepartments(): Department[] {
 
 export function readPrograms(): ProgramRow[] {
   return readCached<ProgramRow[]>(STORAGE_KEYS.programs, [])
+}
+
+export function readAcademicYears(): AcademicYearRecord[] {
+  return readCached<AcademicYearRecord[]>(STORAGE_KEYS.academicYears, [])
+}
+
+export function readAcademicTerms(): AcademicTermRecord[] {
+  return readCached<AcademicTermRecord[]>(STORAGE_KEYS.academicTerms, [])
+}
+
+export function readCourseOfferings(): CourseOfferingRecord[] {
+  return readCached<CourseOfferingRecord[]>(STORAGE_KEYS.courseOfferings, [])
+}
+
+export function readCurrentAcademicTerm(): AcademicTermRecord | undefined {
+  return readAcademicTerms().find((term) => term.isCurrent)
 }
 
 export function readEnrollments(): CourseEnrollment[] {

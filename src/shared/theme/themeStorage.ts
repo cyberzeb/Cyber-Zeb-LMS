@@ -4,7 +4,7 @@ export const THEME_STORAGE_KEY = 'berana:theme'
 
 export function readStoredTheme(): ThemeMode {
   try {
-    const stored = window.localStorage.getItem(THEME_STORAGE_KEY)
+    const stored = window.sessionStorage.getItem(THEME_STORAGE_KEY)
     if (stored === 'light' || stored === 'dark') return stored
   } catch {
     /* ignore */
@@ -13,7 +13,7 @@ export function readStoredTheme(): ThemeMode {
 }
 
 export function writeStoredTheme(mode: ThemeMode) {
-  window.localStorage.setItem(THEME_STORAGE_KEY, mode)
+  window.sessionStorage.setItem(THEME_STORAGE_KEY, mode)
 }
 
 export function applyThemeClass(mode: ThemeMode) {

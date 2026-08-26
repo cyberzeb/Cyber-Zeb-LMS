@@ -3,7 +3,7 @@ import { UserRoundPen } from 'lucide-react'
 import { Modal } from '../../../shared/components/Modal'
 import { Button } from '../../../shared/components/Button'
 import { FormField } from '../../../shared/components/FormField'
-import { updateAdmin, type UpdateStudentInput } from '../api/peopleApi'
+import { updateAdmin, type UpdateAdminInput } from '../api/peopleApi'
 import type { Campus, Department, PersonRow } from '../types'
 
 interface AdminEditModalProps {
@@ -27,7 +27,7 @@ export function AdminEditModal({
 }: AdminEditModalProps) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [form, setForm] = useState<UpdateStudentInput>({
+  const [form, setForm] = useState<UpdateAdminInput>({
     name: '',
     email: '',
     campusId: campuses[0]?.id ?? '',

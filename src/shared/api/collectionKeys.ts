@@ -5,6 +5,9 @@ export const STORAGE_TO_API_KEY: Record<string, string> = {
   'berana:colleges': 'colleges',
   'berana:departments': 'departments',
   'berana:programs': 'programs',
+  'berana:academic-years': 'academic-years',
+  'berana:academic-terms': 'academic-terms',
+  'berana:course-offerings': 'course-offerings',
   'berana:courses': 'courses',
   'berana:enrollments': 'enrollments',
   'berana:certificates': 'certificates',
@@ -31,6 +34,7 @@ export const STORAGE_TO_API_KEY: Record<string, string> = {
   'berana:payments': 'payments',
   'berana:help-desk-tickets': 'help-desk-tickets',
   'berana:integrations': 'integrations',
+  'berana:service-leads': 'service-leads',
 }
 
 export function toApiKey(storageKey: string): string {

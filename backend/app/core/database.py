@@ -41,6 +41,8 @@ class Base(DeclarativeBase):
 def register_models() -> None:
     """Import ORM modules so Base.metadata includes every table."""
     from app.common import audit as audit_models  # noqa: F401
+    from app.modules.academic import models as academic_models  # noqa: F401
+    from app.modules.courses import models as courses_models  # noqa: F401
     from app.modules.identity import models as identity_models  # noqa: F401
     from app.modules.lms_store import models as lms_store_models  # noqa: F401
     from app.modules.tenants import models as tenants_models  # noqa: F401

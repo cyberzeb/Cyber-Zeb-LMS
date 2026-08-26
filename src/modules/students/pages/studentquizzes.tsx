@@ -4,15 +4,19 @@ import { Button } from '../../../shared/components/Button'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { StatBlock } from '../../../shared/components/StatBlock'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { QuizAndAssessmentCard } from '../components/AssessmentCards'
+import { QuizAttemptModal } from '../components/QuizAttemptModal'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
 
 const tabs = ['All', 'Open', 'Completed', 'Locked']
 
 export function StudentQuizzesPage() {
-  const { data, isLoading, isError } = useStudentDashboard()
+  const { notify } = useToast()
+  const { data, isLoading, isError, reload } = useStudentDashboard()
   const [activeTab, setActiveTab] = useState('All')
+  const [activeQuizId, setActiveQuizId] = useState<string | null>(null)
 
   const stats = useMemo(() => {
     if (!data) return { open: 0, completed: 0, locked: 0, avgScore: '—' }
@@ -30,6 +34,16 @@ export function StudentQuizzesPage() {
     return data.quizzes.filter((q) => q.status === activeTab)
   }, [data, activeTab])
 
+  const handleStartQuiz = (quizId: string) => {
+    const quiz = data?.quizzes.find((q) => q.id === quizId)
+    if (!quiz) return
+    if (quiz.status === 'Locked') {
+      notify('This quiz is locked until the due date passes or your instructor opens it.', 'error')
+      return
+    }
+    setActiveQuizId(quizId)
+  }
+
   if (isLoading) return <StudentPageLoading />
   if (isError || !data) return <StudentPageError message="Failed to load quizzes." />
 
@@ -42,7 +56,7 @@ export function StudentQuizzesPage() {
         subtitle="Practice checks, weekly assessments, and graded quizzes for your courses."
         actions={
           openQuiz ? (
-            <Button variant="primary">
+            <Button variant="primary" onClick={() => handleStartQuiz(openQuiz.id)}>
               <PlayCircle size={15} />
               Start: {openQuiz.title.split(' ').slice(0, 3).join(' ')}…
             </Button>
@@ -51,34 +65,10 @@ export function StudentQuizzesPage() {
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatBlock
-          label="Open now"
-          value={stats.open}
-          sub="Ready to attempt"
-          icon={<PlayCircle size={17} />}
-          iconBg="bg-lemon-100 text-lemon-800"
-        />
-        <StatBlock
-          label="Completed"
-          value={stats.completed}
-          sub="Graded attempts"
-          icon={<Trophy size={17} />}
-          iconBg="bg-success-bg text-success"
-        />
-        <StatBlock
-          label="Locked"
-          value={stats.locked}
-          sub="Unlocks later"
-          icon={<Lock size={17} />}
-          iconBg="bg-navy-50 text-navy-600"
-        />
-        <StatBlock
-          label="Avg. score"
-          value={stats.avgScore}
-          sub="Across completed quizzes"
-          icon={<BadgeCheck size={17} />}
-          iconBg="bg-info-bg text-info"
-        />
+        <StatBlock label="Open now" value={stats.open} sub="Ready to attempt" icon={<PlayCircle size={17} />} iconBg="bg-lemon-100 text-lemon-800" />
+        <StatBlock label="Completed" value={stats.completed} sub="Graded attempts" icon={<Trophy size={17} />} iconBg="bg-success-bg text-success" />
+        <StatBlock label="Locked" value={stats.locked} sub="Unlocks later" icon={<Lock size={17} />} iconBg="bg-navy-50 text-navy-600" />
+        <StatBlock label="Avg. score" value={stats.avgScore} sub="Across completed quizzes" icon={<BadgeCheck size={17} />} iconBg="bg-info-bg text-info" />
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -89,7 +79,15 @@ export function StudentQuizzesPage() {
         </span>
       </div>
 
-      <QuizAndAssessmentCard quizzes={filtered} />
+      <QuizAndAssessmentCard quizzes={filtered} onStartQuiz={handleStartQuiz} />
+
+      <QuizAttemptModal
+        open={activeQuizId !== null}
+        quizId={activeQuizId ?? ''}
+        studentId={data.studentId}
+        onClose={() => setActiveQuizId(null)}
+        onSubmitted={() => void reload()}
+      />
     </div>
   )
 }

@@ -4,6 +4,9 @@ import { useApiCollection } from '../../../shared/hooks/useApiCollection'
 import { createId } from '../../../shared/hooks/useLocalStorageState'
 import {
   readCourses as readCoursesFromCache,
+  readAcademicTerms as readAcademicTermsFromCache,
+  readCourseOfferings as readCourseOfferingsFromCache,
+  readEnrollments as readEnrollmentsFromCache,
   readSettings as readSettingsFromCache,
 } from '../../../shared/storage/readers'
 
@@ -431,13 +434,20 @@ export function useOrgStructure() {
 
       departments.some((d) => d.collegeId && d.name.trim())
 
-    const hasCourses = readCoursesFromCache().length > 0
+    const hasCalendar = readAcademicTermsFromCache().some((t) => t.isCurrent)
 
-    const hasSso =
+    const hasDepartmentsConfigured =
+      departments.length > 0 && departments.every((d) => (d.maxYears ?? 0) > 0)
 
-      Boolean(settings.integrations?.googleSso) || Boolean(settings.integrations?.microsoftSso)
+    const hasCatalog = readCoursesFromCache().length > 0
 
-    const hasBranding = Boolean(settings.branding?.domain?.trim())
+    const offerings = readCourseOfferingsFromCache()
+
+    const hasOfferings = offerings.length > 0
+
+    const hasInstructors = offerings.some((o) => Boolean(o.primaryInstructorId))
+
+    const hasEnrollments = readEnrollmentsFromCache().some((e) => e.status === 'active')
 
 
 
@@ -447,7 +457,7 @@ export function useOrgStructure() {
 
         id: 'profile',
 
-        title: 'Institution Profile',
+        title: 'University Setup',
 
         subtitle: 'Name, timezone and regional settings',
 
@@ -461,9 +471,9 @@ export function useOrgStructure() {
 
         id: 'structure',
 
-        title: 'Organizational Structure',
+        title: 'Academic Structure',
 
-        subtitle: 'Configure campuses, colleges & departments',
+        subtitle: 'Configure campuses, colleges and departments',
 
         done: hasStructure,
 
@@ -473,13 +483,41 @@ export function useOrgStructure() {
 
       {
 
-        id: 'courses',
+        id: 'calendar',
+
+        title: 'Academic Year / Term',
+
+        subtitle: 'Define calendar and set the current term',
+
+        done: hasCalendar,
+
+        href: '/admin/institution/academic-calendar',
+
+      },
+
+      {
+
+        id: 'departments',
+
+        title: 'Departments & Programs',
+
+        subtitle: 'Program code, level, and duration (Year 1 … Year N)',
+
+        done: hasDepartmentsConfigured,
+
+        href: '/admin/institution/departments',
+
+      },
+
+      {
+
+        id: 'catalog',
 
         title: 'Course Catalog',
 
-        subtitle: 'Build courses under departments',
+        subtitle: 'Reusable courses without term binding',
 
-        done: hasCourses,
+        done: hasCatalog,
 
         href: '/admin/courses',
 
@@ -487,29 +525,43 @@ export function useOrgStructure() {
 
       {
 
-        id: 'identity',
+        id: 'offerings',
 
-        title: 'Identity & SSO',
+        title: 'Course Offerings',
 
-        subtitle: 'Connect Google or Microsoft login',
+        subtitle: 'Sections by department, year, and term',
 
-        done: hasSso,
+        done: hasOfferings,
 
-        href: '/admin/settings',
+        href: '/admin/course-offerings',
 
       },
 
       {
 
-        id: 'branding',
+        id: 'instructors',
 
-        title: 'Branding & Domain',
+        title: 'Instructor Assignment',
 
-        subtitle: 'Custom domain and email sender',
+        subtitle: 'Assign teaching staff to offerings',
 
-        done: hasBranding,
+        done: hasInstructors,
 
-        href: '/admin/settings',
+        href: '/admin/instructors',
+
+      },
+
+      {
+
+        id: 'enrollments',
+
+        title: 'Student Enrollment',
+
+        subtitle: 'Register students into offerings',
+
+        done: hasEnrollments,
+
+        href: '/admin/enrollments',
 
       },
 

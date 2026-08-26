@@ -85,4 +85,5 @@ export interface StudentSubmissionRecord {
   maxScore?: number
   submittedAt?: string
   feedback?: string
+  attachmentName?: string
 }

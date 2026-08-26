@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react'
-import { CalendarClock, MonitorPlay, Plus, Radio, Trash2, Video } from 'lucide-react'
+import { CalendarClock, MonitorPlay, Radio, Video } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
-import { FormField } from '../../../shared/components/FormField'
-import { Modal } from '../../../shared/components/Modal'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { SearchInput } from '../../../shared/components/SearchInput'
 import { SelectMenu } from '../../../shared/components/SelectMenu'
@@ -11,15 +9,14 @@ import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
-import { readCourses } from '../../../shared/storage/readers'
 import {
   formatAssessmentDateTime,
   resolveLiveSessionStatus,
 } from '../../../shared/storage/assessmentUtils'
+import { openMeetingUrl } from '../../../shared/utils/liveSessionUtils'
 import { useCampusContext } from '../context/CampusContext'
 import { useSyncCampusFilter } from '../hooks/useSyncCampusFilter'
 import { useLiveSessions } from '../hooks/useAssessments'
-import type { LiveSessionRecord } from '../types/assessments'
 
 const tabs = ['All', 'Live', 'Upcoming', 'Ended']
 
@@ -33,26 +30,12 @@ const statusTone: Record<string, 'success' | 'info' | 'neutral' | 'danger'> = {
 export function LiveClassesAdminPage() {
   const { notify } = useToast()
   const { activeCampuses, selectedCampusId } = useCampusContext()
-  const { records, createSession, updateSession, deleteSession } = useLiveSessions()
+  const { records } = useLiveSessions()
   const [activeTab, setActiveTab] = useState('All')
   const [query, setQuery] = useState('')
   const [campusFilter, setCampusFilter] = useState('all')
-  const [modalOpen, setModalOpen] = useState(false)
-
-  const [form, setForm] = useState({
-    title: '',
-    courseId: '',
-    startAt: '',
-    durationMinutes: '60',
-    platform: 'Zoom',
-  })
 
   useSyncCampusFilter(selectedCampusId, setCampusFilter)
-
-  const courses = useMemo(
-    () => readCourses().filter((c) => c.status !== 'archived'),
-    [],
-  )
 
   const campusOptions = useMemo(
     () => [
@@ -88,49 +71,11 @@ export function LiveClassesAdminPage() {
     [records],
   )
 
-  const handleCreate = () => {
-    const course = courses.find((c) => c.id === form.courseId)
-    if (!course || !form.title.trim() || !form.startAt) {
-      notify('Fill in title, course, and start time.', 'error')
-      return
-    }
-
-    createSession({
-      title: form.title.trim(),
-      courseId: course.id,
-      courseCode: course.code,
-      courseTitle: course.title,
-      instructorId: course.instructorId ?? '',
-      instructorName: course.instructor,
-      campusId: 'c1',
-      department: course.department,
-      startAt: new Date(form.startAt).toISOString(),
-      durationMinutes: Number(form.durationMinutes) || 60,
-      platform: form.platform,
-      status: 'upcoming',
-    })
-
-    notify('Live session scheduled.')
-    setModalOpen(false)
-    setForm({ title: '', courseId: '', startAt: '', durationMinutes: '60', platform: 'Zoom' })
-  }
-
-  const handleCancel = (session: LiveSessionRecord) => {
-    updateSession(session.id, { status: 'cancelled' })
-    notify('Session cancelled.')
-  }
-
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Live Classes"
-        subtitle="Schedule and manage virtual lectures across all courses."
-        actions={
-          <Button variant="primary" onClick={() => setModalOpen(true)}>
-            <Plus size={15} />
-            Schedule session
-          </Button>
-        }
+        subtitle="Monitor live sessions scheduled by instructors across all courses."
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -175,16 +120,21 @@ export function LiveClassesAdminPage() {
                       <StatusPill label={resolved} tone={statusTone[resolved] ?? 'neutral'} />
                     </td>
                     <td className="py-3 text-right">
-                      <div className="flex justify-end gap-2">
-                        {resolved === 'upcoming' ? (
-                          <Button variant="ghost" size="sm" onClick={() => handleCancel(session)}>
-                            Cancel
-                          </Button>
-                        ) : null}
-                        <Button variant="ghost" size="sm" onClick={() => { deleteSession(session.id); notify('Session removed.') }}>
-                          <Trash2 size={13} />
+                      {session.meetingUrl && resolved !== 'ended' ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (!openMeetingUrl(session.meetingUrl)) {
+                              notify('Could not open meeting link.', 'error')
+                            }
+                          }}
+                        >
+                          Open
                         </Button>
-                      </div>
+                      ) : (
+                        <span className="text-[11px] text-secondary-text">—</span>
+                      )}
                     </td>
                   </tr>
                 )
@@ -199,40 +149,6 @@ export function LiveClassesAdminPage() {
           ) : null}
         </div>
       </GlassCard>
-
-      <Modal
-        open={modalOpen}
-        title="Schedule live session"
-        description="Students and instructors see this in their portals."
-        icon={<MonitorPlay size={18} />}
-        onClose={() => setModalOpen(false)}
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button variant="primary" onClick={handleCreate}>Schedule</Button>
-          </>
-        }
-      >
-        <div className="flex flex-col gap-4">
-          <FormField label="Session title" value={form.title} onChange={(v) => setForm((f) => ({ ...f, title: v }))} placeholder="e.g. Week 4 — Live Lab" />
-          <label className="flex flex-col gap-1.5">
-            <span className="text-[12px] font-semibold text-navy-900">Course</span>
-            <select
-              value={form.courseId}
-              onChange={(e) => setForm((f) => ({ ...f, courseId: e.target.value }))}
-              className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px]"
-            >
-              <option value="">Select course…</option>
-              {courses.map((c) => (
-                <option key={c.id} value={c.id}>{c.code} — {c.title}</option>
-              ))}
-            </select>
-          </label>
-          <FormField label="Start date & time" value={form.startAt} onChange={(v) => setForm((f) => ({ ...f, startAt: v }))} type="text" placeholder="2026-08-20T10:00" hint="Use ISO format or datetime-local value" />
-          <FormField label="Duration (minutes)" value={form.durationMinutes} onChange={(v) => setForm((f) => ({ ...f, durationMinutes: v }))} type="number" />
-          <FormField label="Platform" value={form.platform} onChange={(v) => setForm((f) => ({ ...f, platform: v }))} type="select" options={['Zoom', 'Google Meet', 'Microsoft Teams', 'Berana Live']} />
-        </div>
-      </Modal>
     </div>
   )
 }

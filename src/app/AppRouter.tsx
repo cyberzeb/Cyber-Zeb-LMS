@@ -1,10 +1,11 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { InstitutionAdminLayout } from './InstitutionAdminLayout'
 import { CampusProfilePage } from '../modules/institution/pages/CampusProfilePage'
 import { OrgStructurePage } from '../modules/institution/pages/OrgStructurePage'
 import { InstitutionOverviewPage } from '../modules/institution/pages/InstitutionOverviewPage'
 import { DepartmentsPage } from '../modules/institution/pages/DepartmentsPage'
-import { ProgramsPage } from '../modules/institution/pages/ProgramsPage'
+import { AcademicCalendarPage } from '../modules/institution/pages/AcademicCalendarPage'
+import { CourseOfferingsPage } from '../modules/institution/pages/CourseOfferingsPage'
 import { CoursesPage } from '../modules/institution/pages/CoursesPage'
 import { PeoplePage } from '../modules/institution/pages/PeoplePage'
 import { StudentsPage } from '../modules/institution/pages/StudentsPage'
@@ -291,7 +292,15 @@ export const router = createBrowserRouter([
       },
       {
         path: 'institution/programs',
-        element: <ProgramsPage />,
+        element: <Navigate to="/admin/institution/departments" replace />,
+      },
+      {
+        path: 'institution/academic-calendar',
+        element: <AcademicCalendarPage />,
+      },
+      {
+        path: 'course-offerings',
+        element: <CourseOfferingsPage />,
       },
       {
         path: 'courses',

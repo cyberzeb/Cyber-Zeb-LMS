@@ -3,7 +3,12 @@ import { useApiCollection } from '../../../shared/hooks/useApiCollection'
 import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { STORAGE_EVENTS, STORAGE_KEYS } from '../../../shared/storage/keys'
 import { readEnrollments } from '../../../shared/storage/readers'
-import type { CourseEnrollment } from '../types'
+import type { CourseEnrollment, PersonRow } from '../types'
+import type { CourseOfferingRecord } from '../types/academic'
+import {
+  buildCohortEnrollmentRows,
+  type BulkEnrollCohortResult,
+} from '../utils/enrollmentUtils'
 
 function notifyEnrollmentsUpdated() {
   window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.enrollmentsUpdated))
@@ -56,14 +61,18 @@ export function useEnrollments() {
     [enrollments],
   )
 
-  const enrollStudent = useCallback(
+  const getEnrollmentsForOffering = useCallback(
+    (offeringId: string) =>
+      enrollments.filter((e) => e.courseOfferingId === offeringId || e.courseId === offeringId),
+    [enrollments],
+  )
+
+  const enrollStudentInOffering = useCallback(
     (
       studentId: string,
-      courseId: string,
+      offering: CourseOfferingRecord,
       meta: {
         studentName: string
-        courseCode: string
-        courseTitle: string
         program?: string
         campus?: string
       },
@@ -71,9 +80,10 @@ export function useEnrollments() {
       return addEnrollment({
         studentId,
         studentName: meta.studentName,
-        courseId,
-        courseCode: meta.courseCode,
-        courseTitle: meta.courseTitle,
+        courseId: offering.courseId,
+        courseCode: offering.courseCode,
+        courseTitle: offering.courseTitle,
+        courseOfferingId: offering.id,
         program: meta.program,
         campus: meta.campus,
         enrolledOn: new Date().toISOString(),
@@ -84,15 +94,70 @@ export function useEnrollments() {
     [addEnrollment],
   )
 
+  /** @deprecated Use enrollStudentInOffering — kept for legacy callers during migration */
+  const enrollStudent = useCallback(
+    (
+      studentId: string,
+      courseId: string,
+      meta: {
+        studentName: string
+        courseCode: string
+        courseTitle: string
+        program?: string
+        campus?: string
+        courseOfferingId?: string
+        academicTermId?: string
+      },
+    ) => {
+      return addEnrollment({
+        studentId,
+        studentName: meta.studentName,
+        courseId,
+        courseCode: meta.courseCode,
+        courseTitle: meta.courseTitle,
+        courseOfferingId: meta.courseOfferingId,
+        academicTermId: meta.academicTermId,
+        program: meta.program,
+        campus: meta.campus,
+        enrolledOn: new Date().toISOString(),
+        status: 'active',
+        progress: 0,
+      })
+    },
+    [addEnrollment],
+  )
+
+  const bulkEnrollCohort = useCallback(
+    (
+      _params: { departmentId: string; studyYear: number; programSemester: number },
+      students: PersonRow[],
+      offerings: CourseOfferingRecord[],
+    ): BulkEnrollCohortResult => {
+      const { rows, result } = buildCohortEnrollmentRows(students, offerings, enrollments)
+      if (rows.length === 0) return result
+
+      const newRows: CourseEnrollment[] = rows.map((row) => ({
+        id: createId('enr'),
+        ...row,
+      }))
+      setEnrollments((prev) => [...newRows, ...prev])
+      return result
+    },
+    [enrollments, setEnrollments],
+  )
+
   return {
     enrollments,
     setEnrollments,
     addEnrollment,
     enrollStudent,
+    enrollStudentInOffering,
+    bulkEnrollCohort,
     updateEnrollment,
     removeEnrollment,
     getEnrollmentsForStudent,
     getEnrollmentsForCourse,
+    getEnrollmentsForOffering,
   }
 }
 

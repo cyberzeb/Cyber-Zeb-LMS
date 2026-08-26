@@ -1,5 +1,5 @@
 import type { KeyboardEvent } from 'react'
-import { BookOpen, Building2, GraduationCap, Settings2, Trash2, User } from 'lucide-react'
+import { Building2, GraduationCap, Settings2, Trash2, User } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { Monogram } from '../../../shared/components/Monogram'
 
@@ -8,10 +8,12 @@ interface DepartmentCardProps {
   headName: string
   studentsCount: number
   facultyCount: number
-  courseCount?: number
   collegeName?: string
   campusName?: string
   campusCode?: string
+  programCode?: string
+  maxYears?: number
+  programLevel?: string
   onClick?: () => void
   onDelete?: () => void
 }
@@ -21,10 +23,12 @@ export function DepartmentCard({
   headName,
   studentsCount,
   facultyCount,
-  courseCount,
   collegeName,
   campusName,
   campusCode,
+  programCode,
+  maxYears,
+  programLevel,
   onClick,
   onDelete,
 }: DepartmentCardProps) {
@@ -44,6 +48,13 @@ export function DepartmentCard({
               </div>
             ) : null}
             <h3 className="font-extrabold text-navy-900 text-[15px] leading-tight">{name}</h3>
+            {programCode ? (
+              <div className="text-[11px] text-secondary-text mt-0.5">
+                {programCode}
+                {programLevel ? ` · ${programLevel}` : ''}
+                {maxYears ? ` · ${maxYears} years` : ''}
+              </div>
+            ) : null}
           </div>
         </div>
         <div className="flex items-center gap-0.5 shrink-0">
@@ -103,15 +114,6 @@ export function DepartmentCard({
             Faculty
           </div>
         </div>
-        {courseCount !== undefined ? (
-          <div>
-            <div className="text-[14px] font-extrabold text-navy-900">{courseCount}</div>
-            <div className="text-[9.5px] uppercase tracking-wider text-secondary-text font-semibold flex items-center gap-1">
-              <BookOpen size={9} />
-              Courses
-            </div>
-          </div>
-        ) : null}
       </div>
     </GlassCard>
   )

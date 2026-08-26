@@ -19,9 +19,9 @@ authoritative mapping from the blueprint's functional modules
 
 | Folder | Blueprint module(s) | Key entities | Sprint |
 |---|---|---|---|
-| `tenants` | 1. Tenant & Institution Management | Tenant, Campus, Department | 1 |
+| `tenants` | 1. Tenant & Institution Management | Tenant, Campus, College, Department | 1 |
 | `identity` | 2. Identity & Access, 3. User Profiles | User, UserRoleAssignment, GuardianLink | 1 |
-| `academic` | 4. Academic / Training Structure | Program, AcademicTerm, Cohort | 2 |
+| `academic` | 4. Academic / Training Structure | AcademicYear, AcademicTerm, Program, Cohort | 2 |
 | `courses` | 5. Course Catalog & Authoring, 6. Content Management | Course, CourseOffering, Module, Lesson, ContentItem | 2 |
 | `enrollment` | 7. Enrollment & Cohorts | Enrollment | 3 |
 | `live_sessions` | 8. Virtual Classroom | LiveSession | 6 |

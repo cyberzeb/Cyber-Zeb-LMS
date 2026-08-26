@@ -36,8 +36,12 @@ def map_frontend_role(role: str) -> Role:
         "Student": Role.STUDENT,
         "Instructor": Role.INSTRUCTOR,
         "Admin": Role.INSTITUTION_ADMIN,
+        "Registrar": Role.REGISTRAR,
+        "AcademicAdmin": Role.ACADEMIC_ADMIN,
+        "FinanceAdmin": Role.FINANCE_OFFICER,
         "Guardian": Role.PARENT_GUARDIAN,
         "Staff": Role.DEPARTMENT_ADMIN,
+        "HeadOfDepartment": Role.HEAD_OF_DEPARTMENT,
         "HelpDesk": Role.SUPPORT_AGENT,
     }
     return mapping.get(role, Role.STUDENT)

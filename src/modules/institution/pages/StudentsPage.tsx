@@ -18,6 +18,14 @@ import { useCampusContext } from '../context/CampusContext'
 import { peoplePageConfigs } from '../data/peoplePageConfig'
 import { DEFAULT_CAMPUS_ID } from '../data/orgSeedData'
 import { migrateStudentRecord } from '../api/peopleApi'
+import {
+  departmentMaxYears,
+  departmentSemestersPerYear,
+  formatProgramSemester,
+  formatStudyYear,
+  programSemesterOptions,
+  studyYearOptions,
+} from '../utils/studyYearUtils'
 import { StudentsTable } from '../components/StudentsTable'
 import { StudentEditModal } from '../components/StudentEditModal'
 import { StudentImportModal } from '../components/StudentImportModal'
@@ -50,6 +58,8 @@ export function StudentsPage() {
     email: '',
     campusId: DEFAULT_CAMPUS_ID,
     departmentId: '',
+    studyYear: 1,
+    programSemester: 1,
   })
 
   useEffect(() => {
@@ -98,6 +108,22 @@ export function StudentsPage() {
     [departments, inviteForm.campusId],
   )
 
+  const inviteDept = inviteDepartments.find((d) => d.id === inviteForm.departmentId)
+  const inviteMaxYears = departmentMaxYears(inviteDept)
+  const inviteSemestersPerYear = departmentSemestersPerYear(inviteDept)
+
+  useEffect(() => {
+    if (inviteForm.studyYear > inviteMaxYears) {
+      setInviteForm((prev) => ({ ...prev, studyYear: inviteMaxYears }))
+    }
+  }, [inviteMaxYears, inviteForm.studyYear])
+
+  useEffect(() => {
+    if (inviteForm.programSemester > inviteSemestersPerYear) {
+      setInviteForm((prev) => ({ ...prev, programSemester: inviteSemestersPerYear }))
+    }
+  }, [inviteSemestersPerYear, inviteForm.programSemester])
+
   useEffect(() => {
     if (!inviteDepartments.some((d) => d.id === inviteForm.departmentId)) {
       setInviteForm((prev) => ({ ...prev, departmentId: inviteDepartments[0]?.id ?? '' }))
@@ -110,6 +136,8 @@ export function StudentsPage() {
       email: '',
       campusId: campusFilter !== 'all' ? campusFilter : DEFAULT_CAMPUS_ID,
       departmentId: '',
+      studyYear: 1,
+      programSemester: 1,
     })
     setInviteOpen(true)
   }
@@ -128,6 +156,9 @@ export function StudentsPage() {
       email: inviteForm.email.trim().toLowerCase(),
       role: 'Student',
       department: dept.name,
+      departmentId: dept.id,
+      studyYear: inviteForm.studyYear,
+      programSemester: inviteForm.programSemester,
       campusId: inviteForm.campusId,
       status: 'active',
       lastActive: 'Just added',
@@ -135,7 +166,7 @@ export function StudentsPage() {
     })
     setPeople((prev) => [newStudent, ...prev])
     setInviteOpen(false)
-    notify(`${newStudent.name} added. Enroll them in courses under Admin → Enrollments.`)
+    notify(`${newStudent.name} added. Enroll their cohort under Admin → Enrollments.`)
   }
 
   const handleDelete = (student: PersonRow) => {
@@ -288,7 +319,14 @@ export function StudentsPage() {
             <span className="text-[12px] font-semibold text-navy-900">Department</span>
             <select
               value={inviteForm.departmentId}
-              onChange={(e) => setInviteForm({ ...inviteForm, departmentId: e.target.value })}
+              onChange={(e) =>
+                setInviteForm({
+                  ...inviteForm,
+                  departmentId: e.target.value,
+                  studyYear: 1,
+                  programSemester: 1,
+                })
+              }
               className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
             >
               {inviteDepartments.map((d) => (
@@ -298,6 +336,30 @@ export function StudentsPage() {
               ))}
             </select>
           </label>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormField
+            label="Study Year"
+            type="select"
+            value={formatStudyYear(inviteForm.studyYear)}
+            options={studyYearOptions(inviteMaxYears).map(formatStudyYear)}
+            onChange={(label) => {
+              const year = studyYearOptions(inviteMaxYears).find((y) => formatStudyYear(y) === label)
+              if (year) setInviteForm({ ...inviteForm, studyYear: year })
+            }}
+          />
+          <FormField
+            label="Program Semester"
+            type="select"
+            value={formatProgramSemester(inviteForm.programSemester)}
+            options={programSemesterOptions(inviteSemestersPerYear).map(formatProgramSemester)}
+            onChange={(label) => {
+              const sem = programSemesterOptions(inviteSemestersPerYear).find(
+                (s) => formatProgramSemester(s) === label,
+              )
+              if (sem) setInviteForm({ ...inviteForm, programSemester: sem })
+            }}
+          />
         </div>
       </Modal>
 

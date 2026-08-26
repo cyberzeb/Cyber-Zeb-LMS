@@ -1,27 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { STORAGE_EVENTS, STORAGE_KEYS } from '../../../shared/storage/keys'
+import { STORAGE_EVENTS } from '../../../shared/storage/keys'
 import { fetchStudentDashboardData } from '../api/studentpApi'
 import type { StudentDashboardData } from '../types'
-
-const RELOAD_KEYS = new Set<string>([
-  STORAGE_KEYS.courses,
-  STORAGE_KEYS.enrollments,
-  STORAGE_KEYS.lessonProgress,
-  STORAGE_KEYS.people,
-  STORAGE_KEYS.departments,
-  STORAGE_KEYS.session,
-  STORAGE_KEYS.announcements,
-  STORAGE_KEYS.certificates,
-  STORAGE_KEYS.liveSessions,
-  STORAGE_KEYS.assignments,
-  STORAGE_KEYS.quizzes,
-  STORAGE_KEYS.questionBank,
-  STORAGE_KEYS.studentSubmissions,
-  STORAGE_KEYS.payments,
-  STORAGE_KEYS.helpDeskTickets,
-  STORAGE_KEYS.integrations,
-])
 
 export function useStudentDashboard() {
   const location = useLocation()
@@ -48,17 +29,12 @@ export function useStudentDashboard() {
   }, [location.pathname, reload])
 
   useEffect(() => {
-    const onStorage = (event: StorageEvent) => {
-      if (event.key && RELOAD_KEYS.has(event.key)) void reload()
-    }
-
     const onCustom = () => void reload()
 
     const onVisible = () => {
       if (document.visibilityState === 'visible') void reload()
     }
 
-    window.addEventListener('storage', onStorage)
     window.addEventListener(STORAGE_EVENTS.enrollmentsUpdated, onCustom)
     window.addEventListener(STORAGE_EVENTS.coursesUpdated, onCustom)
     window.addEventListener(STORAGE_EVENTS.peopleUpdated, onCustom)
@@ -69,7 +45,6 @@ export function useStudentDashboard() {
     window.addEventListener(STORAGE_EVENTS.platformUpdated, onCustom)
     document.addEventListener('visibilitychange', onVisible)
     return () => {
-      window.removeEventListener('storage', onStorage)
       window.removeEventListener(STORAGE_EVENTS.enrollmentsUpdated, onCustom)
       window.removeEventListener(STORAGE_EVENTS.coursesUpdated, onCustom)
       window.removeEventListener(STORAGE_EVENTS.peopleUpdated, onCustom)

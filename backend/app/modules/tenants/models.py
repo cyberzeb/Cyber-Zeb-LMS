@@ -2,8 +2,8 @@
 Tenants module - Blueprint Section 6 (Identity, Organization and User
 Management) + Section 17.2 Organization domain.
 
-Entities: Tenant, Campus, Department
-(Program, AcademicTerm, Cohort live in app.modules.academic)
+Entities: Tenant, Campus, College, Department
+(Program, AcademicYear, AcademicTerm, Cohort live in app.modules.academic)
 """
 import uuid
 from enum import Enum
@@ -13,6 +13,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.common.base_model import TimestampMixin, UUIDPrimaryKeyMixin
 from app.core.database import Base
+
+
+class BeranaEdition(str, Enum):
+    """Product edition — drives default org model and role pack."""
+    UNIVERSITY = "university"
+    CORPORATE = "corporate"
+    TRAINING = "training"
 
 
 class TenantType(str, Enum):
@@ -52,6 +59,21 @@ class Tenant(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
     campuses: Mapped[list["Campus"]] = relationship(back_populates="tenant")
 
+    @property
+    def edition(self) -> BeranaEdition:
+        """Resolve Berana edition from tenant settings or tenant_type fallback."""
+        raw = (self.settings or {}).get("edition")
+        if raw:
+            try:
+                return BeranaEdition(raw)
+            except ValueError:
+                pass
+        if self.tenant_type == TenantType.TRAINING_PROVIDER:
+            return BeranaEdition.TRAINING
+        if self.tenant_type in (TenantType.BUSINESS, TenantType.GOVERNMENT, TenantType.NGO):
+            return BeranaEdition.CORPORATE
+        return BeranaEdition.UNIVERSITY
+
 
 class Campus(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     """Campus / branch / business unit under a tenant."""
@@ -63,7 +85,21 @@ class Campus(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     address: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     tenant: Mapped["Tenant"] = relationship(back_populates="campuses")
+    colleges: Mapped[list["College"]] = relationship(back_populates="campus")
     departments: Mapped[list["Department"]] = relationship(back_populates="campus")
+
+
+class College(Base, UUIDPrimaryKeyMixin, TimestampMixin):
+    """College / faculty / school under a campus (University Edition)."""
+    __tablename__ = "colleges"
+
+    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), index=True)
+    campus_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("campuses.id"), index=True)
+    name: Mapped[str] = mapped_column(String(200))
+    code: Mapped[str] = mapped_column(String(50))
+
+    campus: Mapped["Campus"] = relationship(back_populates="colleges")
+    departments: Mapped[list["Department"]] = relationship(back_populates="college")
 
 
 class Department(Base, UUIDPrimaryKeyMixin, TimestampMixin):
@@ -72,7 +108,14 @@ class Department(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
     tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), index=True)
     campus_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("campuses.id"), index=True)
+    college_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid(as_uuid=True), ForeignKey("colleges.id"), nullable=True, index=True
+    )
     name: Mapped[str] = mapped_column(String(200))
     code: Mapped[str] = mapped_column(String(50))
+    head_user_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid(as_uuid=True), ForeignKey("users.id"), nullable=True, index=True
+    )
 
     campus: Mapped["Campus"] = relationship(back_populates="departments")
+    college: Mapped["College | None"] = relationship(back_populates="departments")

@@ -33,7 +33,7 @@ export function applyDocumentLanguage(code: AppLanguage) {
 
 export function readStoredLanguage(): AppLanguage {
   try {
-    const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
+    const stored = window.sessionStorage.getItem(LANGUAGE_STORAGE_KEY)
     if (isAppLanguage(stored)) return stored
   } catch {
     /* ignore */
@@ -42,5 +42,5 @@ export function readStoredLanguage(): AppLanguage {
 }
 
 export function writeStoredLanguage(code: AppLanguage) {
-  window.localStorage.setItem(LANGUAGE_STORAGE_KEY, code)
+  window.sessionStorage.setItem(LANGUAGE_STORAGE_KEY, code)
 }
