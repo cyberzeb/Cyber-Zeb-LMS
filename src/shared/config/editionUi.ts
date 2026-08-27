@@ -137,7 +137,7 @@ export function getEditionPageCopy(key: EditionPageKey): PageCopy {
     },
     departments: {
       title: t.department + 's',
-      subtitle: `Manage ${t.department.toLowerCase()}s across your ${t.organization.toLowerCase()}.`,
+      subtitle: `Major business units (e.g. Retail Banking, Risk & Compliance). Used for reporting, bulk training assignment, and org structure.`,
     },
   }
 

@@ -126,7 +126,7 @@ export function StudentEditModal({
         label="Email Address"
         value={form.email}
         onChange={(v) => setForm({ ...form, email: v })}
-        placeholder="e.g. selam.girma@berana.edu"
+        placeholder={isCorporateEdition() ? 'e.g. dawit.bekele@horizonbank.et' : 'e.g. selam.girma@berana.edu'}
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {!corporateMode ? (

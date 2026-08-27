@@ -44,7 +44,7 @@ export function CorporateJobRolesPage() {
     <div className="space-y-6">
       <PageHeader
         title="Job Roles"
-        subtitle="Define roles and link required skills and mandatory training for your workforce."
+        subtitle="Job titles in your organization (e.g. Customer Service Officer). Each role defines required skills and mandatory training — compliance is tracked against these."
         actions={
           <Button onClick={() => setModal({ open: true, mode: 'create', role: null })}>
             <Plus size={15} />

@@ -128,7 +128,7 @@ export function CorporateTeamsPage() {
     <div className="space-y-6">
       <PageHeader
         title="Teams"
-        subtitle="View and manage teams across all departments."
+        subtitle="Working groups inside a department (e.g. Branch Operations, AML & Regulatory). Assign employees to teams for finer reporting and manager oversight."
         actions={
           <Button onClick={() => setTeamModal({ open: true, mode: 'create', team: null })}>
             <Plus size={15} />

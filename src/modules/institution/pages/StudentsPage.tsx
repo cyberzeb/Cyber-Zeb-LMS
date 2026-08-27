@@ -17,10 +17,16 @@ import { withAdminVerification } from '../utils/peopleVerification'
 import { useCampusContext } from '../context/CampusContext'
 import { DEFAULT_CAMPUS_ID } from '../data/orgSeedData'
 import { migrateStudentRecord } from '../api/peopleApi'
+import { isCorporateEdition } from '../../../shared/config/edition'
+import { isValidEmail, normalizeEmail } from '../../../shared/utils/emailValidation'
 import { StudentsTable } from '../components/StudentsTable'
 import { StudentEditModal } from '../components/StudentEditModal'
 import { StudentImportModal } from '../components/StudentImportModal'
 import { usePeoplePageConfigForEdition, useHideCampusFiltersInEdition } from '../../../shared/config/useEditionPageCopy'
+import { useTeams } from '../../corporate/hooks/useTeams'
+import { useJobRoles } from '../../corporate/hooks/useJobRoles'
+import { useEnrollments } from '../hooks/useEnrollments'
+import { assignRequiredTrainingForRole } from '../../corporate/utils/complianceUtils'
 import type { PersonRow } from '../types'
 
 function initialsFromName(name: string): string {
@@ -35,10 +41,14 @@ function initialsFromName(name: string): string {
 
 export function StudentsPage() {
   const { notify } = useToast()
+  const corporateMode = isCorporateEdition()
   const config = usePeoplePageConfigForEdition('Student')
   const hideCampusFilters = useHideCampusFiltersInEdition()
   const { campuses, departments, activeCampuses, selectedCampusId } = useCampusContext()
   const { people, setPeople } = usePeople()
+  const { teams } = useTeams()
+  const { jobRoles } = useJobRoles()
+  const { enrollments, setEnrollments } = useEnrollments()
   const [query, setQuery] = useState('')
   const [campusFilter, setCampusFilter] = useState<string>('all')
   const [departmentFilter, setDepartmentFilter] = useState<string>('all')
@@ -50,6 +60,8 @@ export function StudentsPage() {
     email: '',
     campusId: DEFAULT_CAMPUS_ID,
     departmentId: '',
+    teamId: '',
+    jobRoleId: '',
   })
 
   useEffect(() => {
@@ -98,11 +110,25 @@ export function StudentsPage() {
     [departments, inviteForm.campusId],
   )
 
+  const inviteTeams = useMemo(
+    () =>
+      teams.filter(
+        (team) => !inviteForm.departmentId || team.departmentId === inviteForm.departmentId,
+      ),
+    [teams, inviteForm.departmentId],
+  )
+
   useEffect(() => {
     if (!inviteDepartments.some((d) => d.id === inviteForm.departmentId)) {
-      setInviteForm((prev) => ({ ...prev, departmentId: inviteDepartments[0]?.id ?? '' }))
+      setInviteForm((prev) => ({ ...prev, departmentId: inviteDepartments[0]?.id ?? '', teamId: '' }))
     }
   }, [inviteDepartments, inviteForm.departmentId])
+
+  useEffect(() => {
+    if (!inviteTeams.some((t) => t.id === inviteForm.teamId)) {
+      setInviteForm((prev) => ({ ...prev, teamId: '' }))
+    }
+  }, [inviteTeams, inviteForm.teamId])
 
   const openInvite = () => {
     setInviteForm({
@@ -110,6 +136,8 @@ export function StudentsPage() {
       email: '',
       campusId: campusFilter !== 'all' ? campusFilter : DEFAULT_CAMPUS_ID,
       departmentId: '',
+      teamId: '',
+      jobRoleId: '',
     })
     setInviteOpen(true)
   }
@@ -119,23 +147,50 @@ export function StudentsPage() {
       notify('Please complete all required fields.', 'error')
       return
     }
+    if (!isValidEmail(inviteForm.email)) {
+      notify('Enter a valid email address (e.g. name@horizonbank.et).', 'error')
+      return
+    }
     const dept = departments.find((d) => d.id === inviteForm.departmentId)
     if (!dept) return
 
     const newStudent = withAdminVerification({
       id: createId('user'),
       name: inviteForm.name.trim(),
-      email: inviteForm.email.trim().toLowerCase(),
+      email: normalizeEmail(inviteForm.email),
       role: 'Student',
       department: dept.name,
+      departmentId: dept.id,
+      teamId: inviteForm.teamId || undefined,
+      jobRoleId: inviteForm.jobRoleId || undefined,
       campusId: inviteForm.campusId,
       status: 'active',
       lastActive: 'Just added',
       initials: initialsFromName(inviteForm.name),
     })
     setPeople((prev) => [newStudent, ...prev])
+
+    if (corporateMode && inviteForm.jobRoleId) {
+      const role = jobRoles.find((r) => r.id === inviteForm.jobRoleId)
+      if (role && role.requiredCourseIds.length > 0) {
+        const assigned = assignRequiredTrainingForRole(newStudent, role, undefined, enrollments)
+        if (assigned.length > 0) {
+          setEnrollments((prev) => [...assigned, ...prev])
+        }
+      }
+    }
+
     setInviteOpen(false)
-    notify(`${newStudent.name} added. Enroll them in courses under Admin → Enrollments.`)
+    const role = inviteForm.jobRoleId
+      ? jobRoles.find((r) => r.id === inviteForm.jobRoleId)
+      : undefined
+    notify(
+      corporateMode
+        ? role && role.requiredCourseIds.length > 0
+          ? `${newStudent.name} added with job role “${role.title}”. Required training was assigned automatically.`
+          : `${newStudent.name} added. Assign training under Training Assignments when ready.`
+        : `${newStudent.name} added. Enroll them in courses under Admin → Enrollments.`,
+    )
   }
 
   const handleDelete = (student: PersonRow) => {
@@ -267,7 +322,7 @@ export function StudentsPage() {
           label="Email Address"
           value={inviteForm.email}
           onChange={(v) => setInviteForm({ ...inviteForm, email: v })}
-          placeholder="e.g. selam.girma@berana.edu"
+          placeholder={isCorporateEdition() ? 'e.g. dawit.bekele@horizonbank.et' : 'e.g. selam.girma@berana.edu'}
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {!hideCampusFilters ? (
@@ -292,7 +347,9 @@ export function StudentsPage() {
             <span className="text-[12px] font-semibold text-navy-900">Department</span>
             <select
               value={inviteForm.departmentId}
-              onChange={(e) => setInviteForm({ ...inviteForm, departmentId: e.target.value })}
+              onChange={(e) =>
+                setInviteForm({ ...inviteForm, departmentId: e.target.value, teamId: '' })
+              }
               className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
             >
               {inviteDepartments.map((d) => (
@@ -303,6 +360,45 @@ export function StudentsPage() {
             </select>
           </label>
         </div>
+        {corporateMode ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[12px] font-semibold text-navy-900">Team</span>
+              <select
+                value={inviteForm.teamId}
+                onChange={(e) => setInviteForm({ ...inviteForm, teamId: e.target.value })}
+                className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
+              >
+                <option value="">No team</option>
+                {inviteTeams.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[12px] font-semibold text-navy-900">Job Role</span>
+              <select
+                value={inviteForm.jobRoleId}
+                onChange={(e) => setInviteForm({ ...inviteForm, jobRoleId: e.target.value })}
+                className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
+              >
+                <option value="">No job role</option>
+                {jobRoles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.title}
+                  </option>
+                ))}
+              </select>
+              {inviteForm.jobRoleId ? (
+                <span className="text-[11px] text-secondary-text">
+                  Required training for this role will be assigned automatically.
+                </span>
+              ) : null}
+            </label>
+          </div>
+        ) : null}
       </Modal>
 
       <StudentEditModal

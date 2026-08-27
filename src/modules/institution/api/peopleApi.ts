@@ -1,6 +1,7 @@
 import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { DEFAULT_CAMPUS_ID } from '../data/orgSeedData'
 import { INSTRUCTOR_FACULTY_LABEL } from '../utils/courseAssignmentUtils'
+import { assertValidEmail, isValidEmail } from '../../../shared/utils/emailValidation'
 import type { Campus, Department, PersonRow } from '../types'
 
 export interface StudentImportInput {
@@ -138,7 +139,7 @@ export function parseStudentCsv(csvText: string): { rows: StudentImportInput[]; 
       continue
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!isValidEmail(email)) {
       errors.push({ row: i + 1, message: `Invalid email: ${email}` })
       continue
     }
@@ -337,12 +338,12 @@ export async function updateStudent(
   if (!department) throw new Error('Selected department does not belong to this campus.')
 
   if (!input.name.trim()) throw new Error('Student name is required.')
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) throw new Error('Invalid email address.')
+  const email = assertValidEmail(input.email)
 
   return {
     id: studentId,
     name: input.name.trim(),
-    email: input.email.trim().toLowerCase(),
+    email,
     role: 'Student',
     department: department.name,
     campusId: campus.id,
@@ -367,12 +368,12 @@ export async function updateInstructor(
   if (!campus) throw new Error('Selected campus was not found.')
 
   if (!input.name.trim()) throw new Error('Instructor name is required.')
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) throw new Error('Invalid email address.')
+  const email = assertValidEmail(input.email)
 
   return {
     id: instructorId,
     name: input.name.trim(),
-    email: input.email.trim().toLowerCase(),
+    email,
     role: 'Instructor',
     department: INSTRUCTOR_FACULTY_LABEL,
     campusId: campus.id,
@@ -394,12 +395,12 @@ export async function updateStaff(
   if (!campus) throw new Error('Selected campus was not found.')
   if (!input.name.trim()) throw new Error('Staff name is required.')
   if (!input.office.trim()) throw new Error('Office assignment is required.')
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) throw new Error('Invalid email address.')
+  const email = assertValidEmail(input.email)
 
   return {
     id: staffId,
     name: input.name.trim(),
-    email: input.email.trim().toLowerCase(),
+    email,
     role: 'Staff',
     department: input.office.trim(),
     campusId: campus.id,
@@ -428,12 +429,12 @@ export async function updateAdmin(
   if (!department) throw new Error('Selected department does not belong to this campus.')
 
   if (!input.name.trim()) throw new Error('Administrator name is required.')
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) throw new Error('Invalid email address.')
+  const email = assertValidEmail(input.email)
 
   return {
     id: adminId,
     name: input.name.trim(),
-    email: input.email.trim().toLowerCase(),
+    email,
     role: 'Admin',
     department: department.name,
     campusId: campus.id,
@@ -452,7 +453,7 @@ export async function updateGuardian(
   await new Promise((resolve) => setTimeout(resolve, 350))
 
   if (!input.name.trim()) throw new Error('Guardian name is required.')
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) throw new Error('Invalid email address.')
+  const email = assertValidEmail(input.email)
 
   const student = students.find((s) => s.id === input.linkedStudentId)
   if (!student) throw new Error('Linked student is required.')
@@ -460,7 +461,7 @@ export async function updateGuardian(
   return {
     id: guardianId,
     name: input.name.trim(),
-    email: input.email.trim().toLowerCase(),
+    email,
     role: 'Guardian',
     department: student.name,
     campusId: student.campusId,
