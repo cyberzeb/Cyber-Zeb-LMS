@@ -21,7 +21,7 @@ cd Cyber-Zeb-LMS
 # 3. Configure
 cp .env.docker.example .env
 nano .env
-# Set YOUR_VPS_IP, POSTGRES_PASSWORD, JWT_SECRET_KEY, HTTP_PORT=8085
+# Set YOUR_VPS_IP, JWT_SECRET_KEY, HTTP_PORT=8085
 
 # 4. Build and run
 chmod +x deploy/vps-docker.sh
@@ -66,12 +66,11 @@ CORS_ORIGINS=["http://203.0.113.10:8085"]
 | Container | Role |
 |-----------|------|
 | **web** | Frontend + nginx (proxies `/api` to backend) |
-| **api** | FastAPI |
-| **worker** | Celery |
-| **db** | PostgreSQL |
-| **redis** | Queue |
+| **api** | FastAPI + **SQLite** database (no Postgres/Redis) |
 
-Demo data is seeded automatically on first start.
+Only **2 containers**. Demo data is seeded automatically on first start.
+
+Need Postgres instead? Use `docker compose -f docker-compose.postgres.yml up --build -d`.
 
 ---
 

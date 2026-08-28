@@ -38,7 +38,7 @@ if [ ! -f ".env" ]; then
   echo "Created .env - edit it first:"
   echo "  nano .env"
   echo ""
-  echo "Set YOUR_VPS_IP, POSTGRES_PASSWORD, JWT_SECRET_KEY, and HTTP_PORT (e.g. 8085)"
+  echo "Set YOUR_VPS_IP, JWT_SECRET_KEY, and HTTP_PORT (e.g. 8085)"
   echo "Then run: ./deploy/vps-docker.sh"
   exit 0
 fi
