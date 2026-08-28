@@ -20,7 +20,7 @@ const STEPS = [
   {
     n: '04',
     title: 'Get Your Dedicated LMS Link',
-    text: 'We provision your own branded subdomain (e.g. aau.brana-lms.com) and email it to you.',
+    text: 'We provision your own branded subdomain (e.g. aau.berana-lms.com) and email it to you.',
     icon: '🚀',
   },
 ]

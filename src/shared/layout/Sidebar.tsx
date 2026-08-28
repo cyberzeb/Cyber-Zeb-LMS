@@ -26,7 +26,7 @@ interface SidebarProps {
 export function Sidebar({
   sections,
   brandLogoSrc,
-  brandName = 'Brana LMS',
+  brandName = 'Berana LMS',
   brandSubtitle = 'Cyber-Zeb',
   showSystemStatus = true,
 }: SidebarProps) {

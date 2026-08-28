@@ -13,12 +13,21 @@ from sqlalchemy.orm import DeclarativeBase
 
 from app.core.config import settings
 
+_connect_args: dict = {}
+if settings.DATABASE_URL.startswith("postgresql+asyncpg://") and "neon.tech" in settings.DATABASE_URL:
+    # Neon and most managed Postgres require TLS; asyncpg uses `ssl` not sslmode.
+    import ssl as _ssl
+
+    _ssl_ctx = _ssl.create_default_context()
+    _connect_args["ssl"] = _ssl_ctx
+
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
     pool_pre_ping=True,
     pool_size=10,
     max_overflow=20,
+    connect_args=_connect_args,
 )
 
 AsyncSessionLocal = async_sessionmaker(

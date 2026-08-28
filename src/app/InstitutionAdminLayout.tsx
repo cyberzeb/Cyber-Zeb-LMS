@@ -311,7 +311,7 @@ function InstitutionAdminShell() {
       <Sidebar
         sections={navSections}
         brandLogoSrc={brandLogo}
-        brandName="Brana LMS"
+        brandName="Berana LMS"
         brandSubtitle="Cyber-Zeb"
       />
 

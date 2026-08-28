@@ -40,7 +40,7 @@ export function Hero({ onRequestServiceClick }: HeroProps) {
           </h1>
 
           <p className="mt-5 text-[15.5px] md:text-[17px] text-navy-200 max-w-xl leading-relaxed">
-            Brana LMS brings courses, live classes, attendance, assessment,
+            Berana LMS brings courses, live classes, attendance, assessment,
             payments and parent communication into one secure, modular
             platform — built in Ethiopia for universities, schools,
             businesses, government and NGOs.

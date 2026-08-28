@@ -50,6 +50,35 @@ def register_exception_handlers(app: FastAPI) -> None:
                     "code": exc.error_code,
                     "message": exc.detail,
                     "correlation_id": correlation_id,
+                    "details": [],
                 }
             },
+        )
+
+    from fastapi import HTTPException
+
+    @app.exception_handler(HTTPException)
+    async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+        correlation_id = getattr(request.state, "correlation_id", None)
+        detail = exc.detail
+        if isinstance(detail, dict):
+            message = str(detail.get("message") or detail)
+        else:
+            message = str(detail)
+        code = "http_error"
+        if exc.status_code == 401:
+            code = "unauthorized"
+        elif exc.status_code == 403:
+            code = "permission_denied"
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={
+                "error": {
+                    "code": code,
+                    "message": message,
+                    "correlation_id": correlation_id,
+                    "details": [],
+                }
+            },
+            headers=getattr(exc, "headers", None),
         )

@@ -51,6 +51,14 @@ Suggested demo users:
 
 ## Features
 
+### Super Admin portal
+
+- Base path: `/super-admin/*`
+- Wired to the FastAPI backend in `backend/` (not localStorage-based like the other portals)
+- Handles the client onboarding pipeline: incoming service/lead requests, invoicing, payment confirmation, and subdomain/tenant activation
+- Pages: service requests list + detail, add-on requests, module management, renewals, and a login gate
+- See `backend/app/modules/onboarding/` for the corresponding backend module (models, schemas, repository, service, email notifications)
+
 ### Institution Admin
 
 - Institution overview, org structure, departments, programs
@@ -102,6 +110,7 @@ Demo seed data is loaded on startup. Bump `STORAGE_VERSION` in `src/shared/stora
 src/
 ├── app/                 # Router and admin layout
 ├── modules/
+│   ├── superadmin/      # Super admin portal — service requests, onboarding, billing
 │   ├── students/        # Student portal pages, layout, hooks
 │   ├── instructors/     # Instructor portal
 │   ├── institution/     # Admin pages, hooks, seed data
@@ -118,7 +127,9 @@ backend/                 # FastAPI scaffold (not connected to frontend yet)
 
 ## Backend (planned)
 
-The `backend/` folder contains a modular FastAPI monolith with planned modules for live sessions, assessments, enrollments, and more. See `backend/ARCHITECTURE.md` for the target API design. The frontend currently uses localStorage instead of HTTP calls.
+## Backend
+
+The `backend/` folder contains a modular FastAPI monolith. The **onboarding module** (`app/modules/onboarding/`) is fully implemented and connected to the Super Admin portal — handling lead capture, invoicing, and subdomain activation. Other modules (live sessions, assessments, enrollments, etc.) are scaffolded per `backend/ARCHITECTURE.md` but not yet connected; the Student/Instructor/Institution Admin portals still use localStorage for those.
 
 ## License
 

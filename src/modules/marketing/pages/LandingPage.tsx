@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { AnnouncementBanner } from '../components/AnnouncementBanner'
 import { Navbar } from '../components/Navbar'
 import { Hero } from '../components/Hero'
 import { AboutSection } from '../components/AboutSection'
@@ -16,6 +17,7 @@ export function LandingPage() {
 
   return (
     <div className="font-sans">
+      <AnnouncementBanner />
       <Navbar onRequestServiceClick={scrollToForm} />
       <Hero onRequestServiceClick={scrollToForm} />
       <AboutSection />
@@ -33,7 +35,7 @@ export function LandingPage() {
             </h2>
             <p className="mt-3 text-[14.5px] text-secondary-text max-w-lg mx-auto">
               Fill in the form below. Our team will send you a custom
-              proposal and invoice, and set up your dedicated Brana LMS
+              proposal and invoice, and set up your dedicated Berana LMS
               once payment and the agreement are confirmed.
             </p>
           </div>
