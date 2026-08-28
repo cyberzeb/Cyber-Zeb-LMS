@@ -190,6 +190,12 @@ function InstitutionAdminShell() {
       title: 'People',
       items: [
         {
+          label: 'Enrollments',
+          to: '/admin/enrollments',
+          active: isActive(['/admin/enrollments']),
+          icon: <UserRoundCheck size={ICON_SIZE} />,
+        },
+        {
           label: 'Students',
           to: '/admin/students',
           active: isActive(['/admin/students']),
@@ -202,16 +208,16 @@ function InstitutionAdminShell() {
           icon: <UserRoundCog size={ICON_SIZE} />,
         },
         {
-          label: 'Staff',
-          to: '/admin/staff',
-          active: isActive(['/admin/staff']),
-          icon: <Briefcase size={ICON_SIZE} />,
-        },
-        {
           label: 'Guardians',
           to: '/admin/guardians',
           active: isActive(['/admin/guardians']),
           icon: <HeartHandshake size={ICON_SIZE} />,
+        },
+        {
+          label: 'Staff',
+          to: '/admin/staff',
+          active: isActive(['/admin/staff']),
+          icon: <Briefcase size={ICON_SIZE} />,
         },
         {
           label: 'Administrators',
@@ -231,12 +237,6 @@ function InstitutionAdminShell() {
           to: '/admin/people',
           active: isActive(['/admin/people']),
           icon: <Users size={ICON_SIZE} />,
-        },
-        {
-          label: 'Enrollments',
-          to: '/admin/enrollments',
-          active: isActive(['/admin/enrollments']),
-          icon: <UserRoundCheck size={ICON_SIZE} />,
         },
       ],
     },

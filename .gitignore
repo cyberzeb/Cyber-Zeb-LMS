@@ -28,8 +28,14 @@ dist-ssr
 .env.*
 !.env.example
 !*.env.example
+!.env.docker.example
 
 # Local SQLite / Python
 *.db
+deploy/brana-demo.log
+deploy/.brana-demo.pid
+deploy/.release-staging
+deploy/berana-release.zip
+backend/brana_lms.db
 backend/.venv/
 __pycache__/
