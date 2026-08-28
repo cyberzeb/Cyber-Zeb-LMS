@@ -23,7 +23,8 @@ export function setCookie(name: string, value: string, options: CookieOptions = 
   const maxAge = options.maxAgeSeconds ?? DEFAULT_MAX_AGE_SECONDS
   const path = options.path ?? '/'
   const sameSite = options.sameSite ?? 'Lax'
-  const secure = import.meta.env.PROD ? '; Secure' : ''
+  // Secure cookies are ignored on plain HTTP — breaks login on IP-based VPS demos.
+  const secure = window.location.protocol === 'https:' ? '; Secure' : ''
   document.cookie = [
     `${encodeURIComponent(name)}=${encodeURIComponent(value)}`,
     `Max-Age=${maxAge}`,
