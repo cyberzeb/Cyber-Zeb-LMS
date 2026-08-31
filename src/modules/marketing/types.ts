@@ -134,6 +134,17 @@ export const MODULE_GROUPS: { title: string; keys: ModuleKey[] }[] = [
   },
 ]
 
+export interface PublicBranding {
+  id: string
+  logo_url: string | null
+  favicon_url: string | null
+  footer_text: string | null
+  footer_links: { label: string; url: string }[] | null
+  support_email: string | null
+  support_phone: string | null
+  updated_at: string
+}
+
 export interface ModuleCatalogItem {
   id: string
   key: ModuleKey | string

@@ -103,3 +103,8 @@ export async function resolveTenantBySubdomain(slug: string) {
   }>(`/tenants/by-subdomain/${slug}`)
   return data
 }
+
+export async function getPublicBranding(): Promise<import('../types').PublicBranding> {
+  const { data } = await axiosClient.get('/branding')
+  return data
+}

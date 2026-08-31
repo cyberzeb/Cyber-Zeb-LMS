@@ -648,6 +648,7 @@ async def update_site_content(
 )
 async def list_audit_logs(
     action: str | None = Query(None),
+    actions: list[str] = Query(default=[]),
     since: datetime | None = Query(None),
     until: datetime | None = Query(None),
     offset: int = Query(0, ge=0),
@@ -657,7 +658,12 @@ async def list_audit_logs(
 ):
     service = OnboardingService(db)
     return await service.list_audit_logs(
-        action=action, since=since, until=until, offset=offset, limit=limit
+        action=action,
+        actions=actions or None,
+        since=since,
+        until=until,
+        offset=offset,
+        limit=limit,
     )
 
 
@@ -771,3 +777,470 @@ async def export_csv(
         media_type="text/csv",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+# ─────────────────────────────────────────────────────────────────────────────
+# New Super Admin Feature Endpoints
+# ─────────────────────────────────────────────────────────────────────────────
+
+from fastapi import UploadFile, File
+from app.modules.onboarding import features_service as fs
+from app.modules.onboarding.schemas import (
+    AdminBanIn,
+    AdminBanOut,
+    AdminUnbanIn,
+    AnalyticsOut,
+    BackupListOut,
+    BackupRunOut,
+    BrandingOut,
+    BrandingPatch,
+    IntegrationOAuthCallbackIn,
+    IntegrationOAuthInitOut,
+    IntegrationOut,
+    RenewalReminderOut,
+    RestoreIn,
+    SuspendedAdminOut,
+    SystemHealthOut,
+    UserBanIn,
+    UserBanOut,
+    UserReportIn,
+    UserReportOut,
+    UserReportReviewIn,
+    UserUnbanIn,
+)
+
+
+# ── System Health ─────────────────────────────────────────────────────────────
+
+@router.get(
+    "/super-admin/system-health",
+    response_model=SystemHealthOut,
+    tags=["System Health"],
+)
+async def get_system_health(
+    db: AsyncSession = Depends(get_db),
+    _principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.get_system_health(db)
+
+
+# ── Integrations ──────────────────────────────────────────────────────────────
+
+@router.get(
+    "/super-admin/integrations",
+    response_model=list[IntegrationOut],
+    tags=["Integrations"],
+)
+async def list_integrations(
+    db: AsyncSession = Depends(get_db),
+    _principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.list_integrations(db)
+
+
+@router.post(
+    "/super-admin/integrations/{platform}/connect",
+    response_model=IntegrationOAuthInitOut,
+    tags=["Integrations"],
+)
+async def begin_oauth(
+    platform: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.begin_oauth(
+        db, platform,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+@router.post(
+    "/super-admin/integrations/{platform}/callback",
+    response_model=IntegrationOut,
+    tags=["Integrations"],
+)
+async def complete_oauth(
+    platform: str,
+    payload: IntegrationOAuthCallbackIn,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.complete_oauth(
+        db, platform, payload,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+@router.post(
+    "/super-admin/integrations/{platform}/disconnect",
+    response_model=IntegrationOut,
+    tags=["Integrations"],
+)
+async def disconnect_integration(
+    platform: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.disconnect_integration(
+        db, platform,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+# ── Renewal Reminder ──────────────────────────────────────────────────────────
+
+@router.post(
+    "/super-admin/tenants/{tenant_id}/renewal-reminder",
+    response_model=RenewalReminderOut,
+    tags=["Subscriptions"],
+)
+async def send_renewal_reminder(
+    tenant_id: uuid.UUID,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.send_renewal_reminder(
+        db, tenant_id,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+# ── Audit Logs — multi-action filter ─────────────────────────────────────────
+
+@router.get(
+    "/super-admin/audit-logs-v2",
+    response_model=PlatformAuditLogListOut,
+    tags=["Super Admin Console"],
+)
+async def list_audit_logs_v2(
+    actions: list[str] = Query(default=[]),
+    since: datetime | None = Query(None),
+    until: datetime | None = Query(None),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+    _principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    service = OnboardingService(db)
+    return await service.list_audit_logs(
+        action=None,
+        actions=actions or None,
+        since=since,
+        until=until,
+        offset=offset,
+        limit=limit,
+    )
+
+
+# ── Branding ──────────────────────────────────────────────────────────────────
+
+@router.get(
+    "/super-admin/branding",
+    response_model=BrandingOut,
+    tags=["Branding"],
+)
+async def get_branding(
+    db: AsyncSession = Depends(get_db),
+    _principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.get_branding(db)
+
+
+@router.get(
+    "/branding",
+    response_model=BrandingOut,
+    tags=["Branding"],
+)
+async def get_public_branding(db: AsyncSession = Depends(get_db)):
+    """Public — no auth. Used by the landing page footer."""
+    return await fs.get_branding(db)
+
+
+@router.patch(
+    "/super-admin/branding",
+    response_model=BrandingOut,
+    tags=["Branding"],
+)
+async def update_branding(
+    payload: BrandingPatch,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.update_branding(
+        db, payload,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+@router.post(
+    "/super-admin/branding/upload/{asset_type}",
+    response_model=BrandingOut,
+    tags=["Branding"],
+)
+async def upload_branding_asset(
+    asset_type: str,
+    request: Request,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    content = await file.read()
+    if len(content) > 5 * 1024 * 1024:
+        from app.core.exceptions import ValidationAppError
+        raise ValidationAppError("File too large (max 5 MB)")
+    return await fs.upload_branding_asset(
+        db, asset_type, file.filename or "upload", content,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+# ── Security Center — Admin bans ──────────────────────────────────────────────
+
+@router.get(
+    "/super-admin/security/admins",
+    response_model=list[SuspendedAdminOut],
+    tags=["Security"],
+)
+async def list_admins_with_status(
+    db: AsyncSession = Depends(get_db),
+    _principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.list_platform_admins_with_status(db)
+
+
+@router.post(
+    "/super-admin/security/admins/{target_id}/ban",
+    response_model=AdminBanOut,
+    tags=["Security"],
+)
+async def ban_platform_admin(
+    target_id: uuid.UUID,
+    payload: AdminBanIn,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.ban_platform_admin(
+        db, target_id, payload,
+        acting_admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+@router.post(
+    "/super-admin/security/admins/{target_id}/unban",
+    response_model=SuspendedAdminOut,
+    tags=["Security"],
+)
+async def unban_platform_admin(
+    target_id: uuid.UUID,
+    payload: AdminUnbanIn,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.unban_platform_admin(
+        db, target_id, payload,
+        acting_admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+# ── Security Center — User Reports & Bans ────────────────────────────────────
+
+@router.post(
+    "/super-admin/security/reports",
+    response_model=UserReportOut,
+    status_code=status.HTTP_201_CREATED,
+    tags=["Security"],
+)
+async def create_user_report(
+    payload: UserReportIn,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    _principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.create_user_report(
+        db, payload,
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+@router.get(
+    "/super-admin/security/reports",
+    response_model=dict,
+    tags=["Security"],
+)
+async def list_user_reports(
+    report_status: str | None = Query(None, alias="status"),
+    tenant_id: uuid.UUID | None = Query(None),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+    _principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    items, total = await fs.list_user_reports(
+        db, status=report_status, tenant_id=tenant_id, offset=offset, limit=limit
+    )
+    return {"items": [i.model_dump() for i in items], "total": total}
+
+
+@router.patch(
+    "/super-admin/security/reports/{report_id}",
+    response_model=UserReportOut,
+    tags=["Security"],
+)
+async def review_user_report(
+    report_id: uuid.UUID,
+    payload: UserReportReviewIn,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.review_user_report(
+        db, report_id, payload,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+@router.post(
+    "/super-admin/security/users/{user_id}/ban",
+    response_model=UserBanOut,
+    tags=["Security"],
+)
+async def ban_user(
+    user_id: uuid.UUID,
+    payload: UserBanIn,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.ban_user(
+        db, user_id, payload,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+@router.post(
+    "/super-admin/security/users/{user_id}/unban",
+    response_model=UserBanOut,
+    tags=["Security"],
+)
+async def unban_user(
+    user_id: uuid.UUID,
+    payload: UserUnbanIn,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.unban_user(
+        db, user_id, payload,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+@router.get(
+    "/super-admin/security/bans",
+    response_model=dict,
+    tags=["Security"],
+)
+async def list_user_bans(
+    active_only: bool = Query(True),
+    tenant_id: uuid.UUID | None = Query(None),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+    _principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    items, total = await fs.list_user_bans(
+        db, active_only=active_only, tenant_id=tenant_id, offset=offset, limit=limit
+    )
+    return {"items": [i.model_dump() for i in items], "total": total}
+
+
+# ── Analytics ─────────────────────────────────────────────────────────────────
+
+@router.get(
+    "/super-admin/analytics",
+    response_model=AnalyticsOut,
+    tags=["Analytics"],
+)
+async def get_analytics(
+    since: datetime | None = Query(None),
+    until: datetime | None = Query(None),
+    institution_type: str | None = Query(None),
+    db: AsyncSession = Depends(get_db),
+    _principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.get_analytics(
+        db, since=since, until=until, institution_type=institution_type
+    )
+
+
+# ── Backup & Restore ──────────────────────────────────────────────────────────
+
+@router.get(
+    "/super-admin/backups",
+    response_model=BackupListOut,
+    tags=["Backup"],
+)
+async def list_backups(
+    offset: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+    _principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.list_backup_runs(db, offset=offset, limit=limit)
+
+
+@router.post(
+    "/super-admin/backups/trigger",
+    response_model=BackupRunOut,
+    tags=["Backup"],
+)
+async def trigger_backup(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await fs.trigger_backup(
+        db,
+        admin=await _current_admin(db, principal),
+        triggered_by="manual",
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+@router.post(
+    "/super-admin/backups/restore",
+    tags=["Backup"],
+)
+async def restore_from_backup(
+    payload: RestoreIn,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    from app.core.config import settings as s
+    # Confirmation must equal the app env name
+    expected = s.APP_ENV
+    result = await fs.restore_from_backup(
+        db, payload,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+        expected_confirmation=expected,
+    )
+    return result

@@ -45,7 +45,6 @@ class Settings(BaseSettings):
     ZOOM_CLIENT_ID: str = ""
     ZOOM_CLIENT_SECRET: str = ""
     ZOOM_WEBHOOK_SECRET_TOKEN: str = ""
-    ZOOM_REDIRECT_URI: str = ""
 
     # --- Payments (Blueprint Section 13) ---
     PAYMENT_PROVIDER: str = "stripe"
@@ -72,6 +71,34 @@ class Settings(BaseSettings):
 
     # --- CORS ---
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
+
+    # --- Integrations OAuth ---
+    # Zoom
+    ZOOM_REDIRECT_URI: str = "http://localhost:5173/super-admin/integrations/callback/zoom"
+    # Microsoft Teams / Azure AD
+    TEAMS_CLIENT_ID: str = ""
+    TEAMS_CLIENT_SECRET: str = ""
+    TEAMS_TENANT_ID: str = "common"
+    TEAMS_REDIRECT_URI: str = "http://localhost:5173/super-admin/integrations/callback/teams"
+    # Google Meet
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    GOOGLE_REDIRECT_URI: str = "http://localhost:5173/super-admin/integrations/callback/google_meet"
+    # Webex
+    WEBEX_CLIENT_ID: str = ""
+    WEBEX_CLIENT_SECRET: str = ""
+    WEBEX_REDIRECT_URI: str = "http://localhost:5173/super-admin/integrations/callback/webex"
+
+    # --- Backup ---
+    BACKUP_DIR: str = "/tmp/berana_backups"
+    BACKUP_SCHEDULE_CRON: str = "0 2 * * *"  # 02:00 UTC daily
+    BACKUP_RETENTION_DAYS: int = 30
+    # Set to "s3" to enable S3-compatible upload after local dump
+    BACKUP_STORAGE: str = "local"
+
+    # --- Token encryption (Fernet key for OAuth tokens at rest) ---
+    # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    TOKEN_ENCRYPTION_KEY: str = ""
 
     @field_validator("DEBUG", mode="before")
     @classmethod

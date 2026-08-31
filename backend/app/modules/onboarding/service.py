@@ -81,25 +81,49 @@ EDITABLE_PLATFORM_SETTINGS: dict[str, str] = {
 }
 
 AUDIT_ACTION_LABELS: dict[str, str] = {
+    # Service requests
     "service_request.created": "New service request created",
     "service_request.invoice_sent": "Invoice sent",
     "service_request.payment_confirmed": "Payment confirmed",
     "service_request.rejected": "Service request rejected",
     "service_request.email_resent": "Email resent",
+    # Tenants
     "tenant.activated": "Tenant activated",
     "tenant.renewed": "Tenant renewed",
+    "tenant.renewal_reminder_sent": "Renewal reminder sent",
+    # Add-on requests
     "addon_request.created": "Add-on request created",
     "addon_request.invoice_sent": "Add-on invoice sent",
     "addon_request.payment_confirmed": "Add-on payment confirmed",
     "addon_request.activated": "Add-on modules activated",
     "addon_request.email_resent": "Add-on email resent",
+    # Module catalog
     "module_catalog.created": "Module catalog item created",
     "module_catalog.updated": "Module catalog item updated",
+    # Platform admins
     "platform_admin.login": "Super admin signed in",
     "platform_admin.invited": "Super admin invited",
+    # Content & settings
     "site_content.created": "Landing content created",
     "site_content.updated": "Landing content updated",
     "platform_setting.updated": "Platform setting updated",
+    # Branding
+    "branding.updated": "Branding updated",
+    # Integrations
+    "integration.oauth_initiated": "Integration OAuth initiated",
+    "integration.connected": "Integration connected",
+    "integration.disconnected": "Integration disconnected",
+    # Security — admin bans
+    "security.admin_banned": "Super admin suspended",
+    "security.admin_unbanned": "Super admin reinstated",
+    # Security — user reports & bans
+    "security.user_reported": "User reported",
+    "security.report_reviewed": "User report reviewed",
+    "security.user_banned": "User banned",
+    "security.user_unbanned": "User unbanned",
+    # Backup & restore
+    "backup.created": "Backup created",
+    "backup.restore_initiated": "Database restore initiated",
 }
 
 logger = logging.getLogger(__name__)
@@ -1500,14 +1524,21 @@ class OnboardingService:
         self,
         *,
         action: str | None,
+        actions: list[str] | None = None,
         since: datetime | None,
         until: datetime | None,
         offset: int,
         limit: int,
     ) -> PlatformAuditLogListOut:
-        items, total = await self.repo.list_audit_logs(
-            action=action, since=since, until=until, offset=offset, limit=limit
-        )
+        # Support both single action (legacy) and multi-action list (new dropdown filter)
+        if actions:
+            items, total = await self.repo.list_audit_logs_by_actions(
+                actions=actions, since=since, until=until, offset=offset, limit=limit
+            )
+        else:
+            items, total = await self.repo.list_audit_logs(
+                action=action, since=since, until=until, offset=offset, limit=limit
+            )
         out: list[PlatformAuditLogOut] = []
         for entry in items:
             actor_email = None

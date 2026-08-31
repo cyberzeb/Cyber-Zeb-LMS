@@ -355,3 +355,40 @@ class OnboardingRepository:
         total = (await self.db.execute(count_q)).scalar_one()
         items = list((await self.db.execute(list_q)).scalars().all())
         return items, total
+
+    async def get_tenant_by_id(self, tenant_id: uuid.UUID) -> "Tenant | None":
+        from app.modules.tenants.models import Tenant
+        result = await self.db.execute(select(Tenant).where(Tenant.id == tenant_id))
+        return result.scalar_one_or_none()
+
+    async def list_audit_logs_by_actions(
+        self,
+        *,
+        actions: list[str] | None,
+        since: "datetime | None",
+        until: "datetime | None",
+        offset: int,
+        limit: int,
+    ) -> "tuple[list[PlatformAuditLog], int]":
+        """Like list_audit_logs but accepts a list of action codes (OR match)."""
+        from sqlalchemy import or_
+        filters = []
+        if actions:
+            filters.append(or_(*[PlatformAuditLog.action == a for a in actions]))
+        if since is not None:
+            filters.append(PlatformAuditLog.created_at >= since)
+        if until is not None:
+            filters.append(PlatformAuditLog.created_at <= until)
+        count_q = select(func.count()).select_from(PlatformAuditLog)
+        list_q = (
+            select(PlatformAuditLog)
+            .order_by(PlatformAuditLog.created_at.desc())
+            .offset(offset)
+            .limit(limit)
+        )
+        if filters:
+            count_q = count_q.where(*filters)
+            list_q = list_q.where(*filters)
+        total = (await self.db.execute(count_q)).scalar_one()
+        items = list((await self.db.execute(list_q)).scalars().all())
+        return items, total

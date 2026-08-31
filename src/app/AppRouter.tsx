@@ -78,14 +78,13 @@ import { RolesPermissionsPage } from '../modules/superadmin/pages/RolesPermissio
 import { SystemSettingsPage } from '../modules/superadmin/pages/SystemSettingsPage'
 import { NotificationsPage } from '../modules/superadmin/pages/NotificationsPage'
 import { DataExportPage } from '../modules/superadmin/pages/DataExportPage'
-import {
-  AppearancePage,
-  AnalyticsPage,
-  BackupPage,
-  IntegrationsPage,
-  SecurityPage,
-  SystemHealthPage,
-} from '../modules/superadmin/pages/ComingSoonPage'
+import { AppearancePage } from '../modules/superadmin/pages/AppearancePage'
+import { AnalyticsPage } from '../modules/superadmin/pages/AnalyticsPage'
+import { BackupPage } from '../modules/superadmin/pages/BackupPage'
+import { IntegrationsPage } from '../modules/superadmin/pages/IntegrationsPage'
+import { IntegrationOAuthCallbackPage } from '../modules/superadmin/pages/IntegrationOAuthCallbackPage'
+import { SecurityPage } from '../modules/superadmin/pages/SecurityPage'
+import { SystemHealthPage } from '../modules/superadmin/pages/SystemHealthPage'
 
 export const router = createBrowserRouter([
   {
@@ -116,6 +115,7 @@ export const router = createBrowserRouter([
       { path: 'settings', element: <SystemSettingsPage /> },
       { path: 'appearance', element: <AppearancePage /> },
       { path: 'integrations', element: <IntegrationsPage /> },
+      { path: 'integrations/callback/:platform', element: <IntegrationOAuthCallbackPage /> },
       { path: 'notifications', element: <NotificationsPage /> },
       { path: 'system-health', element: <SystemHealthPage /> },
       { path: 'backup', element: <BackupPage /> },

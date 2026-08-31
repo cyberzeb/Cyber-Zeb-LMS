@@ -6,10 +6,10 @@ Entities: Tenant, Campus, Department
 (Program, AcademicTerm, Cohort live in app.modules.academic)
 """
 import uuid
-from datetime import date
+from datetime import date, datetime
 from enum import Enum
 
-from sqlalchemy import Date, Enum as SAEnum
+from sqlalchemy import Date, DateTime, Enum as SAEnum
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB, UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -84,6 +84,10 @@ class Tenant(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     enabled_modules: Mapped[list] = mapped_column(JSONB, default=list)
     subscription_start_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     renewal_date: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
+    renewal_reminder_sent_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    institution_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
 
     campuses: Mapped[list["Campus"]] = relationship(back_populates="tenant")
 

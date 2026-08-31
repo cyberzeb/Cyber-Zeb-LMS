@@ -272,3 +272,208 @@ export async function exportCsv(kind: 'service-requests' | 'tenants') {
   a.remove()
   URL.revokeObjectURL(url)
 }
+
+// ── New Super Admin Feature API functions ─────────────────────────────────────
+
+import type {
+  Analytics,
+  BackupList,
+  BackupRun,
+  Branding,
+  Integration,
+  IntegrationOAuthInit,
+  RenewalReminder,
+  SuspendedAdmin,
+  AdminBan,
+  UserReport,
+  UserBan,
+  SystemHealth,
+} from '../types'
+
+// System Health
+export async function getSystemHealth() {
+  const { data } = await axiosClient.get<SystemHealth>('/super-admin/system-health')
+  return data
+}
+
+// Integrations
+export async function listIntegrations() {
+  const { data } = await axiosClient.get<Integration[]>('/super-admin/integrations')
+  return data
+}
+
+export async function beginOAuth(platform: string) {
+  const { data } = await axiosClient.post<IntegrationOAuthInit>(
+    `/super-admin/integrations/${platform}/connect`,
+  )
+  return data
+}
+
+export async function disconnectIntegration(platform: string) {
+  const { data } = await axiosClient.post<Integration>(
+    `/super-admin/integrations/${platform}/disconnect`,
+  )
+  return data
+}
+
+// Renewal Reminder
+export async function sendRenewalReminder(tenantId: string) {
+  const { data } = await axiosClient.post<RenewalReminder>(
+    `/super-admin/tenants/${tenantId}/renewal-reminder`,
+  )
+  return data
+}
+
+// Branding
+export async function getBranding() {
+  const { data } = await axiosClient.get<Branding>('/super-admin/branding')
+  return data
+}
+
+export async function updateBranding(body: {
+  footer_text?: string | null
+  footer_links?: { label: string; url: string }[] | null
+  support_email?: string | null
+  support_phone?: string | null
+}) {
+  const { data } = await axiosClient.patch<Branding>('/super-admin/branding', body)
+  return data
+}
+
+export async function uploadBrandingAsset(assetType: 'logo' | 'favicon', file: File) {
+  const form = new FormData()
+  form.append('file', file)
+  const { data } = await axiosClient.post<Branding>(
+    `/super-admin/branding/upload/${assetType}`,
+    form,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  )
+  return data
+}
+
+// Security — Admins
+export async function listAdminsWithStatus() {
+  const { data } = await axiosClient.get<SuspendedAdmin[]>('/super-admin/security/admins')
+  return data
+}
+
+export async function banPlatformAdmin(adminId: string, reason: string) {
+  const { data } = await axiosClient.post<AdminBan>(
+    `/super-admin/security/admins/${adminId}/ban`,
+    { reason },
+  )
+  return data
+}
+
+export async function unbanPlatformAdmin(adminId: string, reason: string) {
+  const { data } = await axiosClient.post<SuspendedAdmin>(
+    `/super-admin/security/admins/${adminId}/unban`,
+    { reason },
+  )
+  return data
+}
+
+// Security — User Reports
+export async function listUserReports(params?: {
+  status?: string
+  tenant_id?: string
+  offset?: number
+  limit?: number
+}) {
+  const { data } = await axiosClient.get<{ items: UserReport[]; total: number }>(
+    '/super-admin/security/reports',
+    { params },
+  )
+  return data
+}
+
+export async function reviewUserReport(
+  reportId: string,
+  body: { status: string; notes?: string | null },
+) {
+  const { data } = await axiosClient.patch<UserReport>(
+    `/super-admin/security/reports/${reportId}`,
+    body,
+  )
+  return data
+}
+
+export async function banUser(userId: string, body: { reason: string; ban_scope?: string; report_id?: string | null }) {
+  const { data } = await axiosClient.post<UserBan>(
+    `/super-admin/security/users/${userId}/ban`,
+    body,
+  )
+  return data
+}
+
+export async function unbanUser(userId: string, reason: string) {
+  const { data } = await axiosClient.post<UserBan>(
+    `/super-admin/security/users/${userId}/unban`,
+    { reason },
+  )
+  return data
+}
+
+export async function listUserBans(params?: {
+  active_only?: boolean
+  tenant_id?: string
+  offset?: number
+  limit?: number
+}) {
+  const { data } = await axiosClient.get<{ items: UserBan[]; total: number }>(
+    '/super-admin/security/bans',
+    { params },
+  )
+  return data
+}
+
+// Analytics
+export async function getAnalytics(params?: {
+  since?: string
+  until?: string
+  institution_type?: string
+}) {
+  const { data } = await axiosClient.get<Analytics>('/super-admin/analytics', { params })
+  return data
+}
+
+// Backup
+export async function listBackups(params?: { offset?: number; limit?: number }) {
+  const { data } = await axiosClient.get<BackupList>('/super-admin/backups', { params })
+  return data
+}
+
+export async function triggerBackup() {
+  const { data } = await axiosClient.post<BackupRun>('/super-admin/backups/trigger')
+  return data
+}
+
+export async function restoreFromBackup(backupId: string, confirmation: string) {
+  const { data } = await axiosClient.post('/super-admin/backups/restore', {
+    backup_id: backupId,
+    confirmation,
+  })
+  return data
+}
+
+// Audit logs — multi-action filter
+export async function listAuditLogsV2(params?: {
+  actions?: string[]
+  since?: string
+  until?: string
+  offset?: number
+  limit?: number
+}) {
+  const { actions, ...rest } = params ?? {}
+  const searchParams = new URLSearchParams()
+  if (actions?.length) {
+    actions.forEach((a) => searchParams.append('actions', a))
+  }
+  Object.entries(rest).forEach(([k, v]) => {
+    if (v !== undefined && v !== null) searchParams.set(k, String(v))
+  })
+  const { data } = await axiosClient.get<PlatformAuditLogList>(
+    `/super-admin/audit-logs-v2?${searchParams.toString()}`,
+  )
+  return data
+}

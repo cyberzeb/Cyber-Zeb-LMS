@@ -364,3 +364,224 @@ class ErrorDetail(BaseModel):
 # Used by OpenAPI docs; runtime errors go through AppError handler.
 class ErrorEnvelope(BaseModel):
     error: dict[str, Any]
+
+# ── New schemas for Super Admin features ─────────────────────────────────────
+
+from decimal import Decimal as _Decimal
+
+
+class SystemHealthOut(BaseModel):
+    db_ok: bool
+    db_latency_ms: float | None
+    api_ok: bool
+    email_sent_count_24h: int
+    email_failed_count_24h: int
+    email_success_rate_pct: float | None
+    db_size_bytes: int | None
+    db_size_human: str | None
+    checked_at: datetime
+
+
+class IntegrationOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    platform: str
+    display_name: str
+    is_connected: bool
+    connected_account: str | None
+    token_expires_at: datetime | None
+    last_health_check: datetime | None
+    last_health_ok: bool | None
+    token_status: str  # "valid" | "expired" | "missing"
+    updated_at: datetime
+
+
+class IntegrationOAuthInitOut(BaseModel):
+    authorization_url: str
+    state: str
+
+
+class IntegrationOAuthCallbackIn(BaseModel):
+    code: str
+    state: str
+
+
+class RenewalReminderOut(BaseModel):
+    tenant_id: uuid.UUID
+    tenant_name: str
+    reminder_sent_at: datetime
+    email_ok: bool
+    error_message: str | None = None
+
+
+# Branding
+class FooterLink(BaseModel):
+    label: str = Field(min_length=1, max_length=100)
+    url: str = Field(min_length=1, max_length=500)
+
+
+class BrandingOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    logo_url: str | None
+    favicon_url: str | None
+    footer_text: str | None
+    footer_links: list[Any] | None
+    support_email: str | None
+    support_phone: str | None
+    updated_at: datetime
+
+
+class BrandingPatch(BaseModel):
+    footer_text: str | None = Field(default=None, max_length=4000)
+    footer_links: list[FooterLink] | None = None
+    support_email: str | None = Field(default=None, max_length=255)
+    support_phone: str | None = Field(default=None, max_length=50)
+
+
+# Security Center — admin bans
+class AdminBanIn(BaseModel):
+    reason: str = Field(min_length=1, max_length=2000)
+
+
+class AdminUnbanIn(BaseModel):
+    reason: str = Field(min_length=1, max_length=2000)
+
+
+class AdminBanOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    target_admin_id: uuid.UUID
+    target_admin_email: str
+    banned_by_admin_id: uuid.UUID
+    reason: str
+    is_active: bool
+    unbanned_at: datetime | None
+    unban_reason: str | None
+    created_at: datetime
+
+
+class SuspendedAdminOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    email: str
+    role: str
+    is_suspended: bool
+    suspension_reason: str | None
+    suspended_at: datetime | None
+    created_at: datetime
+
+
+# Security Center — user reports / bans
+class UserReportIn(BaseModel):
+    reported_user_id: uuid.UUID
+    tenant_id: uuid.UUID
+    reason: str = Field(min_length=1, max_length=500)
+    description: str | None = Field(default=None, max_length=4000)
+
+
+class UserReportOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    reporter_user_id: uuid.UUID | None
+    reported_user_id: uuid.UUID
+    reported_user_display_name: str | None = None
+    reported_user_email: str | None = None
+    tenant_id: uuid.UUID
+    tenant_name: str | None = None
+    reason: str
+    description: str | None
+    status: str
+    reviewed_by_admin_id: uuid.UUID | None
+    reviewed_at: datetime | None
+    review_notes: str | None
+    created_at: datetime
+
+
+class UserReportReviewIn(BaseModel):
+    notes: str | None = Field(default=None, max_length=2000)
+    status: str = Field(default="reviewed")  # reviewed | dismissed
+
+
+class UserBanIn(BaseModel):
+    reason: str = Field(min_length=1, max_length=2000)
+    ban_scope: str = "full_account"
+    report_id: uuid.UUID | None = None
+
+
+class UserUnbanIn(BaseModel):
+    reason: str = Field(min_length=1, max_length=2000)
+
+
+class UserBanOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    user_id: uuid.UUID
+    user_display_name: str | None = None
+    user_email: str | None = None
+    tenant_id: uuid.UUID
+    tenant_name: str | None = None
+    banned_by_admin_id: uuid.UUID
+    reason: str
+    ban_scope: str
+    is_active: bool
+    unbanned_at: datetime | None
+    report_id: uuid.UUID | None
+    created_at: datetime
+
+
+# Analytics
+class ModuleDemandItem(BaseModel):
+    module_key: str
+    display_name: str
+    request_count: int
+    addon_count: int
+    total_count: int
+
+
+class RevenueTrendItem(BaseModel):
+    period: str  # e.g. "2026-08"
+    revenue: _Decimal
+    currency: str
+    confirmed_count: int
+
+
+class AnalyticsOut(BaseModel):
+    module_demand: list[ModuleDemandItem]
+    revenue_trend: list[RevenueTrendItem]
+    avg_activation_days: float | None
+    total_activated: int
+    institution_type_counts: dict[str, int]
+
+
+# Backup & Restore
+class BackupRunOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    status: str
+    file_path: str | None
+    file_size_bytes: int | None
+    file_size_human: str | None = None
+    duration_seconds: _Decimal | None
+    error_message: str | None
+    triggered_by: str
+    triggered_by_admin_id: uuid.UUID | None
+    started_at: datetime
+    completed_at: datetime | None
+
+
+class BackupListOut(BaseModel):
+    items: list[BackupRunOut]
+    total: int
+
+
+class RestoreIn(BaseModel):
+    backup_id: uuid.UUID
+    confirmation: str = Field(min_length=1, max_length=200)

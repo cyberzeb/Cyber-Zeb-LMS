@@ -258,3 +258,156 @@ export const MODULE_LABELS: Record<ModuleKey, string> = {
   integration_hub_api: 'Integration Hub & API',
   administration_support: 'Administration & Support',
 }
+
+// ── New types for Super Admin features ────────────────────────────────────────
+
+export interface SystemHealth {
+  db_ok: boolean
+  db_latency_ms: number | null
+  api_ok: boolean
+  email_sent_count_24h: number
+  email_failed_count_24h: number
+  email_success_rate_pct: number | null
+  db_size_bytes: number | null
+  db_size_human: string | null
+  checked_at: string
+}
+
+export interface Integration {
+  id: string
+  platform: string
+  display_name: string
+  is_connected: boolean
+  connected_account: string | null
+  token_expires_at: string | null
+  last_health_check: string | null
+  last_health_ok: boolean | null
+  token_status: 'valid' | 'expired' | 'missing'
+  updated_at: string
+}
+
+export interface IntegrationOAuthInit {
+  authorization_url: string
+  state: string
+}
+
+export interface RenewalReminder {
+  tenant_id: string
+  tenant_name: string
+  reminder_sent_at: string
+  email_ok: boolean
+  error_message: string | null
+}
+
+export interface FooterLink {
+  label: string
+  url: string
+}
+
+export interface Branding {
+  id: string
+  logo_url: string | null
+  favicon_url: string | null
+  footer_text: string | null
+  footer_links: FooterLink[] | null
+  support_email: string | null
+  support_phone: string | null
+  updated_at: string
+}
+
+export interface SuspendedAdmin {
+  id: string
+  email: string
+  role: string
+  is_suspended: boolean
+  suspension_reason: string | null
+  suspended_at: string | null
+  created_at: string
+}
+
+export interface AdminBan {
+  id: string
+  target_admin_id: string
+  target_admin_email: string
+  banned_by_admin_id: string
+  reason: string
+  is_active: boolean
+  unbanned_at: string | null
+  unban_reason: string | null
+  created_at: string
+}
+
+export interface UserReport {
+  id: string
+  reporter_user_id: string | null
+  reported_user_id: string
+  reported_user_display_name: string | null
+  reported_user_email: string | null
+  tenant_id: string
+  tenant_name: string | null
+  reason: string
+  description: string | null
+  status: 'open' | 'reviewed' | 'dismissed' | 'banned'
+  reviewed_by_admin_id: string | null
+  reviewed_at: string | null
+  review_notes: string | null
+  created_at: string
+}
+
+export interface UserBan {
+  id: string
+  user_id: string
+  user_display_name: string | null
+  user_email: string | null
+  tenant_id: string
+  tenant_name: string | null
+  banned_by_admin_id: string
+  reason: string
+  ban_scope: string
+  is_active: boolean
+  unbanned_at: string | null
+  report_id: string | null
+  created_at: string
+}
+
+export interface ModuleDemandItem {
+  module_key: string
+  display_name: string
+  request_count: number
+  addon_count: number
+  total_count: number
+}
+
+export interface RevenueTrendItem {
+  period: string
+  revenue: string
+  currency: string
+  confirmed_count: number
+}
+
+export interface Analytics {
+  module_demand: ModuleDemandItem[]
+  revenue_trend: RevenueTrendItem[]
+  avg_activation_days: number | null
+  total_activated: number
+  institution_type_counts: Record<string, number>
+}
+
+export interface BackupRun {
+  id: string
+  status: 'running' | 'success' | 'failed'
+  file_path: string | null
+  file_size_bytes: number | null
+  file_size_human: string | null
+  duration_seconds: string | null
+  error_message: string | null
+  triggered_by: string
+  triggered_by_admin_id: string | null
+  started_at: string
+  completed_at: string | null
+}
+
+export interface BackupList {
+  items: BackupRun[]
+  total: number
+}
