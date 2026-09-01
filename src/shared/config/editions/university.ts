@@ -17,6 +17,14 @@ const universityTerminology = {
   compliance: 'Compliance',
   adminRole: 'Institution Admin',
   learnerPortal: 'Student Portal',
+  cohort: 'Class Section',
+  cohorts: 'Class Sections',
+  trainingProgram: 'Academic Program',
+  trainingPrograms: 'Academic Programs',
+  trainingDivision: 'College / School',
+  trainingDivisions: 'Colleges / Schools',
+  learner: 'Student',
+  learners: 'Students',
 } as const
 
 /** Reference config — University behavior is driven by InstitutionAdminLayout. */

@@ -17,6 +17,14 @@ const corporateTerminology = {
   compliance: 'Compliance',
   adminRole: 'Learning Admin',
   learnerPortal: 'Employee Portal',
+  cohort: 'Cohort',
+  cohorts: 'Cohorts',
+  trainingProgram: 'Training Program',
+  trainingPrograms: 'Training Programs',
+  trainingDivision: 'Division',
+  trainingDivisions: 'Divisions',
+  learner: 'Employee',
+  learners: 'Employees',
 } as const
 
 export const corporateEditionConfig: EditionConfig = {

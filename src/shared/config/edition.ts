@@ -15,3 +15,7 @@ export function isCorporateEdition(): boolean {
 export function isUniversityEdition(): boolean {
   return getActiveEdition() === 'university'
 }
+
+export function isTrainingEdition(): boolean {
+  return getActiveEdition() === 'training_organization'
+}

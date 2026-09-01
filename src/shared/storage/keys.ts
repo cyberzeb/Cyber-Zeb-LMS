@@ -39,6 +39,12 @@ export const STORAGE_KEYS = {
   payments: 'berana:payments',
   helpDeskTickets: 'berana:help-desk-tickets',
   integrations: 'berana:integrations',
+  trainingDivisions: 'berana:training-divisions',
+  trainingPrograms: 'berana:training-programs',
+  cohorts: 'berana:cohorts',
+  learners: 'berana:learners',
+  trainers: 'berana:trainers',
+  trainingCertificates: 'berana:training-certificates',
 } as const
 
 export const STORAGE_EVENTS = {

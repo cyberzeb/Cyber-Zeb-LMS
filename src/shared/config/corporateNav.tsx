@@ -20,6 +20,9 @@ import {
   Network,
   Briefcase,
   Sparkles,
+  GraduationCap,
+  Layers,
+  UserCheck,
 } from 'lucide-react'
 import type { EditionConfig, EditionModules, ResolvedNavSection } from './editions/types'
 
@@ -34,13 +37,16 @@ const iconMap: Record<string, ReactNode> = {
   'job-roles': <Briefcase size={ICON_SIZE} />,
   'training-catalog': <BookOpen size={ICON_SIZE} />,
   'training-assignments': <ClipboardCheck size={ICON_SIZE} />,
+  'training-programs': <GraduationCap size={ICON_SIZE} />,
+  cohorts: <Layers size={ICON_SIZE} />,
+  learners: <UsersRound size={ICON_SIZE} />,
   assignments: <SquarePen size={ICON_SIZE} />,
   assessments: <ClipboardList size={ICON_SIZE} />,
   'live-training': <MonitorPlay size={ICON_SIZE} />,
   skills: <Sparkles size={ICON_SIZE} />,
   certificates: <BookCheck size={ICON_SIZE} />,
   compliance: <ShieldCheck size={ICON_SIZE} />,
-  trainers: <Users size={ICON_SIZE} />,
+  trainers: <UserCheck size={ICON_SIZE} />,
   staff: <Briefcase size={ICON_SIZE} />,
   admins: <Shield size={ICON_SIZE} />,
   announcements: <Megaphone size={ICON_SIZE} />,

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-export type BeranaEdition = 'university' | 'corporate'
+export type BeranaEdition = 'university' | 'corporate' | 'training_organization'
 
 /** Informational only — not used for industry-specific UI branching. */
 export type OrganizationTenantType =
@@ -28,6 +28,14 @@ export interface TerminologyMap {
   compliance: string
   adminRole: string
   learnerPortal: string
+  cohort: string
+  cohorts: string
+  trainingProgram: string
+  trainingPrograms: string
+  trainingDivision: string
+  trainingDivisions: string
+  learner: string
+  learners: string
 }
 
 export interface EditionNavItem {
@@ -56,6 +64,11 @@ export interface EditionModules {
   teams: boolean
   employees: boolean
   compliance: boolean
+  trainingDivisions?: boolean
+  trainingPrograms?: boolean
+  cohorts?: boolean
+  learners?: boolean
+  trainers?: boolean
 }
 
 export interface EditionConfig {

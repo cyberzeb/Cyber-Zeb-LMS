@@ -2,12 +2,16 @@ import { useMemo } from 'react'
 import { getActiveEdition } from './edition'
 import { corporateEditionConfig } from './editions/corporate'
 import { universityEditionConfig } from './editions/university'
+import { trainingEditionConfig } from './editions/training'
 import type { EditionConfig, OrganizationConfig } from './editions/types'
 import { readSettings } from '../storage/readers'
 import { normalizeInstitutionSettings, type InstitutionSettingsState } from '../storage/settingsUtils'
 
 export function getEditionConfig(): EditionConfig {
-  return getActiveEdition() === 'corporate' ? corporateEditionConfig : universityEditionConfig
+  const edition = getActiveEdition()
+  if (edition === 'corporate') return corporateEditionConfig
+  if (edition === 'training_organization') return trainingEditionConfig
+  return universityEditionConfig
 }
 
 export function useOrganizationConfig(): OrganizationConfig {
