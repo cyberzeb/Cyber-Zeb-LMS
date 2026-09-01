@@ -67,6 +67,13 @@ import { AdminDepartmentsPage } from './AdminDepartmentsPage'
 import { AdminEmployeesPage } from './AdminEmployeesPage'
 import { AdminTrainingAssignmentsPage } from './AdminTrainingAssignmentsPage'
 import { AdminJobRolesPage, AdminSkillsPage, AdminCompliancePage } from './AdminCorporatePlaceholders'
+import {
+  AdminCohortsPage,
+  AdminLearnersPage,
+  AdminTrainingProgramsPage,
+  AdminTrainingDivisionsPage,
+  AdminTrainersPage,
+} from './AdminTrainingPlaceholders'
 import { learnerPortalChildren } from './learnerPortalRoutes'
 
 export const router = createBrowserRouter([
@@ -223,6 +230,26 @@ export const router = createBrowserRouter([
       {
         path: 'compliance',
         element: <AdminCompliancePage />,
+      },
+      {
+        path: 'training-programs',
+        element: <AdminTrainingProgramsPage />,
+      },
+      {
+        path: 'cohorts',
+        element: <AdminCohortsPage />,
+      },
+      {
+        path: 'learners',
+        element: <AdminLearnersPage />,
+      },
+      {
+        path: 'trainers',
+        element: <AdminTrainersPage />,
+      },
+      {
+        path: 'divisions',
+        element: <AdminTrainingDivisionsPage />,
       },
       {
         path: 'institution/overview',
