@@ -39,6 +39,40 @@ docker compose up --build -d
 
 ---
 
+## HTTPS without a domain (self-signed)
+
+Let's Encrypt needs a domain name. For **IP-only** demos, use a **self-signed certificate** — free, works immediately. Browsers show a warning; stakeholders click **Advanced → Proceed** once.
+
+```bash
+cd ~/Cyber-Zeb-LMS
+chmod +x deploy/generate-certs.sh
+./deploy/generate-certs.sh YOUR_VPS_IP
+
+nano .env
+```
+
+Set in `.env`:
+
+```env
+USE_HTTPS=true
+WEB_DOCKERFILE=Dockerfile.https
+HTTPS_PORT=8443
+PUBLIC_URL=https://YOUR_VPS_IP:8443
+CORS_ORIGINS=["https://YOUR_VPS_IP:8443"]
+JWT_SECRET_KEY=...
+```
+
+```bash
+sudo ufw allow 8443/tcp
+docker compose up --build -d
+```
+
+**Open:** `https://YOUR_VPS_IP:8443`
+
+Tell stakeholders: when the browser warns the connection is not private, choose **Advanced** → **Proceed to … (unsafe)**. This is normal for self-signed certs without a domain.
+
+---
+
 ## Pick a free port
 
 ```bash

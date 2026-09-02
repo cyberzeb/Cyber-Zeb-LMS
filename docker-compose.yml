@@ -18,13 +18,16 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ${WEB_DOCKERFILE:-Dockerfile}
       args:
         VITE_API_BASE_URL: /api/v1
     container_name: brana_web
     restart: unless-stopped
     ports:
       - "${HTTP_PORT:-8085}:80"
+      - "${HTTPS_PORT:-8443}:443"
+    volumes:
+      - ./deploy/certs:/etc/nginx/certs:ro
     depends_on:
       - api
 
