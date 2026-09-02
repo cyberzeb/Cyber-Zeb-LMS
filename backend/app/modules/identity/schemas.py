@@ -47,3 +47,42 @@ class PasswordResetRequest(BaseModel):
 class PasswordResetConfirm(BaseModel):
     reset_token: str
     new_password: str
+
+
+# --- Demo / portal OTP auth (bridges the demo frontend to the backend) ---
+class DemoLoginRequest(BaseModel):
+    person_id: str
+    tenant_code: str = "berana"
+
+
+class DemoLoginResponse(TokenPair):
+    person_id: str
+    frontend_role: str
+    display_name: str
+
+
+class OtpSendRequest(BaseModel):
+    email: EmailStr
+    role: str
+    tenant_code: str = "berana"
+
+
+class OtpSendResponse(BaseModel):
+    message: str
+    email: str
+    role: str
+    expires_in_seconds: int
+    demo_code: str | None = None
+
+
+class OtpVerifyRequest(BaseModel):
+    email: EmailStr
+    role: str
+    code: str
+    tenant_code: str = "berana"
+
+
+class OtpVerifyResponse(TokenPair):
+    person_id: str
+    frontend_role: str
+    display_name: str
