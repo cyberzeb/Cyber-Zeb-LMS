@@ -7,6 +7,7 @@ import { AdminFooter } from '../../../shared/layout/AdminFooter'
 import brandLogo from '../../../assets/Logo.jpg'
 import { PortalUserPicker } from '../../../shared/components/PortalUserPicker'
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { readInstitutionName } from '../../../shared/storage/readers'
 
 const ICON_SIZE = 17
@@ -35,6 +36,7 @@ export function StudentLayout() {
   const mainRef = useRef<HTMLElement>(null)
   const session = readPortalSession()
   const person = getSessionPerson()
+  const { terminology: t } = useOrganizationConfig()
 
   useEffect(() => {
     mainRef.current?.scrollTo({ top: 0, behavior: 'auto' })
@@ -47,7 +49,7 @@ export function StudentLayout() {
   const isForumPage = path === '/student/forum'
 
   if (!session || session.role !== 'Student' || !person) {
-    return <PortalUserPicker role="Student" portalLabel="Student Portal" />
+    return <PortalUserPicker role="Student" portalLabel={t.learnerPortal} />
   }
 
   const isActive = (to: string) => {
@@ -184,7 +186,7 @@ export function StudentLayout() {
       <div className="flex flex-col flex-1 min-w-0">
         <AdminTopHeader
           userName={person.name}
-          userRole="Student"
+          userRole={t.learner}
           institutionName={readInstitutionName()}
           breadcrumb={breadcrumb}
         />

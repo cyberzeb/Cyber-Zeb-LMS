@@ -21,6 +21,7 @@ import { AdminFooter } from '../../../shared/layout/AdminFooter'
 import brandLogo from '../../../assets/Logo.jpg'
 import { PortalUserPicker } from '../../../shared/components/PortalUserPicker'
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { readInstitutionName } from '../../../shared/storage/readers'
 
 const ICON_SIZE = 17
@@ -48,9 +49,10 @@ export function InstructorLayout() {
   const path = location.pathname
   const session = readPortalSession()
   const person = getSessionPerson()
+  const { terminology: t } = useOrganizationConfig()
 
   if (!session || session.role !== 'Instructor' || !person) {
-    return <PortalUserPicker role="Instructor" portalLabel="Instructor Portal" />
+    return <PortalUserPicker role="Instructor" portalLabel={t.instructorPortal} />
   }
 
   const isActive = (to: string) => {
@@ -187,7 +189,7 @@ export function InstructorLayout() {
       <div className="flex flex-col flex-1 min-w-0">
         <AdminTopHeader
           userName={person.name}
-          userRole="Instructor"
+          userRole={t.trainer}
           institutionName={readInstitutionName()}
           breadcrumb={breadcrumb}
         />

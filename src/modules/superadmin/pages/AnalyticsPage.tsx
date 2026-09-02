@@ -285,7 +285,7 @@ export function AnalyticsPage() {
                       }
                     />
                     <Tooltip
-                      formatter={(value: number) => [
+                      formatter={(value) => [
                         Number(value).toLocaleString(),
                         'Revenue',
                       ]}

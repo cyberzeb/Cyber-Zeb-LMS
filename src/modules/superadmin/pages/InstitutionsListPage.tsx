@@ -3,10 +3,24 @@ import { useQuery } from '@tanstack/react-query'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { institutionTypeLabel } from '../../../shared/constants/institutionTypes'
+import { setActiveTenant } from '../../../shared/config/tenant'
 import { listInstitutions } from '../api/serviceRequestApi'
 
 export function InstitutionsListPage() {
   const navigate = useNavigate()
+
+  const openInstitutionPortal = (row: {
+    name: string
+    slug: string | null
+    institution_type: 'college_university' | 'training' | 'corporate'
+  }) => {
+    setActiveTenant({
+      slug: row.slug ?? row.name.toLowerCase().replace(/\s+/g, '-'),
+      name: row.name,
+      institutionType: row.institution_type,
+    })
+    navigate('/admin')
+  }
   const { data = [], isLoading, error } = useQuery({
     queryKey: ['super-admin', 'institutions'],
     queryFn: listInstitutions,
@@ -50,10 +64,29 @@ export function InstitutionsListPage() {
                         : ''}
                     </p>
                   </div>
-                  <StatusPill
-                    label={row.status}
-                    tone={row.status === 'active' ? 'success' : 'neutral'}
-                  />
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        openInstitutionPortal(row)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.stopPropagation()
+                          openInstitutionPortal(row)
+                        }
+                      }}
+                      className="rounded-lg border border-divider px-3 py-1.5 text-[12px] font-bold text-navy-900 hover:bg-lemon-500/15 hover:border-lemon-500 transition-colors cursor-pointer"
+                    >
+                      Open portal
+                    </span>
+                    <StatusPill
+                      label={row.status}
+                      tone={row.status === 'active' ? 'success' : 'neutral'}
+                    />
+                  </div>
                 </div>
               </button>
             </li>

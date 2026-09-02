@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Activity, CheckCircle, XCircle, RefreshCw, Database, Mail, Cpu } from 'lucide-react'
+import { CheckCircle, XCircle, RefreshCw, Database, Mail, Cpu } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { getSystemHealth } from '../api/serviceRequestApi'
 import type { SystemHealth } from '../types'
