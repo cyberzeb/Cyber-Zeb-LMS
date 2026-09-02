@@ -27,13 +27,17 @@ class ServiceRequestCreate(BaseModel):
     phone: str = Field(min_length=1, max_length=50)
     estimated_users: str = Field(min_length=1, max_length=100)
     preferred_slug: str | None = Field(default=None, max_length=80)
-    requested_modules: list[ModuleKey] = Field(min_length=1)
+    # Institutions now register by edition only; every tenant gets the full
+    # module suite. The field stays optional for API compatibility and, when
+    # omitted or empty, is expanded to the complete catalog.
+    requested_modules: list[ModuleKey] = Field(default_factory=lambda: list(ModuleKey))
     message: str | None = None
 
     @field_validator("requested_modules")
     @classmethod
     def ensure_core_modules(cls, value: list[ModuleKey]) -> list[ModuleKey]:
-        merged = list(dict.fromkeys([*ALWAYS_ON_MODULES, *value]))
+        base = value if value else list(ModuleKey)
+        merged = list(dict.fromkeys([*ALWAYS_ON_MODULES, *base]))
         return merged
 
 

@@ -1,34 +1,43 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
-import { BarChart3, BookOpen, CheckCircle2, CreditCard, FileText } from 'lucide-react'
+import { CheckCircle2, GraduationCap, Briefcase, Building2, Sparkles } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import type { InstitutionType, RequestedModule, ServiceRequestPayload } from '../types'
+import type { InstitutionType, ServiceRequestPayload } from '../types'
 import { submitServiceRequest } from '../api/leadApi'
 
-const INSTITUTION_TYPES: { value: InstitutionType; label: string }[] = [
-  { value: 'university', label: 'University / College' },
-  { value: 'school', label: 'Primary / Secondary School' },
-  { value: 'business', label: 'Business / Corporate' },
-  { value: 'government', label: 'Government Institution' },
-  { value: 'ngo', label: 'NGO / International Org' },
-  { value: 'training_provider', label: 'Training Provider' },
-]
-
-const MODULE_OPTIONS: { value: RequestedModule; label: string; icon: LucideIcon }[] = [
-  { value: 'academic', label: 'Academic & Courses', icon: BookOpen },
-  { value: 'assessment', label: 'Assessment & Gradebook', icon: FileText },
-  { value: 'payments', label: 'Payments & Invoicing', icon: CreditCard },
-  { value: 'reports_ai', label: 'Reports & AI Insights', icon: BarChart3 },
+const INSTITUTION_EDITIONS: {
+  value: InstitutionType
+  label: string
+  description: string
+  icon: LucideIcon
+}[] = [
+  {
+    value: 'college_university',
+    label: 'University Edition',
+    description: 'Colleges & universities — programs, departments, academic calendar.',
+    icon: GraduationCap,
+  },
+  {
+    value: 'corporate',
+    label: 'Corporate Edition',
+    description: 'Companies & enterprises — employee training and compliance.',
+    icon: Briefcase,
+  },
+  {
+    value: 'training',
+    label: 'Training Edition',
+    description: 'Training providers & academies — courses, cohorts, certificates.',
+    icon: Building2,
+  },
 ]
 
 const EMPTY_FORM: ServiceRequestPayload = {
   institutionName: '',
-  institutionType: 'university',
+  institutionType: 'college_university',
   contactName: '',
   email: '',
   phone: '',
   estimatedUsers: '',
   preferredSubdomain: '',
-  modules: [],
   message: '',
 }
 
@@ -45,25 +54,15 @@ export function RequestServiceForm() {
     setForm((f) => ({ ...f, [key]: value }))
   }
 
-  function toggleModule(mod: RequestedModule) {
-    setForm((f) => ({
-      ...f,
-      modules: f.modules.includes(mod)
-        ? f.modules.filter((m) => m !== mod)
-        : [...f.modules, mod],
-    }))
-  }
-
   function validateStep(current: number): string {
     if (current === 1) {
       if (!form.institutionName.trim()) return 'Please enter your institution name.'
-      if (!form.institutionType) return 'Please select your institution type.'
+      if (!form.institutionType) return 'Please select your institution edition.'
     }
     if (current === 2) {
       if (!form.contactName.trim()) return 'Please enter a contact person.'
       if (!/^\S+@\S+\.\S+$/.test(form.email)) return 'Please enter a valid email address.'
       if (!form.phone.trim()) return 'Please enter a phone number.'
-      if (form.modules.length === 0) return 'Please select at least one module.'
     }
     return ''
   }
@@ -109,7 +108,7 @@ export function RequestServiceForm() {
           and will review <strong>{form.institutionName}</strong>&rsquo;s request. You&rsquo;ll
           receive a custom proposal and invoice at <strong>{form.email}</strong> within 1
           business day. Once payment and the agreement are confirmed, we&rsquo;ll email you
-          your dedicated Brana LMS link.
+          your dedicated Brana LMS link — with <strong>all modules included</strong>.
         </p>
         <button
           onClick={() => {
@@ -143,7 +142,7 @@ export function RequestServiceForm() {
         {step === 1 && (
           <div className="space-y-5">
             <div>
-              <h3 className="text-[19px] font-extrabold marketing-section-heading">Tell us about your institution</h3>
+              <h3 className="text-[19px] font-extrabold marketing-section-heading">Choose your edition</h3>
               <p className="text-[13px] marketing-body-text mt-1">Step 1 of {TOTAL_STEPS}</p>
             </div>
 
@@ -156,19 +155,47 @@ export function RequestServiceForm() {
               />
             </Field>
 
-            <Field label="Institution type">
-              <select
-                value={form.institutionType}
-                onChange={(e) => update('institutionType', e.target.value as InstitutionType)}
-                className={inputClass}
-              >
-                {INSTITUTION_TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
+            <Field label="Institution edition">
+              <div className="grid gap-2.5">
+                {INSTITUTION_EDITIONS.map((ed) => {
+                  const active = form.institutionType === ed.value
+                  const Icon = ed.icon
+                  return (
+                    <button
+                      type="button"
+                      key={ed.value}
+                      onClick={() => update('institutionType', ed.value)}
+                      className={`flex items-start gap-3 text-left px-4 py-3.5 rounded-xl border transition-all duration-200 cursor-pointer ${
+                        active
+                          ? 'marketing-module-active bg-lemon-50 border-lemon-500'
+                          : 'surface-panel border-divider hover:border-lemon-500/40'
+                      }`}
+                    >
+                      <span
+                        className={`mt-0.5 shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${
+                          active ? 'bg-lemon-500 text-[#020810]' : 'bg-navy-50 text-navy-500'
+                        }`}
+                      >
+                        <Icon size={18} strokeWidth={2.25} />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-[14px] font-bold marketing-section-heading">{ed.label}</span>
+                        <span className="block text-[12.5px] marketing-body-text mt-0.5">{ed.description}</span>
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
             </Field>
+
+            <div className="flex items-start gap-2.5 rounded-xl bg-lemon-50 border border-lemon-500/30 px-4 py-3">
+              <Sparkles size={16} strokeWidth={2.25} className="mt-0.5 shrink-0 text-lemon-700" />
+              <p className="text-[12.5px] marketing-body-text">
+                <strong className="marketing-section-heading">All modules included.</strong> Every
+                edition ships with the full platform — courses, assessments, live classes,
+                attendance, payments, certificates, reports and more. No add-ons to pick.
+              </p>
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <Field label="Estimated users">
@@ -199,7 +226,7 @@ export function RequestServiceForm() {
         {step === 2 && (
           <div className="space-y-5">
             <div>
-              <h3 className="text-[19px] font-extrabold marketing-section-heading">Contact details &amp; modules needed</h3>
+              <h3 className="text-[19px] font-extrabold marketing-section-heading">Contact details</h3>
               <p className="text-[13px] marketing-body-text mt-1">Step 2 of {TOTAL_STEPS}</p>
             </div>
 
@@ -232,30 +259,6 @@ export function RequestServiceForm() {
               />
             </Field>
 
-            <Field label="Which modules do you need?">
-              <div className="grid grid-cols-2 gap-2.5">
-                {MODULE_OPTIONS.map((m) => {
-                  const active = form.modules.includes(m.value)
-                  const Icon = m.icon
-                  return (
-                    <button
-                      type="button"
-                      key={m.value}
-                      onClick={() => toggleModule(m.value)}
-                      className={`flex items-center gap-2 text-left text-[12.5px] font-semibold px-3.5 py-2.5 rounded-xl border transition-all duration-200 cursor-pointer ${
-                        active
-                          ? 'marketing-module-active bg-lemon-50 border-lemon-500 text-navy-900'
-                          : 'surface-panel text-secondary-text hover:border-lemon-500/30'
-                      }`}
-                    >
-                      <Icon size={16} strokeWidth={2.25} className={active ? 'text-lemon-700' : 'text-navy-500'} />
-                      {m.label}
-                    </button>
-                  )
-                })}
-              </div>
-            </Field>
-
             <Field label="Anything else we should know? (optional)">
               <textarea
                 value={form.message}
@@ -278,8 +281,8 @@ export function RequestServiceForm() {
             <div className="marketing-review-panel bg-canvas rounded-2xl p-5 space-y-3 text-[13.5px]">
               <Row label="Institution" value={form.institutionName || '—'} />
               <Row
-                label="Type"
-                value={INSTITUTION_TYPES.find((t) => t.value === form.institutionType)?.label ?? '—'}
+                label="Edition"
+                value={INSTITUTION_EDITIONS.find((e) => e.value === form.institutionType)?.label ?? '—'}
               />
               <Row label="Contact" value={`${form.contactName || '—'} · ${form.email || '—'}`} />
               <Row label="Phone" value={form.phone || '—'} />
@@ -291,16 +294,7 @@ export function RequestServiceForm() {
                     : 'To be assigned'
                 }
               />
-              <Row
-                label="Modules"
-                value={
-                  form.modules.length
-                    ? form.modules
-                        .map((m) => MODULE_OPTIONS.find((o) => o.value === m)?.label)
-                        .join(', ')
-                    : '—'
-                }
-              />
+              <Row label="Modules" value="All modules included" />
             </div>
 
             <p className="text-[12.5px] marketing-body-text leading-relaxed">

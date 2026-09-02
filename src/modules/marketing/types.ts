@@ -1,18 +1,12 @@
+/**
+ * Institution edition / category. Registration is by edition only — every
+ * activated institution receives the full module suite (no module selection).
+ * Values match the backend `InstitutionType` enum.
+ */
 export type InstitutionType =
-  | 'university'
-  | 'school'
-  | 'business'
-  | 'government'
-  | 'ngo'
-  | 'training_provider'
-
-export type RequestedModule =
-  | 'academic'
-  | 'virtual_classroom'
-  | 'assessment'
-  | 'payments'
-  | 'parent_portal'
-  | 'reports_ai'
+  | 'college_university'
+  | 'corporate'
+  | 'training'
 
 export type LeadStatus =
   | 'new'
@@ -28,7 +22,6 @@ export interface ServiceRequestPayload {
   phone: string
   estimatedUsers: string
   preferredSubdomain: string
-  modules: RequestedModule[]
   message: string
 }
 

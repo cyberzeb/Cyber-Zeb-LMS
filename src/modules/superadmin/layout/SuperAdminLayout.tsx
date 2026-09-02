@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import { Sidebar } from '../../../shared/layout/Sidebar'
 import { AdminFooter } from '../../../shared/layout/AdminFooter'
+import { ThemeToggle } from '../../../shared/components/ThemeToggle'
 import brandLogo from '../../../assets/Logo.jpg'
 import {
   getSuperAdminEmail,
@@ -245,6 +246,7 @@ export function SuperAdminLayout() {
           </div>
           <div className="flex-1" />
           <div className="flex items-center gap-3">
+            <ThemeToggle variant="header" />
             <span className="hidden sm:inline text-[12px] text-navy-200">{getSuperAdminEmail()}</span>
             <button
               type="button"
