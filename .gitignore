@@ -13,7 +13,6 @@ dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -24,8 +23,6 @@ dist-ssr
 *.sw?
 
 # Local environment files
-.env
-.env.*
 !.env.example
 !*.env.example
 !.env.docker.example
@@ -34,8 +31,10 @@ dist-ssr
 *.db
 deploy/brana-demo.log
 deploy/.brana-demo.pid
-deploy/.release-staging
+deploy/certs/*.pem
+deploy/certs/*.key
 deploy/berana-release.zip
 backend/brana_lms.db
 backend/.venv/
 __pycache__/
+config.bat
