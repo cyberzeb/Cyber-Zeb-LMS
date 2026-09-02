@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { InstitutionAdminLayout } from './InstitutionAdminLayout'
 import { CampusProfilePage } from '../modules/institution/pages/CampusProfilePage'
 import { OrgStructurePage } from '../modules/institution/pages/OrgStructurePage'
@@ -95,6 +95,15 @@ export const router = createBrowserRouter([
     // Local fallback only; production tenant lookup is by subdomain host.
     path: '/institution/:slug',
     element: <InstitutionLandingPage />,
+  },
+  {
+    // Convenience redirects for the common no-hyphen typo.
+    path: '/superadmin',
+    element: <Navigate to="/super-admin" replace />,
+  },
+  {
+    path: '/superadmin/*',
+    element: <Navigate to="/super-admin" replace />,
   },
   {
     path: '/super-admin',
