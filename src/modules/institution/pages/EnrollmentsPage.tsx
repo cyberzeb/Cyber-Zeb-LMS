@@ -5,6 +5,7 @@ import { Button } from '../../../shared/components/Button'
 import { SelectMenu } from '../../../shared/components/SelectMenu'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { useEnrollments } from '../hooks/useEnrollments'
 import { usePeople } from '../hooks/usePeople'
 import { useCourses } from '../hooks/useCourses'
@@ -17,6 +18,7 @@ import type { CourseEnrollment } from '../types'
 
 export function EnrollmentsPage() {
   const { notify } = useToast()
+  const { terminology: t } = useOrganizationConfig()
   const { enrollments, enrollStudent, updateEnrollment, removeEnrollment } = useEnrollments()
   const { people } = usePeople()
   const { courses, setCourses } = useCourses()
@@ -138,8 +140,8 @@ export function EnrollmentsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Enrollments"
-        subtitle="Students only appear on instructor rosters after you enroll them in a course here. Department assignment alone does not enroll anyone."
+        title={t.trainingAssignment}
+        subtitle={`${t.learners} only appear on ${t.trainer.toLowerCase()} rosters after you enroll them in a ${t.course.toLowerCase()} here. ${t.department} assignment alone does not enroll anyone.`}
       />
 
       <GlassCard className="p-5 space-y-4">

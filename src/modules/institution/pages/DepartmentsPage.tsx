@@ -21,6 +21,7 @@ import { Modal } from '../../../shared/components/Modal'
 import { FormField } from '../../../shared/components/FormField'
 
 import { useToast } from '../../../shared/components/toast/ToastProvider'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 
 import { createId } from '../../../shared/hooks/useLocalStorageState'
 
@@ -63,6 +64,7 @@ const emptyForm = {
 export function DepartmentsPage() {
 
   const { notify } = useToast()
+  const { terminology: t } = useOrganizationConfig()
 
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -506,9 +508,9 @@ export function DepartmentsPage() {
 
       <PageHeader
 
-        title="Departments"
+        title={t.departments}
 
-        subtitle="Academic departments are the final organizational unit — e.g. Computer Science, Software Engineering — grouped under colleges."
+        subtitle={`${t.departments} are the primary organizational unit used for grouping, reporting and structure.`}
 
         actions={
 

@@ -7,6 +7,7 @@ import { PageHeader } from '../../../shared/components/PageHeader'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
 import { SearchInput } from '../../../shared/components/SearchInput'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { CourseCard } from '../components/CourseCard'
 import { CourseCreateModal } from '../components/CourseCreateModal'
 import { useCourses } from '../hooks/useCourses'
@@ -20,6 +21,7 @@ const tabs = ['All', 'Pending Approval', 'Published', 'Draft', 'Archived']
 
 export function CoursesPage() {
   const { notify } = useToast()
+  const { terminology: t } = useOrganizationConfig()
   const { courses, addCourse, updateCourseFromInput, removeCourse, approveCourse, rejectCourse } = useCourses()
   const { departments } = useCampusContext()
   const { people } = usePeople()
@@ -107,8 +109,8 @@ export function CoursesPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="Course Catalog"
-        subtitle="Author courses and assign a teaching instructor per course. Department grouping is organizational only."
+        title={t.trainingCatalog}
+        subtitle={`Author ${t.courses.toLowerCase()} and assign a teaching ${t.trainer.toLowerCase()} per ${t.course.toLowerCase()}. ${t.department} grouping is organizational only.`}
         actions={
           <>
             <Button variant="secondary" onClick={() => notify('Course templates library is coming soon.', 'info')}>

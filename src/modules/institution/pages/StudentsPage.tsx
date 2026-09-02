@@ -10,6 +10,7 @@ import { FormField } from '../../../shared/components/FormField'
 import { SelectMenu } from '../../../shared/components/SelectMenu'
 import { DepartmentSelectMenu } from '../../../shared/components/DepartmentSelectMenu'
 import { useSyncCampusFilter } from '../hooks/useSyncCampusFilter'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { usePeople } from '../hooks/usePeople'
@@ -37,6 +38,7 @@ function initialsFromName(name: string): string {
 
 export function StudentsPage() {
   const { notify } = useToast()
+  const { terminology: t } = useOrganizationConfig()
   const { campuses, departments, activeCampuses, selectedCampusId } = useCampusContext()
   const { people, setPeople } = usePeople()
   const [query, setQuery] = useState('')
@@ -165,7 +167,7 @@ export function StudentsPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title={config.title}
+        title={t.learners}
         subtitle={config.subtitle}
         actions={
           <>
@@ -214,7 +216,7 @@ export function StudentsPage() {
             className="w-full sm:w-auto"
           />
           <span className="text-[13px] font-semibold text-navy-700 whitespace-nowrap">
-            {filtered.length} student{filtered.length === 1 ? '' : 's'}
+            {filtered.length} {(filtered.length === 1 ? t.learner : t.learners).toLowerCase()}
           </span>
         </div>
         <SearchInput

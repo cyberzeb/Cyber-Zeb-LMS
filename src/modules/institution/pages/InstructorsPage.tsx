@@ -9,6 +9,7 @@ import { Modal } from '../../../shared/components/Modal'
 import { FormField } from '../../../shared/components/FormField'
 import { SelectMenu } from '../../../shared/components/SelectMenu'
 import { useSyncCampusFilter } from '../hooks/useSyncCampusFilter'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { usePeople } from '../hooks/usePeople'
@@ -41,6 +42,7 @@ function initialsFromName(name: string): string {
 
 export function InstructorsPage() {
   const { notify } = useToast()
+  const { terminology: t } = useOrganizationConfig()
   const { campuses, activeCampuses, selectedCampusId } = useCampusContext()
   const { people, setPeople } = usePeople()
   const { courses, setCourses } = useCourses()
@@ -187,7 +189,7 @@ export function InstructorsPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title={config.title}
+        title={`${t.trainer}s`}
         subtitle={config.subtitle}
         actions={
           <Button variant="primary" onClick={openInvite}>
