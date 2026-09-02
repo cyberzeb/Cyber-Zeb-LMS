@@ -34,7 +34,8 @@ dist-ssr
 *.db
 deploy/brana-demo.log
 deploy/.brana-demo.pid
-deploy/.release-staging
+deploy/certs/*.pem
+deploy/certs/*.key
 deploy/berana-release.zip
 backend/brana_lms.db
 backend/.venv/
