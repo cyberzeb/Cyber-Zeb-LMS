@@ -3,32 +3,32 @@ version: "3.9"
 services:
   db:
     image: postgres:16-alpine
-    container_name: brana_db
+    container_name: berana_db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: brana_user
-      POSTGRES_PASSWORD: brana_pass
-      POSTGRES_DB: brana_lms
+      POSTGRES_USER: berana_user
+      POSTGRES_PASSWORD: berana_pass
+      POSTGRES_DB: berana_lms
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - brana_pg_data:/var/lib/postgresql/data
+      - berana_pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U brana_user -d brana_lms"]
+      test: ["CMD-SHELL", "pg_isready -U berana_user -d berana_lms"]
       interval: 5s
       timeout: 5s
       retries: 10
 
   redis:
     image: redis:7-alpine
-    container_name: brana_redis
+    container_name: berana_redis
     restart: unless-stopped
     ports:
       - "6379:6379"
 
   api:
     build: .
-    container_name: brana_api
+    container_name: berana_api
     restart: unless-stopped
     env_file: .env
     depends_on:
@@ -45,7 +45,7 @@ services:
 
   worker:
     build: .
-    container_name: brana_worker
+    container_name: berana_worker
     restart: unless-stopped
     env_file: .env
     depends_on:
@@ -57,10 +57,10 @@ services:
 
   adminer:
     image: adminer
-    container_name: brana_adminer
+    container_name: berana_adminer
     restart: unless-stopped
     ports:
       - "8080:8080"
 
 volumes:
-  brana_pg_data:
+  berana_pg_data:

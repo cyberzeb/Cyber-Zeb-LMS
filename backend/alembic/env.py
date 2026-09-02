@@ -5,10 +5,12 @@ IMPORTANT: every module's models.py must be imported below so its
 tables register on Base.metadata before `alembic revision --autogenerate`
 runs. When you add a new module's models, add the import here.
 """
+import asyncio
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import create_engine, pool
+from sqlalchemy import pool
+from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.config import settings
 from app.core.database import Base
@@ -16,13 +18,16 @@ from app.core.database import Base
 # --- Import every module's models so Base.metadata is complete ---
 from app.modules.tenants import models as tenants_models  # noqa: F401
 from app.modules.identity import models as identity_models  # noqa: F401
-from app.modules.academic import models as academic_models  # noqa: F401
-from app.modules.courses import models as courses_models  # noqa: F401
+from app.modules.onboarding import models as onboarding_models  # noqa: F401
 from app.common import audit as audit_models  # noqa: F401
-from app.modules.lms_store import models as lms_store_models  # noqa: F401
+# TODO: as each module's models.py gains real tables, import it here too:
+# from app.modules.academic import models as academic_models  # noqa: F401
+# from app.modules.courses import models as courses_models  # noqa: F401
+# ... etc for enrollment, live_sessions, attendance, assessments,
+#     communication, payments, certificates, integrations, admin
 
 config = context.config
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL_SYNC)
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
@@ -31,7 +36,7 @@ target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    url = settings.DATABASE_URL_SYNC
+    url = settings.DATABASE_URL
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -42,15 +47,29 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
-    connectable = create_engine(settings.DATABASE_URL_SYNC, poolclass=pool.NullPool)
-    with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
-        with context.begin_transaction():
-            context.run_migrations()
+def do_run_migrations(connection):
+    context.configure(connection=connection, target_metadata=target_metadata)
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+async def run_migrations_online() -> None:
+    connect_args: dict = {}
+    if settings.DATABASE_URL.startswith("postgresql+asyncpg://") and "neon.tech" in settings.DATABASE_URL:
+        import ssl as _ssl
+
+        connect_args["ssl"] = _ssl.create_default_context()
+    connectable = create_async_engine(
+        settings.DATABASE_URL,
+        poolclass=pool.NullPool,
+        connect_args=connect_args,
+    )
+    async with connectable.connect() as connection:
+        await connection.run_sync(do_run_migrations)
+    await connectable.dispose()
 
 
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    run_migrations_online()
+    asyncio.run(run_migrations_online())

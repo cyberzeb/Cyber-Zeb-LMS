@@ -2,37 +2,34 @@
 Tenants module - Blueprint Section 6 (Identity, Organization and User
 Management) + Section 17.2 Organization domain.
 
-Entities: Tenant, Campus, College, Department
-(Program, AcademicYear, AcademicTerm, Cohort live in app.modules.academic)
+Entities: Tenant, Campus, Department
+(Program, AcademicTerm, Cohort live in app.modules.academic)
 """
 import uuid
+from datetime import date, datetime
 from enum import Enum
 
-from sqlalchemy import JSON, Enum as SAEnum, ForeignKey, String, Uuid
+from sqlalchemy import Date, DateTime, Enum as SAEnum
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.dialects.postgresql import JSONB, UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.common.base_model import TimestampMixin, UUIDPrimaryKeyMixin
 from app.core.database import Base
+from app.modules.onboarding.institution_types import InstitutionType
 
 
-class BeranaEdition(str, Enum):
-    """Product edition — drives default org model and role pack."""
-    UNIVERSITY = "university"
-    CORPORATE = "corporate"
-    TRAINING = "training"
+def _enum_values(enum_cls: type) -> list[str]:
+    return [member.value for member in enum_cls]
 
 
-class TenantType(str, Enum):
-    UNIVERSITY = "university"
-    SCHOOL = "school"
-    BUSINESS = "business"
-    GOVERNMENT = "government"
-    NGO = "ngo"
-    TRAINING_PROVIDER = "training_provider"
+# Mirrors InstitutionType — kept as tenant_type for existing column / API compatibility.
+TenantType = InstitutionType
 
 
 class TenantStatus(str, Enum):
     ACTIVE = "active"
+    EXPIRED = "expired"
     SUSPENDED = "suspended"
     ARCHIVED = "archived"
 
@@ -41,13 +38,26 @@ class Tenant(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     """
     Platform-global table (NOT tenant-scoped itself - this IS the tenant).
     Created only by a Platform Super Administrator (Section 6.1 step 1).
+
+    Onboarding activation sets `slug` (unique path segment) and
+    `enabled_modules` (per-tenant feature flags — Blueprint 4.1).
+    `code` mirrors `slug` so existing tenant_code login keeps working.
+
+    Real subdomain traffic requires wildcard DNS + wildcard TLS +
+    reverse-proxy routing to the same app. Application code stores the
+    subdomain slug and resolves tenants by host.
     """
     __tablename__ = "tenants"
 
     code: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     name: Mapped[str] = mapped_column(String(200))
-    tenant_type: Mapped[TenantType] = mapped_column(SAEnum(TenantType))
-    status: Mapped[TenantStatus] = mapped_column(SAEnum(TenantStatus), default=TenantStatus.ACTIVE)
+    tenant_type: Mapped[TenantType] = mapped_column(
+        SAEnum(TenantType, name="tenanttype", values_callable=_enum_values)
+    )
+    status: Mapped[TenantStatus] = mapped_column(
+        SAEnum(TenantStatus, name="tenantstatus", values_callable=_enum_values),
+        default=TenantStatus.ACTIVE,
+    )
     timezone: Mapped[str] = mapped_column(String(50), default="Africa/Addis_Ababa")
     locale: Mapped[str] = mapped_column(String(10), default="en")
     currency: Mapped[str] = mapped_column(String(10), default="ETB")
@@ -55,67 +65,51 @@ class Tenant(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     # Branding / policy defaults stored as JSONB (Section 6.1 step 4):
     # logo_url, primary_color, custom_domain, grading_defaults,
     # attendance_defaults, completion_defaults
-    settings: Mapped[dict] = mapped_column(JSON, default=dict)
+    settings: Mapped[dict] = mapped_column(JSONB, default=dict)
+
+    # --- Onboarding / activation fields ---
+    slug: Mapped[str | None] = mapped_column(String(80), unique=True, index=True, nullable=True)
+    service_request_id: Mapped[uuid.UUID | None] = mapped_column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("service_requests.id"),
+        unique=True,
+        nullable=True,
+        index=True,
+    )
+    # Module enablement and tenant feature flags (Blueprint 4.1)
+    enabled_modules: Mapped[list] = mapped_column(JSONB, default=list)
+    subscription_start_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    renewal_date: Mapped[date | None] = mapped_column(Date, nullable=True, index=True)
+    renewal_reminder_sent_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    institution_type: Mapped[InstitutionType] = mapped_column(
+        SAEnum(InstitutionType, name="institution_type", values_callable=_enum_values)
+    )
 
     campuses: Mapped[list["Campus"]] = relationship(back_populates="tenant")
-
-    @property
-    def edition(self) -> BeranaEdition:
-        """Resolve Berana edition from tenant settings or tenant_type fallback."""
-        raw = (self.settings or {}).get("edition")
-        if raw:
-            try:
-                return BeranaEdition(raw)
-            except ValueError:
-                pass
-        if self.tenant_type == TenantType.TRAINING_PROVIDER:
-            return BeranaEdition.TRAINING
-        if self.tenant_type in (TenantType.BUSINESS, TenantType.GOVERNMENT, TenantType.NGO):
-            return BeranaEdition.CORPORATE
-        return BeranaEdition.UNIVERSITY
 
 
 class Campus(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     """Campus / branch / business unit under a tenant."""
     __tablename__ = "campuses"
 
-    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), index=True)
+    tenant_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("tenants.id"), index=True)
     name: Mapped[str] = mapped_column(String(200))
     code: Mapped[str] = mapped_column(String(50))
     address: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     tenant: Mapped["Tenant"] = relationship(back_populates="campuses")
-    colleges: Mapped[list["College"]] = relationship(back_populates="campus")
     departments: Mapped[list["Department"]] = relationship(back_populates="campus")
-
-
-class College(Base, UUIDPrimaryKeyMixin, TimestampMixin):
-    """College / faculty / school under a campus (University Edition)."""
-    __tablename__ = "colleges"
-
-    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), index=True)
-    campus_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("campuses.id"), index=True)
-    name: Mapped[str] = mapped_column(String(200))
-    code: Mapped[str] = mapped_column(String(50))
-
-    campus: Mapped["Campus"] = relationship(back_populates="colleges")
-    departments: Mapped[list["Department"]] = relationship(back_populates="college")
 
 
 class Department(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     """Faculty / school / department / business unit under a campus."""
     __tablename__ = "departments"
 
-    tenant_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("tenants.id"), index=True)
-    campus_id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("campuses.id"), index=True)
-    college_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid(as_uuid=True), ForeignKey("colleges.id"), nullable=True, index=True
-    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("tenants.id"), index=True)
+    campus_id: Mapped[uuid.UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("campuses.id"), index=True)
     name: Mapped[str] = mapped_column(String(200))
     code: Mapped[str] = mapped_column(String(50))
-    head_user_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid(as_uuid=True), ForeignKey("users.id"), nullable=True, index=True
-    )
 
     campus: Mapped["Campus"] = relationship(back_populates="departments")
-    college: Mapped["College | None"] = relationship(back_populates="departments")

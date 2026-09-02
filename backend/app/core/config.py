@@ -6,38 +6,27 @@ secrets, provider keys, or environment-specific URLs anywhere else in
 the codebase (Blueprint Section 16 - Secrets).
 """
 from functools import lru_cache
-from pathlib import Path
 from typing import List
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from sqlalchemy.engine.url import URL
-
-_BACKEND_DIR = Path(__file__).resolve().parents[2]
-_ENV_FILE = _BACKEND_DIR / ".env"
-_SQLITE_PATH = str((_BACKEND_DIR / "brana_lms.db").resolve())
-
-
-def _default_sqlite_url(driver: str) -> str:
-    return URL.create(drivername=driver, database=_SQLITE_PATH).render_as_string(
-        hide_password=False
-    )
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=str(_ENV_FILE), extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     # --- App ---
-    APP_NAME: str = "Brana LMS API"
+    APP_NAME: str = "Berana LMS API"
     APP_ENV: str = "development"
     API_V1_PREFIX: str = "/api/v1"
     DEBUG: bool = True
 
-    # --- Database (SQLite by default so local startup does not require Postgres) ---
-    DATABASE_URL: str = _default_sqlite_url("sqlite+aiosqlite")
-    DATABASE_URL_SYNC: str = _default_sqlite_url("sqlite")
+    # --- Database ---
+    DATABASE_URL: str
+    DATABASE_URL_SYNC: str
 
     # --- Auth ---
-    JWT_SECRET_KEY: str = "dev-secret-change-in-production"
+    JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 14
@@ -47,7 +36,7 @@ class Settings(BaseSettings):
 
     # --- Object storage ---
     STORAGE_ENDPOINT: str = ""
-    STORAGE_BUCKET: str = "brana-lms-files"
+    STORAGE_BUCKET: str = "berana-lms-files"
     STORAGE_ACCESS_KEY: str = ""
     STORAGE_SECRET_KEY: str = ""
     STORAGE_REGION: str = ""
@@ -56,7 +45,6 @@ class Settings(BaseSettings):
     ZOOM_CLIENT_ID: str = ""
     ZOOM_CLIENT_SECRET: str = ""
     ZOOM_WEBHOOK_SECRET_TOKEN: str = ""
-    ZOOM_REDIRECT_URI: str = ""
 
     # --- Payments (Blueprint Section 13) ---
     PAYMENT_PROVIDER: str = "stripe"
@@ -65,14 +53,63 @@ class Settings(BaseSettings):
     CHAPA_SECRET_KEY: str = ""
 
     # --- Email / SMS (Blueprint Section 12) ---
-    SMTP_HOST: str = ""
+    SMTP_HOST: str = "smtp.gmail.com"
     SMTP_PORT: int = 587
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
+    # Prefer Gmail App Password (not the account password).
+    GMAIL_USER: str = ""
+    GMAIL_APP_PASSWORD: str = ""
     SMS_PROVIDER_API_KEY: str = ""
+
+    # --- Onboarding / Super Admin ---
+    SUPER_ADMIN_NOTIFY_EMAIL: str = "mekashabetel@gmail.com"
+    PLATFORM_SUPER_ADMIN_EMAIL: str = "mekashabetel@gmail.com"
+    PLATFORM_SUPER_ADMIN_PASSWORD: str = ""  # seed only; never hardcode in source
+    FRONTEND_BASE_URL: str = "http://localhost:5173"
+    PUBLIC_BASE_DOMAIN: str = "berana-lms.com"
 
     # --- CORS ---
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
+
+    # --- Integrations OAuth ---
+    # Zoom
+    ZOOM_REDIRECT_URI: str = "http://localhost:5173/super-admin/integrations/callback/zoom"
+    # Microsoft Teams / Azure AD
+    TEAMS_CLIENT_ID: str = ""
+    TEAMS_CLIENT_SECRET: str = ""
+    TEAMS_TENANT_ID: str = "common"
+    TEAMS_REDIRECT_URI: str = "http://localhost:5173/super-admin/integrations/callback/teams"
+    # Google Meet
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    GOOGLE_REDIRECT_URI: str = "http://localhost:5173/super-admin/integrations/callback/google_meet"
+    # Webex
+    WEBEX_CLIENT_ID: str = ""
+    WEBEX_CLIENT_SECRET: str = ""
+    WEBEX_REDIRECT_URI: str = "http://localhost:5173/super-admin/integrations/callback/webex"
+
+    # --- Backup ---
+    BACKUP_DIR: str = "/tmp/berana_backups"
+    BACKUP_SCHEDULE_CRON: str = "0 2 * * *"  # 02:00 UTC daily
+    BACKUP_RETENTION_DAYS: int = 30
+    # Set to "s3" to enable S3-compatible upload after local dump
+    BACKUP_STORAGE: str = "local"
+
+    # --- Token encryption (Fernet key for OAuth tokens at rest) ---
+    # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    TOKEN_ENCRYPTION_KEY: str = ""
+
+    @field_validator("DEBUG", mode="before")
+    @classmethod
+    def parse_debug(cls, value):
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            if normalized in {"release", "prod", "production", "false", "0", "no", "off"}:
+                return False
+            if normalized in {"dev", "development", "true", "1", "yes", "on"}:
+                return True
+        return value
 
 
 @lru_cache

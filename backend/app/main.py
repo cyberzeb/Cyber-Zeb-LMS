@@ -1,38 +1,22 @@
 """
-Brana LMS API - application entrypoint.
+Berana LMS API - application entrypoint.
 
 This wires together: CORS, correlation-id middleware, global exception
 handlers, and the versioned API router. Individual business logic lives
 in app/modules/*, never here.
 """
-import asyncio
-import sys
-from contextlib import asynccontextmanager
-
-if sys.platform == "win32":
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
 from app.common.middleware import CorrelationIdMiddleware
 from app.core.config import settings
-from app.core.database import init_db
 from app.core.exceptions import register_exception_handlers
-
-
-@asynccontextmanager
-async def lifespan(_app: FastAPI):
-    await init_db()
-    yield
-
 
 app = FastAPI(
     title=settings.APP_NAME,
     version="0.1.0",
-    description="Brana LMS - modular monolith backend (Cyber-Zeb Consulting)",
-    lifespan=lifespan,
+    description="Berana LMS - modular monolith backend (Cyber-Zeb Consulting)",
 )
 
 app.add_middleware(CorrelationIdMiddleware)

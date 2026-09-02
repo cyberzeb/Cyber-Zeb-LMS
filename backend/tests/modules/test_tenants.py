@@ -23,6 +23,6 @@ async def test_health_check(client):
 async def test_create_tenant_requires_auth(client):
     response = await client.post(
         "/api/v1/tenants",
-        json={"code": "aau", "name": "Addis Ababa University", "tenant_type": "university"},
+        json={"code": "aau", "name": "Addis Ababa University", "tenant_type": "college_university"},
     )
     assert response.status_code == 401
