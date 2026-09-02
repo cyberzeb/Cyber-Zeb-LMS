@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Mail, CheckCircle } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill } from '../../../shared/components/StatusPill'
+import { institutionTypeLabel } from '../../../shared/constants/institutionTypes'
 import { listRenewals, markTenantRenewed, sendRenewalReminder } from '../api/serviceRequestApi'
 import type { RenewalTenant } from '../types'
 
@@ -78,7 +79,9 @@ export function RenewalsPage() {
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <p className="text-[14px] font-extrabold text-navy-900">{tenant.name}</p>
-                    <p className="text-[12.5px] text-secondary-text">{tenant.institution_link}</p>
+                    <p className="text-[12.5px] text-secondary-text">
+                      {institutionTypeLabel(tenant.institution_type)} · {tenant.institution_link}
+                    </p>
                     <p className="mt-1 text-[12px] text-secondary-text">
                       Renewal:{' '}
                       {renewalDate ? renewalDate.toLocaleDateString() : 'Not set'} ·{' '}

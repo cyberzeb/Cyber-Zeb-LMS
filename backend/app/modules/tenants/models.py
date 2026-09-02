@@ -16,19 +16,15 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.common.base_model import TimestampMixin, UUIDPrimaryKeyMixin
 from app.core.database import Base
+from app.modules.onboarding.institution_types import InstitutionType
 
 
 def _enum_values(enum_cls: type) -> list[str]:
     return [member.value for member in enum_cls]
 
 
-class TenantType(str, Enum):
-    UNIVERSITY = "university"
-    SCHOOL = "school"
-    BUSINESS = "business"
-    GOVERNMENT = "government"
-    NGO = "ngo"
-    TRAINING_PROVIDER = "training_provider"
+# Mirrors InstitutionType — kept as tenant_type for existing column / API compatibility.
+TenantType = InstitutionType
 
 
 class TenantStatus(str, Enum):
@@ -87,7 +83,9 @@ class Tenant(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     renewal_reminder_sent_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
-    institution_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    institution_type: Mapped[InstitutionType] = mapped_column(
+        SAEnum(InstitutionType, name="institution_type", values_callable=_enum_values)
+    )
 
     campuses: Mapped[list["Campus"]] = relationship(back_populates="tenant")
 

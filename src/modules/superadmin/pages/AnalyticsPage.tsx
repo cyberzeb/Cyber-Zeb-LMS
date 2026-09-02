@@ -10,20 +10,12 @@ import {
   Legend,
 } from 'recharts'
 import { GlassCard } from '../../../shared/layout/GlassCard'
+import { INSTITUTION_TYPES, institutionTypeLabel } from '../../../shared/constants/institutionTypes'
 import { getAnalytics } from '../api/serviceRequestApi'
 import type { ModuleDemandItem, RevenueTrendItem } from '../types'
 
 const inputClass =
   'rounded-lg border border-divider bg-white px-3 py-2 text-[13px] text-navy-900 outline-none focus:border-lemon-500'
-
-const INSTITUTION_TYPE_LABELS: Record<string, string> = {
-  university: 'University',
-  school: 'School',
-  business: 'Business',
-  government: 'Government',
-  ngo: 'NGO',
-  training_provider: 'Training Provider',
-}
 
 /** Merge multiple rows sharing the same period (different currencies) into one,
  *  summing revenue and converting to number so recharts can plot it. */
@@ -184,9 +176,9 @@ export function AnalyticsPage() {
               className={inputClass}
             >
               <option value="">All types</option>
-              {Object.entries(INSTITUTION_TYPE_LABELS).map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v}
+              {INSTITUTION_TYPES.map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
                 </option>
               ))}
             </select>
@@ -256,7 +248,7 @@ export function AnalyticsPage() {
                     key={type}
                     className="text-[11.5px] font-semibold bg-navy-50 text-navy-900 px-2.5 py-1 rounded-full border border-navy-900/10"
                   >
-                    {INSTITUTION_TYPE_LABELS[type] ?? type}: {count}
+                    {institutionTypeLabel(type)}: {count}
                   </span>
                 ))}
                 {Object.keys(data.institution_type_counts).length === 0 && (

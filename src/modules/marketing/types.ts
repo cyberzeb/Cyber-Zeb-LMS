@@ -1,10 +1,4 @@
-export type InstitutionType =
-  | 'university'
-  | 'school'
-  | 'business'
-  | 'government'
-  | 'ngo'
-  | 'training_provider'
+export type InstitutionType = 'college_university' | 'training' | 'corporate'
 
 export type ModuleKey =
   | 'tenant_institution_mgmt'

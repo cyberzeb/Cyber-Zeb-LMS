@@ -41,6 +41,7 @@ from app.modules.onboarding.models import (
     ServiceRequestStatus,
     SiteContentBlock,
 )
+from app.modules.onboarding.institution_types import institution_type_from_url_segment, institution_type_url_segment
 from app.modules.onboarding.repository import OnboardingRepository
 from app.modules.onboarding.schemas import (
     AddOnModuleRequestCreate,
@@ -145,21 +146,42 @@ def _generate_temp_password(length: int = 16) -> str:
     return "".join(secrets.choice(alphabet) for _ in range(length))
 
 
-def _institution_link(slug: str, base_domain: str | None = None) -> str:
-    domain = (base_domain or settings.PUBLIC_BASE_DOMAIN).strip().removeprefix("https://").removeprefix("http://").rstrip("/")
+def _institution_link(
+    slug: str,
+    institution_type: str,
+    base_domain: str | None = None,
+) -> str:
+    domain = (
+        (base_domain or settings.PUBLIC_BASE_DOMAIN)
+        .strip()
+        .removeprefix("https://")
+        .removeprefix("http://")
+        .rstrip("/")
+    )
     scheme = "http" if domain.endswith("localhost") or ".localhost" in domain else "https"
-    return f"{scheme}://{slug}.{domain}"
+    segment = institution_type_url_segment(institution_type)
+    return f"{scheme}://{slug}.{domain}/{segment}"
+
+
+def _tenant_institution_type(tenant: Tenant) -> str:
+    return (
+        tenant.institution_type.value
+        if hasattr(tenant.institution_type, "value")
+        else str(tenant.institution_type)
+    )
 
 
 def _tenant_out(tenant: Tenant) -> TenantActivationOut:
     slug = tenant.slug or tenant.code
+    inst_type = _tenant_institution_type(tenant)
     return TenantActivationOut(
         id=tenant.id,
         name=tenant.name,
         slug=slug,
+        institution_type=inst_type,
         enabled_modules=list(tenant.enabled_modules or []),
         status=tenant.status.value if hasattr(tenant.status, "value") else str(tenant.status),
-        institution_link=_institution_link(slug),
+        institution_link=_institution_link(slug, inst_type),
         renewal_date=tenant.renewal_date,
     )
 
@@ -861,7 +883,7 @@ class OnboardingService:
         try:
             tenant_type = TenantType(sr.institution_type.value)
         except ValueError:
-            tenant_type = TenantType.TRAINING_PROVIDER
+            tenant_type = TenantType.TRAINING
 
         before = {"status": sr.status.value}
         temp_password = _generate_temp_password()
@@ -871,6 +893,7 @@ class OnboardingService:
             code=slug,
             name=sr.institution_name,
             tenant_type=tenant_type,
+            institution_type=sr.institution_type,
             status=TenantStatus.ACTIVE,
             slug=slug,
             service_request_id=sr.id,
@@ -910,7 +933,7 @@ class OnboardingService:
             correlation_id=correlation_id,
         )
 
-        link = await self.institution_link(slug)
+        link = await self.institution_link(slug, sr.institution_type.value)
         subject, email_body = build_welcome_email(
             institution_name=sr.institution_name,
             institution_link=link,
@@ -1129,11 +1152,14 @@ class OnboardingService:
                     id=t.id,
                     name=t.name,
                     slug=t.slug or t.code,
+                    institution_type=t.institution_type,
                     status=t.status.value,
                     enabled_modules=list(t.enabled_modules or []),
                     subscription_start_date=t.subscription_start_date,
                     renewal_date=t.renewal_date,
-                    institution_link=await self.institution_link(t.slug or t.code),
+                    institution_link=await self.institution_link(
+                        t.slug or t.code, _tenant_institution_type(t)
+                    ),
                 )
             )
         return out
@@ -1169,11 +1195,14 @@ class OnboardingService:
             id=tenant.id,
             name=tenant.name,
             slug=tenant.slug or tenant.code,
+            institution_type=tenant.institution_type,
             status=tenant.status.value,
             enabled_modules=list(tenant.enabled_modules or []),
             subscription_start_date=tenant.subscription_start_date,
             renewal_date=tenant.renewal_date,
-            institution_link=await self.institution_link(tenant.slug or tenant.code),
+            institution_link=await self.institution_link(
+                tenant.slug or tenant.code, _tenant_institution_type(tenant)
+            ),
         )
 
     async def expire_overdue_tenants(self, *, correlation_id: str | None) -> dict[str, int]:
@@ -1181,21 +1210,41 @@ class OnboardingService:
         await self.db.commit()
         return {"expired": count}
 
-    async def resolve_tenant_by_subdomain(self, slug: str) -> RenewalTenantOut:
+    async def resolve_tenant_by_subdomain(
+        self,
+        slug: str,
+        *,
+        type_segment: str | None = None,
+    ) -> RenewalTenantOut:
+        expected_type = None
+        if type_segment is not None:
+            expected_type = institution_type_from_url_segment(type_segment)
+            if expected_type is None:
+                raise NotFoundError("Institution not found")
+
         tenant = await self.repo.get_tenant_by_slug(_slugify(slug))
         if not tenant:
             raise NotFoundError("Institution not found")
+
+        if expected_type is not None and tenant.institution_type != expected_type:
+            raise NotFoundError("Institution not found")
+
         if tenant.status == TenantStatus.EXPIRED:
-            raise PermissionDeniedError("Subscription expired. Please contact Cyber-Zeb Consulting to renew.")
+            raise PermissionDeniedError(
+                "Subscription expired. Please contact Cyber-Zeb Consulting to renew."
+            )
         return RenewalTenantOut(
             id=tenant.id,
             name=tenant.name,
             slug=tenant.slug or tenant.code,
+            institution_type=tenant.institution_type,
             status=tenant.status.value,
             enabled_modules=list(tenant.enabled_modules or []),
             subscription_start_date=tenant.subscription_start_date,
             renewal_date=tenant.renewal_date,
-            institution_link=await self.institution_link(tenant.slug or tenant.code),
+            institution_link=await self.institution_link(
+                tenant.slug or tenant.code, _tenant_institution_type(tenant)
+            ),
         )
 
     async def resend_service_request_email(
@@ -1381,10 +1430,13 @@ class OnboardingService:
                     id=t.id,
                     name=t.name,
                     slug=t.slug or t.code,
+                    institution_type=t.institution_type,
                     status=t.status.value,
                     enabled_modules=list(t.enabled_modules or []),
                     renewal_date=t.renewal_date,
-                    institution_link=await self.institution_link(t.slug or t.code),
+                    institution_link=await self.institution_link(
+                        t.slug or t.code, _tenant_institution_type(t)
+                    ),
                 )
             )
         return out
@@ -1399,11 +1451,14 @@ class OnboardingService:
             id=tenant.id,
             name=tenant.name,
             slug=tenant.slug or tenant.code,
+            institution_type=tenant.institution_type,
             status=tenant.status.value,
             enabled_modules=list(tenant.enabled_modules or []),
             subscription_start_date=tenant.subscription_start_date,
             renewal_date=tenant.renewal_date,
-            institution_link=await self.institution_link(tenant.slug or tenant.code),
+            institution_link=await self.institution_link(
+                tenant.slug or tenant.code, _tenant_institution_type(tenant)
+            ),
             admin_email=admin_acct.email if admin_acct else None,
             estimated_total=total,
             estimated_currency=currency,
@@ -1592,12 +1647,12 @@ class OnboardingService:
             return row.value.strip()
         return fallback
 
-    async def institution_link(self, slug: str) -> str:
+    async def institution_link(self, slug: str, institution_type: str) -> str:
         base_domain = await self.get_setting_value(
             "PUBLIC_BASE_DOMAIN",
             settings.PUBLIC_BASE_DOMAIN or "",
         )
-        return _institution_link(slug, base_domain=base_domain or None)
+        return _institution_link(slug, institution_type, base_domain=base_domain or None)
 
     async def list_platform_settings(self) -> list[PlatformSettingOut]:
         await self.ensure_default_platform_settings()

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill } from '../../../shared/components/StatusPill'
+import { institutionTypeLabel } from '../../../shared/constants/institutionTypes'
 import { listInstitutions } from '../api/serviceRequestApi'
 
 export function InstitutionsListPage() {
@@ -42,7 +43,8 @@ export function InstitutionsListPage() {
                   <div>
                     <p className="text-[14.5px] font-extrabold text-navy-900">{row.name}</p>
                     <p className="text-[12.5px] text-secondary-text mt-0.5">
-                      {row.slug || '—'} · {row.enabled_modules.length} modules
+                      {institutionTypeLabel(row.institution_type)} · {row.slug || '—'} ·{' '}
+                      {row.enabled_modules.length} modules
                       {row.renewal_date
                         ? ` · renews ${new Date(row.renewal_date).toLocaleDateString()}`
                         : ''}

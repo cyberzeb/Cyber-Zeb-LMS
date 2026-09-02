@@ -1,3 +1,5 @@
+export type InstitutionType = 'college_university' | 'training' | 'corporate'
+
 export type ServiceRequestStatus =
   | 'new'
   | 'invoice_sent'
@@ -44,6 +46,7 @@ export interface TenantInfo {
   id: string
   name: string
   slug: string
+  institution_type: InstitutionType
   enabled_modules: string[]
   status: string
   institution_link: string
@@ -53,7 +56,7 @@ export interface ServiceRequest {
   id: string
   institution_name: string
   request_kind: 'new_institution' | 'add_modules'
-  institution_type: string
+  institution_type: InstitutionType
   contact_name: string
   email: string
   phone: string
@@ -124,6 +127,7 @@ export interface RenewalTenant {
   id: string
   name: string
   slug: string | null
+  institution_type: InstitutionType
   status: string
   enabled_modules: string[]
   subscription_start_date: string | null
@@ -163,6 +167,7 @@ export interface InstitutionListItem {
   id: string
   name: string
   slug: string | null
+  institution_type: InstitutionType
   status: string
   enabled_modules: string[]
   renewal_date: string | null
@@ -173,6 +178,7 @@ export interface InstitutionDetail {
   id: string
   name: string
   slug: string | null
+  institution_type: InstitutionType
   status: string
   enabled_modules: string[]
   subscription_start_date: string | null

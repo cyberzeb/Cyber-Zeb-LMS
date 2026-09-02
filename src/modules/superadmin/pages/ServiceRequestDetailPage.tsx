@@ -12,6 +12,7 @@ import {
   resendServiceRequestEmail,
   sendInvoice,
 } from '../api/serviceRequestApi'
+import { institutionTypeLabel } from '../../../shared/constants/institutionTypes'
 import { MODULE_LABELS, STATUS_LABELS, type ModuleKey, type ServiceRequestStatus } from '../types'
 
 function statusTone(status: ServiceRequestStatus): StatusTone {
@@ -158,7 +159,7 @@ export function ServiceRequestDetailPage() {
         <GlassCard className="lg:col-span-2 p-5 space-y-4">
           <h2 className="text-[14px] font-extrabold text-navy-900">Request details</h2>
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[13px]">
-            <Item label="Type" value={data.institution_type} />
+            <Item label="Type" value={institutionTypeLabel(data.institution_type)} />
             <Item label="Estimated users" value={data.estimated_users} />
             <Item label="Preferred slug" value={data.preferred_slug || '—'} />
             <Item label="Submitted" value={new Date(data.created_at).toLocaleString()} />

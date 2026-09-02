@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
 import { StatusPill, type StatusTone } from '../../../shared/components/StatusPill'
 import { GlassCard } from '../../../shared/layout/GlassCard'
+import { institutionTypeLabel } from '../../../shared/constants/institutionTypes'
 import { listServiceRequests } from '../api/serviceRequestApi'
 import { STATUS_LABELS, type ServiceRequestStatus } from '../types'
 
@@ -89,7 +90,8 @@ export function ServiceRequestsListPage() {
                         {row.institution_name}
                       </p>
                       <p className="text-[12.5px] text-secondary-text mt-0.5">
-                        {row.contact_name} · {row.email} · {row.phone}
+                        {institutionTypeLabel(row.institution_type)} · {row.contact_name} · {row.email} ·{' '}
+                        {row.phone}
                       </p>
                     </div>
                     <StatusPill label={STATUS_LABELS[row.status]} tone={statusTone(row.status)} />

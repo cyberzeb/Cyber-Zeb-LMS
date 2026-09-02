@@ -1250,7 +1250,7 @@ async def get_analytics(
     sr_counts = {row[0]: int(row[1]) for row in sr_module_counts_q.fetchall()}
 
     addon_filters_str = (
-        ("AND institution_type = :itype " if institution_type else "")
+        ("AND t.institution_type = :itype " if institution_type else "")
         + ("AND amr.created_at >= :since " if since else "")
         + ("AND amr.created_at <= :until " if until else "")
     )

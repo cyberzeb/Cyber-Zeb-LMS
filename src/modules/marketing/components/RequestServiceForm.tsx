@@ -6,20 +6,12 @@ import {
   MODULE_GROUPS,
   MODULE_LABELS,
 } from '../types'
+import { INSTITUTION_TYPES, institutionTypeLabel, institutionTypeUrlSegment } from '../../../shared/constants/institutionTypes'
 import { listPublicModules, submitAddOnModuleRequest, submitServiceRequest } from '../api/leadApi'
-
-const INSTITUTION_TYPES: { value: InstitutionType; label: string }[] = [
-  { value: 'university', label: 'University / College' },
-  { value: 'school', label: 'Primary / Secondary School' },
-  { value: 'business', label: 'Business / Corporate' },
-  { value: 'government', label: 'Government Institution' },
-  { value: 'ngo', label: 'NGO / International Org' },
-  { value: 'training_provider', label: 'Training Provider' },
-]
 
 const EMPTY_FORM: ServiceRequestPayload = {
   institutionName: '',
-  institutionType: 'university',
+  institutionType: 'college_university',
   contactName: '',
   email: '',
   phone: '',
@@ -385,7 +377,7 @@ export function RequestServiceForm() {
               <Row label="Institution" value={form.institutionName || '—'} />
               <Row
                 label="Type"
-                value={INSTITUTION_TYPES.find((t) => t.value === form.institutionType)?.label ?? '—'}
+                value={institutionTypeLabel(form.institutionType)}
               />
               <Row label="Contact" value={`${form.contactName || '—'} · ${form.email || '—'}`} />
               <Row label="Phone" value={form.phone || '—'} />
@@ -395,7 +387,7 @@ export function RequestServiceForm() {
                   requestMode === 'add_modules'
                     ? tenantLookup || '—'
                     : form.preferredSubdomain
-                      ? `${form.preferredSubdomain}.berana-lms.com`
+                      ? `${form.preferredSubdomain}.berana-lms.com/${institutionTypeUrlSegment(form.institutionType)}`
                       : 'To be assigned'
                 }
               />

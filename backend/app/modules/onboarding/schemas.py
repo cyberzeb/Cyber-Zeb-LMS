@@ -122,6 +122,7 @@ class TenantActivationOut(BaseModel):
     id: uuid.UUID
     name: str
     slug: str
+    institution_type: InstitutionType
     enabled_modules: list[str]
     status: str
     institution_link: str
@@ -212,6 +213,7 @@ class RenewalTenantOut(BaseModel):
     id: uuid.UUID
     name: str
     slug: str | None
+    institution_type: InstitutionType
     status: str
     enabled_modules: list[str]
     subscription_start_date: date | None = None
@@ -223,6 +225,7 @@ class InstitutionListItemOut(BaseModel):
     id: uuid.UUID
     name: str
     slug: str | None
+    institution_type: InstitutionType
     status: str
     enabled_modules: list[str]
     renewal_date: date | None = None
@@ -233,6 +236,7 @@ class InstitutionDetailOut(BaseModel):
     id: uuid.UUID
     name: str
     slug: str | None
+    institution_type: InstitutionType
     status: str
     enabled_modules: list[str]
     subscription_start_date: date | None = None

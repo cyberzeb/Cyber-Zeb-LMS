@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill } from '../../../shared/components/StatusPill'
+import { institutionTypeLabel } from '../../../shared/constants/institutionTypes'
 import { getInstitution } from '../api/serviceRequestApi'
 import { MODULE_LABELS, type ModuleKey } from '../types'
 
@@ -34,7 +35,8 @@ export function InstitutionDetailPage() {
         <div>
           <h1 className="text-[24px] font-extrabold text-navy-900">{data.name}</h1>
           <p className="text-[13px] text-secondary-text mt-1">
-            {data.slug || 'No slug'} · Admin: {data.admin_email || '—'}
+            {data.slug || 'No slug'} · {institutionTypeLabel(data.institution_type)} · Admin:{' '}
+            {data.admin_email || '—'}
           </p>
         </div>
         <StatusPill label={data.status} tone={data.status === 'active' ? 'success' : 'neutral'} />
@@ -43,6 +45,7 @@ export function InstitutionDetailPage() {
       <GlassCard className="p-5 space-y-4">
         <h2 className="text-[14px] font-extrabold text-navy-900">Details</h2>
         <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[13px]">
+          <Item label="Institution type" value={institutionTypeLabel(data.institution_type)} />
           <Item
             label="Institution link"
             value={

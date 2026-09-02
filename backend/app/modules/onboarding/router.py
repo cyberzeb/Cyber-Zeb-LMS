@@ -148,11 +148,31 @@ async def create_addon_module_request(
 
 
 @router.get(
+    "/tenants/by-subdomain/{slug}/{type_segment}",
+    response_model=RenewalTenantOut,
+    tags=["Tenants"],
+)
+async def resolve_tenant_by_subdomain_with_type(
+    slug: str,
+    type_segment: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """Resolve tenant by subdomain slug + institution type path segment."""
+    service = OnboardingService(db)
+    return await service.resolve_tenant_by_subdomain(slug, type_segment=type_segment)
+
+
+@router.get(
     "/tenants/by-subdomain/{slug}",
     response_model=RenewalTenantOut,
     tags=["Tenants"],
 )
 async def resolve_tenant_by_subdomain(slug: str, db: AsyncSession = Depends(get_db)):
+    """
+    Legacy slug-only lookup (no type-segment validation).
+
+    Prefer GET /tenants/by-subdomain/{slug}/{type_segment} for type-aware resolution.
+    """
     service = OnboardingService(db)
     return await service.resolve_tenant_by_subdomain(slug)
 

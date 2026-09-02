@@ -29,19 +29,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.common.base_model import TimestampMixin, UUIDPrimaryKeyMixin
 from app.core.database import Base
+from app.modules.onboarding.institution_types import InstitutionType
 
 
 def _enum_values(enum_cls: type) -> list[str]:
     return [member.value for member in enum_cls]
-
-
-class InstitutionType(str, Enum):
-    UNIVERSITY = "university"
-    SCHOOL = "school"
-    BUSINESS = "business"
-    GOVERNMENT = "government"
-    NGO = "ngo"
-    TRAINING_PROVIDER = "training_provider"
 
 
 class ServiceRequestStatus(str, Enum):

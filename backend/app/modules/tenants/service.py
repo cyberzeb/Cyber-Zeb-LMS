@@ -23,7 +23,7 @@ class TenantService:
         if existing:
             raise ConflictError(f"Tenant code '{data.code}' already exists")
 
-        tenant = Tenant(**data.model_dump())
+        tenant = Tenant(**data.model_dump(), institution_type=data.tenant_type)
         tenant = await self.repo.create(tenant)
 
         await write_audit_log(

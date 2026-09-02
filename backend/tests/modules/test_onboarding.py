@@ -25,6 +25,7 @@ from app.modules.onboarding.models import (
     ServiceRequest,
     ServiceRequestStatus,
 )
+from app.modules.onboarding.institution_types import InstitutionType
 from app.modules.tenants.models import Tenant, TenantStatus, TenantType
 
 # Import models for metadata
@@ -105,7 +106,7 @@ async def test_create_service_request_idempotent(client):
     key = str(uuid.uuid4())
     body = {
         "institution_name": "Test University",
-        "institution_type": "university",
+        "institution_type": "college_university",
         "contact_name": "Ada Lovelace",
         "email": "ada@test.edu",
         "phone": "+251900000001",
@@ -162,7 +163,7 @@ async def test_state_machine_and_activate_idempotent(client, super_admin, db_ses
         "/api/v1/service-requests",
         json={
             "institution_name": "Activation U",
-            "institution_type": "university",
+            "institution_type": "college_university",
             "contact_name": "Admin",
             "email": f"admin-{uuid.uuid4().hex[:6]}@activation.edu",
             "phone": "+251911111111",
@@ -220,7 +221,8 @@ async def test_cross_tenant_institution_admin_isolation(db_session: AsyncSession
     t1 = Tenant(
         code=f"t1-{uuid.uuid4().hex[:6]}",
         name="Tenant One",
-        tenant_type=TenantType.UNIVERSITY,
+        tenant_type=TenantType.COLLEGE_UNIVERSITY,
+        institution_type=TenantType.COLLEGE_UNIVERSITY,
         status=TenantStatus.ACTIVE,
         slug=f"t1-{uuid.uuid4().hex[:6]}",
         enabled_modules=["identity_access"],
@@ -228,7 +230,8 @@ async def test_cross_tenant_institution_admin_isolation(db_session: AsyncSession
     t2 = Tenant(
         code=f"t2-{uuid.uuid4().hex[:6]}",
         name="Tenant Two",
-        tenant_type=TenantType.SCHOOL,
+        institution_type=TenantType.TRAINING,
+        tenant_type=TenantType.TRAINING,
         status=TenantStatus.ACTIVE,
         slug=f"t2-{uuid.uuid4().hex[:6]}",
         enabled_modules=["identity_access"],
@@ -263,3 +266,49 @@ async def test_cross_tenant_institution_admin_isolation(db_session: AsyncSession
     emails = {a.email for a in t1_admins}
     assert "admin1@one.edu" in emails
     assert "admin2@two.edu" not in emails
+
+
+@pytest.mark.asyncio
+async def test_resolve_tenant_by_subdomain_validates_type_segment(client, db_session):
+    slug = f"resolve-{uuid.uuid4().hex[:8]}"
+    tenant = Tenant(
+        code=slug,
+        name="Resolve Test U",
+        tenant_type=TenantType.COLLEGE_UNIVERSITY,
+        institution_type=InstitutionType.COLLEGE_UNIVERSITY,
+        status=TenantStatus.ACTIVE,
+        slug=slug,
+        enabled_modules=["identity_access"],
+    )
+    db_session.add(tenant)
+    await db_session.commit()
+
+    ok = await client.get(f"/api/v1/tenants/by-subdomain/{slug}/college")
+    assert ok.status_code == 200, ok.text
+    assert ok.json()["slug"] == slug
+
+    wrong_type = await client.get(f"/api/v1/tenants/by-subdomain/{slug}/training")
+    assert wrong_type.status_code == 404
+
+    unknown_segment = await client.get(f"/api/v1/tenants/by-subdomain/{slug}/invalid")
+    assert unknown_segment.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_resolve_tenant_by_subdomain_slug_only_legacy(client, db_session):
+    slug = f"legacy-{uuid.uuid4().hex[:8]}"
+    tenant = Tenant(
+        code=slug,
+        name="Legacy Resolve U",
+        tenant_type=TenantType.TRAINING,
+        institution_type=InstitutionType.TRAINING,
+        status=TenantStatus.ACTIVE,
+        slug=slug,
+        enabled_modules=["identity_access"],
+    )
+    db_session.add(tenant)
+    await db_session.commit()
+
+    r = await client.get(f"/api/v1/tenants/by-subdomain/{slug}")
+    assert r.status_code == 200, r.text
+    assert r.json()["slug"] == slug

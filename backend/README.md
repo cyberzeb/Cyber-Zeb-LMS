@@ -192,7 +192,8 @@ All paths are under `/api/v1`.
 | POST | `/addon-module-requests` | Landing: add modules for existing tenant |
 | GET | `/modules` | Active module catalog + prices |
 | GET | `/site-content` | Active landing content blocks |
-| GET | `/tenants/by-subdomain/{slug}` | Resolve institution by slug |
+| GET | `/tenants/by-subdomain/{slug}/{type_segment}` | Resolve institution by slug + type path (`college`, `training`, `corporate`) |
+| GET | `/tenants/by-subdomain/{slug}` | Legacy slug-only resolve (no type validation) |
 
 ### Super Admin (Bearer platform token)
 
