@@ -178,3 +178,10 @@ export function readSettings<T = unknown>(): T {
 export function readSelectedCampus(): string {
   return readCached<string>(STORAGE_KEYS.selectedCampus, 'all')
 }
+
+// ── Corporate edition readers ──────────────────────────────────────────────
+import type { JobRole } from '../../modules/corporate/types'
+
+export function readJobRoles(): JobRole[] {
+  return readCached<JobRole[]>(STORAGE_KEYS.jobRoles, [])
+}
