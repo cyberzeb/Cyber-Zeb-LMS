@@ -36,6 +36,10 @@ export const STORAGE_KEYS = {
   payments: 'berana:payments',
   helpDeskTickets: 'berana:help-desk-tickets',
   integrations: 'berana:integrations',
+  // Corporate edition
+  teams: 'berana:teams',
+  jobRoles: 'berana:job-roles',
+  skills: 'berana:skills',
 } as const
 
 export const STORAGE_EVENTS = {

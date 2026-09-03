@@ -1,5 +1,13 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
-import { InstitutionAdminLayout } from './InstitutionAdminLayout'
+import { EditionAdminLayout } from './EditionAdminLayout'
+import { CorporateOverviewPage } from '../modules/corporate/dashboard/CorporateOverviewPage'
+import { CorporateDepartmentsPage } from '../modules/corporate/pages/CorporateDepartmentsPage'
+import { CorporateTeamsPage } from '../modules/corporate/pages/CorporateTeamsPage'
+import { CorporateOrganizationPage } from '../modules/corporate/pages/CorporateOrganizationPage'
+import { CorporateCompliancePage } from '../modules/corporate/pages/CorporateCompliancePage'
+import { CorporateJobRolesPage } from '../modules/corporate/pages/CorporateJobRolesPage'
+import { CorporateSkillsPage } from '../modules/corporate/pages/CorporateSkillsPage'
+import { TrainingOverviewPage } from '../modules/training/dashboard/TrainingOverviewPage'
 import { CampusProfilePage } from '../modules/institution/pages/CampusProfilePage'
 import { OrgStructurePage } from '../modules/institution/pages/OrgStructurePage'
 import { InstitutionOverviewPage } from '../modules/institution/pages/InstitutionOverviewPage'
@@ -322,12 +330,22 @@ export const router = createBrowserRouter([
   },
   {
     path: '/admin',
-    element: <InstitutionAdminLayout />,
+    element: <EditionAdminLayout />,
     children: [
       {
         index: true,
         element: <InstitutionOverviewPage />,
       },
+      // Corporate edition routes
+      { path: 'corporate/overview', element: <CorporateOverviewPage /> },
+      { path: 'corporate/organization', element: <CorporateOrganizationPage /> },
+      { path: 'corporate/departments', element: <CorporateDepartmentsPage /> },
+      { path: 'corporate/teams', element: <CorporateTeamsPage /> },
+      { path: 'corporate/compliance', element: <CorporateCompliancePage /> },
+      { path: 'corporate/job-roles', element: <CorporateJobRolesPage /> },
+      { path: 'corporate/skills', element: <CorporateSkillsPage /> },
+      // Training edition routes
+      { path: 'training/overview', element: <TrainingOverviewPage /> },
       {
         path: 'institution/overview',
         element: <InstitutionOverviewPage />,

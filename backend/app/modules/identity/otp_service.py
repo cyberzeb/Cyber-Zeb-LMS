@@ -244,6 +244,61 @@ class OtpAuthService:
             "display_name": display_name,
         }
 
+    # ── Email Lookup (email-first login) ──────────────────────────────────
+    async def lookup_email(self, email: str):
+        """
+        Given an email, return what kind of account it belongs to.
+        Checks (in order):
+          1. Platform super admin
+          2. Provisioned institution admin (InstitutionAdminAccount)
+          3. Demo/berana tenant people collection
+        """
+        from app.modules.identity.schemas import EmailLookupResponse
+        from app.modules.onboarding.models import PlatformAdminRole
+        from app.modules.onboarding.repository import OnboardingRepository
+
+        normalized = email.strip().lower()
+
+        # 1. Super admin?
+        repo = OnboardingRepository(self.db)
+        admin = await repo.get_platform_admin_by_email(normalized)
+        if admin and admin.role == PlatformAdminRole.SUPER_ADMIN:
+            return EmailLookupResponse(found=True, is_super_admin=True, role="SuperAdmin")
+
+        # 2. Provisioned institution admin?
+        match = await self._find_institution_admin(normalized)
+        if match:
+            _admin, tenant = match
+            return EmailLookupResponse(
+                found=True,
+                role="Admin",
+                tenant_code=tenant.code,
+                tenant_name=tenant.name,
+                institution_type=tenant.institution_type.value if hasattr(tenant.institution_type, 'value') else str(tenant.institution_type),
+            )
+
+        # 3. Demo tenant people (berana)?
+        try:
+            tenant_id = await self.store.resolve_tenant_id("berana")
+            people = await self.store.get_collection(tenant_id, "people", [])
+            if isinstance(people, list):
+                for person in people:
+                    if not isinstance(person, dict):
+                        continue
+                    person_email = str(person.get("email", "")).strip().lower()
+                    if person_email == normalized:
+                        frontend_role = str(person.get("role", "Student"))
+                        return EmailLookupResponse(
+                            found=True,
+                            is_demo=True,
+                            role=frontend_role,
+                            tenant_code="berana",
+                        )
+        except Exception:
+            pass
+
+        return EmailLookupResponse(found=False)
+
     async def verify_code(self, tenant_code: str, email: str, role: str, code: str) -> dict:
         if role == "Admin":
             match = await self._find_institution_admin(email)

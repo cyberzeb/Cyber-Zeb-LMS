@@ -9,6 +9,8 @@ from app.core.permissions import Role
 from app.modules.identity.schemas import (
     DemoLoginRequest,
     DemoLoginResponse,
+    EmailLookupRequest,
+    EmailLookupResponse,
     LoginRequest,
     OtpSendRequest,
     OtpSendResponse,
@@ -64,6 +66,13 @@ async def demo_login(payload: DemoLoginRequest, db: AsyncSession = Depends(get_d
         frontend_role=frontend_role,
         display_name=str(person.get("name", "")),
     )
+
+
+@router.post("/otp/lookup", response_model=EmailLookupResponse)
+async def lookup_email(payload: EmailLookupRequest, db: AsyncSession = Depends(get_db)):
+    """Identify an email before OTP: returns role, tenant, and edition hints."""
+    service = OtpAuthService(db)
+    return await service.lookup_email(payload.email)
 
 
 @router.post("/otp/send", response_model=OtpSendResponse)
