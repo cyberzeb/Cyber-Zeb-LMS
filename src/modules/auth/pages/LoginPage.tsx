@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   ArrowLeft,
+  Building2,
+  CheckCircle2,
   GraduationCap,
   Headset,
   HeartHandshake,
+  Loader2,
   Mail,
   Shield,
   ShieldCheck,
@@ -12,7 +15,8 @@ import {
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 
 import brandLogo from '../../../assets/Logo.jpg'
-import { sendLoginOtp, verifyLoginOtp } from '../../../shared/api/auth'
+import { sendLoginOtp, verifyLoginOtp, lookupEmail } from '../../../shared/api/auth'
+import type { EmailLookupResult } from '../../../shared/api/auth'
 import { setAccessToken } from '../../../shared/api/client'
 import { setSuperAdminSession } from '../../../modules/superadmin/api/superAdminAuthApi'
 import { setActiveTenant } from '../../../shared/config/tenant'
@@ -51,7 +55,8 @@ export function LoginPage() {
   const initialRole = searchParams.get('role')
   const redirectTo = searchParams.get('redirect')
 
-  const [step, setStep] = useState<'credentials' | 'code'>('credentials')
+  // 'email' → user types email, 'credentials' → email looked up, role confirmed, 'code' → OTP input
+  const [step, setStep] = useState<'email' | 'credentials' | 'code'>('email')
   const [role, setRole] = useState<LoginRole>(
     isLoginRole(initialRole) ? initialRole : 'Student',
   )
@@ -61,6 +66,7 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [demoHint, setDemoHint] = useState<string | null>(null)
   const [sentTo, setSentTo] = useState('')
+  const [lookupResult, setLookupResult] = useState<EmailLookupResult | null>(null)
 
   const codeRefs = useRef<(HTMLInputElement | null)[]>([])
 
@@ -68,7 +74,11 @@ export function LoginPage() {
   const person = getSessionPerson()
 
   useEffect(() => {
-    if (isLoginRole(initialRole)) setRole(initialRole)
+    if (isLoginRole(initialRole)) {
+      setRole(initialRole)
+      // If a role was pre-selected via URL, skip straight to credentials step
+      setStep('credentials')
+    }
   }, [initialRole])
 
   useEffect(() => {
@@ -84,6 +94,34 @@ export function LoginPage() {
     const destination =
       redirectTo && redirectTo.startsWith('/') ? redirectTo : portalPathForRole(session.role)
     return <Navigate to={destination} replace />
+  }
+
+  async function handleEmailContinue(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
+    try {
+      const result = await lookupEmail(email.trim())
+      setLookupResult(result)
+      if (!result.found) {
+        setError('No account found for this email. Try a demo account or contact your administrator.')
+        setLoading(false)
+        return
+      }
+      // Auto-fill the role from lookup
+      if (result.is_super_admin) {
+        setRole('SuperAdmin')
+      } else if (result.role && isLoginRole(result.role)) {
+        setRole(result.role as LoginRole)
+      }
+      setStep('credentials')
+    } catch {
+      // Lookup failed (network error) — fall back to manual role selection
+      setLookupResult(null)
+      setStep('credentials')
+    } finally {
+      setLoading(false)
+    }
   }
 
   async function handleSendCode(e: React.FormEvent) {
@@ -201,15 +239,81 @@ export function LoginPage() {
             <div>
               <h1 className="text-[20px] font-extrabold text-navy-900">{t('login.title')}</h1>
               <p className="text-[13px] text-secondary-text">
-                {step === 'credentials'
-                  ? t('login.access', { role: t(`role.${role}` as TranslationKey) })
-                  : t('login.enterCode')}
+                {step === 'code'
+                  ? t('login.enterCode')
+                  : step === 'email'
+                    ? 'Enter your email to continue'
+                    : t('login.access', { role: t(`role.${role}` as TranslationKey) })}
               </p>
             </div>
           </div>
 
-          {step === 'credentials' ? (
+          {step === 'email' ? (
+            <form onSubmit={(e) => void handleEmailContinue(e)} className="space-y-5">
+              <label className="block">
+                <span className="block text-[12px] font-bold text-navy-900 mb-1.5">{t('login.email')}</span>
+                <div className="relative">
+                  <Mail
+                    size={16}
+                    className="absolute start-3.5 top-1/2 -translate-y-1/2 text-secondary-text pointer-events-none"
+                  />
+                  <input
+                    type="email"
+                    required
+                    autoFocus
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    className="w-full ps-10 pe-3.5 py-2.5 text-[13.5px] input-surface rounded-xl outline-none focus:ring-2 focus:ring-lemon-500/25 focus:border-lemon-500/50 transition-all"
+                  />
+                </div>
+              </label>
+
+              {error ? (
+                <p className="text-[13px] font-semibold text-danger bg-danger-bg px-3.5 py-2.5 rounded-lg">
+                  {error}
+                </p>
+              ) : null}
+
+              <button
+                type="submit"
+                disabled={loading || !email.trim()}
+                className="w-full bg-lemon-500 text-[#020810] font-bold text-[14px] py-3 rounded-xl hover:bg-lemon-200 transition-all duration-200 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+              >
+                {loading ? <Loader2 size={16} className="animate-spin" /> : null}
+                {loading ? 'Looking up…' : 'Continue'}
+              </button>
+
+              <p className="text-[12px] text-secondary-text text-center leading-relaxed">
+                {t('login.demoHint', { email: DEMO_ACCOUNTS[role].email, code: DEMO_OTP_CODE })}
+              </p>
+            </form>
+          ) : step === 'credentials' ? (
             <form onSubmit={(e) => void handleSendCode(e)} className="space-y-5">
+              {/* Show lookup confirmation banner */}
+              {lookupResult?.found ? (
+                <div className="flex items-start gap-3 rounded-xl bg-lemon-50 dark:bg-lemon-500/10 border border-lemon-200 dark:border-lemon-500/20 px-4 py-3">
+                  <CheckCircle2 size={16} className="text-lemon-700 dark:text-lemon-500 shrink-0 mt-0.5" />
+                  <div className="text-[12.5px]">
+                    <p className="font-semibold text-navy-900">
+                      {lookupResult.is_super_admin
+                        ? 'Signing in as Platform Super Admin'
+                        : `Signing in as ${lookupResult.role ?? 'User'}`}
+                    </p>
+                    {lookupResult.tenant_name ? (
+                      <p className="text-secondary-text mt-0.5 flex items-center gap-1">
+                        <Building2 size={12} />
+                        {lookupResult.tenant_name}
+                        {lookupResult.institution_type ? ` · ${lookupResult.institution_type.replace(/_/g, ' ')}` : ''}
+                      </p>
+                    ) : lookupResult.is_demo ? (
+                      <p className="text-secondary-text mt-0.5">Demo account</p>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+
               <label className="block">
                 <span className="block text-[12px] font-bold text-navy-900 mb-1.5">{t('login.email')}</span>
                 <div className="relative">
@@ -234,7 +338,8 @@ export function LoginPage() {
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value as LoginRole)}
-                  className="w-full px-3.5 py-2.5 text-[13.5px] input-surface rounded-xl outline-none focus:ring-2 focus:ring-lemon-500/25 cursor-pointer dark:[color-scheme:dark]"
+                  disabled={!!lookupResult?.found}
+                  className="w-full px-3.5 py-2.5 text-[13.5px] input-surface rounded-xl outline-none focus:ring-2 focus:ring-lemon-500/25 cursor-pointer dark:[color-scheme:dark] disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {LOGIN_ROLES.map((r) => (
                     <option key={r.value} value={r.value}>
@@ -256,6 +361,19 @@ export function LoginPage() {
                 className="w-full bg-lemon-500 text-[#020810] font-bold text-[14px] py-3 rounded-xl hover:bg-lemon-200 transition-all duration-200 disabled:opacity-50 cursor-pointer"
               >
                 {loading ? t('login.sending') : t('login.sendCode')}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setStep('email')
+                  setLookupResult(null)
+                  setError(null)
+                }}
+                className="w-full flex items-center justify-center gap-2 text-[13px] font-semibold text-secondary-text hover:text-navy-900 transition-colors cursor-pointer"
+              >
+                <ArrowLeft size={15} className="rtl:rotate-180" />
+                Change email
               </button>
 
               <p className="text-[12px] text-secondary-text text-center leading-relaxed">

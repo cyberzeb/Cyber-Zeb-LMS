@@ -23,6 +23,8 @@ export interface College {
   description?: string
 }
 
+export type DepartmentStatus = 'active' | 'inactive'
+
 export interface Department {
   id: string
   name: string
@@ -42,6 +44,8 @@ export interface Department {
   maxYears?: number
   /** Semesters offered per study year (default 2: Fall + Spring) */
   semestersPerYear?: number
+  /** Corporate edition: active / inactive status. */
+  status?: DepartmentStatus
 }
 
 export interface Program {
@@ -425,6 +429,12 @@ export interface CourseEnrollment {
   enrolledOn: string
   status: 'active' | 'pending' | 'withdrawn'
   progress: number
+  /** Corporate edition: assignment due date (ISO date string). */
+  dueDate?: string
+  /** Corporate edition: whether this enrollment is mandatory. */
+  isMandatory?: boolean
+  /** Corporate edition: who assigned this enrollment. */
+  assignedBy?: string
 }
 
 /* ── People ───────────────────────────────────────────────── */
@@ -457,6 +467,10 @@ export interface PersonRow {
   status: 'active' | 'invited' | 'suspended'
   lastActive: string
   initials: string
+  /** Corporate edition: FK to job role (for compliance tracking). */
+  jobRoleId?: string
+  /** Corporate edition: FK to team. */
+  teamId?: string
 }
 
 /* ── Reports ──────────────────────────────────────────────── */

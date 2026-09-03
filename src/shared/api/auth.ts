@@ -1,6 +1,22 @@
 import { apiClient } from './client'
 import { DEFAULT_TENANT_CODE } from './collectionKeys'
 
+// ── Email-first login lookup ────────────────────────────────────────────────
+export interface EmailLookupResult {
+  found: boolean
+  role?: string
+  tenant_code?: string
+  tenant_name?: string
+  institution_type?: string
+  is_super_admin?: boolean
+  is_demo?: boolean
+}
+
+export async function lookupEmail(email: string): Promise<EmailLookupResult> {
+  const res = await apiClient.post<EmailLookupResult>('/auth/otp/lookup', { email })
+  return res.data
+}
+
 export interface DemoLoginResult {
   access_token: string
   refresh_token: string

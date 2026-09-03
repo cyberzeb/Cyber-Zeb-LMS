@@ -91,3 +91,18 @@ class OtpVerifyResponse(TokenPair):
     tenant_code: str | None = None
     tenant_name: str | None = None
     institution_type: str | None = None
+
+
+# --- Email lookup (email-first login flow) ---
+class EmailLookupRequest(BaseModel):
+    email: str
+
+
+class EmailLookupResponse(BaseModel):
+    found: bool
+    role: str | None = None
+    tenant_code: str | None = None
+    tenant_name: str | None = None
+    institution_type: str | None = None
+    is_super_admin: bool = False
+    is_demo: bool = False
