@@ -11,6 +11,7 @@ import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
 
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 
 import { SearchInput } from '../../../shared/components/SearchInput'
 
@@ -62,6 +63,7 @@ const emptyForm = {
 export function DepartmentsPage() {
 
   const { notify } = useToast()
+  const { terminology: t } = useOrganizationConfig()
   const { ensureCalendarForProgram } = useAcademicCalendar()
 
   const [searchParams, setSearchParams] = useSearchParams()
@@ -532,7 +534,7 @@ export function DepartmentsPage() {
 
       <PageHeader
 
-        title="Departments & Programs"
+        title={t.departments}
 
         subtitle="Each department is a degree program with a fixed duration (Year 1 … Year N). Students and course offerings are scoped by department and study year."
 

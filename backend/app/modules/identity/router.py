@@ -69,14 +69,20 @@ async def demo_login(payload: DemoLoginRequest, db: AsyncSession = Depends(get_d
 @router.post("/otp/send", response_model=OtpSendResponse)
 async def send_otp(payload: OtpSendRequest, db: AsyncSession = Depends(get_db)):
     service = OtpAuthService(db)
-    result = await service.send_code(payload.tenant_code, payload.email, payload.role)
+    if payload.role == "SuperAdmin":
+        result = await service.send_super_admin_code(payload.email)
+    else:
+        result = await service.send_code(payload.tenant_code, payload.email, payload.role)
     return OtpSendResponse(**result)
 
 
 @router.post("/otp/verify", response_model=OtpVerifyResponse)
 async def verify_otp(payload: OtpVerifyRequest, db: AsyncSession = Depends(get_db)):
     service = OtpAuthService(db)
-    result = await service.verify_code(payload.tenant_code, payload.email, payload.role, payload.code)
+    if payload.role == "SuperAdmin":
+        result = await service.verify_super_admin_code(payload.email, payload.code)
+    else:
+        result = await service.verify_code(payload.tenant_code, payload.email, payload.role, payload.code)
     return OtpVerifyResponse(**result)
 
 

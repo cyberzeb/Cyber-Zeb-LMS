@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BookOpen, Users } from 'lucide-react'
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { Button } from '../../../shared/components/Button'
 import { SelectMenu } from '../../../shared/components/SelectMenu'
@@ -38,6 +39,7 @@ import type { CourseEnrollment } from '../types'
 
 export function EnrollmentsPage() {
   const { notify } = useToast()
+  const { terminology: t } = useOrganizationConfig()
   const { departments } = useCampusContext()
   const { enrollments, bulkEnrollCohort, updateEnrollment, removeEnrollment } = useEnrollments()
   const { people } = usePeople()
@@ -141,7 +143,7 @@ export function EnrollmentsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Enrollments" />
+      <PageHeader title={t.trainingAssignment} />
 
       {missingSetup ? (
         <GlassCard className="p-4 text-[13px] text-secondary-text space-y-2">

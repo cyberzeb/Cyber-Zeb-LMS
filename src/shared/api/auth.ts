@@ -7,6 +7,10 @@ export interface DemoLoginResult {
   person_id: string
   frontend_role: string
   display_name: string
+  /** Present when a provisioned institution admin signs in (their own tenant). */
+  tenant_code?: string | null
+  tenant_name?: string | null
+  institution_type?: string | null
 }
 
 export interface OtpSendResult {

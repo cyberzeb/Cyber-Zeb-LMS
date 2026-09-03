@@ -6,6 +6,7 @@ import {
   HeartHandshake,
   Mail,
   Shield,
+  ShieldCheck,
   UserRound,
 } from 'lucide-react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
@@ -13,6 +14,9 @@ import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import brandLogo from '../../../assets/Logo.jpg'
 import { sendLoginOtp, verifyLoginOtp } from '../../../shared/api/auth'
 import { setAccessToken } from '../../../shared/api/client'
+import { setSuperAdminSession } from '../../../modules/superadmin/api/superAdminAuthApi'
+import { setActiveTenant } from '../../../shared/config/tenant'
+import type { InstitutionType } from '../../../shared/constants/institutionTypes'
 import {
   isLoginRole,
   LOGIN_ROLES,
@@ -35,6 +39,7 @@ function roleIcon(role: LoginRole) {
   if (role === 'Student') return GraduationCap
   if (role === 'Guardian') return HeartHandshake
   if (role === 'HelpDesk') return Headset
+  if (role === 'SuperAdmin') return ShieldCheck
   if (role === 'Admin') return Shield
   return UserRound
 }
@@ -88,7 +93,9 @@ export function LoginPage() {
     try {
       const result = await sendLoginOtp(email.trim(), role)
       setSentTo(result.email)
-      setDemoHint(result.demo_code ?? '000000')
+      // Real accounts (e.g. provisioned institution admins) don't expose a code;
+      // only demo roles return one to display as a hint.
+      setDemoHint(result.demo_code ?? null)
       setStep('code')
       setCode(['', '', '', '', '', ''])
       setTimeout(() => codeRefs.current[0]?.focus(), 100)
@@ -105,11 +112,30 @@ export function LoginPage() {
     setLoading(true)
     try {
       const result = await verifyLoginOtp(sentTo || email.trim(), role, fullCode)
+      if (role === 'SuperAdmin') {
+        // Platform super admin uses its own session store (localStorage token).
+        setSuperAdminSession(result.access_token, sentTo || email.trim())
+        navigate('/super-admin', { replace: true })
+        return
+      }
       setAccessToken(result.access_token)
       writePortalSession({
         personId: result.person_id,
-        role: result.frontend_role as LoginRole,
+        // SuperAdmin is handled above; the remaining roles are portal roles.
+        role: result.frontend_role as Exclude<LoginRole, 'SuperAdmin'>,
       })
+      // A provisioned institution admin signs into their own tenant: switch the
+      // active tenant/edition, then hard-navigate so the data layer reloads that
+      // institution's workspace.
+      if (role === 'Admin' && result.tenant_code) {
+        setActiveTenant({
+          slug: result.tenant_code,
+          name: result.tenant_name || '',
+          institutionType: (result.institution_type as InstitutionType) || 'college_university',
+        })
+        window.location.assign('/admin')
+        return
+      }
       const destination =
         redirectTo && redirectTo.startsWith('/') ? redirectTo : portalPathForRole(role)
       navigate(destination, { replace: true })

@@ -175,6 +175,9 @@ class ActivateResponse(BaseModel):
     service_request: ServiceRequestOut
     tenant: TenantActivationOut
     already_activated: bool = False
+    # The 6-digit access code the institution admin uses to sign in. Present only
+    # on a fresh activation (it is stored hashed and cannot be recovered later).
+    admin_access_code: str | None = None
 
 
 class AddOnModuleRequestOut(BaseModel):

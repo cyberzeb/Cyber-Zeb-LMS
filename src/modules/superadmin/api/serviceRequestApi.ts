@@ -53,6 +53,7 @@ export async function activateRequest(id: string) {
     service_request: ServiceRequest
     tenant: NonNullable<ServiceRequest['tenant']>
     already_activated: boolean
+    admin_access_code: string | null
   }>(`/service-requests/${id}/activate`, null, {
     headers: { 'Idempotency-Key': crypto.randomUUID() },
   })

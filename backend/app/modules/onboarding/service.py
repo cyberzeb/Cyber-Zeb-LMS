@@ -74,6 +74,7 @@ from app.modules.onboarding.schemas import (
     SuperAdminTokenResponse,
     TenantActivationOut,
 )
+from app.modules.lms_store.models import LmsCollection
 from app.modules.tenants.models import Tenant, TenantStatus, TenantType
 
 EDITABLE_PLATFORM_SETTINGS: dict[str, str] = {
@@ -144,6 +145,11 @@ def _slugify(value: str) -> str:
 def _generate_temp_password(length: int = 16) -> str:
     alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
     return "".join(secrets.choice(alphabet) for _ in range(length))
+
+
+def _generate_otp_code(length: int = 6) -> str:
+    """A short numeric access code the institution admin enters like an OTP."""
+    return "".join(secrets.choice(string.digits) for _ in range(length))
 
 
 def _institution_link(
@@ -886,8 +892,10 @@ class OnboardingService:
             tenant_type = TenantType.TRAINING
 
         before = {"status": sr.status.value}
-        temp_password = _generate_temp_password()
-        # Never log or return plaintext password except in the outbound email.
+        # Institution admins now sign in with a short 6-digit access code (entered
+        # like an OTP on the shared /login page) instead of a long temp password.
+        access_code = _generate_otp_code()
+        # Never log the plaintext code except in the outbound email / activation response.
 
         tenant = Tenant(
             code=slug,
@@ -908,10 +916,16 @@ class OnboardingService:
         admin_account = InstitutionAdminAccount(
             tenant_id=tenant.id,
             email=sr.email,
-            temporary_password_hash=hash_password(temp_password),
-            must_change_password=True,
+            temporary_password_hash=hash_password(access_code),
+            must_change_password=False,
         )
         self.db.add(admin_account)
+        await self.db.flush()
+
+        # Seed a minimal starter workspace so the admin can immediately sign in
+        # and start creating. The admin's person id == the admin-account id, which
+        # is also what the OTP login returns as person_id.
+        self._seed_starter_collections(tenant.id, admin_account.id, sr)
 
         sr.status = ServiceRequestStatus.ACTIVATED
         sr.activated_at = _utcnow()
@@ -938,7 +952,7 @@ class OnboardingService:
             institution_name=sr.institution_name,
             institution_link=link,
             admin_email=sr.email,
-            temporary_password=temp_password,
+            temporary_password=access_code,
         )
         result = send_email_sync(to_email=sr.email, subject=subject, body=email_body)
         await persist_email_log(
@@ -957,7 +971,35 @@ class OnboardingService:
             service_request=await self._sr_out(reloaded or sr, tenant),
             tenant=tenant_out,
             already_activated=False,
+            admin_access_code=access_code,
         )
+
+    def _seed_starter_collections(
+        self,
+        tenant_id: uuid.UUID,
+        admin_person_id: uuid.UUID,
+        sr,
+    ) -> None:
+        """Add minimal starter data so a freshly activated institution portal is
+        immediately usable. Rows are added to the current session and persisted
+        by the caller's commit."""
+        admin_person = {
+            "id": str(admin_person_id),
+            "name": sr.contact_name or "Institution Admin",
+            "email": sr.email,
+            "role": "Admin",
+            "department": "Administration",
+            "status": "active",
+            "verificationStatus": "verified",
+        }
+        starter: dict[str, object] = {
+            "people": [admin_person],
+            "settings": {"general": {"name": sr.institution_name}},
+        }
+        for key, data in starter.items():
+            self.db.add(
+                LmsCollection(tenant_id=tenant_id, collection_key=key, data=data)
+            )
 
     async def reject(
         self,

@@ -57,19 +57,12 @@ export function SuperAdminLayout() {
   const location = useLocation()
   const navigate = useNavigate()
   const path = location.pathname
-  const isLogin = path.endsWith('/login')
   const token = getSuperAdminToken()
 
-  if (!isLogin && !token) {
-    return <Navigate to="/super-admin/login" replace />
-  }
-
-  if (isLogin && token) {
-    return <Navigate to="/super-admin" replace />
-  }
-
-  if (isLogin) {
-    return <Outlet />
+  // Super admin authenticates through the shared /login page (role dropdown +
+  // OTP), so an unauthenticated visit is bounced there with the role preset.
+  if (!token) {
+    return <Navigate to="/login?role=SuperAdmin" replace />
   }
 
   const isActive = (to: string) => {
@@ -252,7 +245,7 @@ export function SuperAdminLayout() {
               type="button"
               onClick={() => {
                 logoutSuperAdmin()
-                navigate('/super-admin/login')
+                navigate('/login?role=SuperAdmin')
               }}
               className="inline-flex items-center gap-1.5 text-[12.5px] font-bold text-danger px-3 py-2 rounded-lg hover:bg-white/[0.06] cursor-pointer"
             >

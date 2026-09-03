@@ -79,7 +79,6 @@ import { HelpDeskDashboardPage } from '../modules/helpdesk/pages/helpdeskdashboa
 import { HelpDeskTicketsPage } from '../modules/helpdesk/pages/helpdesktickets'
 import { HelpDeskSettingsPage } from '../modules/helpdesk/pages/helpdesksettings'
 import { SuperAdminLayout } from '../modules/superadmin/layout/SuperAdminLayout'
-import { SuperAdminLoginPage } from '../modules/superadmin/pages/SuperAdminLoginPage'
 import { OverviewPage } from '../modules/superadmin/pages/OverviewPage'
 import { ServiceRequestsListPage } from '../modules/superadmin/pages/ServiceRequestsListPage'
 import { ServiceRequestDetailPage } from '../modules/superadmin/pages/ServiceRequestDetailPage'
@@ -143,7 +142,8 @@ export const router = createBrowserRouter([
       { path: 'security', element: <SecurityPage /> },
       { path: 'export', element: <DataExportPage /> },
       { path: 'analytics', element: <AnalyticsPage /> },
-      { path: 'login', element: <SuperAdminLoginPage /> },
+      // Legacy dedicated login route now folds into the shared /login page.
+      { path: 'login', element: <Navigate to="/login?role=SuperAdmin" replace /> },
     ],
   },
   {

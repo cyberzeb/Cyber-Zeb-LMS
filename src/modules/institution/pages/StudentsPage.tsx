@@ -4,6 +4,7 @@ import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { SearchInput } from '../../../shared/components/SearchInput'
 import { Modal } from '../../../shared/components/Modal'
 import { FormField } from '../../../shared/components/FormField'
@@ -45,6 +46,7 @@ function initialsFromName(name: string): string {
 
 export function StudentsPage() {
   const { notify } = useToast()
+  const { terminology: t } = useOrganizationConfig()
   const { campuses, departments, activeCampuses, selectedCampusId } = useCampusContext()
   const { people, setPeople } = usePeople()
   const [query, setQuery] = useState('')
@@ -196,7 +198,7 @@ export function StudentsPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title={config.title}
+        title={t.learners}
         subtitle={config.subtitle}
         actions={
           <>

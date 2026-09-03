@@ -4,6 +4,7 @@ import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { SearchInput } from '../../../shared/components/SearchInput'
 import { Modal } from '../../../shared/components/Modal'
 import { FormField } from '../../../shared/components/FormField'
@@ -41,6 +42,7 @@ function initialsFromName(name: string): string {
 
 export function InstructorsPage() {
   const { notify } = useToast()
+  const { terminology: t } = useOrganizationConfig()
   const { campuses, activeCampuses, selectedCampusId } = useCampusContext()
   const { people, setPeople } = usePeople()
   const { courses, setCourses } = useCourses()
@@ -187,7 +189,7 @@ export function InstructorsPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title={config.title}
+        title={`${t.trainer}s`}
         subtitle={config.subtitle}
         actions={
           <Button variant="primary" onClick={openInvite}>

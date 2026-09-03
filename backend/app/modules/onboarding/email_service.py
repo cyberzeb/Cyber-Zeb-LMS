@@ -149,12 +149,12 @@ Your Berana LMS workspace for {institution_name} is ready.
 Unique institution link:
 {institution_link}
 
+Sign in at the Berana login page and choose the "Institution Admin" role.
 Login email: {admin_email}
-Temporary password: {temporary_password}
+Access code (6-digit): {temporary_password}
 
-Please change your password on first login.
-(Dependency: the institution-admin login flow must enforce must_change_password —
-that enforcement is owned by the separate institution-admin workstream.)
+Enter the access code like a one-time code to reach your institution workspace,
+where you can start adding programs, courses, instructors and learners.
 
 — Cyber-Zeb Consulting / Berana LMS
 """

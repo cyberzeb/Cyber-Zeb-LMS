@@ -6,6 +6,12 @@ import {
   LEGACY_AUTH_TOKEN_KEY,
 } from './collectionKeys'
 import { getCookie, removeCookie, setCookie } from '../storage/cookies'
+import { getActiveTenant } from '../config/tenant'
+
+/** The tenant code the data layer talks to — the active institution, or the demo tenant. */
+export function activeTenantCode(): string {
+  return getActiveTenant()?.slug || DEFAULT_TENANT_CODE
+}
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api/v1'
 const TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7 // 7 days (JWT may expire sooner)
@@ -35,6 +41,8 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  // Route data calls to the active institution's tenant (falls back to demo).
+  config.headers['X-Tenant-Code'] = activeTenantCode()
   return config
 })
 

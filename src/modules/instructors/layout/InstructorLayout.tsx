@@ -22,6 +22,7 @@ import brandLogo from '../../../assets/Logo.jpg'
 import { PortalAuthRedirect } from '../../../shared/components/PortalAuthRedirect'
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 import { readInstitutionName } from '../../../shared/storage/readers'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 
 const ICON_SIZE = 17
 
@@ -46,6 +47,7 @@ const breadcrumbLabels: Record<string, string> = {
 export function InstructorLayout() {
   const location = useLocation()
   const path = location.pathname
+  const { terminology: t } = useOrganizationConfig()
   const session = readPortalSession()
   const person = getSessionPerson()
 
@@ -187,7 +189,7 @@ export function InstructorLayout() {
       <div className="flex flex-col flex-1 min-w-0">
         <AdminTopHeader
           userName={person.name}
-          userRole="Instructor"
+          userRole={t.trainer}
           institutionName={readInstitutionName()}
           breadcrumb={breadcrumb}
         />

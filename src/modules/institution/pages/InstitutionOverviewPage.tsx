@@ -20,6 +20,7 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { useInstitutionOverview } from '../hooks/useInstitution'
 import { useCampusContext } from '../context/CampusContext'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { Button } from '../../../shared/components/Button'
 import { DashboardSummaryCard } from '../../../shared/components/DashboardSummaryCard'
 import { AnnouncementDashboardList } from '../../../shared/components/announcements/AnnouncementFeedCard'
@@ -138,6 +139,7 @@ function integrationLabel(status: IntegrationStatusItem['status']) {
 
 export function InstitutionOverviewPage() {
   const { t } = useLanguage()
+  const { terminology: term } = useOrganizationConfig()
   const navigate = useNavigate()
   const { setupPercent, setupSteps } = useCampusContext()
   const { data, isLoading, isError } = useInstitutionOverview()
@@ -227,24 +229,24 @@ export function InstitutionOverviewPage() {
           {t('common.welcomeBack')} <span className="text-navy-700">Admin</span>
         </h1>
         <p className="text-[13px] text-secondary-text mt-1">
-          Track institutional performance, learner progress and operational priorities for {data.institutionName}.
+          Track {term.organization.toLowerCase()} performance, {term.learner.toLowerCase()} progress and operational priorities for {data.institutionName}.
         </p>
         <div className="flex flex-wrap items-center gap-2 mt-4">
           <Button variant="outline-green" onClick={() => navigate('/admin/courses')}>
             <Plus size={15} />
-            Create Course
+            Create {term.course}
           </Button>
           <Button variant="outline-blue" onClick={() => navigate('/admin/people')}>
             <UserPlus size={15} />
-            Add Student
+            Add {term.learner}
           </Button>
           <Button variant="outline-purple" onClick={() => navigate('/admin/people')}>
             <Presentation size={15} />
-            Add Instructor
+            Add {term.trainer}
           </Button>
           <Button variant="secondary" onClick={() => navigate('/admin/reports')}>
             <CalendarClock size={15} />
-            Schedule Class
+            Schedule {term.cohort}
           </Button>
           <Button variant="secondary" onClick={() => navigate('/admin/announcements')}>
             <Megaphone size={15} />
@@ -259,7 +261,7 @@ export function InstitutionOverviewPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatBlock
-          label="Total Students"
+          label={`Total ${term.learners}`}
           value={data.kpis.totalStudents.toLocaleString()}
           trend={totalStudentsTrend.trend}
           trendValue={totalStudentsTrend.trendValue}
@@ -269,7 +271,7 @@ export function InstitutionOverviewPage() {
           iconBg="bg-info-bg text-info"
         />
         <StatBlock
-          label="Active Students"
+          label={`Active ${term.learners}`}
           value={data.kpis.activeStudents.toLocaleString()}
           sub="Last 7 days"
           trend={activeStudentsTrend.trend}
@@ -291,7 +293,7 @@ export function InstitutionOverviewPage() {
           iconBg="bg-info-bg text-info"
         />
         <StatBlock
-          label="Certificates Issued"
+          label={`${term.certificates} Issued`}
           value={data.kpis.certificatesIssued.toLocaleString()}
           sub="This semester"
           trend={certificatesTrend.trend}
@@ -302,7 +304,7 @@ export function InstitutionOverviewPage() {
           iconBg="bg-lemon-50 text-lemon-700"
         />
         <StatBlock
-          label="Active Courses"
+          label={`Active ${term.courses}`}
           value={data.kpis.activeCourses}
           trend={activeCoursesTrend.trend}
           trendValue={activeCoursesTrend.trendValue}
@@ -312,7 +314,7 @@ export function InstitutionOverviewPage() {
           iconBg="bg-navy-50 text-navy-700"
         />
         <StatBlock
-          label="Instructors"
+          label={`${term.trainer}s`}
           value={data.kpis.instructors}
           trend={instructorsTrend.trend}
           trendValue={instructorsTrend.trendValue}
@@ -335,7 +337,7 @@ export function InstitutionOverviewPage() {
         <StatBlock
           label="Pending Approvals"
           value={data.kpis.pendingApprovals}
-          sub="Enrollments and requests"
+          sub={`${term.enrollments} and requests`}
           trend={pendingApprovalsTrend.trend}
           trendValue={pendingApprovalsTrend.trendValue}
           sparkline={data.kpiTrends.pendingApprovals}
@@ -348,8 +350,8 @@ export function InstitutionOverviewPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
         <GlassCard className="p-5 flex flex-col h-full w-full">
           <div className="mb-4">
-            <h3 className="text-[15px] font-bold text-navy-900">Student Progress Overview</h3>
-            <p className="text-[11.5px] text-secondary-text mt-1">Progress distribution across enrolled learners</p>
+            <h3 className="text-[15px] font-bold text-navy-900">{term.learner} Progress Overview</h3>
+            <p className="text-[11.5px] text-secondary-text mt-1">Progress distribution across enrolled {term.learners.toLowerCase()}</p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 flex-1">
@@ -387,21 +389,21 @@ export function InstitutionOverviewPage() {
                   <span className="text-navy-900 font-bold">{item.count.toLocaleString()}</span>
                 </div>
               ))}
-              <div className="pt-2 text-[11px] text-secondary-text">Total learners: {totalProgress.toLocaleString()}</div>
+              <div className="pt-2 text-[11px] text-secondary-text">Total {term.learners.toLowerCase()}: {totalProgress.toLocaleString()}</div>
             </div>
           </div>
         </GlassCard>
 
         <TrendLineChart
-          title="Student Enrollment Trend"
-          subtitle="Total enrolled learners over the last 6 months"
+          title={`${term.learner} ${term.enrollment} Trend`}
+          subtitle={`Total enrolled ${term.learners.toLowerCase()} over the last 6 months`}
           data={enrollmentBars}
           color="#1976D2"
         />
 
         <TrendLineChart
-          title="Active Student Trend"
-          subtitle="Weekly active learners over the last 6 months"
+          title={`Active ${term.learner} Trend`}
+          subtitle={`Weekly active ${term.learners.toLowerCase()} over the last 6 months`}
           data={activeBars}
           color="#16A34A"
         />
@@ -417,13 +419,13 @@ export function InstitutionOverviewPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">
         <div className="xl:col-span-2 space-y-4">
-          <DashboardSummaryCard title="Top Courses" onViewAll={() => navigate('/admin/courses')}>
+          <DashboardSummaryCard title={`Top ${term.courses}`} onViewAll={() => navigate('/admin/courses')}>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-left">
                 <thead>
                   <tr className="text-[10px] uppercase tracking-wider text-secondary-text border-b border-divider">
-                    <th className="py-2 pr-2 font-semibold">Course</th>
-                    <th className="py-2 px-2 font-semibold">Instructor</th>
+                    <th className="py-2 pr-2 font-semibold">{term.course}</th>
+                    <th className="py-2 px-2 font-semibold">{term.trainer}</th>
                     <th className="py-2 px-2 font-semibold">Enrolled</th>
                     <th className="py-2 px-2 font-semibold">Completion</th>
                     <th className="py-2 pl-2 font-semibold">Status</th>
@@ -462,7 +464,7 @@ export function InstitutionOverviewPage() {
                 <thead>
                   <tr className="text-[10px] uppercase tracking-wider text-secondary-text border-b border-divider">
                     <th className="py-2 pr-2 font-semibold">Assignment</th>
-                    <th className="py-2 px-2 font-semibold">Student</th>
+                    <th className="py-2 px-2 font-semibold">{term.learner}</th>
                     <th className="py-2 px-2 font-semibold">Submitted</th>
                     <th className="py-2 pl-2 font-semibold">Status</th>
                   </tr>
@@ -487,8 +489,8 @@ export function InstitutionOverviewPage() {
           </DashboardSummaryCard>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <AttentionList title="Pending Enrollments" items={data.pendingEnrollments} />
-            <AttentionList title="Learners At Risk" items={data.learnersAtRisk} />
+            <AttentionList title={`Pending ${term.enrollments}`} items={data.pendingEnrollments} />
+            <AttentionList title={`${term.learners} At Risk`} items={data.learnersAtRisk} />
             <AttentionList title="Overdue Assignments & Exams" items={data.overdueAssessments} />
             <AttentionList title="Courses Requiring Attention" items={data.coursesRequiringAttention} />
           </div>

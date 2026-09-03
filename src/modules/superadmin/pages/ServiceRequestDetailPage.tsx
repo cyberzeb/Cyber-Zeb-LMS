@@ -50,6 +50,7 @@ export function ServiceRequestDetailPage() {
   )
   const [rejectReason, setRejectReason] = useState('')
   const [actionError, setActionError] = useState('')
+  const [accessCode, setAccessCode] = useState<string | null>(null)
 
   const queryKey = ['super-admin', 'service-request', id] as const
 
@@ -87,7 +88,10 @@ export function ServiceRequestDetailPage() {
 
   const activateMutation = useMutation({
     mutationFn: () => activateRequest(id),
-    onSuccess: (res) => setQueryDataFrom(res.service_request),
+    onSuccess: (res) => {
+      if (res.admin_access_code) setAccessCode(res.admin_access_code)
+      setQueryDataFrom(res.service_request)
+    },
     onError: (err: Error) => setActionError(err.message),
   })
 
@@ -198,6 +202,29 @@ export function ServiceRequestDetailPage() {
                   {data.tenant.institution_link}
                 </a>
               </p>
+              {accessCode && (
+                <div className="mt-3 rounded-lg bg-white border border-leaf-300 px-3 py-2">
+                  <p className="text-[11px] font-bold text-secondary-text uppercase tracking-wide">
+                    Institution admin access code
+                  </p>
+                  <p className="mt-1 flex items-center gap-2">
+                    <code className="text-[18px] font-extrabold tracking-[0.3em] text-navy-900">
+                      {accessCode}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={() => void navigator.clipboard?.writeText(accessCode)}
+                      className="text-[11px] font-bold text-info underline"
+                    >
+                      Copy
+                    </button>
+                  </p>
+                  <p className="mt-1 text-[11.5px] text-secondary-text">
+                    Sign in at <code>/login</code> as “Institution Admin” with{' '}
+                    <code>{data.email}</code> and this 6-digit code. Shown once — copy it now.
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </GlassCard>

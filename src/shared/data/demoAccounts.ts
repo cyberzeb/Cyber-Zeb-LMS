@@ -36,6 +36,11 @@ export const DEMO_ACCOUNTS: Record<
     name: 'Martha Bekele',
     email: 'm.bekele@berana.edu',
   },
+  SuperAdmin: {
+    id: 'super-admin',
+    name: 'Platform Super Admin',
+    email: 'admin@berana.com',
+  },
 }
 
 export const DEMO_ACCOUNT_EMAILS = new Set(

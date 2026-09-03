@@ -16,6 +16,12 @@ export function clearSuperAdminSession() {
   localStorage.removeItem(EMAIL_KEY)
 }
 
+/** Persist a super-admin session obtained via the unified OTP login flow. */
+export function setSuperAdminSession(token: string, email: string) {
+  localStorage.setItem(TOKEN_KEY, token)
+  localStorage.setItem(EMAIL_KEY, email)
+}
+
 export async function loginSuperAdmin(email: string, password: string) {
   const { data } = await axiosClient.post<{
     access_token: string

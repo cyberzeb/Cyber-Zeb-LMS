@@ -45,6 +45,7 @@ const en = {
   'role.Guardian': 'Guardian',
   'role.HelpDesk': 'Help Desk',
   'role.Admin': 'Institution Admin',
+  'role.SuperAdmin': 'Super Admin',
   'role.HelpDeskAgent': 'Help Desk Agent',
   'role.guardianPortal': 'Guardian Portal',
 
@@ -330,6 +331,7 @@ const am: Record<TranslationKey, string> = {
   'role.Guardian': 'አሳዳጊ',
   'role.HelpDesk': 'የእርዳታ ማዕከል',
   'role.Admin': 'የተቋም አስተዳዳሪ',
+  'role.SuperAdmin': 'ሱፐር አስተዳዳሪ',
   'role.HelpDeskAgent': 'የእርዳታ ወኪል',
   'role.guardianPortal': 'የአሳዳጊ ፖርታል',
   'section.main': 'ዋና',
@@ -608,6 +610,7 @@ const ar: Record<TranslationKey, string> = {
   'role.Guardian': 'ولي أمر',
   'role.HelpDesk': 'مكتب المساعدة',
   'role.Admin': 'مسؤول المؤسسة',
+  'role.SuperAdmin': 'المشرف العام',
   'role.HelpDeskAgent': 'وكيل مكتب المساعدة',
   'role.guardianPortal': 'بوابة ولي الأمر',
   'section.main': 'الرئيسية',

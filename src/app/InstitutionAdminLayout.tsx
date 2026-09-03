@@ -7,6 +7,8 @@ import brandLogo from '../assets/Logo.jpg'
 import { PortalAuthRedirect } from '../shared/components/PortalAuthRedirect'
 import { getSessionPerson, readPortalSession } from '../shared/storage/session'
 import { CampusProvider, useCampusContext } from '../modules/institution/context/CampusContext'
+import { useOrganizationConfig } from '../shared/config/useOrganizationConfig'
+import { getEditionConfig } from '../shared/config/edition'
 import { readPeopleFromStorage } from '../modules/institution/hooks/usePeople'
 import {
   countPendingVerifications,
@@ -92,6 +94,9 @@ function InstitutionAdminShell() {
   const path = location.pathname
   const session = readPortalSession()
   const person = getSessionPerson()
+  const org = useOrganizationConfig()
+  const t = org.terminology
+  const mods = org.modules
   const {
     campuses,
     selectedCampusId,
@@ -115,7 +120,14 @@ function InstitutionAdminShell() {
 
   const isActive = (routes: string[]) => routes.some((route) => path === route)
 
-  const navSections = [
+  // Edition-aware labels. Terminology drives the wording so the same build reads
+  // "Students / Courses / Enrollments" for a university and
+  // "Employees / Training Modules / Training Assignments" for a corporate tenant.
+  const departmentsLabel = mods.programs
+    ? `${t.departments} & ${t.trainingPrograms}`
+    : t.departments
+
+  const rawSections = [
     {
       title: 'Main',
       items: [
@@ -126,7 +138,7 @@ function InstitutionAdminShell() {
           icon: <LayoutDashboard size={ICON_SIZE} />,
         },
         {
-          label: 'Organization',
+          label: t.organization,
           to: '/admin/institution/structure',
           active: isActive(['/admin/institution/structure', '/admin/institution/profile']),
           icon: <Network size={ICON_SIZE} />,
@@ -134,34 +146,36 @@ function InstitutionAdminShell() {
       ],
     },
     {
-      title: 'Academic',
+      title: org.edition === 'university' ? 'Academic' : 'Learning',
       items: [
         {
           label: 'Academic Calendar',
           to: '/admin/institution/academic-calendar',
           active: isActive(['/admin/institution/academic-calendar']),
           icon: <CalendarRange size={ICON_SIZE} />,
+          show: mods.programs,
         },
         {
-          label: 'Departments & Programs',
+          label: departmentsLabel,
           to: '/admin/institution/departments',
           active: isActive(['/admin/institution/departments', '/admin/institution/programs']),
           icon: <UserCog size={ICON_SIZE} />,
         },
         {
-          label: 'Course Catalog',
+          label: t.trainingCatalog,
           to: '/admin/courses',
           active: isActive(['/admin/courses']),
           icon: <BookOpen size={ICON_SIZE} />,
         },
         {
-          label: 'Course Offerings',
+          label: `${t.course} Offerings`,
           to: '/admin/course-offerings',
           active: isActive(['/admin/course-offerings']),
           icon: <Layers size={ICON_SIZE} />,
+          show: mods.programs,
         },
         {
-          label: 'Live Classes',
+          label: org.edition === 'university' ? 'Live Classes' : 'Live Sessions',
           to: '/admin/live-classes',
           active: isActive(['/admin/live-classes']),
           icon: <MonitorPlay size={ICON_SIZE} />,
@@ -173,7 +187,7 @@ function InstitutionAdminShell() {
           icon: <SquarePen size={ICON_SIZE} />,
         },
         {
-          label: 'Quizzes & Exams',
+          label: org.edition === 'university' ? 'Quizzes & Exams' : 'Assessments',
           to: '/admin/quizzes-exams',
           active: isActive(['/admin/quizzes-exams']),
           icon: <ClipboardList size={ICON_SIZE} />,
@@ -190,34 +204,39 @@ function InstitutionAdminShell() {
       title: 'People',
       items: [
         {
-          label: 'Enrollments',
+          label: t.trainingAssignment,
           to: '/admin/enrollments',
           active: isActive(['/admin/enrollments']),
           icon: <UserRoundCheck size={ICON_SIZE} />,
+          show: mods.enrollments,
         },
         {
-          label: 'Students',
+          label: t.learners,
           to: '/admin/students',
           active: isActive(['/admin/students']),
           icon: <GraduationCap size={ICON_SIZE} />,
+          show: mods.students,
         },
         {
-          label: 'Instructors',
+          label: `${t.trainer}s`,
           to: '/admin/instructors',
           active: isActive(['/admin/instructors']),
           icon: <UserRoundCog size={ICON_SIZE} />,
+          show: mods.instructors,
         },
         {
           label: 'Guardians',
           to: '/admin/guardians',
           active: isActive(['/admin/guardians']),
           icon: <HeartHandshake size={ICON_SIZE} />,
+          show: mods.guardians,
         },
         {
-          label: 'Staff',
+          label: mods.employees ? t.employees : 'Staff',
           to: '/admin/staff',
           active: isActive(['/admin/staff']),
           icon: <Briefcase size={ICON_SIZE} />,
+          show: mods.staff || mods.employees,
         },
         {
           label: 'Administrators',
@@ -244,7 +263,7 @@ function InstitutionAdminShell() {
       title: 'Engagement',
       items: [
         {
-          label: 'Certificates',
+          label: t.certificates,
           to: '/admin/certificates',
           active: isActive(['/admin/certificates']),
           icon: <BookCheck size={ICON_SIZE} />,
@@ -294,6 +313,7 @@ function InstitutionAdminShell() {
           to: '/admin/payments',
           active: isActive(['/admin/payments']),
           icon: <Wallet size={ICON_SIZE} />,
+          show: mods.payments,
         },
         {
           label: 'Reports & Analytics',
@@ -323,7 +343,16 @@ function InstitutionAdminShell() {
     },
   ]
 
+  // Drop items whose module is disabled for this edition, then any empty section.
+  const navSections = rawSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => (item as { show?: boolean }).show !== false),
+    }))
+    .filter((section) => section.items.length > 0)
+
   const breadcrumb =
+    getEditionConfig(org.edition).breadcrumbLabels[path] ??
     breadcrumbLabels[path] ??
     (path.startsWith('/admin/institution/profile') ? 'Campus Profile' : '')
 
@@ -341,10 +370,10 @@ function InstitutionAdminShell() {
       <div className="flex flex-col flex-1 min-w-0">
         <AdminTopHeader
           userName={person.name}
-          userRole="Institution Admin"
-          institutionName={institutionName}
+          userRole={t.adminRole}
+          institutionName={institutionName || org.organizationName}
           breadcrumb={breadcrumb}
-          campuses={campuses}
+          campuses={mods.campuses ? campuses : []}
           selectedCampusId={selectedCampusId}
           onCampusChange={setSelectedCampusId}
         />

@@ -1,6 +1,6 @@
 import type { PersonRole } from '../../modules/institution/types'
 
-export type LoginRole = PersonRole | 'Admin'
+export type LoginRole = PersonRole | 'Admin' | 'SuperAdmin'
 
 export const LOGIN_ROLES: { value: LoginRole; label: string }[] = [
   { value: 'Student', label: 'Student' },
@@ -9,6 +9,7 @@ export const LOGIN_ROLES: { value: LoginRole; label: string }[] = [
   { value: 'Guardian', label: 'Guardian' },
   { value: 'HelpDesk', label: 'Help Desk' },
   { value: 'Admin', label: 'Institution Admin' },
+  { value: 'SuperAdmin', label: 'Super Admin' },
 ]
 
 export const ROLE_HOME: Record<LoginRole, string> = {
@@ -18,6 +19,7 @@ export const ROLE_HOME: Record<LoginRole, string> = {
   Guardian: '/guardian',
   HelpDesk: '/help-desk',
   Admin: '/admin',
+  SuperAdmin: '/super-admin',
 }
 
 export function portalPathForRole(role: LoginRole): string {

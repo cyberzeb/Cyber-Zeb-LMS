@@ -86,3 +86,8 @@ class OtpVerifyResponse(TokenPair):
     person_id: str
     frontend_role: str
     display_name: str
+    # Populated when a provisioned institution admin signs in, so the frontend can
+    # switch the active tenant/edition and drop the user into their own workspace.
+    tenant_code: str | None = None
+    tenant_name: str | None = None
+    institution_type: str | None = None

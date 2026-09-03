@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { fetchAllCollections, putCollection, seedBackendCollections } from '../api/dataApi'
+import { activeTenantCode } from '../api/client'
+import { DEFAULT_TENANT_CODE } from '../api/collectionKeys'
 import { buildSeedPayload } from '../storage/buildSeedPayload'
 import { hydrateCache } from '../storage/dataCache'
 import { collectionQueryKey } from '../hooks/useApiCollection'
@@ -55,7 +57,10 @@ export function AppBootstrap({ children }: AppBootstrapProps) {
   const load = useCallback(async () => {
     let collections = await fetchAllCollections()
 
-    if (Object.keys(collections).length === 0) {
+    // Only the demo tenant is auto-seeded with the full sample dataset. A real
+    // institution created via onboarding starts from its own minimal seed and
+    // is populated by the admin, so we never overwrite it here.
+    if (Object.keys(collections).length === 0 && activeTenantCode() === DEFAULT_TENANT_CODE) {
       await seedBackendCollections(buildSeedPayload())
       collections = await fetchAllCollections()
     }
