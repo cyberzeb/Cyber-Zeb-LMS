@@ -32,10 +32,22 @@ import {
   readTeams,
   readJobRoles,
   readSkills,
+  readTrainingDivisions,
+  readTrainingPrograms,
+  readCohorts,
+  readLearners,
+  readTrainers,
 } from './readers'
 import { seedCorporateTeams } from '../../modules/corporate/data/teamsSeedData'
 import { seedJobRoles } from '../../modules/corporate/data/jobRolesSeedData'
 import { seedSkills } from '../../modules/corporate/data/skillsSeedData'
+import {
+  seedCohorts,
+  seedLearners,
+  seedTrainers,
+  seedTrainingDivisions,
+  seedTrainingPrograms,
+} from '../../modules/training/data/trainingSeedData'
 
 const INSTRUCTOR_IDS: Record<string, string> = {
   'Dr. Aaron Selassie': 'u2',
@@ -161,6 +173,31 @@ export function ensureDemoSeedData() {
 
     if (readSkills().length === 0) {
       window.localStorage.setItem(STORAGE_KEYS.skills, JSON.stringify(seedSkills))
+      changed = true
+    }
+
+    if (readTrainingDivisions().length === 0) {
+      window.localStorage.setItem(STORAGE_KEYS.trainingDivisions, JSON.stringify(seedTrainingDivisions))
+      changed = true
+    }
+
+    if (readTrainingPrograms().length === 0) {
+      window.localStorage.setItem(STORAGE_KEYS.trainingPrograms, JSON.stringify(seedTrainingPrograms))
+      changed = true
+    }
+
+    if (readCohorts().length === 0) {
+      window.localStorage.setItem(STORAGE_KEYS.cohorts, JSON.stringify(seedCohorts))
+      changed = true
+    }
+
+    if (readLearners().length === 0) {
+      window.localStorage.setItem(STORAGE_KEYS.learners, JSON.stringify(seedLearners))
+      changed = true
+    }
+
+    if (readTrainers().length === 0) {
+      window.localStorage.setItem(STORAGE_KEYS.trainers, JSON.stringify(seedTrainers))
       changed = true
     }
 

@@ -9,6 +9,13 @@ import type {
 } from '../../modules/institution/types'
 import type { Team } from '../../modules/corporate/types'
 import type { JobRole, Skill } from '../../modules/corporate/types'
+import type {
+  Cohort,
+  Learner,
+  Trainer,
+  TrainingDivision,
+  TrainingProgram,
+} from '../../modules/training/types'
 import type { AnnouncementRecord } from '../types/announcements'
 import type { ForumChatRecord, ForumMessageRecord } from '../types/forum'
 import { normalizeAnnouncementRecord } from './announcementUtils'
@@ -50,6 +57,26 @@ export function readSkills(): Skill[] {
 
 export function readPrograms(): ProgramRow[] {
   return readCached<ProgramRow[]>(STORAGE_KEYS.programs, [])
+}
+
+export function readTrainingPrograms(): TrainingProgram[] {
+  return readCached<TrainingProgram[]>(STORAGE_KEYS.trainingPrograms, [])
+}
+
+export function readTrainingDivisions(): TrainingDivision[] {
+  return readCached<TrainingDivision[]>(STORAGE_KEYS.trainingDivisions, [])
+}
+
+export function readCohorts(): Cohort[] {
+  return readCached<Cohort[]>(STORAGE_KEYS.cohorts, [])
+}
+
+export function readLearners(): Learner[] {
+  return readCached<Learner[]>(STORAGE_KEYS.learners, [])
+}
+
+export function readTrainers(): Trainer[] {
+  return readCached<Trainer[]>(STORAGE_KEYS.trainers, [])
 }
 
 export function readEnrollments(): CourseEnrollment[] {
