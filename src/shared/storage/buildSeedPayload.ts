@@ -37,6 +37,13 @@ import {
   seedCorporateDepartments,
 } from '../../modules/corporate/data/corporateOrgSeedData'
 import { buildCorporatePeopleSeed } from '../../modules/corporate/data/corporatePeopleSeedData'
+import {
+  seedCohorts,
+  seedLearners,
+  seedTrainers,
+  seedTrainingDivisions,
+  seedTrainingPrograms,
+} from '../../modules/training/data/trainingSeedData'
 import { getActiveEdition } from '../config/edition'
 
 const UNIVERSITY_INSTRUCTOR_IDS: Record<string, string> = {
@@ -265,6 +272,11 @@ export function buildSeedPayload(): Record<string, unknown> {
     'help-desk-tickets': seedHelpDeskTickets,
     integrations: seedIntegrations,
     programs: [],
+    'training-divisions': seedTrainingDivisions,
+    'training-programs': seedTrainingPrograms,
+    cohorts: seedCohorts,
+    learners: seedLearners,
+    trainers: seedTrainers,
     'student-settings': {},
     'instructor-settings': {},
     'staff-settings': {},

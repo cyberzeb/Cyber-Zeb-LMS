@@ -12,22 +12,11 @@ function TrainingPlaceholder({ title, subtitle, phase = 'Next sprint' }: Trainin
   )
 }
 
-export function AdminCohortsPage() {
-  return <TrainingPlaceholder title="Cohorts" subtitle="Manage class sessions, scheduling, and trainer assignments." />
-}
-
-export function AdminLearnersPage() {
-  return <TrainingPlaceholder title="Learners" subtitle="Manage trainees and their enrollments across cohorts." />
-}
-
-export function AdminTrainingProgramsPage() {
-  return <TrainingPlaceholder title="Training Programs" subtitle="Design and structure your training programs." />
-}
+export { CohortsPage as AdminCohortsPage } from '../modules/training/pages/CohortsPage'
+export { LearnersPage as AdminLearnersPage } from '../modules/training/pages/LearnersPage'
+export { TrainingProgramsPage as AdminTrainingProgramsPage } from '../modules/training/pages/TrainingProgramsPage'
+export { TrainersPage as AdminTrainersPage } from '../modules/training/pages/TrainersPage'
 
 export function AdminTrainingDivisionsPage() {
   return <TrainingPlaceholder title="Divisions" subtitle="Manage your organization's training divisions." />
-}
-
-export function AdminTrainersPage() {
-  return <TrainingPlaceholder title="Trainers" subtitle="Manage trainers and their cohort assignments." />
 }
