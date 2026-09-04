@@ -1,5 +1,6 @@
 interface MonogramProps {
-  label: string
+  label?: string
+  name?: string
   size?: 'xs' | 'sm' | 'md'
   className?: string
 }
@@ -10,7 +11,8 @@ const sizeClasses = {
   md: 'w-11 h-11 text-[13.5px] rounded-xl',
 }
 
-function getInitials(label: string): string {
+function getInitials(label?: string): string {
+  if (!label || typeof label !== 'string') return '?'
   const cleaned = label.replace(/[^a-zA-Z0-9\s]/g, ' ').trim()
   const words = cleaned.split(/\s+/).filter(Boolean)
   if (words.length === 0) return '?'
@@ -18,12 +20,13 @@ function getInitials(label: string): string {
   return (words[0][0] + words[1][0]).toUpperCase()
 }
 
-export function Monogram({ label, size = 'md', className = '' }: MonogramProps) {
+export function Monogram({ label, name, size = 'md', className = '' }: MonogramProps) {
+  const text = label ?? name ?? ''
   return (
     <div
       className={`shrink-0 flex items-center justify-center font-extrabold tracking-tight bg-gradient-to-br from-navy-700 to-navy-900 text-lemon-500 shadow-sm ${sizeClasses[size]} ${className}`}
     >
-      {getInitials(label)}
+      {getInitials(text)}
     </div>
   )
 }
