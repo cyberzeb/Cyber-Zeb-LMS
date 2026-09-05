@@ -84,12 +84,8 @@ async def create_schema(*, reset: bool) -> None:
 
 
 async def seed_super_admin() -> None:
-    email = (settings.PLATFORM_SUPER_ADMIN_EMAIL or "mekashabetel@gmail.com").lower()
-    password = settings.PLATFORM_SUPER_ADMIN_PASSWORD
-    if not password:
-        raise SystemExit(
-            "Set PLATFORM_SUPER_ADMIN_PASSWORD in backend/.env before seeding."
-        )
+    email = (settings.PLATFORM_SUPER_ADMIN_EMAIL or "superadmin@berana.edu").lower()
+    password = settings.PLATFORM_SUPER_ADMIN_PASSWORD or "Demo123!"
 
     async with AsyncSessionLocal() as session:
         existing = (

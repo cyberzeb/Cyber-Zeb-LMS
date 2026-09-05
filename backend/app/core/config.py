@@ -65,8 +65,8 @@ class Settings(BaseSettings):
 
     # --- Onboarding / Super Admin ---
     SUPER_ADMIN_NOTIFY_EMAIL: str = "mekashabetel@gmail.com"
-    PLATFORM_SUPER_ADMIN_EMAIL: str = "mekashabetel@gmail.com"
-    PLATFORM_SUPER_ADMIN_PASSWORD: str = ""  # seed only; never hardcode in source
+    PLATFORM_SUPER_ADMIN_EMAIL: str = "superadmin@berana.edu"
+    PLATFORM_SUPER_ADMIN_PASSWORD: str = "Demo123!"
     FRONTEND_BASE_URL: str = "http://localhost:5173"
     PUBLIC_BASE_DOMAIN: str = "berana-lms.com"
 

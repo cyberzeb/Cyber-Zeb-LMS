@@ -27,8 +27,12 @@ async def tenant_exists() -> bool:
 
 
 async def main() -> None:
+    from scripts.bootstrap_onboarding import seed_super_admin
+
+    await seed_super_admin()
+
     if await tenant_exists():
-        print(f"Tenant '{TENANT_CODE}' already exists — skipping seed.")
+        print(f"Tenant '{TENANT_CODE}' already exists — skipping demo tenant seed.")
         return
 
     print(f"No tenant '{TENANT_CODE}' found — running demo seed...")

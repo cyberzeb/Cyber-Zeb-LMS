@@ -232,6 +232,8 @@ ensure_env() {
   upsert_env DATABASE_URL "sqlite+aiosqlite:////code/data/brana_lms.db"
   upsert_env DATABASE_URL_SYNC "sqlite:////code/data/brana_lms.db"
   upsert_env JWT_SECRET_KEY "$jwt"
+  upsert_env PLATFORM_SUPER_ADMIN_EMAIL "superadmin@berana.edu"
+  upsert_env PLATFORM_SUPER_ADMIN_PASSWORD "Demo123!"
 }
 
 ensure_certs() {
