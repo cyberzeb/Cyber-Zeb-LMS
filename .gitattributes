@@ -1,0 +1,2 @@
+*.sh text eol=lf
+deploy/nginx-entrypoint.sh text eol=lf

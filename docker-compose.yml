@@ -1,5 +1,5 @@
-# Production stack (SQLite) — build on the VPS: docker compose up --build -d
-# Shared VPS: set HTTP_PORT in .env (e.g. 8085). See DEPLOY.md
+# Production stack (SQLite) — on the VPS: ./deploy/vps-docker.sh
+# Shared VPS: HTTP_PORT (default 7777) and HTTPS_PORT (default 8443).
 
 services:
   api:
@@ -14,6 +14,12 @@ services:
       DATABASE_URL_SYNC: sqlite:////code/data/brana_lms.db
     volumes:
       - brana_sqlite_data:/code/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 20s
 
   web:
     build:
@@ -24,12 +30,13 @@ services:
     container_name: brana_web
     restart: unless-stopped
     ports:
-      - "${HTTP_PORT:-8085}:80"
+      - "${HTTP_PORT:-7777}:80"
       - "${HTTPS_PORT:-8443}:443"
     volumes:
       - ./deploy/certs:/etc/nginx/certs:ro
     depends_on:
-      - api
+      api:
+        condition: service_healthy
 
 volumes:
   brana_sqlite_data:

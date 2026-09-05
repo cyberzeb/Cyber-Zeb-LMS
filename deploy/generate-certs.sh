@@ -1,15 +1,16 @@
 #!/bin/bash
 # Create a self-signed certificate for HTTPS on a VPS IP (no domain required).
-# Browsers will show a warning — stakeholders click Advanced → Proceed.
+# Prefer the complete deploy instead:
+#   ./deploy/vps-docker.sh --ip YOUR_VPS_IP
 #
 # Usage: ./deploy/generate-certs.sh YOUR_VPS_IP
-# Example: ./deploy/generate-certs.sh 203.0.113.10
 
 set -e
 
 IP="${1:-}"
 if [ -z "$IP" ]; then
   echo "Usage: ./deploy/generate-certs.sh YOUR_VPS_IP"
+  echo "Or run the full deploy: ./deploy/vps-docker.sh --ip YOUR_VPS_IP"
   exit 1
 fi
 
@@ -31,11 +32,7 @@ echo "Created:"
 echo "  $CERT_DIR/cert.pem"
 echo "  $CERT_DIR/key.pem"
 echo ""
-echo "Update .env:"
-echo "  USE_HTTPS=true"
-echo "  HTTPS_PORT=8443"
-echo "  PUBLIC_URL=https://${IP}:8443"
-echo "  CORS_ORIGINS=[\"https://${IP}:8443\"]"
+echo "Finish with the complete deploy script:"
+echo "  ./deploy/vps-docker.sh --ip $IP"
 echo ""
-echo "Then: docker compose up --build -d"
-echo "Open: https://${IP}:8443 (accept browser security warning once)"
+echo "Open: https://${IP}:8443 (accept the browser security warning once)"

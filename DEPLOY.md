@@ -1,97 +1,46 @@
 # Deploy on VPS with Docker
 
-Build and run **on the server**. No zip uploads, no local build required.
+One command **on the server**. Builds, configures, opens ports, and health-checks.
 
-Works on a **shared VPS** — uses a custom port (default **8085**) so it does not need 80/443.
+Works on a **shared VPS** — HTTP **7777** and HTTPS **8443** so it does not need 80/443.
 
 ---
 
 ## Quick start (on the VPS)
 
 ```bash
-# 1. Install Docker (once)
-curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker $USER
-# log out and SSH back in
-
-# 2. Get the code
-git clone <your-repo-url> Cyber-Zeb-LMS
-cd Cyber-Zeb-LMS
-
-# 3. Configure
-cp .env.docker.example .env
-nano .env
-# Set YOUR_VPS_IP, JWT_SECRET_KEY, HTTP_PORT=8085
-
-# 4. Build and run
+cd /home/lms/Cyber-Zeb-LMS
 chmod +x deploy/vps-docker.sh
-./deploy/vps-docker.sh
+./deploy/vps-docker.sh --ip 195.201.117.22
 ```
 
-Or without the helper script:
+IP is auto-detected if you omit `--ip`. First run takes a few minutes.
 
-```bash
-docker compose up --build -d
-```
-
-**Share with stakeholders:** `http://YOUR_VPS_IP:8085`  
+**Share with stakeholders:** `https://YOUR_VPS_IP:8443`  
+HTTP fallback: `http://YOUR_VPS_IP:7777`  
 **Demo login password:** `Demo123!`
 
----
+The browser will warn on the self-signed certificate. Click **Advanced → Proceed**.
 
-## HTTPS without a domain (self-signed)
-
-Let's Encrypt needs a domain name. For **IP-only** demos, use a **self-signed certificate** — free, works immediately. Browsers show a warning; stakeholders click **Advanced → Proceed** once.
+### Options
 
 ```bash
-cd ~/Cyber-Zeb-LMS
-chmod +x deploy/generate-certs.sh
-./deploy/generate-certs.sh YOUR_VPS_IP
-
-nano .env
+./deploy/vps-docker.sh --ip 195.201.117.22
+./deploy/vps-docker.sh --http-port 7777 --https-port 8443
+./deploy/vps-docker.sh --http-only
+./deploy/vps-docker.sh --postgres
 ```
-
-Set in `.env`:
-
-```env
-USE_HTTPS=true
-WEB_DOCKERFILE=Dockerfile.https
-HTTPS_PORT=8443
-PUBLIC_URL=https://YOUR_VPS_IP:8443
-CORS_ORIGINS=["https://YOUR_VPS_IP:8443"]
-JWT_SECRET_KEY=...
-```
-
-```bash
-sudo ufw allow 8443/tcp
-docker compose up --build -d
-```
-
-**Open:** `https://YOUR_VPS_IP:8443`
-
-Tell stakeholders: when the browser warns the connection is not private, choose **Advanced** → **Proceed to … (unsafe)**. This is normal for self-signed certs without a domain.
 
 ---
 
-## Pick a free port
+## What the script does
 
-```bash
-ss -tlnp | grep LISTEN
-```
-
-Set `HTTP_PORT` in `.env` to something free (e.g. `8085`, `8090`). Open it in the firewall:
-
-```bash
-sudo ufw allow 8085/tcp
-```
-
-Update `PUBLIC_URL` and `CORS_ORIGINS` to include the same port:
-
-```env
-HTTP_PORT=8085
-PUBLIC_URL=http://203.0.113.10:8085
-CORS_ORIGINS=["http://203.0.113.10:8085"]
-```
+1. Installs Docker and the compose plugin if they are missing
+2. Writes a complete `.env` (public IP, ports, JWT secret, CORS)
+3. Creates `deploy/certs/cert.pem` + `key.pem` when missing
+4. Allows TCP 7777 and 8443 in `ufw` (does not enable ufw)
+5. `docker compose up --build -d --force-recreate`
+6. `curl` health-checks `127.0.0.1:7777` and `127.0.0.1:8443`
 
 ---
 
@@ -104,28 +53,29 @@ CORS_ORIGINS=["http://203.0.113.10:8085"]
 
 Only **2 containers**. Demo data is seeded automatically on first start.
 
-Need Postgres instead? Use `docker compose -f docker-compose.postgres.yml up --build -d`.
+Need Postgres instead? `./deploy/vps-docker.sh --postgres`
 
 ---
 
 ## Useful commands
 
 ```bash
-docker compose ps              # status
-docker compose logs -f web api # logs
-docker compose up --build -d   # rebuild after git pull
-docker compose down            # stop
-docker compose down -v         # stop + wipe database
+docker compose ps
+docker compose logs -f web api
+./deploy/vps-docker.sh --ip YOUR_VPS_IP    # rebuild / repair
+docker compose down                        # stop
+docker compose down -v                     # stop + wipe database
 ```
+
+If `curl` works on the VPS but the browser does not, open **TCP 7777** and **TCP 8443** in the cloud firewall panel (Hetzner, etc.). Host `ufw` is not enough by itself.
 
 ---
 
 ## Get code onto the VPS without git
 
-If the repo is not on GitHub yet, one-time upload from your PC:
+From the project folder on Windows:
 
 ```powershell
-# From project folder - creates one zip
 deploy\build-and-pack.cmd
 ```
 
@@ -134,7 +84,8 @@ Upload `deploy\berana-release.zip` with WinSCP, then on the VPS:
 ```bash
 unzip berana-release.zip -d Cyber-Zeb-LMS
 cd Cyber-Zeb-LMS
-./deploy/vps-docker.sh
+chmod +x deploy/vps-docker.sh
+./deploy/vps-docker.sh --ip YOUR_VPS_IP
 ```
 
 ---
