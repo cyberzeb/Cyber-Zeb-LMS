@@ -38,11 +38,10 @@ usage() {
 Usage: ./deploy/vps-docker.sh [options]
 
   --ip ADDRESS          Public VPS IP (auto-detected if omitted)
-  --http-port PORT      Host HTTP port (default: 7777)
-  --https-port PORT     Host HTTPS port (default: 8443)
+  --http-port PORT      Host HTTP port (default: 7777, not 80)
+  --https-port PORT     Host HTTPS port (default: 8443, not 443)
   --http-only           Skip TLS certs; HTTP only
   --skip-firewall       Do not run ufw allow
-  --postgres            Use docker-compose.postgres.yml
   -h, --help            Show this help
 EOF
 }
@@ -66,7 +65,10 @@ while [ $# -gt 0 ]; do
       ;;
     --http-only) HTTP_ONLY=1; shift ;;
     --skip-firewall) SKIP_FIREWALL=1; shift ;;
-    --postgres) COMPOSE_FILE="docker-compose.postgres.yml"; shift ;;
+    --postgres)
+      echo "Postgres is disabled for this deploy. SQLite is used."
+      exit 1
+      ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1"; usage; exit 1 ;;
   esac
@@ -79,6 +81,15 @@ fi
 if ! echo "$HTTPS_PORT" | grep -Eq '^[0-9]+$'; then
   echo "Invalid --https-port: $HTTPS_PORT"
   exit 1
+fi
+
+if [ "$HTTP_PORT" = "80" ] || [ "$HTTP_PORT" = "443" ]; then
+  echo "Host port 80/443 are in use on this VPS. Using HTTP 7777 instead."
+  HTTP_PORT="7777"
+fi
+if [ "$HTTPS_PORT" = "80" ] || [ "$HTTPS_PORT" = "443" ]; then
+  echo "Host port 80/443 are in use on this VPS. Using HTTPS 8443 instead."
+  HTTPS_PORT="8443"
 fi
 
 log() { echo ""; echo "==> $*"; }

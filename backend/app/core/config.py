@@ -5,6 +5,7 @@ All environment-dependent values MUST come from here. Never hardcode
 secrets, provider keys, or environment-specific URLs anywhere else in
 the codebase (Blueprint Section 16 - Secrets).
 """
+import json
 from functools import lru_cache
 from typing import List
 
@@ -99,6 +100,25 @@ class Settings(BaseSettings):
     # --- Token encryption (Fernet key for OAuth tokens at rest) ---
     # Generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
     TOKEN_ENCRYPTION_KEY: str = ""
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, value):
+        if value is None or value == "":
+            return ["http://localhost:3000", "http://localhost:5173"]
+        if isinstance(value, list):
+            return value
+        if isinstance(value, str):
+            text = value.strip().strip("'")
+            if text.startswith("["):
+                try:
+                    parsed = json.loads(text)
+                    if isinstance(parsed, list):
+                        return parsed
+                except json.JSONDecodeError:
+                    return [part.strip().strip('"') for part in text.strip("[]").split(",") if part.strip()]
+            return [part.strip() for part in text.split(",") if part.strip()]
+        return value
 
     @field_validator("DEBUG", mode="before")
     @classmethod

@@ -10,25 +10,31 @@ from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.pool import StaticPool
 
 from app.core.config import settings
 
+_is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+
 _connect_args: dict = {}
-if settings.DATABASE_URL.startswith("postgresql+asyncpg://") and "neon.tech" in settings.DATABASE_URL:
-    # Neon and most managed Postgres require TLS; asyncpg uses `ssl` not sslmode.
+_engine_kwargs: dict = {"echo": settings.DEBUG, "connect_args": _connect_args}
+
+if _is_sqlite:
+    # QueuePool (pool_size/max_overflow) is invalid for SQLite and crashes startup.
+    _engine_kwargs["poolclass"] = StaticPool
+elif settings.DATABASE_URL.startswith("postgresql+asyncpg://") and "neon.tech" in settings.DATABASE_URL:
     import ssl as _ssl
 
-    _ssl_ctx = _ssl.create_default_context()
-    _connect_args["ssl"] = _ssl_ctx
+    _connect_args["ssl"] = _ssl.create_default_context()
+    _engine_kwargs["pool_pre_ping"] = True
+    _engine_kwargs["pool_size"] = 10
+    _engine_kwargs["max_overflow"] = 20
+else:
+    _engine_kwargs["pool_pre_ping"] = True
+    _engine_kwargs["pool_size"] = 10
+    _engine_kwargs["max_overflow"] = 20
 
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=settings.DEBUG,
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-    connect_args=_connect_args,
-)
+engine = create_async_engine(settings.DATABASE_URL, **_engine_kwargs)
 
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
@@ -41,6 +47,31 @@ AsyncSessionLocal = async_sessionmaker(
 class Base(DeclarativeBase):
     """Shared declarative base for every ORM model in every module."""
     pass
+
+
+async def init_db() -> None:
+    """Create tables for SQLite (and any empty database). Idempotent."""
+    import app.common.audit  # noqa: F401
+    import app.modules.academic.models  # noqa: F401
+    import app.modules.admin.models  # noqa: F401
+    import app.modules.assessments.models  # noqa: F401
+    import app.modules.attendance.models  # noqa: F401
+    import app.modules.certificates.models  # noqa: F401
+    import app.modules.communication.models  # noqa: F401
+    import app.modules.courses.models  # noqa: F401
+    import app.modules.enrollment.models  # noqa: F401
+    import app.modules.identity.models  # noqa: F401
+    import app.modules.integrations.models  # noqa: F401
+    import app.modules.live_sessions.models  # noqa: F401
+    import app.modules.lms_store.models  # noqa: F401
+    import app.modules.onboarding.models  # noqa: F401
+    import app.modules.parent_portal.models  # noqa: F401
+    import app.modules.payments.models  # noqa: F401
+    import app.modules.reports.models  # noqa: F401
+    import app.modules.tenants.models  # noqa: F401
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:

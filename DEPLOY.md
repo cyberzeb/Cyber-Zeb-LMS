@@ -28,7 +28,6 @@ The browser will warn on the self-signed certificate. Click **Advanced → Proce
 ./deploy/vps-docker.sh --ip 195.201.117.22
 ./deploy/vps-docker.sh --http-port 7777 --https-port 8443
 ./deploy/vps-docker.sh --http-only
-./deploy/vps-docker.sh --postgres
 ```
 
 ---
@@ -53,7 +52,7 @@ The browser will warn on the self-signed certificate. Click **Advanced → Proce
 
 Only **2 containers**. Demo data is seeded automatically on first start.
 
-Need Postgres instead? `./deploy/vps-docker.sh --postgres`
+Database is **SQLite** in a Docker volume (no Postgres).
 
 ---
 

@@ -1,5 +1,5 @@
-# Production stack (SQLite) — on the VPS: ./deploy/vps-docker.sh
-# Shared VPS: HTTP_PORT (default 7777) and HTTPS_PORT (default 8443).
+# SQLite production stack. Host 80/443 are left free for other sites.
+# Publish HTTP 7777 and HTTPS 8443 only. On the VPS: ./deploy/vps-docker.sh
 
 services:
   api:
@@ -19,7 +19,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 24
-      start_period: 20s
+      start_period: 40s
 
   web:
     build:
@@ -30,13 +30,12 @@ services:
     container_name: brana_web
     restart: unless-stopped
     ports:
-      - "${HTTP_PORT:-7777}:80"
-      - "${HTTPS_PORT:-8443}:443"
+      - "7777:80"
+      - "8443:443"
     volumes:
       - ./deploy/certs:/etc/nginx/certs:ro
     depends_on:
-      api:
-        condition: service_healthy
+      - api
 
 volumes:
   brana_sqlite_data:
