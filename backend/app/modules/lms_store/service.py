@@ -32,6 +32,7 @@ class LmsStoreService:
             code=tenant_code,
             name="Berana University" if tenant_code == "berana" else tenant_code,
             tenant_type=TenantType.COLLEGE_UNIVERSITY,
+            institution_type=TenantType.COLLEGE_UNIVERSITY,
             status=TenantStatus.ACTIVE,
             timezone="Africa/Addis_Ababa",
             locale="en",

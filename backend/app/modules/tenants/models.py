@@ -84,7 +84,8 @@ class Tenant(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         DateTime(timezone=True), nullable=True
     )
     institution_type: Mapped[InstitutionType] = mapped_column(
-        SAEnum(InstitutionType, name="institution_type", values_callable=_enum_values)
+        SAEnum(InstitutionType, name="institution_type", values_callable=_enum_values),
+        default=InstitutionType.COLLEGE_UNIVERSITY,
     )
 
     campuses: Mapped[list["Campus"]] = relationship(back_populates="tenant")

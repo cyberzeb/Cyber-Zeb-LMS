@@ -8,11 +8,24 @@ single choke point through which all DB access should flow.
 """
 from typing import AsyncGenerator
 
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.pool import StaticPool
 
 from app.core.config import settings
+
+
+@compiles(JSONB, "sqlite")
+def _sqlite_jsonb(_type, _compiler, **_kw):
+    return "JSON"
+
+
+@compiles(PG_UUID, "sqlite")
+def _sqlite_pg_uuid(_type, _compiler, **_kw):
+    return "CHAR(36)"
 
 _is_sqlite = settings.DATABASE_URL.startswith("sqlite")
 
@@ -72,6 +85,15 @@ async def init_db() -> None:
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+    from sqlalchemy import inspect as sa_inspect
+
+    def _has_tenants(sync_conn) -> bool:
+        return sa_inspect(sync_conn).has_table("tenants")
+
+    async with engine.connect() as conn:
+        if not await conn.run_sync(_has_tenants):
+            raise RuntimeError("SQLite init_db ran but table 'tenants' was not created")
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:

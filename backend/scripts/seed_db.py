@@ -47,6 +47,7 @@ async def ensure_tenant(db) -> Tenant:
         code=TENANT_CODE,
         name=TENANT_NAME,
         tenant_type=TenantType.COLLEGE_UNIVERSITY,
+        institution_type=TenantType.COLLEGE_UNIVERSITY,
         status=TenantStatus.ACTIVE,
         timezone="Africa/Addis_Ababa",
         locale="en",
