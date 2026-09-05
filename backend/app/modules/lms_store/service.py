@@ -20,6 +20,30 @@ class LmsStoreService:
             raise NotFoundError(f"Institution '{tenant_code}' not found")
         return tenant.id
 
+    async def ensure_tenant_id(self, tenant_code: str) -> uuid.UUID:
+        """Resolve tenant, creating the demo institution if the database is empty."""
+        tenant = await self.tenant_repo.get_by_code(tenant_code)
+        if tenant:
+            return tenant.id
+
+        from app.modules.tenants.models import Tenant, TenantStatus, TenantType
+
+        tenant = Tenant(
+            code=tenant_code,
+            name="Berana University" if tenant_code == "berana" else tenant_code,
+            tenant_type=TenantType.COLLEGE_UNIVERSITY,
+            status=TenantStatus.ACTIVE,
+            timezone="Africa/Addis_Ababa",
+            locale="en",
+            currency="ETB",
+            settings={"demo": True},
+            slug=tenant_code,
+        )
+        self.db.add(tenant)
+        await self.db.commit()
+        await self.db.refresh(tenant)
+        return tenant.id
+
     async def get_collection(self, tenant_id: uuid.UUID, key: str, default: Any = None) -> Any:
         row = await self.repo.get(tenant_id, key)
         if row is None:

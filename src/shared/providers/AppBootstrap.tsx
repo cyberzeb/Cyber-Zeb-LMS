@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { fetchAllCollections, putCollection, seedBackendCollections } from '../api/dataApi'
-import { activeTenantCode } from '../api/client'
+import { activeTenantCode, setAccessToken } from '../api/client'
 import { DEFAULT_TENANT_CODE } from '../api/collectionKeys'
 import { buildSeedPayload } from '../storage/buildSeedPayload'
 import { hydrateCache } from '../storage/dataCache'
@@ -32,9 +32,9 @@ function BackendErrorScreen({ message, onRetry }: { message: string; onRetry: ()
         <h1 className="text-lg font-extrabold text-white">Backend unavailable</h1>
         <p className="text-sm text-white/70 leading-relaxed">{message}</p>
         <p className="text-xs text-white/50 leading-relaxed">
-          Start the API server on port 8001, then run{' '}
-          <code className="text-white/70">python scripts/seed_db.py</code> from the backend folder if
-          the database is empty.
+          The API is reached at <code className="text-white/70">/api/v1</code> on this same host.
+          If you still see 401, clear site cookies and retry. On the server, check{' '}
+          <code className="text-white/70">docker compose logs api</code>.
         </p>
         <button
           type="button"
@@ -55,7 +55,19 @@ export function AppBootstrap({ children }: AppBootstrapProps) {
   const [retryCount, setRetryCount] = useState(0)
 
   const load = useCallback(async () => {
-    let collections = await fetchAllCollections()
+    let collections: Record<string, unknown>
+    try {
+      collections = await fetchAllCollections()
+    } catch (err) {
+      const status = (err as { response?: { status?: number } })?.response?.status
+      const message = err instanceof Error ? err.message : ''
+      if (status === 401 || message.includes('401')) {
+        setAccessToken(null)
+        collections = await fetchAllCollections()
+      } else {
+        throw err
+      }
+    }
 
     // Only the demo tenant is auto-seeded with the full sample dataset. A real
     // institution created via onboarding starts from its own minimal seed and

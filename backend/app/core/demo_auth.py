@@ -55,26 +55,20 @@ async def get_demo_principal(
     if token:
         try:
             payload = decode_token(token)
-        except JWTError:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Could not validate credentials",
-            )
-        if payload.get("type") != "access":
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token type")
-        try:
-            return DemoPrincipal(
-                tenant_id=UUID(payload["tenant_id"]),
-                person_id=str(payload["sub"]),
-                role=Role(payload["role"]),
-                frontend_role=str(payload.get("frontend_role", payload["role"])),
-            )
-        except (KeyError, ValueError):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Malformed token claims")
+            if payload.get("type") == "access":
+                return DemoPrincipal(
+                    tenant_id=UUID(payload["tenant_id"]),
+                    person_id=str(payload["sub"]),
+                    role=Role(payload["role"]),
+                    frontend_role=str(payload.get("frontend_role", payload["role"])),
+                )
+        except (JWTError, KeyError, ValueError, HTTPException):
+            # Stale cookies from a previous deploy must not block the demo.
+            pass
 
     tenant_code = x_tenant_code or DEFAULT_DEMO_TENANT_CODE
     service = LmsStoreService(db)
-    tenant_id = await service.resolve_tenant_id(tenant_code)
+    tenant_id = await service.ensure_tenant_id(tenant_code)
 
     return DemoPrincipal(
         tenant_id=tenant_id,

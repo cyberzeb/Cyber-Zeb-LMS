@@ -61,6 +61,6 @@ async def seed_data(
 ):
     """Development-only bulk seed. Replaces all collections for the demo tenant."""
     service = LmsStoreService(db)
-    tenant_id = await service.resolve_tenant_id(tenant_code)
+    tenant_id = await service.ensure_tenant_id(tenant_code)
     count = await service.seed_collections(tenant_id, payload.collections)
     return {"seeded": count, "tenant_code": tenant_code}
