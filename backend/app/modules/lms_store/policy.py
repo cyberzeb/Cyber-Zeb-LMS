@@ -4,49 +4,50 @@ Write-permission policy for LMS data-store collections.
 Tenant admins (institution / academic / training admin) may change anything in
 their own tenant. Every other role may only change the collections listed here,
 and only the records the rule allows. A collection or role that is not listed is
-read-only for that role.
+read-only for that role. Read access is handled separately in `scope.py`.
 
 Collections come in two shapes:
 - list collections: arrays of records, each with a string `id`
 - keyed collections: objects whose top-level keys are person ids
   (lesson progress, forum read state, per-person portal settings)
 
-Known gaps, tracked for Phase 2:
-- reads are not scoped yet: every signed-in user can read every collection
-- instructors may change teaching records tenant-wide, not only for their courses
-- students record their own quiz scores (there is no server-side grading yet)
+Scores and payments are never written by students directly: quiz attempts are
+graded by `POST /assessments/quizzes/{id}/attempts` and invoices are settled by
+the payments checkout flow.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from typing import Any, Awaitable, Callable, Optional
 
 from app.core.permissions import Role
+from app.modules.lms_store.scope import KEYED_COLLECTIONS, ScopeContext
 
 Record = dict[str, Any]
-OwnerCheck = Callable[[Record, str], bool]
+Check = Callable[[Record, ScopeContext], Awaitable[bool]]
+UpdateCheck = Callable[[Record, Record, ScopeContext], Awaitable[bool]]
 
 
-def owned_by(*fields: str) -> OwnerCheck:
+async def _anyone(_record: Record, _ctx: ScopeContext) -> bool:
+    return True
+
+
+def owned_by(*fields: str) -> Check:
     """Record is owned when any of `fields` equals (or, for lists, contains) the person id."""
 
-    def check(record: Record, person_id: str) -> bool:
+    async def check(record: Record, ctx: ScopeContext) -> bool:
         for name in fields:
             value = record.get(name)
-            if value == person_id or (isinstance(value, list) and person_id in value):
+            if value == ctx.person_id or (isinstance(value, list) and ctx.person_id in value):
                 return True
         return False
 
     return check
 
 
-def _anyone(_record: Record, _person_id: str) -> bool:
-    return True
-
-
 @dataclass(frozen=True)
 class Rule:
-    owner: OwnerCheck = _anyone
+    owner: Check = _anyone
     create: bool = False
     update: bool = False
     delete: bool = False
@@ -54,12 +55,89 @@ class Rule:
     owned_update_fields: Optional[frozenset[str]] = None
     # Fields anyone with this rule may change on records they do not own.
     shared_update_fields: frozenset[str] = field(default_factory=frozenset)
-    # Extra validation for newly created records.
-    create_check: Optional[Callable[[Record, str], bool]] = None
+    # Extra validation for newly created records (defaults to the owner check).
+    create_check: Optional[Check] = None
+    # Extra validation for updates of owned records.
+    update_check: Optional[UpdateCheck] = None
 
 
-FULL = Rule(create=True, update=True, delete=True)
+# ── Instructor course ownership ─────────────────────────────────────────────
 
+
+async def _in_taught_course(record: Record, ctx: ScopeContext) -> bool:
+    course_id = record.get("courseId")
+    if course_id:
+        return course_id in await ctx.taught_course_ids()
+    return record.get("instructorId") == ctx.person_id
+
+
+async def _question_owned(record: Record, ctx: ScopeContext) -> bool:
+    # Questions without a course are shared bank items any instructor may maintain.
+    return not record.get("courseId") or record.get("courseId") in await ctx.taught_course_ids()
+
+
+async def _submission_for_taught_course(record: Record, ctx: ScopeContext) -> bool:
+    return record.get("assessmentId") in await ctx.assessment_ids(await ctx.taught_course_ids())
+
+
+async def _course_owned(record: Record, ctx: ScopeContext) -> bool:
+    return (
+        record.get("id") in await ctx.taught_course_ids()
+        or record.get("instructorId") == ctx.person_id
+        or record.get("submittedByInstructorId") == ctx.person_id
+    )
+
+
+async def _course_create(record: Record, ctx: ScopeContext) -> bool:
+    # Instructors may propose courses; only admins approve them.
+    proposer = record.get("submittedByInstructorId") == ctx.person_id or record.get("instructorId") == ctx.person_id
+    return proposer and record.get("approvalStatus") != "approved"
+
+
+async def _course_update(old: Record, new: Record, ctx: ScopeContext) -> bool:
+    if new.get("approvalStatus") != old.get("approvalStatus") and new.get("approvalStatus") == "approved":
+        return False
+    return new.get("instructorId") == old.get("instructorId")
+
+
+# ── Learner submissions (assignments only; quizzes are graded on the server) ─
+
+STUDENT_SUBMISSION_FIELDS = frozenset({"status", "submittedAt", "attachmentName", "maxScore"})
+GRADE_FIELDS = ("score", "feedback", "gradedAt", "gradedBy")
+
+
+async def _student_assignment_create(record: Record, ctx: ScopeContext) -> bool:
+    if record.get("studentId") != ctx.person_id or record.get("assessmentType") != "assignment":
+        return False
+    if record.get("status") != "submitted" or any(record.get(f) is not None for f in GRADE_FIELDS):
+        return False
+    return record.get("assessmentId") in await ctx.assessment_ids(await ctx.student_course_ids())
+
+
+async def _student_assignment_update(old: Record, new: Record, _ctx: ScopeContext) -> bool:
+    return old.get("assessmentType") == "assignment" and new.get("status") == "submitted"
+
+
+async def _staff_submission_is_pending(record: Record, ctx: ScopeContext) -> bool:
+    return record.get("verificationStatus") == "pending" and record.get("submittedById") == ctx.person_id
+
+
+async def _forum_message_create(record: Record, ctx: ScopeContext) -> bool:
+    # The campus chat welcome message is generated client-side as a "system" message.
+    if record.get("senderId") not in (ctx.person_id, "system"):
+        return False
+    return record.get("chatId") in await ctx.visible_chat_ids()
+
+
+async def _forum_chat_create(record: Record, ctx: ScopeContext) -> bool:
+    if record.get("type") == "course":
+        return record.get("createdById") == "system"
+    if record.get("type") == "campus":
+        return True
+    return record.get("createdById") == ctx.person_id
+
+
+TEACHING_ROLES = (Role.INSTRUCTOR, Role.TEACHING_ASSISTANT)
 ALL_PORTAL_ROLES = (
     Role.STUDENT,
     Role.INSTRUCTOR,
@@ -70,50 +148,56 @@ ALL_PORTAL_ROLES = (
     Role.FINANCE_OFFICER,
     Role.MANAGER,
 )
-TEACHING_ROLES = (Role.INSTRUCTOR, Role.TEACHING_ASSISTANT)
 
-# Keyed collections: top-level key must be the caller's own person id.
-KEYED_COLLECTIONS = frozenset(
-    {
-        "lesson-progress",
-        "lesson-responses",
-        "forum-read-state",
-        "student-settings",
-        "instructor-settings",
-        "staff-settings",
-        "guardian-settings",
-        "help-desk-settings",
-    }
-)
-KEYED_SELF_WRITABLE = KEYED_COLLECTIONS  # every portal role may edit its own entry
-
-
-def _staff_submission_is_pending(record: Record, person_id: str) -> bool:
-    return record.get("verificationStatus") == "pending" and record.get("submittedById") == person_id
-
-
-def _forum_message_create(record: Record, person_id: str) -> bool:
-    # The campus chat welcome message is generated client-side as a "system" message.
-    return record.get("senderId") in (person_id, "system")
-
-
-_teaching = {role: FULL for role in TEACHING_ROLES}
+_course_scoped = Rule(owner=_in_taught_course, create=True, update=True, delete=True)
+_teaching = {role: _course_scoped for role in TEACHING_ROLES}
 _ticket_requester = Rule(owner=owned_by("requesterId"), create=True, update=True)
 _announcement_viewer = Rule(shared_update_fields=frozenset({"views", "viewedBy"}))
+_announcement_author = Rule(
+    owner=owned_by("authorId"),
+    create=True,
+    update=True,
+    delete=True,
+    shared_update_fields=frozenset({"views", "viewedBy"}),
+)
+_last_message_fields = frozenset(
+    {"lastMessageAt", "lastMessagePreview", "lastMessageSenderName", "updatedAt"}
+)
 
 POLICY: dict[str, dict[Role, Rule]] = {
-    # Teaching content — instructors manage it (tenant-wide for now).
+    # Teaching content — instructors manage records of the courses they teach.
     "live-sessions": dict(_teaching),
     "assignments": dict(_teaching),
     "quizzes": dict(_teaching),
-    "question-bank": dict(_teaching),
     "attendances": dict(_teaching),
     "certificates": dict(_teaching),
-    "courses": dict(_teaching),
+    "question-bank": {
+        role: Rule(owner=_question_owned, create=True, update=True, delete=True) for role in TEACHING_ROLES
+    },
+    "courses": {
+        role: Rule(
+            owner=_course_owned,
+            create=True,
+            update=True,
+            create_check=_course_create,
+            update_check=_course_update,
+        )
+        for role in TEACHING_ROLES
+    },
     # Learner activity.
     "student-submissions": {
-        **_teaching,
-        Role.STUDENT: Rule(owner=owned_by("studentId"), create=True, update=True),
+        **{
+            role: Rule(owner=_submission_for_taught_course, create=True, update=True)
+            for role in TEACHING_ROLES
+        },
+        Role.STUDENT: Rule(
+            owner=owned_by("studentId"),
+            create=True,
+            update=True,
+            owned_update_fields=STUDENT_SUBMISSION_FIELDS,
+            create_check=_student_assignment_create,
+            update_check=_student_assignment_update,
+        ),
     },
     "enrollments": {
         Role.STUDENT: Rule(
@@ -122,26 +206,27 @@ POLICY: dict[str, dict[Role, Rule]] = {
             owned_update_fields=frozenset({"progress"}),
         ),
     },
-    # Simulated online payment until a real gateway exists (Phase 2).
-    "payments": {
-        Role.STUDENT: Rule(
-            owner=owned_by("studentId"),
-            update=True,
-            owned_update_fields=frozenset({"status", "paidAt", "method", "reference"}),
-        ),
-        Role.FINANCE_OFFICER: FULL,
-    },
+    "payments": {Role.FINANCE_OFFICER: Rule(create=True, update=True, delete=True)},
     # Support.
     "help-desk-tickets": {
         **{role: _ticket_requester for role in ALL_PORTAL_ROLES},
-        Role.SUPPORT_AGENT: FULL,
+        Role.SUPPORT_AGENT: Rule(create=True, update=True, delete=True),
     },
     # Communication.
     "announcements": {
         **{role: _announcement_viewer for role in ALL_PORTAL_ROLES},
-        **_teaching,
+        **{role: _announcement_author for role in TEACHING_ROLES},
     },
-    "forum-chats": {role: Rule(create=True, update=True) for role in ALL_PORTAL_ROLES},
+    "forum-chats": {
+        role: Rule(
+            owner=owned_by("createdById", "memberIds"),
+            create=True,
+            update=True,
+            create_check=_forum_chat_create,
+            shared_update_fields=_last_message_fields,
+        )
+        for role in ALL_PORTAL_ROLES
+    },
     "forum-messages": {
         role: Rule(
             owner=owned_by("senderId"),
@@ -159,7 +244,6 @@ POLICY: dict[str, dict[Role, Rule]] = {
             create=True,
             update=True,
             delete=True,
-            create_check=_staff_submission_is_pending,
         ),
     },
 }
@@ -174,30 +258,27 @@ def _changed_fields(old: Record, new: Record) -> set[str]:
     return {k for k in keys if old.get(k) != new.get(k)}
 
 
-def check_record_change(
+async def check_record_change(
     collection: str,
-    role: Role,
-    person_id: str,
+    ctx: ScopeContext,
     old: Optional[Record],
     new: Optional[Record],
 ) -> None:
     """Validate one record-level change (create when old is None, delete when new is None)."""
-    rule = POLICY.get(collection, {}).get(role)
+    rule = POLICY.get(collection, {}).get(ctx.role)
     record_id = (new or old or {}).get("id", "?")
     denied = PolicyViolation(f"You are not allowed to change {collection} record '{record_id}'")
     if rule is None:
         raise denied
 
     if old is None and new is not None:
-        allowed = rule.create and (
-            rule.create_check(new, person_id) if rule.create_check else rule.owner(new, person_id)
-        )
-        if not allowed:
+        check = rule.create_check or rule.owner
+        if not (rule.create and await check(new, ctx)):
             raise denied
         return
 
     if new is None and old is not None:
-        if not (rule.delete and rule.owner(old, person_id)):
+        if not (rule.delete and await rule.owner(old, ctx)):
             raise denied
         return
 
@@ -205,8 +286,9 @@ def check_record_change(
     changed = _changed_fields(old, new)
     if not changed:
         return
-    if rule.update and rule.owner(old, person_id) and rule.owner(new, person_id):
-        if rule.owned_update_fields is None or changed <= rule.owned_update_fields:
+    if rule.update and await rule.owner(old, ctx) and await rule.owner(new, ctx):
+        fields_ok = rule.owned_update_fields is None or changed <= rule.owned_update_fields
+        if fields_ok and (rule.update_check is None or await rule.update_check(old, new, ctx)):
             return
     if rule.shared_update_fields and changed <= rule.shared_update_fields:
         return
@@ -215,5 +297,5 @@ def check_record_change(
 
 def check_keyed_change(collection: str, person_id: str, key: str) -> None:
     """Keyed collections: callers may only write their own top-level entry."""
-    if collection not in KEYED_SELF_WRITABLE or key != person_id:
+    if collection not in KEYED_COLLECTIONS or key != person_id:
         raise PolicyViolation(f"You are not allowed to change {collection} entry '{key}'")

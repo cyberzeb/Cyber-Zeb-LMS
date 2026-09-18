@@ -249,52 +249,6 @@ export function useStudentSubmissions() {
     [setRecords],
   )
 
-  const submitQuizAttempt = useCallback(
-    (
-      studentId: string,
-      quizId: string,
-      score: number,
-      maxScore: number,
-    ) => {
-      const now = new Date().toISOString()
-      setRecords((prev) => {
-        const existing = prev.find(
-          (s) =>
-            s.studentId === studentId &&
-            s.assessmentType === 'quiz' &&
-            s.assessmentId === quizId,
-        )
-        if (existing) {
-          return prev.map((s) =>
-            s.id === existing.id
-              ? {
-                  ...s,
-                  status: 'graded' as const,
-                  score,
-                  maxScore,
-                  submittedAt: now,
-                }
-              : s,
-          )
-        }
-        return [
-          {
-            id: createId('sub'),
-            studentId,
-            assessmentType: 'quiz' as const,
-            assessmentId: quizId,
-            status: 'graded' as const,
-            score,
-            maxScore,
-            submittedAt: now,
-          },
-          ...prev,
-        ]
-      })
-    },
-    [setRecords],
-  )
-
   const gradeSubmission = useCallback(
     (
       submissionId: string,
@@ -317,7 +271,6 @@ export function useStudentSubmissions() {
     records,
     setRecords,
     submitAssignment,
-    submitQuizAttempt,
     gradeSubmission,
   }
 }

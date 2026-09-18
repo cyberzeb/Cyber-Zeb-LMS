@@ -3,15 +3,17 @@ import { BrainCircuit } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { Modal } from '../../../shared/components/Modal'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
+import { useQueryClient } from '@tanstack/react-query'
+import { apiErrorMessage } from '../../../shared/api/client'
+import { submitQuizAttempt } from '../../../shared/api/assessmentsApi'
+import { refreshCollection } from '../../../shared/hooks/useApiCollection'
+import { STORAGE_EVENTS, STORAGE_KEYS } from '../../../shared/storage/keys'
 import { readQuestionBank, readQuizRecords } from '../../../shared/storage/readers'
-import { scoreQuizAnswers } from '../../../shared/utils/quizScoringUtils'
-import { useStudentSubmissions } from '../../institution/hooks/useAssessments'
 
 interface QuizAttemptModalProps {
   open: boolean
   onClose: () => void
   quizId: string
-  studentId: string
   onSubmitted?: () => void
 }
 
@@ -19,12 +21,12 @@ export function QuizAttemptModal({
   open,
   onClose,
   quizId,
-  studentId,
   onSubmitted,
 }: QuizAttemptModalProps) {
   const { notify } = useToast()
-  const { submitQuizAttempt } = useStudentSubmissions()
+  const queryClient = useQueryClient()
   const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [submitting, setSubmitting] = useState(false)
 
   const quiz = useMemo(() => readQuizRecords().find((q) => q.id === quizId), [quizId, open])
 
@@ -41,8 +43,8 @@ export function QuizAttemptModal({
     onClose()
   }
 
-  const handleSubmit = () => {
-    if (!quiz) return
+  const handleSubmit = async () => {
+    if (!quiz || submitting) return
 
     const unanswered = questions.filter((q) => !answers[q.id]?.trim())
     if (unanswered.length > 0) {
@@ -50,12 +52,21 @@ export function QuizAttemptModal({
       return
     }
 
-    const { score, maxScore } = scoreQuizAnswers(questions, answers)
-    submitQuizAttempt(studentId, quiz.id, score, maxScore || quiz.maxPoints)
-    notify(`Quiz submitted — score ${score}/${maxScore || quiz.maxPoints}.`)
-    setAnswers({})
-    onClose()
-    onSubmitted?.()
+    // Graded on the server against the answer key (never sent to students).
+    setSubmitting(true)
+    try {
+      const result = await submitQuizAttempt(quiz.id, answers)
+      await refreshCollection(queryClient, STORAGE_KEYS.studentSubmissions)
+      window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.assessmentsUpdated))
+      notify(`Quiz submitted — score ${result.score}/${result.max_score}.`)
+      setAnswers({})
+      onClose()
+      onSubmitted?.()
+    } catch (err) {
+      notify(apiErrorMessage(err) ?? 'Your quiz could not be submitted. Please try again.', 'error')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (!quiz) return null
@@ -70,7 +81,9 @@ export function QuizAttemptModal({
       footer={
         <>
           <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-          <Button variant="primary" onClick={handleSubmit}>Submit quiz</Button>
+          <Button variant="primary" onClick={() => void handleSubmit()} disabled={submitting}>
+            {submitting ? 'Submitting…' : 'Submit quiz'}
+          </Button>
         </>
       }
     >

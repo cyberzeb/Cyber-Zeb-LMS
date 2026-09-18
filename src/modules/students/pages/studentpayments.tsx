@@ -1,4 +1,6 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { CheckCircle2, CreditCard, Receipt, Wallet } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
@@ -6,7 +8,10 @@ import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
-import { usePayments } from '../../institution/hooks/usePlatformStorage'
+import { apiErrorMessage } from '../../../shared/api/client'
+import { checkoutInvoice, verifyCheckout } from '../../../shared/api/paymentsApi'
+import { refreshCollection } from '../../../shared/hooks/useApiCollection'
+import { STORAGE_KEYS } from '../../../shared/storage/keys'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
 import type { PaymentItem } from '../types'
@@ -31,8 +36,35 @@ const statusAccent: Record<PaymentItem['status'], string> = {
 
 export function StudentPaymentsPage() {
   const { notify } = useToast()
-  const { markPaid } = usePayments()
+  const queryClient = useQueryClient()
   const { data, isLoading, isError, reload } = useStudentDashboard()
+  const [payingId, setPayingId] = useState<string | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const verifiedRef = useRef<string | null>(null)
+
+  // Returning from the payment provider: confirm the payment on the server.
+  const txRef = searchParams.get('tx_ref')
+  useEffect(() => {
+    if (!txRef || verifiedRef.current === txRef) return
+    verifiedRef.current = txRef
+    void (async () => {
+      try {
+        const result = await verifyCheckout(txRef)
+        await refreshCollection(queryClient, STORAGE_KEYS.payments)
+        void reload()
+        notify(
+          result.status === 'paid'
+            ? 'Payment confirmed. Thank you!'
+            : 'Your payment is still being processed. Check back shortly.',
+          result.status === 'paid' ? 'success' : 'info',
+        )
+      } catch (err) {
+        notify(apiErrorMessage(err) ?? 'We could not confirm your payment.', 'error')
+      } finally {
+        setSearchParams({}, { replace: true })
+      }
+    })()
+  }, [txRef, notify, queryClient, reload, setSearchParams])
 
   const stats = useMemo(() => {
     if (!data) return { pending: 0, paid: 0, overdue: 0 }
@@ -49,10 +81,23 @@ export function StudentPaymentsPage() {
   const outstanding = data.payments.filter((p) => p.status !== 'paid')
   const nextDue = outstanding[0]
 
-  const handlePay = (paymentId: string, label: string) => {
-    markPaid(paymentId)
-    notify(`Payment for "${label}" submitted successfully.`)
-    void reload()
+  const handlePay = async (paymentId: string, label: string) => {
+    if (payingId) return
+    setPayingId(paymentId)
+    try {
+      const result = await checkoutInvoice(paymentId, '/student/payments')
+      if (result.status === 'redirect' && result.checkout_url) {
+        window.location.assign(result.checkout_url)
+        return
+      }
+      await refreshCollection(queryClient, STORAGE_KEYS.payments)
+      notify(`Payment for "${label}" completed.`)
+      void reload()
+    } catch (err) {
+      notify(apiErrorMessage(err) ?? 'Payment could not be started. Please try again.', 'error')
+    } finally {
+      setPayingId(null)
+    }
   }
 
   return (
@@ -62,9 +107,13 @@ export function StudentPaymentsPage() {
         subtitle="Tuition, lab fees, and registration — view balances and pay online."
         actions={
           outstanding.length > 0 ? (
-            <Button variant="primary">
+            <Button
+              variant="primary"
+              disabled={payingId !== null}
+              onClick={() => nextDue && void handlePay(nextDue.id, nextDue.label)}
+            >
               <CreditCard size={15} />
-              Pay outstanding
+              Pay next due
             </Button>
           ) : undefined
         }
@@ -86,7 +135,7 @@ export function StudentPaymentsPage() {
             </div>
             <div className="text-left md:text-right">
               <div className="text-[28px] font-extrabold text-navy-900 leading-none">{nextDue.amount}</div>
-              <Button variant="primary" size="sm" className="mt-3" onClick={() => handlePay(nextDue.id, nextDue.label)}>
+              <Button variant="primary" size="sm" className="mt-3" onClick={() => void handlePay(nextDue.id, nextDue.label)} disabled={payingId !== null}>
                 Pay now
               </Button>
             </div>
@@ -161,7 +210,8 @@ export function StudentPaymentsPage() {
                   <Button
                     variant={payment.status === 'overdue' ? 'primary' : 'secondary'}
                     size="sm"
-                    onClick={() => handlePay(payment.id, payment.label)}
+                    onClick={() => void handlePay(payment.id, payment.label)}
+                    disabled={payingId !== null}
                   >
                     Pay now
                   </Button>

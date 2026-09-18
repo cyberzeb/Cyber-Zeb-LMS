@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.exceptions import NotFoundError, PermissionDeniedError, ValidationAppError
 from app.core.permissions import Role
 from app.modules.lms_store import policy
+from app.modules.lms_store.scope import ScopeContext, filter_collection
 from app.modules.lms_store.repository import LmsCollectionRepository
 from app.modules.tenants.repository import TenantRepository
 
@@ -15,6 +16,34 @@ class LmsStoreService:
         self.db = db
         self.repo = LmsCollectionRepository(db)
         self.tenant_repo = TenantRepository(db)
+
+    def scope_context(self, tenant_id: uuid.UUID, person_id: str, role: Role) -> ScopeContext:
+        async def loader(key: str) -> Any:
+            return await self.get_collection(tenant_id, key)
+
+        return ScopeContext(loader, person_id, role)
+
+    async def read_collection(
+        self, tenant_id: uuid.UUID, key: str, *, role: Role, person_id: str, is_admin: bool
+    ) -> Any:
+        data = await self.get_collection(tenant_id, key)
+        if is_admin:
+            return data
+        return await filter_collection(key, data, self.scope_context(tenant_id, person_id, role))
+
+    async def read_all_collections(
+        self, tenant_id: uuid.UUID, *, role: Role, person_id: str, is_admin: bool
+    ) -> dict[str, Any]:
+        collections = await self.list_collections(tenant_id)
+        if is_admin:
+            return collections
+        ctx = self.scope_context(tenant_id, person_id, role)
+        # Seed the context cache so views reuse the rows already loaded.
+        ctx._cache.update(collections)
+        out: dict[str, Any] = {}
+        for key, data in collections.items():
+            out[key] = await filter_collection(key, data, ctx)
+        return out
 
     async def resolve_tenant_id(self, tenant_code: str) -> uuid.UUID:
         tenant = await self.tenant_repo.get_by_code(tenant_code)
@@ -89,6 +118,7 @@ class LmsStoreService:
     ) -> Any:
         """Apply record-level changes to the latest stored collection (no lost updates)."""
         row = await self.repo.get(tenant_id, key, for_update=True)
+        ctx = self.scope_context(tenant_id, person_id, role)
         keyed = bool(set_entries or unset_keys) or key in policy.KEYED_COLLECTIONS
         current = row.data if row is not None else ({} if keyed else [])
 
@@ -118,7 +148,7 @@ class LmsStoreService:
                         raise ValidationAppError("Every record needs a non-empty string 'id'")
                     old = data[index[record_id]] if record_id in index else None
                     if not is_admin:
-                        policy.check_record_change(key, role, person_id, old, record)
+                        await policy.check_record_change(key, ctx, old, record)
                     if old is not None:
                         data[index[record_id]] = record
                         continue
@@ -136,7 +166,7 @@ class LmsStoreService:
                         continue
                     old = data[index[record_id]]
                     if not is_admin:
-                        policy.check_record_change(key, role, person_id, old, None)
+                        await policy.check_record_change(key, ctx, old, None)
                     data = [r for r in data if not (isinstance(r, dict) and r.get("id") == record_id)]
                     index = {r.get("id"): i for i, r in enumerate(data) if isinstance(r, dict)}
         except policy.PolicyViolation as exc:
@@ -145,7 +175,9 @@ class LmsStoreService:
 
         row = await self.repo.upsert(tenant_id, key, data)
         await self.db.commit()
-        return row.data
+        if is_admin:
+            return row.data
+        return await filter_collection(key, row.data, self.scope_context(tenant_id, person_id, role))
 
     async def bootstrap(self, tenant_code: str) -> dict[str, Any]:
         tenant = await self.tenant_repo.get_by_code(tenant_code)

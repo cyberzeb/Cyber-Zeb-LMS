@@ -84,7 +84,6 @@ export function StudentQuizzesPage() {
       <QuizAttemptModal
         open={activeQuizId !== null}
         quizId={activeQuizId ?? ''}
-        studentId={data.studentId}
         onClose={() => setActiveQuizId(null)}
         onSubmitted={() => void reload()}
       />

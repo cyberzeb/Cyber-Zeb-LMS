@@ -29,6 +29,8 @@ PEOPLE = [
     {"id": "stu-2", "name": "Tia Student", "email": "tia@example.com", "role": "Student"},
     {"id": "ins-1", "name": "Ian Instructor", "email": "ian@example.com", "role": "Instructor"},
     {"id": "staff-1", "name": "Sue Staff", "email": "sue@example.com", "role": "Staff"},
+    {"id": "ins-2", "name": "Ina Other", "email": "ina@example.com", "role": "Instructor"},
+    {"id": "par-1", "name": "Pat Parent", "email": "pat@example.com", "role": "Guardian", "department": "Sam Student"},
 ]
 
 
@@ -60,12 +62,35 @@ async def env(tmp_path):
         seed = {
             "people": PEOPLE,
             "student-submissions": [
-                {"id": "sub-2", "studentId": "stu-2", "assessmentId": "q1", "score": 5},
+                {"id": "sub-2", "studentId": "stu-2", "assessmentType": "quiz", "assessmentId": "quiz-2", "score": 5},
             ],
             "enrollments": [
                 {"id": "enr-1", "studentId": "stu-1", "courseId": "c1", "progress": 0, "status": "active"},
+                {"id": "enr-2", "studentId": "stu-2", "courseId": "c2", "progress": 0, "status": "active"},
             ],
-            "courses": [{"id": "c1", "title": "Intro"}, {"id": "c2", "title": "Next"}],
+            "courses": [
+                {"id": "c1", "title": "Intro", "instructorId": "ins-1"},
+                {"id": "c2", "title": "Next", "instructorId": "ins-2"},
+            ],
+            "quizzes": [
+                {"id": "quiz-1", "courseId": "c1", "status": "published", "questionIds": ["q-1", "q-2"], "maxPoints": 8},
+                {"id": "quiz-2", "courseId": "c2", "status": "published", "questionIds": ["q-3"], "maxPoints": 5},
+            ],
+            "assignments": [{"id": "asg-1", "courseId": "c1", "status": "published", "maxPoints": 100}],
+            "question-bank": [
+                {"id": "q-1", "courseId": "c1", "type": "mcq", "correctAnswer": "B", "points": 5, "options": ["A", "B"]},
+                {"id": "q-2", "courseId": "c1", "type": "true-false", "correctAnswer": "True", "points": 3},
+                {"id": "q-3", "courseId": "c2", "type": "mcq", "correctAnswer": "A", "points": 5},
+            ],
+            "live-sessions": [
+                {"id": "ls-1", "courseId": "c1", "instructorId": "ins-1"},
+                {"id": "ls-2", "courseId": "c2", "instructorId": "ins-2"},
+            ],
+            "payments": [
+                {"id": "pay-1", "studentId": "stu-1", "amount": 100, "currency": "ETB", "status": "pending"},
+                {"id": "pay-2", "studentId": "stu-2", "amount": 200, "currency": "ETB", "status": "pending"},
+            ],
+            "settings": {"general": {"name": "A"}, "integrations": {"stripe": {"key": "secret"}}},
             "lesson-progress": {},
         }
         for key, data in seed.items():
@@ -168,21 +193,32 @@ async def test_student_cannot_edit_people(env):
     assert res.status_code == 403
 
 
-async def test_student_submissions_are_owner_only(env):
+async def test_student_cannot_write_quiz_scores(env):
     client, tenants = env
     headers = _auth(tenants["tenant-a"], "stu-1", "Student")
-    own = {"id": "sub-1", "studentId": "stu-1", "assessmentId": "q1", "score": 8}
-    assert (
-        await client.patch("/api/v1/data/student-submissions", json={"upserts": [{"record": own}]}, headers=headers)
-    ).status_code == 200
-    other = {"id": "sub-2", "studentId": "stu-2", "assessmentId": "q1", "score": 0}
-    assert (
-        await client.patch("/api/v1/data/student-submissions", json={"upserts": [{"record": other}]}, headers=headers)
-    ).status_code == 403
-    forged = {"id": "sub-9", "studentId": "stu-2", "assessmentId": "q1", "score": 10}
-    assert (
-        await client.patch("/api/v1/data/student-submissions", json={"upserts": [{"record": forged}]}, headers=headers)
-    ).status_code == 403
+    forged = {
+        "id": "sub-1", "studentId": "stu-1", "assessmentType": "quiz",
+        "assessmentId": "quiz-1", "status": "graded", "score": 8,
+    }
+    res = await client.patch(
+        "/api/v1/data/student-submissions", json={"upserts": [{"record": forged}]}, headers=headers
+    )
+    assert res.status_code == 403
+
+
+async def test_student_can_submit_own_assignment_without_score(env):
+    client, tenants = env
+    headers = _auth(tenants["tenant-a"], "stu-1", "Student")
+    url = "/api/v1/data/student-submissions"
+    base = {
+        "id": "sub-a", "studentId": "stu-1", "assessmentType": "assignment", "assessmentId": "asg-1",
+        "status": "submitted", "attachmentName": "work.py", "maxScore": 100,
+    }
+    assert (await client.patch(url, json={"upserts": [{"record": base}]}, headers=headers)).status_code == 200
+    graded = {**base, "score": 100, "status": "graded"}
+    assert (await client.patch(url, json={"upserts": [{"record": graded}]}, headers=headers)).status_code == 403
+    other = {**base, "id": "sub-b", "studentId": "stu-2"}
+    assert (await client.patch(url, json={"upserts": [{"record": other}]}, headers=headers)).status_code == 403
 
 
 async def test_student_enrollment_only_progress(env):

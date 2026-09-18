@@ -44,7 +44,12 @@ async def list_all_collections(
     principal: DemoPrincipal = Depends(get_demo_principal),
 ):
     service = LmsStoreService(db)
-    return await service.list_collections(principal.tenant_id)
+    return await service.read_all_collections(
+        principal.tenant_id,
+        role=principal.role,
+        person_id=principal.person_id,
+        is_admin=principal.is_tenant_admin,
+    )
 
 
 @router.get("/{collection_key}", response_model=CollectionOut)
@@ -54,7 +59,13 @@ async def get_collection(
     principal: DemoPrincipal = Depends(get_demo_principal),
 ):
     service = LmsStoreService(db)
-    data = await service.get_collection(principal.tenant_id, _valid_key(collection_key))
+    data = await service.read_collection(
+        principal.tenant_id,
+        _valid_key(collection_key),
+        role=principal.role,
+        person_id=principal.person_id,
+        is_admin=principal.is_tenant_admin,
+    )
     return CollectionOut(key=collection_key, data=data)
 
 
