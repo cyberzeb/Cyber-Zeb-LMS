@@ -11,6 +11,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, Query, Request, status
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import AsyncSessionLocal, get_db
@@ -74,7 +75,18 @@ async def super_admin_login(
     payload: SuperAdminLoginRequest,
     db: AsyncSession = Depends(get_db),
 ):
-    """Authenticate PlatformAdminUser only — never InstitutionAdminAccount."""
+    """Password sign-in for PlatformAdminUser — demo servers only.
+
+    The portal signs super admins in with an emailed code (/auth/otp/*). The
+    seeded demo password is public knowledge, so this route is disabled unless
+    DEMO_LOGIN_ENABLED is set.
+    """
+    from fastapi import HTTPException
+
+    from app.core.config import settings
+
+    if not settings.DEMO_LOGIN_ENABLED:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
     service = OnboardingService(db)
     return await service.login_super_admin(payload)
 
@@ -587,6 +599,71 @@ async def get_institution(
 ):
     service = OnboardingService(db)
     return await service.get_institution(tenant_id)
+
+
+class TenantStatusBody(BaseModel):
+    reason: str = ""
+
+
+@router.post(
+    "/super-admin/institutions/{tenant_id}/suspend",
+    response_model=InstitutionDetailOut,
+    tags=["Super Admin Console"],
+)
+async def suspend_institution(
+    tenant_id: uuid.UUID,
+    payload: TenantStatusBody,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    """Block every user of this institution until it is reactivated."""
+    return await OnboardingService(db).set_tenant_status(
+        tenant_id,
+        suspend=True,
+        reason=payload.reason,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+@router.post(
+    "/super-admin/institutions/{tenant_id}/reactivate",
+    response_model=InstitutionDetailOut,
+    tags=["Super Admin Console"],
+)
+async def reactivate_institution(
+    tenant_id: uuid.UUID,
+    payload: TenantStatusBody,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    return await OnboardingService(db).set_tenant_status(
+        tenant_id,
+        suspend=False,
+        reason=payload.reason,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
+
+
+@router.post(
+    "/super-admin/institutions/{tenant_id}/reset-admin-code",
+    tags=["Super Admin Console"],
+)
+async def reset_institution_admin_code(
+    tenant_id: uuid.UUID,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    principal: PlatformPrincipal = Depends(require_platform_super_admin),
+):
+    """New access code for the institution admin; emailed and returned once."""
+    return await OnboardingService(db).reset_institution_admin_code(
+        tenant_id,
+        admin=await _current_admin(db, principal),
+        correlation_id=getattr(request.state, "correlation_id", None),
+    )
 
 
 @router.get(

@@ -116,7 +116,7 @@ export function RequestServiceForm() {
             setStep(1)
             setSubmitted(false)
           }}
-          className="mt-7 text-navy-900 font-bold text-[13.5px] border-b-2 border-lemon-500 pb-1 cursor-pointer"
+          className="mt-7 text-navy-900 dark:text-white font-bold text-[13.5px] border-b-2 border-lemon-500 pb-1 cursor-pointer"
         >
           Submit another request
         </button>

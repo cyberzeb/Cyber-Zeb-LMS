@@ -161,3 +161,21 @@ async def test_student_cannot_mark_invoice_paid_directly(env):
         headers=_auth(tenants["tenant-a"], "stu-1", "Student"),
     )
     assert res.status_code == 403
+
+
+# ── Concurrency ─────────────────────────────────────────────────────────────
+
+
+async def test_concurrent_first_writes_both_saved(env):
+    import asyncio
+
+    client, tenants = env
+    headers = _auth(tenants["tenant-a"], "admin-1", "Admin")
+    url = "/api/v1/data/forum-chats"
+    first, second = await asyncio.gather(
+        client.patch(url, json={"upserts": [{"record": {"id": "chat-a", "type": "campus"}}]}, headers=headers),
+        client.patch(url, json={"upserts": [{"record": {"id": "chat-b", "type": "campus"}}]}, headers=headers),
+    )
+    assert first.status_code == 200 and second.status_code == 200
+    ids = {c["id"] for c in (await client.get(url, headers=headers)).json()["data"]}
+    assert ids == {"chat-a", "chat-b"}

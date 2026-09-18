@@ -478,3 +478,28 @@ export async function listAuditLogsV2(params?: {
   )
   return data
 }
+
+// Institution controls
+export async function suspendInstitution(id: string, reason: string) {
+  const { data } = await axiosClient.post<InstitutionDetail>(`/super-admin/institutions/${id}/suspend`, {
+    reason,
+  })
+  return data
+}
+
+export async function reactivateInstitution(id: string) {
+  const { data } = await axiosClient.post<InstitutionDetail>(
+    `/super-admin/institutions/${id}/reactivate`,
+    {},
+  )
+  return data
+}
+
+export async function resetInstitutionAdminCode(id: string) {
+  const { data } = await axiosClient.post<{
+    admin_email: string
+    admin_access_code: string
+    email_sent: boolean
+  }>(`/super-admin/institutions/${id}/reset-admin-code`)
+  return data
+}

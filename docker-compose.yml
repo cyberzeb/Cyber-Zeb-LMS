@@ -12,6 +12,8 @@ services:
       DEBUG: "false"
       DATABASE_URL: sqlite+aiosqlite:////code/data/brana_lms.db
       DATABASE_URL_SYNC: sqlite:////code/data/brana_lms.db
+      # Keep backups on the persistent volume (not /tmp inside the container).
+      BACKUP_DIR: /code/data/backups
       FRONTEND_BASE_URL: ${PUBLIC_URL:-}
       ZOOM_ACCOUNT_ID: ${ZOOM_ACCOUNT_ID:-}
       ZOOM_CLIENT_ID: ${ZOOM_CLIENT_ID:-}

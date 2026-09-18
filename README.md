@@ -11,25 +11,61 @@ A multi-portal Learning Management System demo built with React, TypeScript, and
 | Styling | Tailwind CSS v4, custom design tokens |
 | State / data | localStorage + custom hooks; TanStack Query (wired, lightly used) |
 | Icons | lucide-react |
-| Backend (future) | FastAPI Python in `backend/` |
+| Backend | FastAPI (Python) in `backend/`, SQLite or PostgreSQL |
 
 ## Getting started
 
 The frontend needs the FastAPI backend: Vite proxies `/api` to `127.0.0.1:8001`.
 
-```bash
-# one-time setup
-npm install
-cd backend && python -m venv .venv && .venv/Scripts/pip install -r requirements.txt  # macOS/Linux: .venv/bin/pip
-cp .env.example .env && cd ..
+### 1. One-time setup
 
-# run backend (port 8001) + frontend (port 5173) together
-npm run dev:full
+```bash
+npm install
+
+cd backend
+python -m venv .venv
+.venv/Scripts/pip install -r requirements.txt      # macOS/Linux: .venv/bin/pip
+cp .env.example .env
 ```
 
-Open `http://127.0.0.1:5173`. The demo tenant is seeded on the first backend start.
+Edit `backend/.env`. The simplest local setup uses SQLite (no database server):
+
+```ini
+DATABASE_URL=sqlite+aiosqlite:///./brana_lms_local.db
+DATABASE_URL_SYNC=sqlite:///./brana_lms_local.db
+JWT_SECRET_KEY=<any long random string>
+DEMO_LOGIN_ENABLED=true        # sign in with code 000000, no email needed
+```
+
+To use PostgreSQL instead, start it with `docker compose -f docker-compose.postgres.yml up -d`
+and keep the `postgresql+asyncpg://…` URLs from `.env.example`.
+
+### 2. Run
+
+```bash
+npm run dev:full        # backend on :8001 + frontend on :5173
+```
+
+Open `http://127.0.0.1:5173`. On first start the backend creates the tables, the
+demo university (`berana`) and the super admin `superadmin@berana.edu`. The API
+restarts automatically when you change a backend `.py` file.
+
+### Running the backend on its own
+
+```bash
+cd backend
+.venv/Scripts/python -m uvicorn app.main:app --host 127.0.0.1 --port 8001    # macOS/Linux: .venv/bin/python
+.venv/Scripts/python -m pytest -q                                               # 45 tests
+```
+
+- API docs (Swagger): `http://127.0.0.1:8001/docs`
+- Health check: `http://127.0.0.1:8001/health`
+- Real emailed sign-in codes: set `DEMO_LOGIN_ENABLED=false` plus `GMAIL_USER` / `GMAIL_APP_PASSWORD`
+- Online payments: set `CHAPA_SECRET_KEY` (otherwise demo servers settle invoices instantly,
+  and real servers refuse online payment)
 
 For the feature status of each edition, see [docs/FEATURE_MATRIX.md](docs/FEATURE_MATRIX.md).
+For the Super Admin console step by step, see [docs/SUPER_ADMIN.md](docs/SUPER_ADMIN.md).
 
 ### Other scripts
 

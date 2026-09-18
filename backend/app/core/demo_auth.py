@@ -110,6 +110,11 @@ async def get_demo_principal(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Your institution subscription has expired. Please contact Cyber-Zeb Consulting to renew.",
         )
+    if tenant_status in (TenantStatus.SUSPENDED, TenantStatus.ARCHIVED):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Your institution's access is suspended. Please contact Cyber-Zeb Consulting.",
+        )
     return principal
 
 

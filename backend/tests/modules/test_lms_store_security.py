@@ -96,6 +96,23 @@ async def env(tmp_path):
         for key, data in seed.items():
             db.add(LmsCollection(tenant_id=tenants["tenant-a"], collection_key=key, data=data))
         db.add(LmsCollection(tenant_id=tenants["tenant-b"], collection_key="people", data=[{"id": "b-secret"}]))
+        from app.core.security import hash_password
+        from app.modules.onboarding.models import InstitutionAdminAccount, PlatformAdminRole, PlatformAdminUser
+
+        root = PlatformAdminUser(
+            email="root@example.com", password_hash=hash_password("unused"), role=PlatformAdminRole.SUPER_ADMIN
+        )
+        db.add(root)
+        db.add(
+            InstitutionAdminAccount(
+                tenant_id=tenants["tenant-a"],
+                email="owner@example.com",
+                temporary_password_hash=hash_password("111111"),
+                must_change_password=False,
+            )
+        )
+        await db.flush()
+        tenants["_platform_admin"] = root.id
         await db.commit()
 
     async def override_get_db():

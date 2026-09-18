@@ -299,12 +299,16 @@ async def get_system_health(db: AsyncSession) -> SystemHealthOut:
 
     # DB size
     db_size_bytes: int | None = None
-    try:
-        db_size_bytes = (
-            await db.execute(text("SELECT pg_database_size(current_database())"))
-        ).scalar_one()
-    except Exception:
-        pass
+    sqlite_file = _sqlite_path()
+    if sqlite_file is not None:
+        db_size_bytes = sqlite_file.stat().st_size if sqlite_file.exists() else None
+    else:
+        try:
+            db_size_bytes = (
+                await db.execute(text("SELECT pg_database_size(current_database())"))
+            ).scalar_one()
+        except Exception:
+            pass
 
     return SystemHealthOut(
         db_ok=db_ok,
@@ -1218,60 +1222,55 @@ async def get_analytics(
     until: datetime | None = None,
     institution_type: str | None = None,
 ) -> AnalyticsOut:
+    # Portable across PostgreSQL and SQLite: load the (small) activated sets and
+    # aggregate in Python instead of using JSONB / TO_CHAR / EXTRACT SQL.
+    def _aware(value: datetime | None) -> datetime | None:
+        if value is not None and value.tzinfo is None:
+            return value.replace(tzinfo=timezone.utc)
+        return value
+
+    def _in_window(value: datetime | None) -> bool:
+        value = _aware(value)
+        if value is None:
+            return since is None and until is None
+        if since and value < _aware(since):
+            return False
+        if until and value > _aware(until):
+            return False
+        return True
+
+    def _type_value(value) -> str | None:
+        return getattr(value, "value", value)
+
+    activated = (
+        await db.execute(select(ServiceRequest).where(ServiceRequest.status == ServiceRequestStatus.ACTIVATED))
+    ).scalars().all()
+
     # ── Module demand ─────────────────────────────────────────────────────────
-    # We aggregate requested_modules JSONB arrays by unnesting them
-    sr_filters = [ServiceRequest.status == ServiceRequestStatus.ACTIVATED]
-    if since:
-        sr_filters.append(ServiceRequest.created_at >= since)
-    if until:
-        sr_filters.append(ServiceRequest.created_at <= until)
-    if institution_type:
-        sr_filters.append(ServiceRequest.institution_type == institution_type)
+    sr_counts: dict[str, int] = {}
+    for sr in activated:
+        if institution_type and _type_value(sr.institution_type) != institution_type:
+            continue
+        if not _in_window(sr.created_at):
+            continue
+        for key in sr.requested_modules or []:
+            sr_counts[key] = sr_counts.get(key, 0) + 1
 
-    # Raw query: unnest JSONB array and count
-    sr_module_counts_q = await db.execute(
-        text(
-            "SELECT module_key, COUNT(*) AS cnt FROM service_requests, "
-            "jsonb_array_elements_text(requested_modules) AS module_key "
-            "WHERE status = 'activated' "
-            + ("AND institution_type = :itype " if institution_type else "")
-            + ("AND created_at >= :since " if since else "")
-            + ("AND created_at <= :until " if until else "")
-            + "GROUP BY module_key"
-        ),
-        {
-            k: v for k, v in {
-                "itype": institution_type,
-                "since": since,
-                "until": until,
-            }.items() if v is not None
-        },
-    )
-    sr_counts = {row[0]: int(row[1]) for row in sr_module_counts_q.fetchall()}
-
-    addon_filters_str = (
-        ("AND t.institution_type = :itype " if institution_type else "")
-        + ("AND amr.created_at >= :since " if since else "")
-        + ("AND amr.created_at <= :until " if until else "")
-    )
-    addon_module_counts_q = await db.execute(
-        text(
-            "SELECT module_key, COUNT(*) AS cnt FROM addon_module_requests amr "
-            "JOIN tenants t ON t.id = amr.tenant_id, "
-            "jsonb_array_elements_text(amr.requested_modules) AS module_key "
-            "WHERE amr.status = 'activated' "
-            + addon_filters_str
-            + "GROUP BY module_key"
-        ),
-        {
-            k: v for k, v in {
-                "itype": institution_type,
-                "since": since,
-                "until": until,
-            }.items() if v is not None
-        },
-    )
-    addon_counts = {row[0]: int(row[1]) for row in addon_module_counts_q.fetchall()}
+    addon_rows = (
+        await db.execute(
+            select(AddOnModuleRequest, Tenant.institution_type)
+            .join(Tenant, Tenant.id == AddOnModuleRequest.tenant_id)
+            .where(AddOnModuleRequest.status == ServiceRequestStatus.ACTIVATED)
+        )
+    ).all()
+    addon_counts: dict[str, int] = {}
+    for amr, tenant_type in addon_rows:
+        if institution_type and _type_value(tenant_type) != institution_type:
+            continue
+        if not _in_window(amr.created_at):
+            continue
+        for key in amr.requested_modules or []:
+            addon_counts[key] = addon_counts.get(key, 0) + 1
 
     all_module_keys = set(sr_counts.keys()) | set(addon_counts.keys())
     from app.modules.onboarding.constants import MODULE_LABELS
@@ -1291,52 +1290,38 @@ async def get_analytics(
     )
 
     # ── Revenue trend (last 6 months of activated service requests) ───────────
-    revenue_q = await db.execute(
-        text(
-            "SELECT TO_CHAR(payment_confirmed_at, 'YYYY-MM') AS period, "
-            "SUM(invoice_amount) AS revenue, "
-            "invoice_currency, "
-            "COUNT(*) AS cnt "
-            "FROM service_requests "
-            "WHERE status = 'activated' AND payment_confirmed_at IS NOT NULL "
-            "AND payment_confirmed_at >= NOW() - INTERVAL '6 months' "
-            "GROUP BY period, invoice_currency ORDER BY period"
-        )
-    )
+    six_months_ago = datetime.now(timezone.utc) - timedelta(days=183)
+    revenue: dict[tuple[str, str], list] = {}
+    for sr in activated:
+        confirmed = _aware(sr.payment_confirmed_at)
+        if confirmed is None or confirmed < six_months_ago:
+            continue
+        bucket = revenue.setdefault((confirmed.strftime("%Y-%m"), sr.invoice_currency or "USD"), [Decimal(0), 0])
+        bucket[0] += Decimal(str(sr.invoice_amount or 0))
+        bucket[1] += 1
     revenue_trend = [
-        RevenueTrendItem(
-            period=row[0],
-            revenue=Decimal(str(row[1] or 0)),
-            currency=row[2] or "USD",
-            confirmed_count=int(row[3]),
-        )
-        for row in revenue_q.fetchall()
+        RevenueTrendItem(period=period, revenue=total, currency=currency, confirmed_count=count)
+        for (period, currency), (total, count) in sorted(revenue.items())
     ]
 
     # ── Avg activation time ───────────────────────────────────────────────────
-    avg_q = await db.execute(
-        text(
-            "SELECT AVG(EXTRACT(EPOCH FROM (activated_at - created_at)) / 86400.0) "
-            "FROM service_requests WHERE status = 'activated' AND activated_at IS NOT NULL"
-        )
-    )
-    avg_val = avg_q.scalar_one()
-    avg_activation_days = round(float(avg_val), 1) if avg_val is not None else None
-
-    total_activated = (await db.execute(
-        select(func.count()).select_from(ServiceRequest).where(
-            ServiceRequest.status == ServiceRequestStatus.ACTIVATED
-        )
-    )).scalar_one()
+    durations = [
+        (_aware(sr.activated_at) - _aware(sr.created_at)).total_seconds() / 86400.0
+        for sr in activated
+        if sr.activated_at and sr.created_at
+    ]
+    avg_activation_days = round(sum(durations) / len(durations), 1) if durations else None
+    total_activated = len(activated)
 
     # ── Institution type counts (from tenants) ────────────────────────────────
-    type_q = await db.execute(
-        text(
-            "SELECT institution_type, COUNT(*) FROM tenants "
-            "WHERE institution_type IS NOT NULL GROUP BY institution_type"
+    type_rows = (
+        await db.execute(
+            select(Tenant.institution_type, func.count())
+            .where(Tenant.institution_type.is_not(None))
+            .group_by(Tenant.institution_type)
         )
-    )
-    institution_type_counts = {row[0]: int(row[1]) for row in type_q.fetchall()}
+    ).all()
+    institution_type_counts = {str(_type_value(t)): int(n) for t, n in type_rows}
 
     return AnalyticsOut(
         module_demand=module_demand,
@@ -1407,7 +1392,8 @@ async def trigger_backup(
 
     # Run pg_dump in a thread to avoid blocking the event loop
     loop = asyncio.get_event_loop()
-    result = await loop.run_in_executor(None, _run_pg_dump, str(run.id))
+    runner = _run_sqlite_backup if _sqlite_path() else _run_pg_dump
+    result = await loop.run_in_executor(None, runner, str(run.id))
 
     # Reload the run and update it
     run = (await db.execute(select(BackupRun).where(BackupRun.id == run.id))).scalar_one()
@@ -1431,6 +1417,48 @@ async def trigger_backup(
         )
     await db.commit()
     return _backup_run_out(run)
+
+
+def _sqlite_path() -> Path | None:
+    """File path of the SQLite database, or None when running on PostgreSQL."""
+    url = settings.DATABASE_URL
+    if not url.startswith("sqlite"):
+        return None
+    return Path(url.split(":///", 1)[1])
+
+
+def _run_sqlite_backup(run_id: str) -> dict:
+    """Consistent online copy of the live SQLite database (sqlite3 backup API)."""
+    import sqlite3
+    import time
+
+    source_path = _sqlite_path()
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    dest = _backup_dir() / f"backup_{ts}_{run_id[:8]}.sqlite3"
+    t0 = time.monotonic()
+    try:
+        with sqlite3.connect(str(source_path)) as source, sqlite3.connect(str(dest)) as target:
+            source.backup(target)
+        return {
+            "status": BackupStatus.SUCCESS.value,
+            "file_path": str(dest),
+            "file_size_bytes": dest.stat().st_size,
+            "duration_seconds": Decimal(str(round(time.monotonic() - t0, 2))),
+        }
+    except Exception as exc:
+        return {"status": BackupStatus.FAILED.value, "error_message": str(exc)[:2000]}
+
+
+def _run_sqlite_restore(file_path: str) -> dict:
+    """Copy a backup over the live SQLite database (online, via the backup API)."""
+    import sqlite3
+
+    try:
+        with sqlite3.connect(file_path) as source, sqlite3.connect(str(_sqlite_path())) as target:
+            source.backup(target)
+        return {"ok": True}
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
 
 
 def _run_pg_dump(run_id: str) -> dict:
@@ -1531,7 +1559,8 @@ async def restore_from_backup(
     # Run pg_restore in background thread
     import asyncio
     loop = asyncio.get_event_loop()
-    result = await loop.run_in_executor(None, _run_pg_restore, run.file_path)
+    runner = _run_sqlite_restore if _sqlite_path() else _run_pg_restore
+    result = await loop.run_in_executor(None, runner, run.file_path)
     return result
 
 

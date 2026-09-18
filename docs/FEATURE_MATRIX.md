@@ -16,7 +16,7 @@ resolved at runtime in `src/shared/config/tenant.ts`.
 - ❌ Missing: not built
 - ➖ Not applicable to this edition
 
-Status as of Phase 1 (2026-09-18). Update this file whenever a row changes.
+Status as of Phase 2 (2026-09-18). Super Admin details: [SUPER_ADMIN.md](SUPER_ADMIN.md). Update this file whenever a row changes.
 
 ---
 
@@ -33,12 +33,12 @@ Status as of Phase 1 (2026-09-18). Update this file whenever a row changes.
 | Dark mode / light mode | ✅ | |
 | Multi-language (i18n) | 🟡 | Provider exists. Coverage is not complete |
 | Zoom live sessions | ✅ | Real Zoom API (`live_sessions/zoom_client.py`). Only instructors/admins can create or end meetings |
-| Payment gateway | ❌ | Invoices are records only. No Stripe/Chapa/Telebirr checkout |
+| Payment gateway | 🟡 | Server checkout: Chapa (ETB) when `CHAPA_SECRET_KEY` is set, verified with Chapa before marking paid; demo provider on demo servers. Chapa not yet tested with real keys |
 | Email notifications | 🟡 | SMTP for onboarding only. No LMS event emails |
 | Report PDF export | ✅ | `exportInstitutionReport.ts` |
-| Automated tests | 🟡 | Backend: 25 tests (onboarding, tenants, security). Frontend: none |
+| Automated tests | 🟡 | Backend: 45 tests (onboarding, tenants, security, scoping, grading, payments, tenant controls). Frontend: none |
 | Lint / type-check / build | ✅ | 0 lint errors (60 warnings tracked), `tsc` clean, build passes |
-| Read scoping per role | ❌ | Any signed-in user can still read the whole tenant (e.g. all people and payments). Needs server-side views (Phase 2) |
+| Read scoping per role | ✅ | Server builds each role's view (`lms_store/scope.py`): own records, own/taught courses, linked children; others as directory entries only. Answer keys never sent to students |
 | Per-person portal settings | ✅ | Fixed in Phase 1 (previously one shared object for all users) |
 
 ## 2. Super Admin console (`/super-admin`)
@@ -47,10 +47,11 @@ Status as of Phase 1 (2026-09-18). Update this file whenever a row changes.
 |---|---|---|
 | Service requests → activate institution (with edition) | ✅ | |
 | Institutions list / detail | ✅ | |
-| Manage modules, add-ons, renewals | 🟡 | To verify end to end in Phase 6 |
+| Manage modules, add-ons, renewals | 🟡 | Renewals ✅. Add-ons cannot be created and module prices are unused (decision needed, see SUPER_ADMIN.md) |
 | Landing page announcement banner | ✅ | Banner display restored in Phase 0 |
-| Audit logs, roles, settings, notifications, export | 🟡 | To verify in Phase 6 |
-| Appearance, integrations, system health, backup, security, analytics | 🟡 | Pages exist. Depth not verified |
+| Audit logs, roles, settings, notifications, export | ✅ | Verified in Phase 2 |
+| Appearance, integrations, system health, backup, security, analytics | 🟡 | Backup/analytics fixed for SQLite; super admin suspension enforced. User reports/bans not connected to portal users (decision needed) |
+| Institution controls (suspend, reactivate, reset admin code, renew) | ✅ | Added in Phase 2 |
 | Demo tenant per edition | ❌ | Only the university demo tenant (`berana`) is seeded |
 
 ## 3. Shared learning engine (all editions)
@@ -65,7 +66,7 @@ Status as of Phase 1 (2026-09-18). Update this file whenever a row changes.
 | Assignments | ✅ | ✅ | ✅ | |
 | Quizzes / exams | ✅ | ✅ | ✅ | |
 | Question bank | ✅ | ❌ | ❌ | Not in corp/training nav |
-| Grading / gradebook | ✅ | 🟡 | 🟡 | Learner view is university-shaped (GPA) |
+| Grading / gradebook | ✅ | 🟡 | 🟡 | Quizzes graded on the server. Learner view is university-shaped (GPA) |
 | Attendance | ✅ | ❌ | ❌ | Not in corp/training admin nav |
 | Certificates | ✅ | 🟡 | 🟡 | No automatic issue on completion |
 | Announcements | ✅ | ✅ | ✅ | |

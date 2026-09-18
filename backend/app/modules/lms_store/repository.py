@@ -23,6 +23,24 @@ class LmsCollectionRepository:
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
 
+    async def ensure_row(self, tenant_id: uuid.UUID, collection_key: str, default: object) -> None:
+        """Create the collection row if missing, without failing when another request races us."""
+        dialect = self.db.bind.dialect.name if self.db.bind is not None else ""
+        if dialect == "postgresql":
+            from sqlalchemy.dialects.postgresql import insert
+        else:
+            from sqlalchemy.dialects.sqlite import insert
+        values = {
+            "id": uuid.uuid4(),
+            "tenant_id": tenant_id,
+            "collection_key": collection_key,
+            "data": default,
+        }
+        statement = insert(LmsCollection).values(**values).on_conflict_do_nothing(
+            index_elements=["tenant_id", "collection_key"]
+        )
+        await self.db.execute(statement)
+
     async def list_keys(self, tenant_id: uuid.UUID) -> list[str]:
         result = await self.db.execute(
             select(LmsCollection.collection_key).where(LmsCollection.tenant_id == tenant_id)

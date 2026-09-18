@@ -23,6 +23,14 @@ axiosClient.interceptors.request.use((config) => {
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    // An expired super-admin session: sign in again instead of showing errors.
+    if (error?.response?.status === 401 && localStorage.getItem('berana_super_admin_token')) {
+      localStorage.removeItem('berana_super_admin_token')
+      localStorage.removeItem('berana_super_admin_email')
+      if (window.location.pathname.startsWith('/super-admin')) {
+        window.location.assign('/login?role=SuperAdmin&expired=1')
+      }
+    }
     const message =
       error?.response?.data?.error?.message ??
       error?.message ??

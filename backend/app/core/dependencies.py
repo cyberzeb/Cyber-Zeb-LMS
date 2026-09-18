@@ -98,6 +98,7 @@ async def get_current_principal(
 
 async def get_current_platform_admin(
     token: str = Depends(oauth2_scheme_super_admin),
+    db: AsyncSession = Depends(get_db),
 ) -> PlatformPrincipal:
     payload = _decode_access_payload(token)
 
@@ -112,7 +113,7 @@ async def get_current_platform_admin(
             detail="You do not have permission to perform this action",
         )
     try:
-        return PlatformPrincipal(
+        principal = PlatformPrincipal(
             admin_id=UUID(payload["sub"]),
             email=str(payload.get("email", "")),
             role="super_admin",
@@ -121,6 +122,18 @@ async def get_current_platform_admin(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Malformed token claims"
         )
+
+    # A deleted or suspended super admin loses access immediately, even with a valid token.
+    from app.modules.onboarding.models import PlatformAdminUser
+
+    admin = (
+        await db.execute(select(PlatformAdminUser).where(PlatformAdminUser.id == principal.admin_id))
+    ).scalar_one_or_none()
+    if admin is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Account no longer exists")
+    if admin.is_suspended:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This super admin account is suspended")
+    return principal
 
 
 def require_platform_super_admin(

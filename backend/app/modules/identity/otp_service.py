@@ -117,6 +117,20 @@ def _code_response(message_email: str, role: str) -> dict:
     return result
 
 
+async def _ensure_tenant_can_sign_in(db: AsyncSession, tenant_id) -> None:
+    from sqlalchemy import select
+
+    from app.modules.tenants.models import Tenant, TenantStatus
+
+    tenant_status = (
+        await db.execute(select(Tenant.status).where(Tenant.id == tenant_id))
+    ).scalar_one_or_none()
+    if tenant_status == TenantStatus.EXPIRED:
+        raise ValidationAppError("Your institution's subscription has expired. Contact Cyber-Zeb Consulting.")
+    if tenant_status in (TenantStatus.SUSPENDED, TenantStatus.ARCHIVED):
+        raise ValidationAppError("Your institution's access is suspended. Contact Cyber-Zeb Consulting.")
+
+
 def issue_portal_tokens(person_id: str, tenant_id: str, frontend_role: str) -> tuple[str, str]:
     """Access + refresh token for a tenant portal user. Both carry tenant and role."""
     claims = {
@@ -198,6 +212,8 @@ class OtpAuthService:
     async def _verify_institution_admin_code(self, admin, tenant, code: str) -> dict:
         from app.core.security import verify_password
 
+        await _ensure_tenant_can_sign_in(self.db, tenant.id)
+
         key = admin.email.strip().lower()
         failures, locked_until = _admin_failures.get(key, (0, None))
         if locked_until and _now() < locked_until:
@@ -235,6 +251,7 @@ class OtpAuthService:
                 return await self._send_institution_admin_code(email, tenant)
 
         tenant_id = await self.store.resolve_tenant_id(tenant_code)
+        await _ensure_tenant_can_sign_in(self.db, tenant_id)
         people = await self.store.get_collection(tenant_id, "people", [])
         if not isinstance(people, list):
             raise ValidationAppError("People collection is invalid")
@@ -263,7 +280,7 @@ class OtpAuthService:
 
         repo = OnboardingRepository(self.db)
         admin = await repo.get_platform_admin_by_email(email.strip().lower())
-        if not admin or admin.role != PlatformAdminRole.SUPER_ADMIN:
+        if not admin or admin.role != PlatformAdminRole.SUPER_ADMIN or admin.is_suspended:
             raise NotFoundError("No active super admin account found for this email")
 
         key = _challenge_key("__superadmin__", email, "SuperAdmin")
@@ -410,7 +427,7 @@ class OtpAuthService:
             raise invalid
 
         tenant = (await self.db.execute(select(Tenant).where(Tenant.id == tenant_id))).scalar_one_or_none()
-        if not tenant or tenant.status == TenantStatus.EXPIRED:
+        if not tenant or tenant.status != TenantStatus.ACTIVE:
             raise invalid
 
         people = await self.store.get_collection(tenant_id, "people", [])

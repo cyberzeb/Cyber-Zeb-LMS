@@ -12,6 +12,7 @@ import uuid
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -511,7 +512,7 @@ class OnboardingService:
 
     async def login_super_admin(self, payload: SuperAdminLoginRequest) -> SuperAdminTokenResponse:
         admin = await self.repo.get_platform_admin_by_email(payload.email.lower())
-        if not admin or not verify_password(payload.password, admin.password_hash):
+        if not admin or admin.is_suspended or not verify_password(payload.password, admin.password_hash):
             raise ValidationAppError("Invalid email or password")
         if admin.role != PlatformAdminRole.SUPER_ADMIN:
             raise PermissionDeniedError("Not a platform super admin")
@@ -1483,6 +1484,95 @@ class OnboardingService:
             )
         return out
 
+    async def set_tenant_status(
+        self,
+        tenant_id: uuid.UUID,
+        *,
+        suspend: bool,
+        reason: str,
+        admin: PlatformAdminUser,
+        correlation_id: str | None,
+    ) -> InstitutionDetailOut:
+        """Suspend (block all access) or reactivate an institution."""
+        tenant = await self._tenant_by_id(tenant_id)
+        if not tenant:
+            raise NotFoundError("Tenant not found")
+        if suspend and not reason.strip():
+            raise ValidationAppError("Give a reason for suspending this institution")
+        before = {"status": tenant.status.value}
+        if suspend:
+            tenant.status = TenantStatus.SUSPENDED
+        else:
+            renewal_passed = tenant.renewal_date is not None and tenant.renewal_date < date.today()
+            tenant.status = TenantStatus.EXPIRED if renewal_passed else TenantStatus.ACTIVE
+        await self._audit(
+            actor_type=PlatformActorType.PLATFORM_ADMIN,
+            actor_id=admin.id,
+            action="tenant.suspended" if suspend else "tenant.reactivated",
+            entity_type="Tenant",
+            entity_id=tenant.id,
+            before=before,
+            after={"status": tenant.status.value, "reason": reason.strip() or None},
+            correlation_id=correlation_id,
+        )
+        await self.db.commit()
+        return await self.get_institution(tenant_id)
+
+    async def reset_institution_admin_code(
+        self,
+        tenant_id: uuid.UUID,
+        *,
+        admin: PlatformAdminUser,
+        correlation_id: str | None,
+    ) -> dict:
+        """Issue a new 6-digit access code for the institution admin (old one stops working)."""
+        tenant = await self._tenant_by_id(tenant_id)
+        if not tenant:
+            raise NotFoundError("Tenant not found")
+        account = (
+            await self.db.execute(
+                select(InstitutionAdminAccount)
+                .where(InstitutionAdminAccount.tenant_id == tenant_id)
+                .order_by(InstitutionAdminAccount.created_at.asc())
+                .limit(1)
+            )
+        ).scalar_one_or_none()
+        if not account:
+            raise NotFoundError("This institution has no admin account")
+
+        access_code = _generate_otp_code()
+        account.temporary_password_hash = hash_password(access_code)
+        link = await self.institution_link(tenant.slug or tenant.code, tenant.institution_type.value)
+        subject, email_body = build_welcome_email(
+            institution_name=tenant.name,
+            institution_link=link,
+            admin_email=account.email,
+            temporary_password=access_code,
+        )
+        result = send_email_sync(to_email=account.email, subject=subject, body=email_body)
+        await persist_email_log(
+            self.db,
+            service_request_id=tenant.service_request_id,
+            email_type=EmailType.ACTIVATION_WELCOME,
+            result=result,
+        )
+        await self._audit(
+            actor_type=PlatformActorType.PLATFORM_ADMIN,
+            actor_id=admin.id,
+            action="tenant.admin_code_reset",
+            entity_type="Tenant",
+            entity_id=tenant.id,
+            before=None,
+            after={"admin_email": account.email, "email_ok": result.ok},
+            correlation_id=correlation_id,
+        )
+        await self.db.commit()
+        return {
+            "admin_email": account.email,
+            "admin_access_code": access_code,
+            "email_sent": result.ok,
+        }
+
     async def get_institution(self, tenant_id: uuid.UUID) -> InstitutionDetailOut:
         tenant = await self._tenant_by_id(tenant_id)
         if not tenant:
@@ -1756,10 +1846,9 @@ class OnboardingService:
         subject = "Your Berana LMS Super Admin account"
         body = (
             f"You have been invited as a Berana LMS Super Admin.\n\n"
-            f"Login: {settings.FRONTEND_BASE_URL.rstrip('/')}/super-admin/login\n"
-            f"Email: {email}\n"
-            f"Temporary password: {temp_password}\n\n"
-            f"Please sign in and change this password as soon as possible.\n"
+            f"Sign in: {settings.FRONTEND_BASE_URL.rstrip('/')}/login\n"
+            f"Email: {email}\n\n"
+            f"Enter your email and we will send you a one-time sign-in code.\n"
         )
         result = send_email_sync(to_email=email, subject=subject, body=body)
         await persist_email_log(

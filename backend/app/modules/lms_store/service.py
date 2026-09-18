@@ -83,6 +83,7 @@ class LmsStoreService:
         return row.data
 
     async def put_collection(self, tenant_id: uuid.UUID, key: str, data: Any) -> Any:
+        await self.repo.ensure_row(tenant_id, key, data)
         row = await self.repo.upsert(tenant_id, key, data)
         await self.db.commit()
         return row.data
@@ -103,7 +104,11 @@ class LmsStoreService:
         await self.db.commit()
         return len(collections)
 
-    async def patch_collection(
+    async def patch_collection(self, tenant_id: uuid.UUID, key: str, **kwargs: Any) -> Any:
+        """Apply record-level changes to the latest stored collection (no lost updates)."""
+        return await self._patch_once(tenant_id, key, **kwargs)
+
+    async def _patch_once(
         self,
         tenant_id: uuid.UUID,
         key: str,
@@ -117,9 +122,12 @@ class LmsStoreService:
         unset_keys: list[str],
     ) -> Any:
         """Apply record-level changes to the latest stored collection (no lost updates)."""
+        keyed = bool(set_entries or unset_keys) or key in policy.KEYED_COLLECTIONS
+        # Create the row first (race-safe), then lock it, so concurrent first
+        # writes queue on the same row instead of colliding on insert.
+        await self.repo.ensure_row(tenant_id, key, {} if keyed else [])
         row = await self.repo.get(tenant_id, key, for_update=True)
         ctx = self.scope_context(tenant_id, person_id, role)
-        keyed = bool(set_entries or unset_keys) or key in policy.KEYED_COLLECTIONS
         current = row.data if row is not None else ({} if keyed else [])
 
         try:
