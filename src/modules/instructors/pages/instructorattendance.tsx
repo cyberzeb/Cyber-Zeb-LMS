@@ -155,11 +155,12 @@ function TakeAttendanceModal({
 
   const [overrides, setOverrides] = useState<Record<string, { status: AttendanceStatus; note: string }>>(initialOverrides)
 
-  // Re-sync when date changes
-  useMemo(() => {
+  // Re-sync when the selected date changes
+  const [syncedDate, setSyncedDate] = useState(date)
+  if (syncedDate !== date) {
+    setSyncedDate(date)
     setOverrides(initialOverrides)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date])
+  }
 
   const markAllPresent = () => {
     setOverrides((prev) =>

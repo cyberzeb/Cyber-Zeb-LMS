@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 
 import { AnimateInView } from '../../../shared/components/AnimateInView'
+import { AnnouncementBanner } from '../components/AnnouncementBanner'
 import { Navbar } from '../components/Navbar'
 import { Hero } from '../components/Hero'
 import { AboutSection } from '../components/AboutSection'
@@ -18,6 +19,7 @@ export function LandingPage() {
 
   return (
     <div className="marketing-page font-sans">
+      <AnnouncementBanner />
       <Navbar onRequestServiceClick={scrollToForm} />
       <Hero onRequestServiceClick={scrollToForm} />
       <AboutSection />

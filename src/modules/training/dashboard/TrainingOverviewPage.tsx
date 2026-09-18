@@ -89,13 +89,13 @@ export function TrainingOverviewPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={() => navigate('/admin/cohorts')}>
+          <Button variant="secondary" onClick={() => navigate('/admin/training/cohorts')}>
             Manage cohorts
           </Button>
-          <Button variant="secondary" onClick={() => navigate('/admin/learners')}>
+          <Button variant="secondary" onClick={() => navigate('/admin/students')}>
             View learners
           </Button>
-          <Button onClick={() => navigate('/admin/programs')}>
+          <Button onClick={() => navigate('/admin/training/programs')}>
             Add program
           </Button>
         </div>
@@ -156,10 +156,10 @@ export function TrainingOverviewPage() {
             Manage your training divisions, specialized programs, cohorts, learners, and track their progress through certificates.
           </p>
           <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" size="sm" onClick={() => navigate('/admin/divisions')}>
+            <Button variant="secondary" size="sm" onClick={() => navigate('/admin/institution/departments')}>
               Divisions
             </Button>
-            <Button variant="secondary" size="sm" onClick={() => navigate('/admin/trainers')}>
+            <Button variant="secondary" size="sm" onClick={() => navigate('/admin/instructors')}>
               Trainers
             </Button>
             <Button variant="secondary" size="sm" onClick={() => navigate('/admin/certificates')}>

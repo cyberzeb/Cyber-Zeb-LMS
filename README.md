@@ -15,18 +15,28 @@ A multi-portal Learning Management System demo built with React, TypeScript, and
 
 ## Getting started
 
+The frontend needs the FastAPI backend: Vite proxies `/api` to `127.0.0.1:8001`.
+
 ```bash
+# one-time setup
 npm install
-npm run dev
+cd backend && python -m venv .venv && .venv/Scripts/pip install -r requirements.txt  # macOS/Linux: .venv/bin/pip
+cp .env.example .env && cd ..
+
+# run backend (port 8001) + frontend (port 5173) together
+npm run dev:full
 ```
 
-Open the URL shown in the terminal (typically `http://localhost:5173`).
+Open `http://127.0.0.1:5173`. The demo tenant is seeded on the first backend start.
+
+For the feature status of each edition, see [docs/FEATURE_MATRIX.md](docs/FEATURE_MATRIX.md).
 
 ### Other scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start development server with HMR |
+| `npm run dev:full` | Start backend (8001) and frontend (5173) together |
+| `npm run dev` | Start the frontend only (backend must already run on 8001) |
 | `npm run build` | Type-check and build for production |
 | `npm run preview` | Preview the production build |
 | `npm run lint` | Run ESLint |

@@ -163,9 +163,10 @@ export function InstitutionOverviewPage() {
   const totalProgress = data.progressOverview.reduce((sum, item) => sum + item.count, 0)
   const completed = data.progressOverview.find((item) => item.label === 'Completed')?.count ?? 0
   const completedPercent = totalProgress > 0 ? Math.round((completed / totalProgress) * 100) : 0
-  let cumulative = 0
+  const segmentPercent = (count: number) =>
+    totalProgress > 0 ? (count / totalProgress) * 100 : 0
   const progressStops = data.progressOverview
-    .map((item) => {
+    .map((item, index, items) => {
       const color =
         item.tone === 'success'
           ? '#A8D400'
@@ -174,9 +175,11 @@ export function InstitutionOverviewPage() {
             : item.tone === 'warning'
               ? '#FFC107'
               : '#E53935'
-      const start = cumulative
-      cumulative += totalProgress > 0 ? (item.count / totalProgress) * 100 : 0
-      return `${color} ${start}% ${cumulative}%`
+      const start = items
+        .slice(0, index)
+        .reduce((sum, prev) => sum + segmentPercent(prev.count), 0)
+      const end = start + segmentPercent(item.count)
+      return `${color} ${start}% ${end}%`
     })
     .join(', ')
 

@@ -43,7 +43,7 @@ export async function createZoomMeeting(input: {
     })
     return data
   } catch (error) {
-    throw new Error(zoomErrorMessage(error))
+    throw new Error(zoomErrorMessage(error), { cause: error })
   }
 }
 
@@ -74,6 +74,6 @@ export async function endZoomMeeting(
     const status = (error as { response?: { status?: number } })?.response?.status
     // Already ended in Zoom, or the meeting no longer exists.
     if (status === 404) return { meeting_id: meetingId, status: 'finished' }
-    throw new Error(zoomErrorMessage(error))
+    throw new Error(zoomErrorMessage(error), { cause: error })
   }
 }

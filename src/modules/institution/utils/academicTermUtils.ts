@@ -77,7 +77,7 @@ export function ensureProgramCalendar(
   semestersPerYear: number = DEFAULT_SEMESTERS_PER_YEAR,
 ): { years: AcademicYearRecord[]; terms: AcademicTermRecord[]; termsAdded: number } {
   const nextYears = [...years]
-  let nextTerms = [...terms]
+  const nextTerms = [...terms]
   let termsAdded = 0
 
   const countScopedYears = () =>

@@ -8,13 +8,18 @@ import { CorporateCompliancePage } from '../modules/corporate/pages/CorporateCom
 import { CorporateJobRolesPage } from '../modules/corporate/pages/CorporateJobRolesPage'
 import { CorporateSkillsPage } from '../modules/corporate/pages/CorporateSkillsPage'
 import { TrainingOverviewPage } from '../modules/training/dashboard/TrainingOverviewPage'
+import { TrainingProgramsPage } from '../modules/training/pages/TrainingProgramsPage'
+import { CohortsPage } from '../modules/training/pages/CohortsPage'
+import { LearnersPage } from '../modules/training/pages/LearnersPage'
+import { TrainersPage } from '../modules/training/pages/TrainersPage'
+import { EditionDashboardPage } from './EditionDashboardPage'
 import { CampusProfilePage } from '../modules/institution/pages/CampusProfilePage'
 import { OrgStructurePage } from '../modules/institution/pages/OrgStructurePage'
-import { InstitutionOverviewPage } from '../modules/institution/pages/InstitutionOverviewPage'
 import { DepartmentsPage } from '../modules/institution/pages/DepartmentsPage'
 import { AcademicCalendarPage } from '../modules/institution/pages/AcademicCalendarPage'
 import { CourseOfferingsPage } from '../modules/institution/pages/CourseOfferingsPage'
 import { CoursesPage } from '../modules/institution/pages/CoursesPage'
+import { ResourcesAdminPage } from '../modules/institution/pages/ResourcesAdminPage'
 import { PeoplePage } from '../modules/institution/pages/PeoplePage'
 import { StudentsPage } from '../modules/institution/pages/StudentsPage'
 import { InstructorsPage } from '../modules/institution/pages/InstructorsPage'
@@ -334,7 +339,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <InstitutionOverviewPage />,
+        element: <EditionDashboardPage />,
       },
       // Corporate edition routes
       { path: 'corporate/overview', element: <CorporateOverviewPage /> },
@@ -346,13 +351,17 @@ export const router = createBrowserRouter([
       { path: 'corporate/skills', element: <CorporateSkillsPage /> },
       // Training edition routes
       { path: 'training/overview', element: <TrainingOverviewPage /> },
+      { path: 'training/programs', element: <TrainingProgramsPage /> },
+      { path: 'training/cohorts', element: <CohortsPage /> },
+      { path: 'training/learners', element: <LearnersPage /> },
+      { path: 'training/trainers', element: <TrainersPage /> },
       {
         path: 'institution/overview',
-        element: <InstitutionOverviewPage />,
+        element: <EditionDashboardPage />,
       },
       {
         path: 'institution/dashboard',
-        element: <InstitutionOverviewPage />,
+        element: <EditionDashboardPage />,
       },
       {
         path: 'institution/structure',
@@ -460,7 +469,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'resources',
-        element: <CoursesPage />,
+        element: <ResourcesAdminPage />,
       },
       {
         path: 'calendar',

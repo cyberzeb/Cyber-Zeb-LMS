@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { createElement, useEffect, useRef, useState } from 'react'
 import {
   ArrowLeft,
   Building2,
@@ -211,7 +211,7 @@ export function LoginPage() {
     if (pasted.length === 6) void handleVerify(pasted)
   }
 
-  const Icon = roleIcon(role)
+  const roleIconElement = createElement(roleIcon(role), { size: 22, strokeWidth: 2.25 })
 
   return (
     <div className="min-h-screen bg-canvas flex flex-col">
@@ -234,7 +234,7 @@ export function LoginPage() {
         <GlassCard className="w-full max-w-md p-8 animate-fade-in-up">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-11 h-11 rounded-xl bg-lemon-50 dark:bg-lemon-500/10 text-lemon-700 dark:text-lemon-500 flex items-center justify-center">
-              <Icon size={22} strokeWidth={2.25} />
+              {roleIconElement}
             </div>
             <div>
               <h1 className="text-[20px] font-extrabold text-navy-900">{t('login.title')}</h1>

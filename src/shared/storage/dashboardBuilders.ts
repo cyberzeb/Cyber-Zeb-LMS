@@ -55,6 +55,7 @@ import {
   toStudentAnnouncementItems,
 } from './announcementUtils'
 import { certificateToStudentItem } from '../../modules/institution/api/certificatesApi'
+import { toInstructorResources, toStudentResources } from './resourceUtils'
 
 function emptyStudentDashboard(student: PersonRow): StudentDashboardData {
   return {
@@ -161,6 +162,12 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
     })
     .filter((c) => c.code)
 
+  const enrolledCourseRecords = enrollments
+    .map((e) => coursesCatalog.find((c) => c.id === e.courseId))
+    .filter((c): c is CourseRecord => Boolean(c))
+
+  const resources = toStudentResources(enrolledCourseRecords)
+
   if (courses.length === 0) {
     const enrolledCourseIds = enrollments.map((e) => e.courseId)
 
@@ -179,6 +186,7 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
 
     return {
       ...base,
+      resources,
       payments: toStudentPayments(paymentRecords, student.id),
       helpDeskTickets: toStudentHelpDeskTickets(helpDeskRecords, student.id),
       announcements: toStudentAnnouncementItems(announcementRecords),
@@ -226,6 +234,7 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
   return {
     ...base,
     courses,
+    resources,
     liveClasses,
     quizzes: studentQuizzes,
     assignments: studentAssignments,
@@ -461,6 +470,8 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
 
   const helpDeskRecords = readHelpDeskTickets()
 
+  const resources = toInstructorResources(myCourses)
+
   return {
     ...base,
     department: teachingSummary.label,
@@ -469,6 +480,7 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
         ? teachingSummary.departments.join(', ')
         : 'No courses assigned yet',
     courses: teachingCourses,
+    resources,
     students,
     liveClasses,
     quizzes: instructorQuizzes,

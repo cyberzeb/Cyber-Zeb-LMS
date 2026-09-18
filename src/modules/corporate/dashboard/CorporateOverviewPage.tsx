@@ -93,13 +93,13 @@ export function CorporateOverviewPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="secondary" onClick={() => navigate('/admin/training-assignments')}>
+          <Button variant="secondary" onClick={() => navigate('/admin/enrollments')}>
             Assign training
           </Button>
-          <Button variant="secondary" onClick={() => navigate('/admin/compliance')}>
+          <Button variant="secondary" onClick={() => navigate('/admin/corporate/compliance')}>
             View compliance
           </Button>
-          <Button onClick={() => navigate('/admin/employees')}>
+          <Button onClick={() => navigate('/admin/students')}>
             Add employee
           </Button>
         </div>
@@ -169,10 +169,10 @@ export function CorporateOverviewPage() {
             <Button variant="secondary" size="sm" onClick={() => navigate('/admin/reports')}>
               Open reports
             </Button>
-            <Button variant="secondary" size="sm" onClick={() => navigate('/admin/job-roles')}>
+            <Button variant="secondary" size="sm" onClick={() => navigate('/admin/corporate/job-roles')}>
               Job roles
             </Button>
-            <Button variant="secondary" size="sm" onClick={() => navigate('/admin/skills')}>
+            <Button variant="secondary" size="sm" onClick={() => navigate('/admin/corporate/skills')}>
               Skills catalog
             </Button>
           </div>
