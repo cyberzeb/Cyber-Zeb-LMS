@@ -1,12 +1,11 @@
-import { putCollection } from '../api/dataApi'
 import { toApiKey } from '../api/collectionKeys'
-import { setCachedCollection } from './dataCache'
+import { getCachedCollection, hasCachedCollection, setCachedCollection } from './dataCache'
+import { saveCollectionChange } from './collectionSync'
 
-/** Update in-memory cache and persist to the backend (fire-and-forget). */
+/** Update the in-memory cache and save the change to the backend (fire-and-forget). */
 export function persistCollection(storageKey: string, data: unknown) {
   const apiKey = toApiKey(storageKey)
+  const prev = hasCachedCollection(apiKey) ? getCachedCollection<unknown>(apiKey, undefined) : undefined
   setCachedCollection(apiKey, data)
-  void putCollection(apiKey, data).catch((err) => {
-    console.error(`Failed to persist "${apiKey}"`, err)
-  })
+  saveCollectionChange(apiKey, prev, data)
 }

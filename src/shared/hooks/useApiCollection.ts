@@ -1,9 +1,10 @@
 import { useCallback } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { fetchCollection, putCollection } from '../api/dataApi'
+import { fetchCollection } from '../api/dataApi'
 import { toApiKey } from '../api/collectionKeys'
-import { getCachedCollection, setCachedCollection } from '../storage/dataCache'
+import { getCachedCollection, hasCachedCollection, setCachedCollection } from '../storage/dataCache'
+import { saveCollectionChange } from '../storage/collectionSync'
 
 export function collectionQueryKey(apiKey: string) {
   return ['collection', apiKey] as const
@@ -24,11 +25,12 @@ export function useApiCollection<T>(storageKey: string, initialValue: T) {
     (updater: T | ((prev: T) => T)) => {
       const prev = queryClient.getQueryData<T>(collectionQueryKey(apiKey)) ?? initialValue
       const next = typeof updater === 'function' ? (updater as (prev: T) => T)(prev) : updater
+      // Diff against the last state known to be on the server (the cache), not
+      // the rendered fallback, so first-time writes of seed data are saved too.
+      const base = hasCachedCollection(apiKey) ? getCachedCollection<T | undefined>(apiKey, undefined) : undefined
       queryClient.setQueryData(collectionQueryKey(apiKey), next)
       setCachedCollection(apiKey, next)
-      void putCollection(apiKey, next).catch((err) => {
-        console.error(`Failed to persist collection "${apiKey}"`, err)
-      })
+      saveCollectionChange(apiKey, base, next)
     },
     [apiKey, initialValue, queryClient],
   )

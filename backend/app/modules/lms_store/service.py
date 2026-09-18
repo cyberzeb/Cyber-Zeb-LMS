@@ -1,9 +1,11 @@
 import uuid
-from typing import Any
+from typing import Any, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import NotFoundError, PermissionDeniedError, ValidationAppError
+from app.core.permissions import Role
+from app.modules.lms_store import policy
 from app.modules.lms_store.repository import LmsCollectionRepository
 from app.modules.tenants.repository import TenantRepository
 
@@ -72,13 +74,87 @@ class LmsStoreService:
         await self.db.commit()
         return len(collections)
 
+    async def patch_collection(
+        self,
+        tenant_id: uuid.UUID,
+        key: str,
+        *,
+        role: Role,
+        person_id: str,
+        is_admin: bool,
+        upserts: list[tuple[dict[str, Any], Optional[str]]],
+        deletes: list[str],
+        set_entries: dict[str, Any],
+        unset_keys: list[str],
+    ) -> Any:
+        """Apply record-level changes to the latest stored collection (no lost updates)."""
+        row = await self.repo.get(tenant_id, key, for_update=True)
+        keyed = bool(set_entries or unset_keys) or key in policy.KEYED_COLLECTIONS
+        current = row.data if row is not None else ({} if keyed else [])
+
+        try:
+            if keyed:
+                if not isinstance(current, dict):
+                    raise ValidationAppError(f"Collection '{key}' is not a keyed collection")
+                if upserts or deletes:
+                    raise ValidationAppError("Use set/unset for keyed collections")
+                data = dict(current)
+                for entry_key, value in set_entries.items():
+                    if not is_admin:
+                        policy.check_keyed_change(key, person_id, entry_key)
+                    data[entry_key] = value
+                for entry_key in unset_keys:
+                    if not is_admin:
+                        policy.check_keyed_change(key, person_id, entry_key)
+                    data.pop(entry_key, None)
+            else:
+                if not isinstance(current, list):
+                    raise ValidationAppError(f"Collection '{key}' is not a list collection")
+                data = list(current)
+                index = {r.get("id"): i for i, r in enumerate(data) if isinstance(r, dict)}
+                for record, after in upserts:
+                    record_id = record.get("id")
+                    if not isinstance(record_id, str) or not record_id:
+                        raise ValidationAppError("Every record needs a non-empty string 'id'")
+                    old = data[index[record_id]] if record_id in index else None
+                    if not is_admin:
+                        policy.check_record_change(key, role, person_id, old, record)
+                    if old is not None:
+                        data[index[record_id]] = record
+                        continue
+                    if after is None:
+                        position = 0
+                    else:
+                        position = next(
+                            (i + 1 for i, r in enumerate(data) if isinstance(r, dict) and r.get("id") == after),
+                            len(data),
+                        )
+                    data.insert(position, record)
+                    index = {r.get("id"): i for i, r in enumerate(data) if isinstance(r, dict)}
+                for record_id in deletes:
+                    if record_id not in index:
+                        continue
+                    old = data[index[record_id]]
+                    if not is_admin:
+                        policy.check_record_change(key, role, person_id, old, None)
+                    data = [r for r in data if not (isinstance(r, dict) and r.get("id") == record_id)]
+                    index = {r.get("id"): i for i, r in enumerate(data) if isinstance(r, dict)}
+        except policy.PolicyViolation as exc:
+            await self.db.rollback()
+            raise PermissionDeniedError(str(exc)) from exc
+
+        row = await self.repo.upsert(tenant_id, key, data)
+        await self.db.commit()
+        return row.data
+
     async def bootstrap(self, tenant_code: str) -> dict[str, Any]:
         tenant = await self.tenant_repo.get_by_code(tenant_code)
         if not tenant:
             raise NotFoundError(f"Institution '{tenant_code}' not found")
-        people = await self.get_collection(tenant.id, "people", [])
+        institution_type = getattr(tenant.institution_type, "value", tenant.institution_type)
         return {
             "tenant_code": tenant.code,
             "tenant_id": str(tenant.id),
-            "people": people if isinstance(people, list) else [],
+            "name": tenant.name,
+            "institution_type": str(institution_type),
         }

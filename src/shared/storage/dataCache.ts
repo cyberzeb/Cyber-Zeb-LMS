@@ -8,6 +8,10 @@ export function setCachedCollection(key: string, data: unknown) {
   cache.set(key, data)
 }
 
+export function hasCachedCollection(key: string): boolean {
+  return cache.has(key)
+}
+
 export function getCachedCollection<T>(key: string, fallback: T): T {
   if (cache.has(key)) return cache.get(key) as T
   return fallback

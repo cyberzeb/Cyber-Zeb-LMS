@@ -70,6 +70,7 @@ export function StaffSubmitPeoplePage() {
         departments={departments}
         students={students}
         submittedByName={person.name}
+        submittedById={person.id}
         onClose={() => setSubmitOpen(false)}
         onSubmit={handleSubmit}
       />

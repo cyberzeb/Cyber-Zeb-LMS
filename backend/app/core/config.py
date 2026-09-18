@@ -32,6 +32,14 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 14
 
+    # --- Portal login ---
+    # Demo login: fixed OTP code 000000, the demo account picker (/auth/demo-login)
+    # and the code echoed back in API responses. Never enable on a real tenant's server.
+    DEMO_LOGIN_ENABLED: bool = False
+    OTP_TTL_MINUTES: int = 10
+    OTP_MAX_ATTEMPTS: int = 5
+    OTP_RESEND_COOLDOWN_SECONDS: int = 30
+
     # --- Redis / Queue ---
     REDIS_URL: str = "redis://localhost:6379/0"
 
@@ -134,10 +142,29 @@ class Settings(BaseSettings):
         return value
 
 
+PLACEHOLDER_JWT_SECRETS = {
+    "change-this-in-every-environment",
+    "change-this-to-a-long-random-secret",
+}
+
+
+def _check_production_safety(config: Settings) -> None:
+    """Refuse to run production with secrets copied from the example files."""
+    if config.APP_ENV.strip().lower() != "production":
+        return
+    if config.JWT_SECRET_KEY in PLACEHOLDER_JWT_SECRETS or len(config.JWT_SECRET_KEY) < 32:
+        raise RuntimeError(
+            "JWT_SECRET_KEY is a placeholder or shorter than 32 characters. "
+            "Generate one with: openssl rand -hex 32"
+        )
+
+
 @lru_cache
 def get_settings() -> Settings:
     """Settings are cached so .env is parsed once per process."""
-    return Settings()
+    config = Settings()
+    _check_production_safety(config)
+    return config
 
 
 settings = get_settings()

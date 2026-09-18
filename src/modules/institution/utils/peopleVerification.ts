@@ -20,6 +20,7 @@ export function withAdminVerification(person: PersonRow): PersonRow {
 export function withStaffVerification(
   person: PersonRow,
   submittedByName = 'Staff member',
+  submittedById?: string,
 ): PersonRow {
   return {
     ...person,
@@ -27,6 +28,8 @@ export function withStaffVerification(
     addedByRole: 'Staff',
     submittedAt: 'Just now',
     submittedByName,
+    // The server only lets staff edit pending submissions they made themselves.
+    ...(submittedById ? { submittedById } : {}),
   }
 }
 

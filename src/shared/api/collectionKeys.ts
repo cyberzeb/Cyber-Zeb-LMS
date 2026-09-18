@@ -42,6 +42,7 @@ export function toApiKey(storageKey: string): string {
 }
 
 export const AUTH_TOKEN_KEY = 'berana_token'
+export const REFRESH_TOKEN_KEY = 'berana_refresh'
 export const SESSION_COOKIE_KEY = 'berana_session'
 /** @deprecated Legacy localStorage key — migrated to cookies on read. */
 export const LEGACY_AUTH_TOKEN_KEY = 'berana:access-token'

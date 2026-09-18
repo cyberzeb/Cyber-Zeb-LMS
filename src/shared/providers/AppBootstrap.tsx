@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { fetchAllCollections, putCollection, seedBackendCollections } from '../api/dataApi'
-import { activeTenantCode, setAccessToken } from '../api/client'
-import { DEFAULT_TENANT_CODE } from '../api/collectionKeys'
-import { buildSeedPayload } from '../storage/buildSeedPayload'
+import { fetchAllCollections } from '../api/dataApi'
+import { getAccessToken } from '../api/client'
 import { hydrateCache } from '../storage/dataCache'
+import { saveCollectionChange } from '../storage/collectionSync'
+import { readPortalSession } from '../storage/session'
 import { collectionQueryKey } from '../hooks/useApiCollection'
 import {
   academicCalendarWasPatched,
@@ -55,33 +55,32 @@ export function AppBootstrap({ children }: AppBootstrapProps) {
   const [retryCount, setRetryCount] = useState(0)
 
   const load = useCallback(async () => {
+    // Public pages (landing, sign-in) need no tenant data. Portal data is only
+    // loaded for a signed-in user; the API rejects anonymous requests.
+    if (!getAccessToken()) {
+      setError(null)
+      setReady(true)
+      return
+    }
+
     let collections: Record<string, unknown>
     try {
       collections = await fetchAllCollections()
     } catch (err) {
-      const status = (err as { response?: { status?: number } })?.response?.status
-      const message = err instanceof Error ? err.message : ''
-      if (status === 401 || message.includes('401')) {
-        setAccessToken(null)
-        collections = await fetchAllCollections()
-      } else {
-        throw err
+      // The API client already tried a token refresh and cleared the session;
+      // show the (public) page instead of the "backend unavailable" screen.
+      if ((err as { response?: { status?: number } })?.response?.status === 401) {
+        setError(null)
+        setReady(true)
+        return
       }
+      throw err
     }
 
-    // Only the demo tenant is auto-seeded with the full sample dataset. A real
-    // institution created via onboarding starts from its own minimal seed and
-    // is populated by the admin, so we never overwrite it here.
-    if (Object.keys(collections).length === 0 && activeTenantCode() === DEFAULT_TENANT_CODE) {
-      await seedBackendCollections(buildSeedPayload())
-      collections = await fetchAllCollections()
-    }
-
-    const before = collections
     const patched = hydrateFromRecord(collections, queryClient)
-    if (academicCalendarWasPatched(before, patched)) {
-      await putCollection('academic-years', patched['academic-years'])
-      await putCollection('academic-terms', patched['academic-terms'])
+    if (readPortalSession()?.role === 'Admin' && academicCalendarWasPatched(collections, patched)) {
+      saveCollectionChange('academic-years', collections['academic-years'], patched['academic-years'])
+      saveCollectionChange('academic-terms', collections['academic-terms'], patched['academic-terms'])
     }
 
     setError(null)

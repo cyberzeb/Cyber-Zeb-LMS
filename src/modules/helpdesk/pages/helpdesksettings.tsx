@@ -4,7 +4,7 @@ import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { Monogram } from '../../../shared/components/Monogram'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
-import { useApiCollection } from '../../../shared/hooks/useApiCollection'
+import { usePersonSettings } from '../../../shared/hooks/usePersonSettings'
 import { STORAGE_KEYS } from '../../../shared/storage/keys'
 import { mergePortalSettings } from '../../../shared/storage/settingsUtils'
 import { GlassCard } from '../../../shared/layout/GlassCard'
@@ -44,8 +44,9 @@ export function HelpDeskSettingsPage() {
     () => defaultSettings(sessionPerson ?? undefined),
     [sessionPerson],
   )
-  const [storedRaw, setStored] = useApiCollection<HelpDeskSettingsState>(
+  const [storedRaw, setStored] = usePersonSettings<HelpDeskSettingsState>(
     STORAGE_KEYS.helpDeskSettings,
+    sessionPerson?.id,
     defaults,
   )
   const stored = useMemo(
@@ -72,7 +73,7 @@ export function HelpDeskSettingsPage() {
             <Button variant="secondary" onClick={() => setDraft(stored)} disabled={!isDirty}>
               Reset
             </Button>
-            <Button variant="primary" onClick={() => { setStored(draft); notify('Help desk settings saved locally.', 'success') }} disabled={!isDirty}>
+            <Button variant="primary" onClick={() => { setStored(draft); notify('Help desk settings saved.', 'success') }} disabled={!isDirty}>
               Save changes
             </Button>
           </>

@@ -464,6 +464,7 @@ export interface PersonRow {
   addedByRole?: 'Admin' | 'Staff'
   submittedAt?: string
   submittedByName?: string
+  submittedById?: string
   status: 'active' | 'invited' | 'suspended'
   lastActive: string
   initials: string

@@ -5,7 +5,8 @@ import { PageHeader } from '../../../shared/components/PageHeader'
 import { Monogram } from '../../../shared/components/Monogram'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
-import { useApiCollection } from '../../../shared/hooks/useApiCollection'
+import { STORAGE_KEYS } from '../../../shared/storage/keys'
+import { usePersonSettings } from '../../../shared/hooks/usePersonSettings'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { mergePortalSettings } from '../../../shared/storage/settingsUtils'
 import { SettingsSection } from '../../institution/components/settings/SettingsSection'
@@ -63,8 +64,9 @@ export function InstructorSettingsPage() {
     () => defaultSettings(sessionPerson ?? undefined),
     [sessionPerson],
   )
-  const [storedRaw, setStored] = useApiCollection<InstructorSettingsState>(
-    'berana:instructor-settings',
+  const [storedRaw, setStored] = usePersonSettings<InstructorSettingsState>(
+    STORAGE_KEYS.instructorSettings,
+    sessionPerson?.id,
     defaults,
   )
   const stored = useMemo(

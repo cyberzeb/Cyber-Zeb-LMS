@@ -4,7 +4,7 @@ import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { Monogram } from '../../../shared/components/Monogram'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
-import { useApiCollection } from '../../../shared/hooks/useApiCollection'
+import { usePersonSettings } from '../../../shared/hooks/usePersonSettings'
 import { STORAGE_KEYS } from '../../../shared/storage/keys'
 import { mergePortalSettings } from '../../../shared/storage/settingsUtils'
 import { GlassCard } from '../../../shared/layout/GlassCard'
@@ -46,8 +46,9 @@ export function GuardianSettingsPage() {
     () => defaultSettings(sessionPerson ?? undefined),
     [sessionPerson],
   )
-  const [storedRaw, setStored] = useApiCollection<GuardianSettingsState>(
+  const [storedRaw, setStored] = usePersonSettings<GuardianSettingsState>(
     STORAGE_KEYS.guardianSettings,
+    sessionPerson?.id,
     defaults,
   )
   const stored = useMemo(
@@ -74,7 +75,7 @@ export function GuardianSettingsPage() {
             <Button variant="secondary" onClick={() => setDraft(stored)} disabled={!isDirty}>
               Reset
             </Button>
-            <Button variant="primary" onClick={() => { setStored(draft); notify('Guardian settings saved locally.', 'success') }} disabled={!isDirty}>
+            <Button variant="primary" onClick={() => { setStored(draft); notify('Guardian settings saved.', 'success') }} disabled={!isDirty}>
               Save changes
             </Button>
           </>

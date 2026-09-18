@@ -235,6 +235,12 @@ ensure_env() {
   upsert_env PLATFORM_SUPER_ADMIN_EMAIL "superadmin@berana.edu"
   upsert_env PLATFORM_SUPER_ADMIN_PASSWORD "Demo123!"
 
+  # Stakeholder demo server: keep demo sign-in (code 000000) unless the operator
+  # already chose a value. Set DEMO_LOGIN_ENABLED=false for a real institution.
+  if ! grep -q "^DEMO_LOGIN_ENABLED=" .env 2>/dev/null; then
+    upsert_env DEMO_LOGIN_ENABLED "true"
+  fi
+
   # Keep existing Zoom keys. Only add empty placeholders if they are missing.
   for zoom_key in ZOOM_ACCOUNT_ID ZOOM_CLIENT_ID ZOOM_CLIENT_SECRET ZOOM_USER_EMAIL; do
     if ! grep -q "^${zoom_key}=" .env 2>/dev/null; then

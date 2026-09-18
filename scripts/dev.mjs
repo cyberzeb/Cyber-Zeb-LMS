@@ -5,7 +5,7 @@
  * Usage: npm run dev:full
  * Uses backend/.venv if present, otherwise the `python` on PATH.
  */
-import { spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -37,7 +37,13 @@ function run(name, command, args, cwd) {
 
 function shutdown(code) {
   for (const child of children) {
-    if (!child.killed) child.kill()
+    if (child.exitCode !== null || !child.pid) continue
+    if (isWindows) {
+      // child.kill() only stops the cmd.exe wrapper; kill the whole tree.
+      spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' })
+    } else {
+      child.kill()
+    }
   }
   process.exit(code)
 }

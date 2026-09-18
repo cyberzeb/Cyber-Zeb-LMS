@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -21,7 +21,7 @@ from app.modules.identity.schemas import (
     UserCreate,
     UserOut,
 )
-from app.modules.identity.otp_service import OtpAuthService
+from app.modules.identity.otp_service import OtpAuthService, issue_portal_tokens
 from app.modules.identity.service import AuthService, UserService
 
 router = APIRouter()
@@ -35,9 +35,13 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
 
 @router.post("/demo-login", response_model=DemoLoginResponse)
 async def demo_login(payload: DemoLoginRequest, db: AsyncSession = Depends(get_db)):
-    from app.core.demo_auth import map_frontend_role
+    """Password-less sign-in as any person — only when DEMO_LOGIN_ENABLED is set."""
+    from app.core.config import settings
+
+    if not settings.DEMO_LOGIN_ENABLED:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+
     from app.core.exceptions import NotFoundError, ValidationAppError
-    from app.core.security import create_access_token, create_refresh_token
     from app.modules.lms_store.service import LmsStoreService
 
     service = LmsStoreService(db)
@@ -51,14 +55,7 @@ async def demo_login(payload: DemoLoginRequest, db: AsyncSession = Depends(get_d
         raise NotFoundError("Person not found")
 
     frontend_role = str(person.get("role", "Student"))
-    backend_role = map_frontend_role(frontend_role)
-    claims = {
-        "tenant_id": str(tenant_id),
-        "role": backend_role.value,
-        "frontend_role": frontend_role,
-    }
-    access = create_access_token(subject=payload.person_id, extra_claims=claims)
-    refresh = create_refresh_token(subject=payload.person_id)
+    access, refresh = issue_portal_tokens(payload.person_id, str(tenant_id), frontend_role)
     return DemoLoginResponse(
         access_token=access,
         refresh_token=refresh,
@@ -93,6 +90,13 @@ async def verify_otp(payload: OtpVerifyRequest, db: AsyncSession = Depends(get_d
     else:
         result = await service.verify_code(payload.tenant_code, payload.email, payload.role, payload.code)
     return OtpVerifyResponse(**result)
+
+
+@router.post("/portal/refresh", response_model=TokenPair)
+async def refresh_portal_token(payload: RefreshRequest, db: AsyncSession = Depends(get_db)):
+    """Renew a portal session (student, instructor, admin, …) before the access token expires."""
+    service = OtpAuthService(db)
+    return TokenPair(**await service.refresh_portal(payload.refresh_token))
 
 
 @router.post("/refresh", response_model=TokenPair)

@@ -17,7 +17,7 @@ import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import brandLogo from '../../../assets/Logo.jpg'
 import { sendLoginOtp, verifyLoginOtp, lookupEmail } from '../../../shared/api/auth'
 import type { EmailLookupResult } from '../../../shared/api/auth'
-import { setAccessToken } from '../../../shared/api/client'
+import { activeTenantCode, apiErrorMessage, setPortalTokens } from '../../../shared/api/client'
 import { setSuperAdminSession } from '../../../modules/superadmin/api/superAdminAuthApi'
 import { setActiveTenant } from '../../../shared/config/tenant'
 import type { InstitutionType } from '../../../shared/constants/institutionTypes'
@@ -54,6 +54,7 @@ export function LoginPage() {
   const [searchParams] = useSearchParams()
   const initialRole = searchParams.get('role')
   const redirectTo = searchParams.get('redirect')
+  const sessionExpired = searchParams.get('expired') === '1'
 
   // 'email' → user types email, 'credentials' → email looked up, role confirmed, 'code' → OTP input
   const [step, setStep] = useState<'email' | 'credentials' | 'code'>('email')
@@ -67,6 +68,7 @@ export function LoginPage() {
   const [demoHint, setDemoHint] = useState<string | null>(null)
   const [sentTo, setSentTo] = useState('')
   const [lookupResult, setLookupResult] = useState<EmailLookupResult | null>(null)
+  const loginTenantCode = lookupResult?.tenant_code || activeTenantCode()
 
   const codeRefs = useRef<(HTMLInputElement | null)[]>([])
 
@@ -129,7 +131,7 @@ export function LoginPage() {
     setError(null)
     setLoading(true)
     try {
-      const result = await sendLoginOtp(email.trim(), role)
+      const result = await sendLoginOtp(email.trim(), role, loginTenantCode)
       setSentTo(result.email)
       // Real accounts (e.g. provisioned institution admins) don't expose a code;
       // only demo roles return one to display as a hint.
@@ -137,8 +139,8 @@ export function LoginPage() {
       setStep('code')
       setCode(['', '', '', '', '', ''])
       setTimeout(() => codeRefs.current[0]?.focus(), 100)
-    } catch {
-      setError(t('login.sendError'))
+    } catch (err) {
+      setError(apiErrorMessage(err) ?? t('login.sendError'))
     } finally {
       setLoading(false)
     }
@@ -149,14 +151,14 @@ export function LoginPage() {
     setError(null)
     setLoading(true)
     try {
-      const result = await verifyLoginOtp(sentTo || email.trim(), role, fullCode)
+      const result = await verifyLoginOtp(sentTo || email.trim(), role, fullCode, loginTenantCode)
       if (role === 'SuperAdmin') {
         // Platform super admin uses its own session store (localStorage token).
         setSuperAdminSession(result.access_token, sentTo || email.trim())
         navigate('/super-admin', { replace: true })
         return
       }
-      setAccessToken(result.access_token)
+      setPortalTokens(result.access_token, result.refresh_token)
       writePortalSession({
         personId: result.person_id,
         // SuperAdmin is handled above; the remaining roles are portal roles.
@@ -175,10 +177,13 @@ export function LoginPage() {
         return
       }
       const destination =
-        redirectTo && redirectTo.startsWith('/') ? redirectTo : portalPathForRole(role)
-      navigate(destination, { replace: true })
-    } catch {
-      setError(t('login.verifyError'))
+        redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')
+          ? redirectTo
+          : portalPathForRole(role)
+      // Full page load so the data layer loads this user's workspace with the new token.
+      window.location.assign(destination)
+    } catch (err) {
+      setError(apiErrorMessage(err) ?? t('login.verifyError'))
       setCode(['', '', '', '', '', ''])
       codeRefs.current[0]?.focus()
     } finally {
@@ -269,6 +274,12 @@ export function LoginPage() {
                   />
                 </div>
               </label>
+
+              {sessionExpired && !error ? (
+                <p className="text-[13px] font-semibold text-info bg-info-bg px-3.5 py-2.5 rounded-lg">
+                  Your session has ended. Please sign in again.
+                </p>
+              ) : null}
 
               {error ? (
                 <p className="text-[13px] font-semibold text-danger bg-danger-bg px-3.5 py-2.5 rounded-lg">

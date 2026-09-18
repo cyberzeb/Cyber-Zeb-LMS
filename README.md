@@ -46,18 +46,37 @@ For the feature status of each edition, see [docs/FEATURE_MATRIX.md](docs/FEATUR
 | Portal | Base path | Access |
 |--------|-----------|--------|
 | Marketing | `/` | Public landing page |
-| Student | `/student/*` | Pick a student account (session stored in localStorage) |
-| Instructor | `/instructor/*` | Pick an instructor account |
-| Institution Admin | `/admin/*` | No login picker — demo admin shell |
+| Sign in | `/login` | Email → role → 6-digit code |
+| Student | `/student/*` | Student accounts |
+| Instructor | `/instructor/*` | Instructor accounts |
+| Admin | `/admin/*` | Institution admins (layout follows the tenant's edition) |
+| Staff / Guardian / Help desk | `/staff`, `/guardian`, `/help-desk` | Matching roles |
+| Super Admin | `/super-admin/*` | Platform super admin |
 
-### Demo accounts
+### Sign-in and demo accounts
 
-On first visit to the Student or Instructor portal, choose a user from the account picker. The selection is saved under `berana:session` in localStorage.
+Every portal requires sign-in; the API rejects anonymous requests. Codes are
+random, emailed, single-use, expire after 10 minutes and allow 5 attempts.
 
-Suggested demo users:
+With `DEMO_LOGIN_ENABLED=true` in `backend/.env` (demo and development only), the
+code is always `000000` and is shown on screen, so no email setup is needed.
 
-- **Student:** Amina Lemma (`u-demo-amina`) — enrolled in CS-201, CS-340, and CYB-101
-- **Instructor:** Dr. Aaron Selassie (`u2`) — teaches CS-201 and related courses
+| Role | Demo email |
+|------|------------|
+| Student | `amina.lemma@student.berana.edu` (enrolled in CS-201, CS-340, CYB-101) |
+| Instructor | `a.selassie@berana.edu` |
+| Admin | `h.desta@berana.edu` |
+| Staff | `g.nega@berana.edu` |
+| Guardian | `yonas.t@gmail.com` |
+| Help desk | `m.haile@berana.edu` |
+
+### Data access rules
+
+Tenant admins can change all of their tenant's data. Other roles can only change
+what the write policy in `backend/app/modules/lms_store/policy.py` allows (for example,
+a student's own submissions, lesson progress and settings). The frontend saves
+record-level changes (`PATCH /data/{collection}`), so people editing different
+records no longer overwrite each other.
 
 ## Features
 

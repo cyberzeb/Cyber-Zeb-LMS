@@ -10,13 +10,17 @@ class LmsCollectionRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get(self, tenant_id: uuid.UUID, collection_key: str) -> LmsCollection | None:
-        result = await self.db.execute(
-            select(LmsCollection).where(
-                LmsCollection.tenant_id == tenant_id,
-                LmsCollection.collection_key == collection_key,
-            )
+    async def get(
+        self, tenant_id: uuid.UUID, collection_key: str, *, for_update: bool = False
+    ) -> LmsCollection | None:
+        query = select(LmsCollection).where(
+            LmsCollection.tenant_id == tenant_id,
+            LmsCollection.collection_key == collection_key,
         )
+        if for_update:
+            # Row lock on PostgreSQL; SQLite serializes writers and ignores it.
+            query = query.with_for_update()
+        result = await self.db.execute(query)
         return result.scalar_one_or_none()
 
     async def list_keys(self, tenant_id: uuid.UUID) -> list[str]:

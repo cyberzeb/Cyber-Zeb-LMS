@@ -16,7 +16,7 @@ resolved at runtime in `src/shared/config/tenant.ts`.
 - ❌ Missing: not built
 - ➖ Not applicable to this edition
 
-Status as of the Phase 0 audit (2026-09-18). Update this file whenever a row changes.
+Status as of Phase 1 (2026-09-18). Update this file whenever a row changes.
 
 ---
 
@@ -26,18 +26,20 @@ Status as of the Phase 0 audit (2026-09-18). Update this file whenever a row cha
 |---|---|---|
 | Runtime edition switching (terminology and module toggles) | ✅ | `src/shared/config/editions/*` |
 | Edition-specific admin dashboard at `/admin` | ✅ | Fixed in Phase 0 (`EditionDashboardPage`) |
-| Login (email + demo OTP) and role routing | 🟡 | Works for the demo. Not production-grade (Phase 1) |
-| Backend authorization and tenant isolation | ❌ | Requests without a token fall back to an admin of any tenant (`backend/app/core/demo_auth.py`). **Phase 1 blocker** |
-| Data persistence | 🟡 | Whole-collection JSON blobs (`lms_store`), last write wins, no server-side validation |
+| Login (email + OTP) and role routing | ✅ | Random, emailed, single-use codes with expiry, attempt limit and resend cooldown. Sessions renew automatically. Demo mode (`DEMO_LOGIN_ENABLED`) uses code 000000 |
+| Backend authorization and tenant isolation | ✅ | Every data call requires a token, and the tenant comes from the token. Role/ownership write policy in `lms_store/policy.py`. 16 security tests |
+| Data persistence | 🟡 | Record-level saves (no lost updates across records). Failed saves roll back and show an error. Still JSON collections, not normalized tables |
 | Normalized backend domain modules | ❌ | 12 of 17 backend modules are empty stubs (courses, enrollment, assessments, …) |
 | Dark mode / light mode | ✅ | |
 | Multi-language (i18n) | 🟡 | Provider exists. Coverage is not complete |
-| Zoom live sessions | ✅ | Real Zoom API (`live_sessions/zoom_client.py`) |
+| Zoom live sessions | ✅ | Real Zoom API (`live_sessions/zoom_client.py`). Only instructors/admins can create or end meetings |
 | Payment gateway | ❌ | Invoices are records only. No Stripe/Chapa/Telebirr checkout |
 | Email notifications | 🟡 | SMTP for onboarding only. No LMS event emails |
 | Report PDF export | ✅ | `exportInstitutionReport.ts` |
-| Automated tests | 🟡 | Backend: 9 tests (onboarding, tenants). Frontend: none |
+| Automated tests | 🟡 | Backend: 25 tests (onboarding, tenants, security). Frontend: none |
 | Lint / type-check / build | ✅ | 0 lint errors (60 warnings tracked), `tsc` clean, build passes |
+| Read scoping per role | ❌ | Any signed-in user can still read the whole tenant (e.g. all people and payments). Needs server-side views (Phase 2) |
+| Per-person portal settings | ✅ | Fixed in Phase 1 (previously one shared object for all users) |
 
 ## 2. Super Admin console (`/super-admin`)
 

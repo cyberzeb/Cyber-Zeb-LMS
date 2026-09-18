@@ -18,7 +18,12 @@ IP is auto-detected if you omit `--ip`. First run takes a few minutes.
 
 **Share with stakeholders:** `https://YOUR_VPS_IP:8443`  
 HTTP fallback: `http://YOUR_VPS_IP:7777`  
-**Demo login password:** `Demo123!`
+**Demo sign-in:** enter a demo email on `/login`, then code `000000`
+(the script sets `DEMO_LOGIN_ENABLED=true` for this stakeholder demo server).
+
+> **Real institution?** Set `DEMO_LOGIN_ENABLED=false` in the root `.env` and set
+> `GMAIL_USER` / `GMAIL_APP_PASSWORD` so sign-in codes are emailed. With demo
+> sign-in on, anyone who knows a user's email can sign in as them.
 
 The browser will warn on the self-signed certificate. Click **Advanced → Proceed**.
 

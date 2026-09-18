@@ -14,6 +14,7 @@ interface StaffSubmitPersonModalProps {
   departments: Department[]
   students: PersonRow[]
   submittedByName?: string
+  submittedById?: string
   onClose: () => void
   onSubmit: (person: PersonRow) => void
 }
@@ -36,6 +37,7 @@ export function StaffSubmitPersonModal({
   departments,
   students,
   submittedByName = 'Kidist Yohannes',
+  submittedById,
   onClose,
   onSubmit,
 }: StaffSubmitPersonModalProps) {
@@ -106,7 +108,7 @@ export function StaffSubmitPersonModal({
       }
     }
 
-    onSubmit(withStaffVerification(person, submittedByName))
+    onSubmit(withStaffVerification(person, submittedByName, submittedById))
     onClose()
   }
 

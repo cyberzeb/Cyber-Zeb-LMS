@@ -17,9 +17,11 @@ export function StaffDashboardPage() {
   const { pendingSubmissions, mySubmissions } = useMemo(() => {
     const people = readPeople()
     const pending = people.filter((p) => p.verificationStatus === 'pending')
-    const mine = pending.filter((p) => p.submittedByName === person?.name)
+    const mine = pending.filter((p) =>
+      p.submittedById ? p.submittedById === person?.id : p.submittedByName === person?.name,
+    )
     return { pendingSubmissions: pending.length, mySubmissions: mine }
-  }, [person?.name])
+  }, [person?.id, person?.name])
 
   if (!person) return null
 

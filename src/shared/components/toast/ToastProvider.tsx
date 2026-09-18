@@ -1,6 +1,7 @@
-import { createContext, useCallback, useContext, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { CheckCircle2, Info, AlertTriangle } from 'lucide-react'
+import { PERSIST_ERROR_EVENT } from '../../storage/collectionSync'
 
 type ToastTone = 'success' | 'info' | 'error'
 
@@ -40,6 +41,16 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       setToasts((prev) => prev.filter((t) => t.id !== id))
     }, 3200)
   }, [])
+
+  // Failed background saves (see collectionSync) surface as error toasts.
+  useEffect(() => {
+    const onPersistError = (event: Event) => {
+      const message = (event as CustomEvent<{ message?: string }>).detail?.message
+      notify(message || 'Your change could not be saved.', 'error')
+    }
+    window.addEventListener(PERSIST_ERROR_EVENT, onPersistError)
+    return () => window.removeEventListener(PERSIST_ERROR_EVENT, onPersistError)
+  }, [notify])
 
   return (
     <ToastContext.Provider value={{ notify }}>

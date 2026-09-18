@@ -18,7 +18,9 @@ export function StaffSubmissionsPage() {
   const submissions = useMemo(() => {
     if (!person) return []
     return readPeople().filter(
-      (p) => p.addedByRole === 'Staff' && p.submittedByName === person.name,
+      (p) =>
+        p.addedByRole === 'Staff' &&
+        (p.submittedById ? p.submittedById === person.id : p.submittedByName === person.name),
     )
   }, [person])
 

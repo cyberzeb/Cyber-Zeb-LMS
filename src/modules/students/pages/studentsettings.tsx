@@ -5,7 +5,7 @@ import { PageHeader } from '../../../shared/components/PageHeader'
 import { Monogram } from '../../../shared/components/Monogram'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
-import { useApiCollection } from '../../../shared/hooks/useApiCollection'
+import { usePersonSettings } from '../../../shared/hooks/usePersonSettings'
 import { STORAGE_KEYS } from '../../../shared/storage/keys'
 import { mergePortalSettings } from '../../../shared/storage/settingsUtils'
 import { GlassCard } from '../../../shared/layout/GlassCard'
@@ -61,8 +61,9 @@ export function StudentSettingsPage() {
     () => defaultSettings(sessionPerson ?? undefined),
     [sessionPerson],
   )
-  const [storedRaw, setStored] = useApiCollection<StudentSettingsState>(
+  const [storedRaw, setStored] = usePersonSettings<StudentSettingsState>(
     STORAGE_KEYS.studentSettings,
+    sessionPerson?.id,
     defaults,
   )
   const stored = useMemo(

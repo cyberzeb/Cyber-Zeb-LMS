@@ -1,6 +1,6 @@
 """One-off dev helper: ensure the lms_collections table exists and that a
 tenant with code 'berana' exists so the portal frontends (which send
-X-Tenant-Code: berana) can read/write their data collections.
+a signed-in portal token) can read/write their data collections.
 
 Safe to run multiple times.
 """
