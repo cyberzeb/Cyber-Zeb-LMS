@@ -1,9 +1,4 @@
-import {
-  GraduationCap,
-  LayoutDashboard,
-  Megaphone,
-  Settings,
-} from 'lucide-react'
+import { GraduationCap, LayoutDashboard, Megaphone, ScrollText, Settings, UserRoundCheck, Wallet } from 'lucide-react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
 import { Sidebar } from '../../../shared/layout/Sidebar'
@@ -58,6 +53,24 @@ export function GuardianLayout() {
           to: '/guardian/progress',
           active: isActive('/guardian/progress'),
           icon: <GraduationCap size={ICON_SIZE} />,
+        },
+        {
+          label: 'Grades & Transcript',
+          to: '/guardian/grades',
+          active: isActive('/guardian/grades'),
+          icon: <ScrollText size={ICON_SIZE} />,
+        },
+        {
+          label: 'Attendance',
+          to: '/guardian/attendance',
+          active: isActive('/guardian/attendance'),
+          icon: <UserRoundCheck size={ICON_SIZE} />,
+        },
+        {
+          label: 'Fees & Payments',
+          to: '/guardian/payments',
+          active: isActive('/guardian/payments'),
+          icon: <Wallet size={ICON_SIZE} />,
         },
       ],
     },

@@ -7,23 +7,45 @@ import { StatusPill } from '../../../shared/components/StatusPill'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { Monogram } from '../../../shared/components/Monogram'
 import { getSessionPerson } from '../../../shared/storage/session'
-import { readEnrollments, readPeople } from '../../../shared/storage/readers'
+import { readAttendances, readEnrollments, readPayments } from '../../../shared/storage/readers'
+import { buildTranscript } from '../../../shared/academics/transcript'
+import { formatCurrency } from '../../../shared/storage/platformUtils'
+import { useLinkedStudent } from '../hooks/useLinkedStudent'
 import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 
 export function GuardianDashboardPage() {
   const { t } = useLanguage()
   const person = getSessionPerson()
 
-  const linkedStudent = useMemo(() => {
-    if (!person) return null
-    return readPeople().find(
-      (p) => p.role === 'Student' && p.name === person.department && p.status !== 'suspended',
-    )
-  }, [person])
+  const { student: linkedStudent } = useLinkedStudent()
 
   const enrollmentCount = useMemo(() => {
     if (!linkedStudent) return 0
     return readEnrollments().filter((e) => e.studentId === linkedStudent.id).length
+  }, [linkedStudent])
+
+  const academics = useMemo(
+    () => (linkedStudent ? buildTranscript(linkedStudent) : null),
+    [linkedStudent],
+  )
+
+  const attendanceRate = useMemo(() => {
+    if (!linkedStudent) return null
+    const records = readAttendances().filter((a) => a.studentId === linkedStudent.id)
+    const sessions = records.reduce((sum, r) => sum + r.totalSessions, 0)
+    if (sessions === 0) return null
+    const attended = records.reduce((sum, r) => sum + r.present + r.late, 0)
+    return Math.round((attended / sessions) * 100)
+  }, [linkedStudent])
+
+  const balance = useMemo(() => {
+    if (!linkedStudent) return { amount: 0, currency: 'ETB', count: 0 }
+    const unpaid = readPayments().filter((p) => p.studentId === linkedStudent.id && p.status !== 'paid')
+    return {
+      amount: unpaid.reduce((sum, p) => sum + p.amount, 0),
+      currency: unpaid[0]?.currency ?? 'ETB',
+      count: unpaid.length,
+    }
   }, [linkedStudent])
 
   if (!person) return null
@@ -51,11 +73,25 @@ export function GuardianDashboardPage() {
           iconBg="bg-info-bg text-info"
         />
         <StatBlock
-          label="Account"
-          value={person.status === 'active' ? 'Active' : person.status}
-          sub={`Last active ${person.lastActive}`}
+          label="Cumulative GPA"
+          value={academics?.cumulativeGpa === null || !academics ? '—' : academics.cumulativeGpa.toFixed(2)}
+          sub={academics?.standing ?? 'No graded work yet'}
           icon={<GraduationCap size={17} />}
           iconBg="bg-success-bg text-success"
+        />
+        <StatBlock
+          label="Attendance"
+          value={attendanceRate === null ? '—' : `${attendanceRate}%`}
+          sub={attendanceRate !== null && attendanceRate < 75 ? 'Below the 75% minimum' : 'Meets the minimum'}
+          icon={<BookOpen size={17} />}
+          iconBg="bg-info-bg text-info"
+        />
+        <StatBlock
+          label="Outstanding fees"
+          value={formatCurrency(balance.amount, balance.currency)}
+          sub={`${balance.count} unpaid invoice${balance.count === 1 ? '' : 's'}`}
+          icon={<HeartHandshake size={17} />}
+          iconBg="bg-warning-bg text-[#8A6D00]"
         />
       </div>
 

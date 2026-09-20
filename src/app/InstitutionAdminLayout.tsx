@@ -4,6 +4,7 @@ import { AdminFooter } from '../shared/layout/AdminFooter'
 import { Outlet, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import brandLogo from '../assets/Logo.jpg'
+import { canUsePortal } from '../shared/auth/portalRoutes'
 import { PortalAuthRedirect } from '../shared/components/PortalAuthRedirect'
 import { getSessionPerson, readPortalSession } from '../shared/storage/session'
 import { CampusProvider, useCampusContext } from '../modules/institution/context/CampusContext'
@@ -24,6 +25,7 @@ import {
   ClipboardList,
   FileText,
   GraduationCap,
+  ScrollText,
   Headset,
   Library,
   Megaphone,
@@ -53,6 +55,9 @@ const breadcrumbLabels: Record<string, string> = {
   '/admin/courses': 'Course Catalog',
   '/admin/institution/departments': 'Departments & Programs',
   '/admin/institution/academic-calendar': 'Academic Calendar',
+  '/admin/institution/programs': 'Academic Programs',
+  '/admin/transcripts': 'Transcripts & Academic Records',
+  '/admin/academic-reports': 'Academic Reports',
   '/admin/course-offerings': 'Course Offerings',
   '/admin/institution/structure': 'Organization',
   '/admin/institution/profile': 'Campus Profile',
@@ -114,7 +119,7 @@ function InstitutionAdminShell() {
     return () => window.removeEventListener(PEOPLE_UPDATED_EVENT, refresh)
   }, [path])
 
-  if (!session || session.role !== 'Admin' || !person) {
+  if (!session || !canUsePortal('/admin', session.role) || !person) {
     return <PortalAuthRedirect role="Admin" />
   }
 
@@ -158,8 +163,15 @@ function InstitutionAdminShell() {
         {
           label: departmentsLabel,
           to: '/admin/institution/departments',
-          active: isActive(['/admin/institution/departments', '/admin/institution/programs']),
+          active: isActive(['/admin/institution/departments']),
           icon: <UserCog size={ICON_SIZE} />,
+        },
+        {
+          label: t.trainingPrograms,
+          to: '/admin/institution/programs',
+          active: isActive(['/admin/institution/programs']),
+          icon: <GraduationCap size={ICON_SIZE} />,
+          show: mods.programs,
         },
         {
           label: t.trainingCatalog,
@@ -209,6 +221,13 @@ function InstitutionAdminShell() {
           active: isActive(['/admin/enrollments']),
           icon: <UserRoundCheck size={ICON_SIZE} />,
           show: mods.enrollments,
+        },
+        {
+          label: 'Transcripts & Records',
+          to: '/admin/transcripts',
+          active: isActive(['/admin/transcripts']),
+          icon: <ScrollText size={ICON_SIZE} />,
+          show: org.edition === 'university',
         },
         {
           label: t.learners,
@@ -314,6 +333,13 @@ function InstitutionAdminShell() {
           active: isActive(['/admin/payments']),
           icon: <Wallet size={ICON_SIZE} />,
           show: mods.payments,
+        },
+        {
+          label: 'Academic Reports',
+          to: '/admin/academic-reports',
+          active: isActive(['/admin/academic-reports']),
+          icon: <GraduationCap size={ICON_SIZE} />,
+          show: org.edition === 'university',
         },
         {
           label: 'Reports & Analytics',

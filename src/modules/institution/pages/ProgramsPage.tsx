@@ -118,12 +118,19 @@ export function ProgramsPage() {
       notify('Please provide a program name and code.', 'error')
       return
     }
+    const department = departments.find((d) => d.name === form.department)
+    if (!department) {
+      notify('Choose the department that owns this program.', 'error')
+      return
+    }
     const newProgram: ProgramRow = {
       id: createId('prog'),
       name: form.name.trim(),
       code: form.code.trim().toUpperCase(),
       level: form.level,
-      department: form.department,
+      departmentId: department.id,
+      department: department.name,
+      collegeId: department.collegeId,
       campusId: form.campusId,
       duration: form.duration.trim() || '—',
       enrolledCount: 0,

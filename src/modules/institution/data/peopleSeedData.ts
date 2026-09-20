@@ -16,10 +16,26 @@ const corePeople: PersonRow[] = [
     verificationStatus: 'verified',
   },
   {
+    // Head of the Computer Science department — uses the staff portal to run
+    // the department (sections, instructors, department reports).
+    id: 'u-hod-cs',
+    name: 'Dr. Hanna Girma',
+    email: 'h.girma@berana.edu',
+    role: 'HeadOfDepartment',
+    department: 'Computer Science',
+    departmentId: 'd1',
+    isDepartmentHead: true,
+    campusId: 'c1',
+    status: 'active',
+    lastActive: 'Today',
+    initials: 'HG',
+    verificationStatus: 'verified',
+  },
+  {
     id: 'u-reg',
     name: 'Getachew Nega',
     email: 'g.nega@berana.edu',
-    role: 'Staff',
+    role: 'Registrar',
     department: 'Registrar Office',
     campusId: 'c1',
     status: 'active',

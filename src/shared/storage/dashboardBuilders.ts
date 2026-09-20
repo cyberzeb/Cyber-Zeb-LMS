@@ -56,6 +56,7 @@ import {
 } from './announcementUtils'
 import { certificateToStudentItem } from '../../modules/institution/api/certificatesApi'
 import { toInstructorResources, toStudentResources } from './resourceUtils'
+import { buildStudentAcademicRecord } from '../academics/studentGradeHistory'
 
 function emptyStudentDashboard(student: PersonRow): StudentDashboardData {
   return {
@@ -231,10 +232,15 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
   const paymentRecords = readPayments()
   const helpDeskRecords = readHelpDeskTickets()
 
+  // Grades, GPA and standing come from graded work (see shared/academics).
+  const academicRecord = buildStudentAcademicRecord(student)
+
   return {
     ...base,
     courses,
     resources,
+    gradeHistory: academicRecord.gradeHistory,
+    grades: academicRecord.gradeHistory.flatMap((term) => term.courses),
     liveClasses,
     quizzes: studentQuizzes,
     assignments: studentAssignments,
@@ -246,6 +252,7 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
     standing: `${activeCount} active course${activeCount === 1 ? '' : 's'}`,
     kpis: {
       ...base.kpis,
+      gpa: academicRecord.gpa,
       activeCourses: activeCount,
       avgQuizScore: assessmentStats.avgQuizScore,
       dueThisWeek: assessmentStats.dueThisWeek,
@@ -261,6 +268,17 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
           ...s,
           value: String(assessmentStats.dueThisWeek),
           detail: assessmentStats.dueThisWeek === 1 ? '1 deadline' : `${assessmentStats.dueThisWeek} deadlines`,
+        }
+      }
+      if (s.label === 'Current GPA') {
+        const gpa = academicRecord.transcript.cumulativeGpa
+        return {
+          ...s,
+          value: gpa === null ? '—' : gpa.toFixed(2),
+          detail:
+            gpa === null
+              ? 'No graded work yet'
+              : `${academicRecord.transcript.standing} · ${academicRecord.transcript.creditsEarned} credits earned`,
         }
       }
       if (s.label === 'Avg. Quiz Score') {

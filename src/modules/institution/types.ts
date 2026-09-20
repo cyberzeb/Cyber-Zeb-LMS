@@ -262,9 +262,14 @@ export interface ProgramRow {
   code: string
   name: string
   level: ProgramLevel
+  /** Owning department — required by the academic hierarchy. */
+  departmentId: string
   department: string
+  collegeId?: string
   campusId: string
   duration: string
+  durationYears?: number
+  semestersPerYear?: number
   enrolledCount: number
   courseCount: number
   status: 'active' | 'draft' | 'archived'
@@ -442,8 +447,12 @@ export type PersonRole =
   | 'Student'
   | 'Instructor'
   | 'Admin'
+  /** Registrar: student records, enrolment and transcripts (admin portal). */
+  | 'Registrar'
   | 'Guardian'
   | 'Staff'
+  /** Head of department: runs one department (staff portal). */
+  | 'HeadOfDepartment'
   | 'HelpDesk'
 
 export interface PersonRow {
@@ -465,6 +474,8 @@ export interface PersonRow {
   submittedAt?: string
   submittedByName?: string
   submittedById?: string
+  /** Guardian accounts: the student they may follow. */
+  linkedStudentId?: string
   status: 'active' | 'invited' | 'suspended'
   lastActive: string
   initials: string

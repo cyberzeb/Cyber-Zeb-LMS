@@ -179,6 +179,58 @@ export const peoplePageConfigs: Record<PeoplePageFocus, PeoplePageConfig> = {
       ]
     },
   },
+  Registrar: {
+    title: 'Registrars',
+    subtitle:
+      'Registrar staff manage student records, enrolment and transcripts from the admin portal.',
+    inviteLabel: 'Add Registrar',
+    inviteTitle: 'Invite Registrar',
+    inviteDescription: 'Grant admin portal access for student records, enrolment and transcripts.',
+    defaultRole: 'Registrar',
+    lockRole: true,
+    searchPlaceholder: 'Search registrars by name or email...',
+    emptyMessage: 'No registrars match your search.',
+    showRoleTabs: false,
+    hideRoleColumn: true,
+    getStats: (people) => {
+      const registrars = filterRole(people, 'Registrar')
+      return [
+        { label: 'Registrars', value: registrars.length, icon: <UserCog size={STAT} /> },
+        { label: 'Active', value: countByStatus(registrars, 'active'), icon: <Users size={STAT} /> },
+        {
+          label: 'Pending Invites',
+          value: countByStatus(registrars, 'invited'),
+          icon: <MailPlus size={STAT} />,
+        },
+      ]
+    },
+  },
+  HeadOfDepartment: {
+    title: 'Heads of Department',
+    subtitle:
+      'Heads of department run one department: sections, instructor assignment and department reports.',
+    inviteLabel: 'Add Head of Department',
+    inviteTitle: 'Invite Head of Department',
+    inviteDescription: 'Grant staff portal access scoped to one academic department.',
+    defaultRole: 'HeadOfDepartment',
+    lockRole: true,
+    searchPlaceholder: 'Search heads of department by name or email...',
+    emptyMessage: 'No heads of department match your search.',
+    showRoleTabs: false,
+    hideRoleColumn: true,
+    getStats: (people) => {
+      const heads = filterRole(people, 'HeadOfDepartment')
+      return [
+        { label: 'Heads of Department', value: heads.length, icon: <UserCog size={STAT} /> },
+        { label: 'Active', value: countByStatus(heads, 'active'), icon: <Users size={STAT} /> },
+        {
+          label: 'Departments Covered',
+          value: new Set(heads.map((p) => p.department)).size,
+          icon: <Users size={STAT} />,
+        },
+      ]
+    },
+  },
   HelpDesk: {
     title: 'Help Desk Agents',
     subtitle:
@@ -288,6 +340,8 @@ export const tabToRole: Record<string, PersonRole> = {
   Admins: 'Admin',
   Guardians: 'Guardian',
   Staff: 'Staff',
+  Registrar: 'Registrar',
+  'Head of Department': 'HeadOfDepartment',
   'Help Desk': 'HelpDesk',
 }
 
@@ -295,8 +349,10 @@ export const roleOptions: PersonRole[] = [
   'Student',
   'Instructor',
   'Admin',
+  'Registrar',
   'Guardian',
   'Staff',
+  'HeadOfDepartment',
   'HelpDesk',
 ]
 

@@ -16,7 +16,7 @@ resolved at runtime in `src/shared/config/tenant.ts`.
 - ❌ Missing: not built
 - ➖ Not applicable to this edition
 
-Status as of Phase 2 (2026-09-18). Super Admin details: [SUPER_ADMIN.md](SUPER_ADMIN.md). Update this file whenever a row changes.
+Status as of Phase 3 (2026-09-20). Super Admin details: [SUPER_ADMIN.md](SUPER_ADMIN.md). Update this file whenever a row changes.
 
 ---
 
@@ -36,7 +36,7 @@ Status as of Phase 2 (2026-09-18). Super Admin details: [SUPER_ADMIN.md](SUPER_A
 | Payment gateway | 🟡 | Server checkout: Chapa (ETB) when `CHAPA_SECRET_KEY` is set, verified with Chapa before marking paid; demo provider on demo servers. Chapa not yet tested with real keys |
 | Email notifications | 🟡 | SMTP for onboarding only. No LMS event emails |
 | Report PDF export | ✅ | `exportInstitutionReport.ts` |
-| Automated tests | 🟡 | Backend: 45 tests (onboarding, tenants, security, scoping, grading, payments, tenant controls). Frontend: none |
+| Automated tests | 🟡 | Backend: 52 tests (onboarding, tenants, security, scoping, structure, grading, payments, tenant controls). Frontend: none |
 | Lint / type-check / build | ✅ | 0 lint errors (60 warnings tracked), `tsc` clean, build passes |
 | Read scoping per role | ✅ | Server builds each role's view (`lms_store/scope.py`): own records, own/taught courses, linked children; others as directory entries only. Answer keys never sent to students |
 | Per-person portal settings | ✅ | Fixed in Phase 1 (previously one shared object for all users) |
@@ -79,17 +79,19 @@ Status as of Phase 2 (2026-09-18). Super Admin details: [SUPER_ADMIN.md](SUPER_A
 
 | Feature | Status | Notes |
 |---|---|---|
-| Campuses | ✅ | |
-| Colleges / faculties → departments → programs | ✅ | |
-| Academic years → terms / semesters | ✅ | |
+| Campus → College → Department → Program → Course → Offering | ✅ | Enforced on the server: a record cannot point at a parent that does not exist |
+| Colleges / faculties → departments → programs | ✅ | Programs are first-class records owned by a department |
+| University report pack | ✅ | Enrolment by program, term summary, grade and standing distribution, students needing attention, Dean's List — all CSV exportable |
+| University roles (registrar, head of department) | ✅ | Registrar uses the admin portal; head of department uses the staff portal |
+| Academic years → terms / semesters | ✅ | Offerings now run in a term; grades and reports are grouped by it |
 | Course offerings (course per term) | ✅ | |
 | Students, instructors, staff, guardians, admins | ✅ | |
 | People verification workflow (staff submits, admin verifies) | ✅ | |
-| Tuition / fees (records) | 🟡 | No gateway |
-| Transcripts | ❌ | |
-| GPA computed from real grades | 🟡 | Seeded grade history |
-| Guardian portal | 🟡 | 4 pages |
-| Staff portal | 🟡 | 5 pages |
+| Tuition / fees | 🟡 | Server checkout (Chapa / demo). Students and guardians can pay |
+| Transcripts | ✅ | Per term with GPA, credits and standing; PDF download. Student, registrar and guardian views |
+| GPA computed from real grades | ✅ | Credit-weighted from graded work (`shared/academics`). Term GPA, cumulative GPA and academic standing |
+| Guardian portal | ✅ | Child's grades/transcript, attendance, fees (can pay online) and announcements |
+| Staff portal | ✅ | Department view (programs, sections, instructors, average GPA) for staff and heads of department |
 
 ## 5. Berana Corporate Edition
 

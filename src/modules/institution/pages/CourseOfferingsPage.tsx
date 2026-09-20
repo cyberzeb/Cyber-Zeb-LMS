@@ -18,6 +18,7 @@ import { SelectMenu } from '../../../shared/components/SelectMenu'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useCampusContext } from '../context/CampusContext'
+import { useAcademicCalendar } from '../hooks/useAcademicCalendar'
 import { useCourseOfferings } from '../hooks/useCourseOfferings'
 import { useCourses } from '../hooks/useCourses'
 import { usePeople } from '../hooks/usePeople'
@@ -62,6 +63,7 @@ const emptyOfferingForm = {
   departmentId: '',
   studyYear: 1,
   programSemester: 1,
+  academicTermId: '',
   courseId: '',
   sectionCode: '01',
   primaryInstructorId: '',
@@ -77,6 +79,7 @@ export function CourseOfferingsPage() {
   const { courses } = useCourses()
   const { people } = usePeople()
   const { offerings, addOffering, updateOffering, removeOffering } = useCourseOfferings()
+  const { terms, currentTerm } = useAcademicCalendar()
 
   const instructors = useMemo(
     () => people.filter((p) => p.role === 'Instructor' && p.status === 'active'),
@@ -129,6 +132,7 @@ export function CourseOfferingsPage() {
       studyYear: yearFilter ? Number(yearFilter) : 1,
       programSemester: semesterFilter ? Number(semesterFilter) : 1,
       courseId: '',
+      academicTermId: currentTerm?.id ?? terms[0]?.id ?? '',
       primaryInstructorId: instructors[0]?.id ?? '',
     })
     if (!defaultDept) {
@@ -161,6 +165,12 @@ export function CourseOfferingsPage() {
       return
     }
 
+    const term = terms.find((t) => t.id === form.academicTermId)
+    if (!term) {
+      notify('Choose the academic term this section runs in.', 'error')
+      return
+    }
+
     addOffering({
       courseId: course.id,
       courseCode: course.code,
@@ -169,6 +179,8 @@ export function CourseOfferingsPage() {
       departmentName: dept.name,
       studyYear: form.studyYear,
       programSemester: form.programSemester,
+      academicTermId: term.id,
+      academicTermName: term.name,
       campusId: dept.campusId,
       sectionCode: form.sectionCode.trim() || '01',
       primaryInstructorId: instructor?.id,
@@ -321,6 +333,11 @@ export function CourseOfferingsPage() {
                     </td>
                     <td className="px-5 py-3 text-slate-600 text-xs">
                       {formatProgramSlot(offering.studyYear, offering.programSemester ?? 1)}
+                      <div className="text-[11px] text-slate-500">
+                        {terms.find((t) => t.id === offering.academicTermId)?.name ?? (
+                          <span className="text-warning font-semibold">No term set</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-5 py-3 text-slate-600">{offering.departmentName}</td>
                     <td className="px-5 py-3 min-w-[180px]">
@@ -447,7 +464,19 @@ export function CourseOfferingsPage() {
           }}
         />
 
-        <p className="text-[11px] font-bold uppercase tracking-wide text-secondary-text pt-1">5. Section details</p>
+        <FormField
+          label="5. Academic term"
+          type="select"
+          value={terms.find((t) => t.id === form.academicTermId)?.name ?? ''}
+          options={terms.map((t) => t.name)}
+          onChange={(label) => {
+            const term = terms.find((t) => t.name === label)
+            setForm({ ...form, academicTermId: term?.id ?? '' })
+          }}
+          hint="Calendar term this section runs in — grades and transcripts are grouped by it."
+        />
+
+        <p className="text-[11px] font-bold uppercase tracking-wide text-secondary-text pt-1">6. Section details</p>
         <div className="grid grid-cols-2 gap-4">
           <FormField
             label="Section code"

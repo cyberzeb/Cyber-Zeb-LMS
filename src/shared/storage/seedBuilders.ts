@@ -18,11 +18,18 @@ const INSTRUCTOR_IDS: Record<string, string> = {
   'Kidist Yohannes': 'u7',
 }
 
+/** Credit hours per course — GPA and graduation totals are weighted by these. */
+function seedCredits(code: string): number {
+  const level = Number(code.match(/(\d)\d\d/)?.[1] ?? 1)
+  return level >= 3 ? 4 : 3
+}
+
 export function seedCourseRecords(): CourseRecord[] {
   return seedCourses
     .filter((course) => course.status === 'published')
     .map((course) => ({
       ...course,
+      credits: seedCredits(course.code),
       approvalStatus: 'approved' as const,
       instructorId: INSTRUCTOR_IDS[course.instructor],
       discussionForumEnabled: true,
@@ -81,9 +88,11 @@ export function seedEnrollmentRecords(
     )
     const { rows } = buildCohortEnrollmentRows(cohortStudents, catalog, enrollments)
     for (const row of rows) {
+      const offering = catalog.find((o) => o.id === row.courseOfferingId)
       enrollments.push({
         id: createId('enr'),
         ...row,
+        academicTermId: offering?.academicTermId,
         progress: seedProgress(row.studentId, row.courseId),
         enrolledOn: '2026-01-10',
       })

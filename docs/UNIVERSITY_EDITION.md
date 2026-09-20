@@ -162,21 +162,25 @@ Steps 1–8 are **configuration** (Registrar + Academic Admin). Steps 9–15 are
 
 ---
 
-## 7. Implementation status
+## 7. Implementation status (Phase 3, 2026-09-20)
 
 | Layer | Status |
 |-------|--------|
-| Spec (this doc) | ✅ |
-| Backend roles | ✅ Updated in `permissions.py` |
-| Backend models | ✅ `academic`, `courses`, `colleges` |
-| Alembic migration | 🔲 Sprint 2 — run when DB ready |
-| Frontend types | ✅ `types/academic.ts` |
-| JSON collections | ✅ `academic-years`, `academic-terms`, `course-offerings` |
-| UI pages for calendar/offerings | ✅ Sprint 2 admin pages |
-| Enrollment migration | ✅ Offering-based enrollments |
-| API routes | 🔲 Sprint 2 (`/academic`, `/courses`) |
+| Hierarchy enforced on writes | ✅ `backend/app/modules/lms_store/validation.py` — a record cannot point at a missing parent |
+| Programs as first-class records | ✅ Owned by a department; `/admin/institution/programs` |
+| Offering = catalog course + curriculum slot + **academic term** | ✅ Term is required for new offerings and shown in the list |
+| Enrollment → offering (with term) | ✅ Seeded and validated |
+| Grades, GPA, academic standing | ✅ `src/shared/academics` — credit-weighted, from graded work |
+| Transcripts (student, registrar, guardian) + PDF | ✅ |
+| University report pack | ✅ `/admin/academic-reports`, CSV exports |
+| Guardian portal | ✅ Grades/transcript, attendance, fees (online payment) |
+| Staff portal (department / head of department) | ✅ `/staff/department` |
+| Roles: registrar, head of department | ✅ Registrar → admin portal, HoD → staff portal |
+| Alembic migration for academic tables | 🔲 Data still lives in the `lms_store` JSON collections |
+| Normalized `/academic` + `/courses` API routes | 🔲 Phase: backend modules |
 
----
+Known gaps: grade weighting uses total points across graded work (no per-category
+weights yet), and there is no retake/grade-replacement policy.
 
 ## 8. Recommended next sprint (Sprint 2)
 

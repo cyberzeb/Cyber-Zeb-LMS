@@ -16,6 +16,16 @@ export const DEMO_ACCOUNTS: Record<
     name: 'Dr. Aaron Selassie',
     email: 'a.selassie@berana.edu',
   },
+  Registrar: {
+    id: 'u-reg',
+    name: 'Getachew Nega',
+    email: 'g.nega@berana.edu',
+  },
+  HeadOfDepartment: {
+    id: 'u-hod-cs',
+    name: 'Dr. Hanna Girma',
+    email: 'h.girma@berana.edu',
+  },
   Staff: {
     id: 'u7',
     name: 'Kidist Yohannes',

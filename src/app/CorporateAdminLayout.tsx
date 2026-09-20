@@ -4,6 +4,7 @@ import brandLogo from '../assets/Logo.jpg'
 import { Sidebar } from '../shared/layout/Sidebar'
 import { AdminTopHeader } from '../shared/layout/AdminTopHeader'
 import { AdminFooter } from '../shared/layout/AdminFooter'
+import { canUsePortal } from '../shared/auth/portalRoutes'
 import { PortalAuthRedirect } from '../shared/components/PortalAuthRedirect'
 import { getSessionPerson, readPortalSession } from '../shared/storage/session'
 import { CampusProvider, useCampusContext } from '../modules/institution/context/CampusContext'
@@ -46,7 +47,7 @@ function CorporateAdminShell() {
     return () => window.removeEventListener(PEOPLE_UPDATED_EVENT, refresh)
   }, [path])
 
-  if (!session || session.role !== 'Admin' || !person) {
+  if (!session || !canUsePortal('/admin', session.role) || !person) {
     return <PortalAuthRedirect role="Admin" />
   }
 

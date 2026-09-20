@@ -1,4 +1,4 @@
-import { BookOpen, CalendarDays, ClipboardList, GraduationCap, Headset, LayoutDashboard, LibraryBig, Megaphone, MonitorPlay, Settings, SquarePen, UserRoundCheck, Wallet, BookCheck, Users } from 'lucide-react'
+import { ScrollText, BookOpen, CalendarDays, ClipboardList, GraduationCap, Headset, LayoutDashboard, LibraryBig, Megaphone, MonitorPlay, Settings, SquarePen, UserRoundCheck, Wallet, BookCheck, Users } from 'lucide-react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
 import { Sidebar } from '../../../shared/layout/Sidebar'
@@ -21,6 +21,7 @@ const breadcrumbLabels: Record<string, string> = {
   '/student/assignments': 'Assignment Dropboxes',
   '/student/calendar': 'Schedules and Calendars',
   '/student/grades': 'Grades and Feedback',
+  '/student/transcript': 'Academic Transcript',
   '/student/attendance': 'Attendance',
   '/student/announcements': 'Announcements',
   '/student/forum': 'Discussion Forum',
@@ -116,6 +117,12 @@ export function StudentLayout() {
           to: '/student/grades',
           active: isActive('/student/grades'),
           icon: <GraduationCap size={ICON_SIZE} />,
+        },
+        {
+          label: 'Transcript',
+          to: '/student/transcript',
+          active: isActive('/student/transcript'),
+          icon: <ScrollText size={ICON_SIZE} />,
         },
         {
           label: 'Attendance',

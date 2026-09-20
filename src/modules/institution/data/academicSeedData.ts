@@ -1,6 +1,10 @@
 import type { AcademicTermRecord, AcademicYearRecord, CourseOfferingRecord } from '../types/academic'
 
 const CAMPUS_ID = 'c1'
+
+function todayIso(): string {
+  return new Date().toISOString().slice(0, 10)
+}
 const PROGRAM_YEARS = 4
 
 /** Build a stable academic calendar: `programYears` × 2 semesters (Fall + Spring). */
@@ -172,8 +176,17 @@ export function buildCourseOfferingsFromCatalog(
               ? 'in_person'
               : 'online'
 
+      // Semester 1 sections ran in the finished Fall term; semester 2 sections
+      // run in the current Spring term. Grades are grouped by this term.
+      const term =
+        programSemester === 1
+          ? seedAcademicTerms.find((t) => t.code.endsWith('-FALL') && t.endDate < todayIso())
+          : seedAcademicTerms.find((t) => t.isCurrent)
+
       return {
         id: `off-${course.code.toLowerCase()}-y${studyYear}-s${programSemester}`,
+        academicTermId: term?.id,
+        academicTermName: term?.name,
         courseId: course.id,
         courseCode: course.code,
         courseTitle: course.title,

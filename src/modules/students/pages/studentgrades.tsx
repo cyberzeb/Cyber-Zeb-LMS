@@ -16,13 +16,11 @@ export function StudentGradesPage() {
     [data],
   )
 
-  const cumulativeGpa = useMemo(() => {
-    if (!data?.gradeHistory.length) return '—'
-    const completed = data.gradeHistory.filter((s) => s.status === 'completed')
-    if (completed.length === 0) return data.kpis.gpa.toFixed(2)
-    const avg = completed.reduce((sum, s) => sum + s.gpa, 0) / completed.length
-    return ((avg + data.kpis.gpa) / 2).toFixed(2)
-  }, [data])
+  // Cumulative GPA is credit-weighted across every graded course (see shared/academics).
+  const cumulativeGpa = useMemo(
+    () => (data && data.kpis.gpa > 0 ? data.kpis.gpa.toFixed(2) : '—'),
+    [data],
+  )
 
   const stats = useMemo(() => {
     const courses = currentSemester?.courses ?? data?.grades ?? []

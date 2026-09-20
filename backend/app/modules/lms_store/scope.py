@@ -140,6 +140,22 @@ class ScopeContext:
             ids |= {r.get("id") for r in await self._list(key) if r.get("courseId") in course_ids}
         return ids
 
+    async def my_department(self) -> Optional[str]:
+        """Department name of the signed-in person (department admins / heads)."""
+        me = await self.me()
+        return (me or {}).get("department")
+
+    async def department_assessment_ids(self) -> set[str]:
+        department = await self.my_department()
+        if not department:
+            return set()
+        ids: set[str] = set()
+        for key in ("quizzes", "assignments"):
+            ids |= {
+                r.get("id") for r in await self._list(key) if r.get("department") == department
+            }
+        return ids
+
     async def visible_chat_ids(self) -> set[str]:
         courses = await self.my_course_ids()
         visible = set()
@@ -262,7 +278,16 @@ async def filter_collection(key: str, data: Any, ctx: ScopeContext) -> Any:
             return records
         return []
 
-    if role == Role.DEPARTMENT_ADMIN and key == "enrollments":
-        return records
+    if role == Role.DEPARTMENT_ADMIN:
+        # Department admins and heads of department see their own department.
+        if key == "enrollments":
+            return records
+        department = await ctx.my_department()
+        if key in ("attendances", "assignments", "quizzes", "certificates"):
+            return [r for r in records if r.get("department") == department]
+        if key == "student-submissions":
+            assessments = await ctx.department_assessment_ids()
+            return [r for r in records if r.get("assessmentId") in assessments]
+        return []
     return []
 

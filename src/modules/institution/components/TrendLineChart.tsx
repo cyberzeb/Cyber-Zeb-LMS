@@ -82,8 +82,8 @@ export function TrendLineChart({
       ) : (
       <div className={`w-full flex-1 ${compact ? 'min-h-[260px]' : 'min-h-[220px]'}`}>
         <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet" className="w-full h-full" aria-hidden>
-          {geometry.yTicks.map((tick) => (
-            <g key={tick.value}>
+          {geometry.yTicks.map((tick, index) => (
+            <g key={`${tick.value}-${index}`}>
               <line
                 x1={geometry.padding.left}
                 y1={tick.y}

@@ -69,9 +69,12 @@ export interface CourseOfferingRecord {
   studyYear: number
   /** Semester within that study year (1 = first semester, 2 = second, …) */
   programSemester: number
-  /** @deprecated Legacy calendar link — use programSemester + studyYear instead */
+  /**
+   * Calendar term the section runs in. Required for new offerings: grades,
+   * transcripts and term reports are grouped by it. (Study year + program
+   * semester place the course on the curriculum; the term is when it runs.)
+   */
   academicTermId?: string
-  /** @deprecated Legacy display — use formatProgramSlot instead */
   academicTermName?: string
   campusId?: string
   sectionCode: string             // e.g. "01", "A"

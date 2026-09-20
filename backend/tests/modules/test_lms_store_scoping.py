@@ -179,3 +179,29 @@ async def test_concurrent_first_writes_both_saved(env):
     assert first.status_code == 200 and second.status_code == 200
     ids = {c["id"] for c in (await client.get(url, headers=headers)).json()["data"]}
     assert ids == {"chat-a", "chat-b"}
+
+
+# ── Department scope (staff / head of department) ───────────────────────────
+
+
+async def test_department_admin_sees_only_its_department(env):
+    client, tenants = env
+    admin = _auth(tenants["tenant-a"], "admin-1", "Admin")
+    # Staff member belongs to Computer Science; two assignments in two departments.
+    await client.patch(
+        "/api/v1/data/people",
+        json={"upserts": [{"record": {"id": "staff-1", "name": "Sue Staff", "role": "Staff",
+                                      "department": "Computer Science"}}]},
+        headers=admin,
+    )
+    await client.patch(
+        "/api/v1/data/assignments",
+        json={"upserts": [
+            {"record": {"id": "asg-cs", "courseId": "c1", "department": "Computer Science"}},
+            {"record": {"id": "asg-law", "courseId": "c2", "department": "Law"}},
+        ]},
+        headers=admin,
+    )
+    visible = await _read(client, tenants, "staff-1", "Staff", "assignments")
+    assert [a["id"] for a in visible] == ["asg-cs"]
+    assert await _read(client, tenants, "staff-1", "Staff", "payments") == []

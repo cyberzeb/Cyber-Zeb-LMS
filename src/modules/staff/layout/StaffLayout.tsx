@@ -1,16 +1,11 @@
-import {
-  ClipboardCheck,
-  LayoutDashboard,
-  Megaphone,
-  Settings,
-  UserPlus,
-} from 'lucide-react'
+import { Building2, ClipboardCheck, LayoutDashboard, Megaphone, Settings, UserPlus } from 'lucide-react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
 import { Sidebar } from '../../../shared/layout/Sidebar'
 import { AdminTopHeader } from '../../../shared/layout/AdminTopHeader'
 import { AdminFooter } from '../../../shared/layout/AdminFooter'
 import brandLogo from '../../../assets/Logo.jpg'
+import { canUsePortal } from '../../../shared/auth/portalRoutes'
 import { PortalAuthRedirect } from '../../../shared/components/PortalAuthRedirect'
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 import { readInstitutionName } from '../../../shared/storage/readers'
@@ -37,7 +32,7 @@ export function StaffLayout() {
     mainRef.current?.scrollTo({ top: 0, behavior: 'auto' })
   }, [location.pathname])
 
-  if (!session || session.role !== 'Staff' || !person) {
+  if (!session || !canUsePortal('/staff', session.role) || !person) {
     return <PortalAuthRedirect role="Staff" />
   }
 
@@ -55,6 +50,12 @@ export function StaffLayout() {
           to: '/staff',
           active: isActive('/staff'),
           icon: <LayoutDashboard size={ICON_SIZE} />,
+        },
+        {
+          label: 'My Department',
+          to: '/staff/department',
+          active: isActive('/staff/department'),
+          icon: <Building2 size={ICON_SIZE} />,
         },
         {
           label: 'Submit People',

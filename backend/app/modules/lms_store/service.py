@@ -7,6 +7,7 @@ from app.core.exceptions import NotFoundError, PermissionDeniedError, Validation
 from app.core.permissions import Role
 from app.modules.lms_store import policy
 from app.modules.lms_store.scope import ScopeContext, filter_collection
+from app.modules.lms_store.validation import StructureViolation, VALIDATED_COLLECTIONS, check_structure
 from app.modules.lms_store.repository import LmsCollectionRepository
 from app.modules.tenants.repository import TenantRepository
 
@@ -82,7 +83,18 @@ class LmsStoreService:
             return [] if default is None else default
         return row.data
 
-    async def put_collection(self, tenant_id: uuid.UUID, key: str, data: Any) -> Any:
+    async def put_collection(
+        self, tenant_id: uuid.UUID, key: str, data: Any, *, person_id: str = "", role: Any = None
+    ) -> Any:
+        if key in VALIDATED_COLLECTIONS and isinstance(data, list):
+            ctx = self.scope_context(tenant_id, person_id, role)
+            try:
+                for record in data:
+                    if isinstance(record, dict):
+                        # Replacing the collection re-creates every record.
+                        await check_structure(key, None, record, ctx.load)
+            except StructureViolation as exc:
+                raise ValidationAppError(str(exc)) from exc
         await self.repo.ensure_row(tenant_id, key, data)
         row = await self.repo.upsert(tenant_id, key, data)
         await self.db.commit()
@@ -157,6 +169,8 @@ class LmsStoreService:
                     old = data[index[record_id]] if record_id in index else None
                     if not is_admin:
                         await policy.check_record_change(key, ctx, old, record)
+                    if key in VALIDATED_COLLECTIONS:
+                        await check_structure(key, old, record, ctx.load)
                     if old is not None:
                         data[index[record_id]] = record
                         continue
@@ -180,6 +194,9 @@ class LmsStoreService:
         except policy.PolicyViolation as exc:
             await self.db.rollback()
             raise PermissionDeniedError(str(exc)) from exc
+        except StructureViolation as exc:
+            await self.db.rollback()
+            raise ValidationAppError(str(exc)) from exc
 
         row = await self.repo.upsert(tenant_id, key, data)
         await self.db.commit()

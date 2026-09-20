@@ -33,6 +33,8 @@ import {
   buildSeedOfferingsAndEnrollments,
   seedCourseRecords,
 } from './seedBuilders'
+import { buildAcademicHistory } from '../../modules/institution/data/academicHistorySeed'
+import { buildProgramsFromDepartments } from '../../modules/institution/data/programsSeedData'
 
 function mergeDemoLearningCourse(catalog: CourseRecord[]): CourseRecord[] {
   const demo = createDemoLearningCourse()
@@ -58,6 +60,20 @@ export function buildSeedPayload(): Record<string, unknown> {
   const { courses, courseOfferings, enrollments } = buildSeedOfferingsAndEnrollments(coursesBase)
   const people = ensureDemoStudentInPeople(seedPeople)
 
+  // Degree programs sit between department and course in the hierarchy.
+  const programs = buildProgramsFromDepartments(seedDepartments, Object.fromEntries(
+    seedDepartments.map((department) => [
+      department.id,
+      {
+        students: people.filter((p) => p.role === 'Student' && p.departmentId === department.id).length,
+        courses: courses.filter((c) => c.department === department.name).length,
+      },
+    ]),
+  ))
+
+  // Coursework and grades for every offering, so transcripts have real history.
+  const history = buildAcademicHistory(courseOfferings, enrollments, courses, seedAcademicTerms)
+
   return {
     campuses: seedCampuses,
     colleges: seedColleges,
@@ -80,14 +96,14 @@ export function buildSeedPayload(): Record<string, unknown> {
     'forum-messages': [],
     'forum-read-state': {},
     'live-sessions': seedLiveSessions,
-    assignments: seedAssignments,
-    quizzes: seedQuizzes,
+    assignments: [...seedAssignments, ...history.assignments],
+    quizzes: [...seedQuizzes, ...history.quizzes],
     'question-bank': seedQuestions,
-    'student-submissions': seedStudentSubmissions,
+    'student-submissions': [...seedStudentSubmissions, ...history.submissions],
     payments: seedPayments,
     'help-desk-tickets': seedHelpDeskTickets,
     integrations: seedIntegrations,
-    programs: [],
+    programs,
     'student-settings': {},
     'instructor-settings': {},
     'staff-settings': {},

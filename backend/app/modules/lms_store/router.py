@@ -83,7 +83,13 @@ async def put_collection(
             detail="Only administrators can replace a whole collection",
         )
     service = LmsStoreService(db)
-    data = await service.put_collection(principal.tenant_id, _valid_key(collection_key), payload.data)
+    data = await service.put_collection(
+        principal.tenant_id,
+        _valid_key(collection_key),
+        payload.data,
+        person_id=principal.person_id,
+        role=principal.role,
+    )
     return CollectionOut(key=collection_key, data=data)
 
 

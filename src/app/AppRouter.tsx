@@ -19,6 +19,9 @@ import { DepartmentsPage } from '../modules/institution/pages/DepartmentsPage'
 import { AcademicCalendarPage } from '../modules/institution/pages/AcademicCalendarPage'
 import { CourseOfferingsPage } from '../modules/institution/pages/CourseOfferingsPage'
 import { CoursesPage } from '../modules/institution/pages/CoursesPage'
+import { ProgramsPage } from '../modules/institution/pages/ProgramsPage'
+import { TranscriptsPage } from '../modules/institution/pages/TranscriptsPage'
+import { AcademicReportsPage } from '../modules/institution/pages/AcademicReportsPage'
 import { ResourcesAdminPage } from '../modules/institution/pages/ResourcesAdminPage'
 import { PeoplePage } from '../modules/institution/pages/PeoplePage'
 import { StudentsPage } from '../modules/institution/pages/StudentsPage'
@@ -51,6 +54,7 @@ import { StudentQuizzesPage } from '../modules/students/pages/studentquizzes'
 import { StudentAssignmentsPage } from '../modules/students/pages/studentassignments'
 import { StudentCalendarPage } from '../modules/students/pages/studentcalendar'
 import { StudentGradesPage } from '../modules/students/pages/studentgrades'
+import { StudentTranscriptPage } from '../modules/students/pages/studenttranscript'
 import { StudentCoursesShell } from '../modules/students/pages/StudentCoursesShell'
 import { StudentLiveClassesPage } from '../modules/students/pages/studentliveclasses'
 import { StudentAttendancePage } from '../modules/students/pages/studentattendance'
@@ -79,12 +83,16 @@ import { InstructorSettingsPage } from '../modules/instructors/pages/instructors
 import { StaffLayout } from '../modules/staff/layout/StaffLayout'
 import { StaffDashboardPage } from '../modules/staff/pages/staffdashboard'
 import { StaffSubmitPeoplePage } from '../modules/staff/pages/staffsubmitpeople'
+import { StaffDepartmentPage } from '../modules/staff/pages/staffdepartment'
 import { StaffSubmissionsPage } from '../modules/staff/pages/staffsubmissions'
 import { StaffAnnouncementsPage } from '../modules/staff/pages/staffannouncements'
 import { StaffSettingsPage } from '../modules/staff/pages/staffsettings'
 import { GuardianLayout } from '../modules/guardian/layout/GuardianLayout'
 import { GuardianDashboardPage } from '../modules/guardian/pages/guardiandashboard'
 import { GuardianProgressPage } from '../modules/guardian/pages/guardianprogress'
+import { GuardianGradesPage } from '../modules/guardian/pages/guardiangrades'
+import { GuardianAttendancePage } from '../modules/guardian/pages/guardianattendance'
+import { GuardianPaymentsPage } from '../modules/guardian/pages/guardianpayments'
 import { GuardianAnnouncementsPage } from '../modules/guardian/pages/guardianannouncements'
 import { GuardianSettingsPage } from '../modules/guardian/pages/guardiansettings'
 import { HelpDeskLayout } from '../modules/helpdesk/layout/HelpDeskLayout'
@@ -190,6 +198,10 @@ export const router = createBrowserRouter([
       {
         path: 'grades',
         element: <StudentGradesPage />,
+      },
+      {
+        path: 'transcript',
+        element: <StudentTranscriptPage />,
       },
       {
         path: 'courses',
@@ -308,6 +320,7 @@ export const router = createBrowserRouter([
     element: <StaffLayout />,
     children: [
       { index: true, element: <StaffDashboardPage /> },
+      { path: 'department', element: <StaffDepartmentPage /> },
       { path: 'submit-people', element: <StaffSubmitPeoplePage /> },
       { path: 'submissions', element: <StaffSubmissionsPage /> },
       { path: 'announcements', element: <StaffAnnouncementsPage /> },
@@ -320,6 +333,9 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <GuardianDashboardPage /> },
       { path: 'progress', element: <GuardianProgressPage /> },
+      { path: 'grades', element: <GuardianGradesPage /> },
+      { path: 'attendance', element: <GuardianAttendancePage /> },
+      { path: 'payments', element: <GuardianPaymentsPage /> },
       { path: 'announcements', element: <GuardianAnnouncementsPage /> },
       { path: 'settings', element: <GuardianSettingsPage /> },
     ],
@@ -381,7 +397,15 @@ export const router = createBrowserRouter([
       },
       {
         path: 'institution/programs',
-        element: <Navigate to="/admin/institution/departments" replace />,
+        element: <ProgramsPage />,
+      },
+      {
+        path: 'transcripts',
+        element: <TranscriptsPage />,
+      },
+      {
+        path: 'academic-reports',
+        element: <AcademicReportsPage />,
       },
       {
         path: 'institution/academic-calendar',
