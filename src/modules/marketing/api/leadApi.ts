@@ -1,15 +1,17 @@
 import { axiosClient } from '../../../lib/axiosClient'
+import { toMasterDataPayload } from '../masterData'
 import type { ServiceRequestPayload } from '../types'
 
 /**
  * Submit a public institution registration to the onboarding backend so it
  * shows up in the Super Admin console for review/activation.
  *
- * Institutions register by edition only — no module selection. The backend
- * automatically grants the full module suite to every activated tenant.
+ * The institution chooses its own modules and only those are activated. Sending
+ * no module list at all still means the full catalog, which keeps any older
+ * client working.
  */
 export async function submitServiceRequest(payload: ServiceRequestPayload) {
-  const body = {
+  const body: Record<string, unknown> = {
     institution_name: payload.institutionName,
     institution_type: payload.institutionType,
     contact_name: payload.contactName,
@@ -18,7 +20,10 @@ export async function submitServiceRequest(payload: ServiceRequestPayload) {
     estimated_users: payload.estimatedUsers?.trim() || 'Not specified',
     preferred_slug: payload.preferredSubdomain?.trim() || null,
     message: payload.message?.trim() || null,
-    // requested_modules intentionally omitted → backend enables ALL modules.
+    requested_modules: payload.selectedModules,
+  }
+  if (payload.masterData) {
+    body.master_data = toMasterDataPayload(payload.masterData)
   }
 
   const { data } = await axiosClient.post('/service-requests', body, {

@@ -20,7 +20,7 @@ Status legend: ✅ works end to end (tested in the browser) · 🟡 works with g
 
 | Step | Where | What happens | Status |
 |---|---|---|---|
-| 1. Institution registers | Public landing page → "Request Service" form | Creates a service request (edition: University, Corporate or Training). All modules are included. | ✅ |
+| 1. Institution registers | `/request` page | The institution fills in its Institution Master Data (10 groups) and picks its modules — every box ticked by default, so it removes what it does not need. Creates a service request with an `INST-000n` reference. | ✅ |
 | 2. Review the request | Service Requests → request | Shows contact, edition, subdomain and email log | ✅ |
 | 3. Send invoice | Request → Amount, Currency, Payment instructions → **Send Invoice** | Emails the invoice to the contact | ✅ |
 | 4. Confirm payment | Request → **Confirm Payment** | Records that the institution paid (offline / bank transfer) | ✅ |
@@ -47,8 +47,8 @@ Status legend: ✅ works end to end (tested in the browser) · 🟡 works with g
 | Page | Status | Notes |
 |---|---|---|
 | Overview | ✅ | Counts and quick actions |
-| Manage Modules & Pricing | 🟡 | Works, but prices are not used anywhere: every institution gets all modules (see Decisions) |
-| Add-On Requests | ❌ | No way to create one: institutions have no "request add-on" screen (see Decisions) |
+| Manage Modules & Pricing | 🟡 | Works, and the selection is now enforced per institution. Prices still only drive the estimate shown on a request |
+| Add-On Requests | ✅ | An institution hits a locked module in its workspace and clicks "Request this module", which lands here |
 | Landing Page Content | ✅ | The announcement banner shows on the public landing page |
 | Appearance & Branding | ✅ | Footer text, links, support contacts, logo/favicon upload |
 | System Settings | ✅ | Platform key/value settings |
@@ -83,12 +83,27 @@ Status legend: ✅ works end to end (tested in the browser) · 🟡 works with g
 - An expired console session now returns to sign-in instead of showing errors.
 - Invite emails pointed to a removed password page. They now explain code sign-in.
 
+## Module entitlement
+
+An institution only gets the modules it selected when registering. This is
+enforced on the server, not just hidden in the interface:
+
+* Module routers are gated — a call for a module the institution did not take
+  answers `403 module_not_enabled` and names the module in `error.details`.
+* `/api/v1/data/<collection>` is gated the same way, which is where the portal
+  actually reads and writes. A bulk read simply omits locked collections.
+* `GET /api/v1/tenants/me/modules` tells the workspace which modules are enabled,
+  so the sidebar can show the rest locked with a "Request this module" action.
+* Tenant & Institution Management and Identity & Access are always on, and an
+  institution with no recorded selection keeps the full catalog, so nothing that
+  predates module selection loses access.
+
 ## Decisions needed (product owner)
 
-1. **Add-ons and module pricing.** Registration now includes every module, so add-on
-   requests can never be created and module prices are unused. Either remove the
-   Add-On Requests page and prices, or build an "request add-on" screen for
-   institution admins and stop granting all modules at activation.
+1. **Module pricing.** Institutions now choose their modules at registration and
+   only those are activated, so add-on requests are reachable from the workspace.
+   What remains open is pricing: module prices drive only the estimate on a
+   request, not an actual per-module invoice.
 2. **User reports and bans.** Either remove this part of the Security Center (tenant
    admins can already suspend their own people), or rebuild it on portal accounts
    with a "report a user" action in the portals.

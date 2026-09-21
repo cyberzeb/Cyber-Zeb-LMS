@@ -6,6 +6,7 @@ Every repository/query MUST apply tenant scope from the authenticated
 server context, never from client input. Session helpers below are the
 single choke point through which all DB access should flow.
 """
+import logging
 from typing import AsyncGenerator
 
 from sqlalchemy.dialects.postgresql import JSONB
@@ -16,6 +17,8 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.pool import StaticPool
 
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 @compiles(JSONB, "sqlite")
@@ -94,6 +97,40 @@ async def init_db() -> None:
     async with engine.connect() as conn:
         if not await conn.run_sync(_has_tenants):
             raise RuntimeError("SQLite init_db ran but table 'tenants' was not created")
+
+    await _add_missing_columns()
+
+
+# Columns added to tables that already exist in deployed databases. create_all
+# only creates missing *tables*, and these deployments were never stamped by
+# Alembic, so a new column has to be added here or the API 500s on the first
+# request that touches it. Each entry stays until every environment is past it.
+_ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
+    # Institution Master Data (Master_Data.pdf), added 2026-09-21.
+    ("service_requests", "master_data", "JSON"),
+    ("service_requests", "institution_ref", "VARCHAR(20)"),
+)
+
+
+async def _add_missing_columns() -> None:
+    """Add any column in _ADDED_COLUMNS that this database does not have yet."""
+    from sqlalchemy import inspect as sa_inspect, text
+
+    def _columns(sync_conn, table: str) -> set[str]:
+        inspector = sa_inspect(sync_conn)
+        if not inspector.has_table(table):
+            return set()
+        return {col["name"] for col in inspector.get_columns(table)}
+
+    is_postgres = engine.dialect.name == "postgresql"
+    async with engine.begin() as conn:
+        for table, column, column_type in _ADDED_COLUMNS:
+            existing = await conn.run_sync(_columns, table)
+            if not existing or column in existing:
+                continue
+            sql_type = "JSONB" if (is_postgres and column_type == "JSON") else column_type
+            await conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {sql_type}"))
+            logger.info("Added missing column %s.%s", table, column)
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:

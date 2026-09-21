@@ -1,7 +1,9 @@
+import type { ModuleKey } from '../../shared/constants/modules'
+import type { MasterDataForm } from './masterData'
+
 /**
- * Institution edition / category. Registration is by edition only — every
- * activated institution receives the full module suite (no module selection).
- * Values match the backend `InstitutionType` enum.
+ * Institution edition / category. Values match the backend `InstitutionType` enum.
+ * Modules are chosen separately on the request page — see MODULE_CATALOG.
  */
 export type InstitutionType =
   | 'college_university'
@@ -23,6 +25,10 @@ export interface ServiceRequestPayload {
   estimatedUsers: string
   preferredSubdomain: string
   message: string
+  /** Modules the institution selected. Only these are activated. */
+  selectedModules: ModuleKey[]
+  /** Institution Master Data, omitted for a short enquiry. */
+  masterData?: MasterDataForm
 }
 
 export interface ServiceLead extends ServiceRequestPayload {

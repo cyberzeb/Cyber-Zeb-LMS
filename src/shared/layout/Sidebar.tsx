@@ -1,19 +1,29 @@
 import { Link, useLocation } from 'react-router-dom'
-import { useCallback, useEffect, useRef, type ReactNode } from 'react'
-import { Activity, HardDrive } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Activity, HardDrive, Lock } from 'lucide-react'
 import { useLanguage } from '../i18n/LanguageProvider'
+import { useTenantModules } from '../hooks/useTenantModules'
+import { ModuleUpsellDialog } from '../components/ModuleUpsellDialog'
+import type { ModuleKey } from '../constants/modules'
 
-interface NavItem {
+export interface NavItem {
   label: string
   to?: string
   active?: boolean
   icon?: ReactNode
   badge?: number
+  /**
+   * The module this destination belongs to. When the institution did not buy it
+   * the row is shown locked, with a way to request it, rather than linking to a
+   * page whose every request the API refuses.
+   */
+  module?: ModuleKey
 }
 
-interface NavSection {
+export interface NavSection {
   title: string
-  items: NavItem[]
+  /** `show: false` hides an item for this edition, before any module check. */
+  items: (NavItem & { show?: boolean })[]
 }
 
 interface SidebarProps {
@@ -34,6 +44,8 @@ export function Sidebar({
   const { tx } = useLanguage()
   const location = useLocation()
   const scrollRef = useRef<HTMLDivElement>(null)
+  const { isLocked, labels } = useTenantModules()
+  const [upsell, setUpsell] = useState<{ module: ModuleKey; label: string } | null>(null)
 
   const scrollToActiveItem = useCallback(() => {
     const container = scrollRef.current
@@ -76,6 +88,7 @@ export function Sidebar({
               {tx(section.title)}
             </div>
             {section.items.map((item) => {
+              const locked = isLocked(item.module)
               const rowClass = `group/item relative flex items-center justify-center group-hover/sidebar:justify-start px-2.5 group-hover/sidebar:px-3 py-2 rounded-lg text-[13px] cursor-pointer transition-colors duration-150
                   ${item.active
                     ? 'bg-lemon-500/15 text-lemon-500 font-semibold'
@@ -102,6 +115,31 @@ export function Sidebar({
                   ) : null}
                 </span>
               )
+
+              if (locked) {
+                return (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() =>
+                      setUpsell({
+                        module: item.module as ModuleKey,
+                        label: labels[item.module as string] ?? tx(item.label),
+                      })
+                    }
+                    className={`${rowClass} w-full opacity-55 hover:opacity-90`}
+                    title={`${tx(item.label)} — not included in your subscription`}
+                  >
+                    {indicator}
+                    {leading}
+                    {label}
+                    <Lock
+                      size={11}
+                      className="ms-auto shrink-0 overflow-hidden max-w-0 opacity-0 group-hover/sidebar:max-w-4 group-hover/sidebar:opacity-100 transition-all duration-300"
+                    />
+                  </button>
+                )
+              }
 
               if (item.to) {
                 return (
@@ -155,6 +193,14 @@ export function Sidebar({
           </span>
         </div>
       </div>
+
+      {upsell ? (
+        <ModuleUpsellDialog
+          moduleKey={upsell.module}
+          moduleLabel={upsell.label}
+          onClose={() => setUpsell(null)}
+        />
+      ) : null}
     </aside>
   )
 }

@@ -1,3 +1,4 @@
+import type { NavSection } from '../shared/layout/Sidebar'
 import { Sidebar } from '../shared/layout/Sidebar'
 import { AdminTopHeader } from '../shared/layout/AdminTopHeader'
 import { AdminFooter } from '../shared/layout/AdminFooter'
@@ -46,6 +47,8 @@ import {
   UserCog,
 } from 'lucide-react'
 
+// Each destination declares the module it needs; the sidebar locks the row
+// when the institution did not subscribe to it.
 const ICON_SIZE = 17
 
 const breadcrumbLabels: Record<string, string> = {
@@ -132,7 +135,7 @@ function InstitutionAdminShell() {
     ? `${t.departments} & ${t.trainingPrograms}`
     : t.departments
 
-  const rawSections = [
+  const rawSections: NavSection[] = [
     {
       title: 'Main',
       items: [
@@ -156,6 +159,7 @@ function InstitutionAdminShell() {
         {
           label: 'Academic Calendar',
           to: '/admin/institution/academic-calendar',
+          module: 'academic_structure',
           active: isActive(['/admin/institution/academic-calendar']),
           icon: <CalendarRange size={ICON_SIZE} />,
           show: mods.programs,
@@ -163,12 +167,14 @@ function InstitutionAdminShell() {
         {
           label: departmentsLabel,
           to: '/admin/institution/departments',
+          module: 'academic_structure',
           active: isActive(['/admin/institution/departments']),
           icon: <UserCog size={ICON_SIZE} />,
         },
         {
           label: t.trainingPrograms,
           to: '/admin/institution/programs',
+          module: 'academic_structure',
           active: isActive(['/admin/institution/programs']),
           icon: <GraduationCap size={ICON_SIZE} />,
           show: mods.programs,
@@ -176,12 +182,14 @@ function InstitutionAdminShell() {
         {
           label: t.trainingCatalog,
           to: '/admin/courses',
+          module: 'course_catalog_authoring',
           active: isActive(['/admin/courses']),
           icon: <BookOpen size={ICON_SIZE} />,
         },
         {
           label: `${t.course} Offerings`,
           to: '/admin/course-offerings',
+          module: 'course_catalog_authoring',
           active: isActive(['/admin/course-offerings']),
           icon: <Layers size={ICON_SIZE} />,
           show: mods.programs,
@@ -189,12 +197,14 @@ function InstitutionAdminShell() {
         {
           label: org.edition === 'university' ? 'Live Classes' : 'Live Sessions',
           to: '/admin/live-classes',
+          module: 'virtual_classroom',
           active: isActive(['/admin/live-classes']),
           icon: <MonitorPlay size={ICON_SIZE} />,
         },
         {
           label: 'Assignments',
           to: '/admin/assignments',
+          module: 'assignments_assessments',
           active: isActive(['/admin/assignments']),
           icon: <SquarePen size={ICON_SIZE} />,
         },
@@ -207,6 +217,7 @@ function InstitutionAdminShell() {
         {
           label: 'Question Bank',
           to: '/admin/question-bank',
+          module: 'assignments_assessments',
           active: isActive(['/admin/question-bank']),
           icon: <ShieldQuestion size={ICON_SIZE} />,
         },
@@ -218,6 +229,7 @@ function InstitutionAdminShell() {
         {
           label: t.trainingAssignment,
           to: '/admin/enrollments',
+          module: 'enrollment_cohorts',
           active: isActive(['/admin/enrollments']),
           icon: <UserRoundCheck size={ICON_SIZE} />,
           show: mods.enrollments,
@@ -225,6 +237,7 @@ function InstitutionAdminShell() {
         {
           label: 'Transcripts & Records',
           to: '/admin/transcripts',
+          module: 'gradebook_progress',
           active: isActive(['/admin/transcripts']),
           icon: <ScrollText size={ICON_SIZE} />,
           show: org.edition === 'university',
@@ -246,6 +259,7 @@ function InstitutionAdminShell() {
         {
           label: 'Guardians',
           to: '/admin/guardians',
+          module: 'parent_manager_portal',
           active: isActive(['/admin/guardians']),
           icon: <HeartHandshake size={ICON_SIZE} />,
           show: mods.guardians,
@@ -284,18 +298,21 @@ function InstitutionAdminShell() {
         {
           label: t.certificates,
           to: '/admin/certificates',
+          module: 'certificates_credentials',
           active: isActive(['/admin/certificates']),
           icon: <BookCheck size={ICON_SIZE} />,
         },
         {
           label: 'Attendance',
           to: '/admin/attendance',
+          module: 'attendance',
           active: isActive(['/admin/attendance']),
           icon: <UserRoundCheck size={ICON_SIZE} />,
         },
         {
           label: 'Announcements',
           to: '/admin/announcements',
+          module: 'communication_notifications',
           active: isActive(['/admin/announcements']),
           icon: <Megaphone size={ICON_SIZE} />,
         },
@@ -330,6 +347,7 @@ function InstitutionAdminShell() {
         {
           label: 'Payments',
           to: '/admin/payments',
+          module: 'payments_billing',
           active: isActive(['/admin/payments']),
           icon: <Wallet size={ICON_SIZE} />,
           show: mods.payments,
@@ -337,6 +355,7 @@ function InstitutionAdminShell() {
         {
           label: 'Academic Reports',
           to: '/admin/academic-reports',
+          module: 'reports_analytics',
           active: isActive(['/admin/academic-reports']),
           icon: <GraduationCap size={ICON_SIZE} />,
           show: org.edition === 'university',
@@ -344,6 +363,7 @@ function InstitutionAdminShell() {
         {
           label: 'Reports & Analytics',
           to: '/admin/reports',
+          module: 'reports_analytics',
           active: isActive(['/admin/reports']),
           icon: <FileText size={ICON_SIZE} />,
         },
@@ -356,6 +376,7 @@ function InstitutionAdminShell() {
         {
           label: 'Help Desk',
           to: '/admin/help-desk',
+          module: 'administration_support',
           active: isActive(['/admin/help-desk']),
           icon: <Headset size={ICON_SIZE} />,
         },

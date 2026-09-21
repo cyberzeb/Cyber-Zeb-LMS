@@ -5,12 +5,42 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.pagination import Page, PaginationParams
 from app.core.database import get_db
+from app.core.demo_auth import DemoPrincipal, get_demo_principal
 from app.core.dependencies import Principal, require_roles
+from app.core.modules import enabled_modules_for
 from app.core.permissions import Role
-from app.modules.tenants.schemas import CampusCreate, CampusOut, TenantCreate, TenantOut
+from app.modules.onboarding.constants import MODULE_LABELS, ModuleKey
+from app.modules.tenants.schemas import (
+    CampusCreate,
+    CampusOut,
+    TenantCreate,
+    TenantModulesOut,
+    TenantOut,
+)
 from app.modules.tenants.service import CampusService, TenantService
 
 router = APIRouter()
+
+
+# Declared before "/{tenant_id}" so the literal path wins the match.
+@router.get("/me/modules", response_model=TenantModulesOut)
+async def get_my_modules(
+    db: AsyncSession = Depends(get_db),
+    principal: DemoPrincipal = Depends(get_demo_principal),
+):
+    """
+    Which modules this institution bought, for any signed-in member.
+
+    The workspace uses it to lock the navigation entries the institution did not
+    take. It is advisory only — the routes themselves are gated server-side.
+    """
+    enabled = sorted(await enabled_modules_for(db, principal.tenant_id))
+    all_keys = [m.value for m in ModuleKey]
+    return TenantModulesOut(
+        enabled=[key for key in all_keys if key in enabled],
+        locked=[key for key in all_keys if key not in enabled],
+        labels={key: MODULE_LABELS[ModuleKey(key)] for key in all_keys},
+    )
 
 
 @router.post("", response_model=TenantOut, status_code=status.HTTP_201_CREATED)

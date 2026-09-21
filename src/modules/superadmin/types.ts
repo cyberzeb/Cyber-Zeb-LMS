@@ -63,6 +63,10 @@ export interface ServiceRequest {
   estimated_users: string
   preferred_slug: string | null
   requested_modules: ModuleKey[]
+  /** Institution Master Data as submitted; null for a short enquiry. */
+  master_data: Record<string, unknown> | null
+  /** System-generated institution reference, e.g. "INST-0001". */
+  institution_ref: string | null
   message: string | null
   status: ServiceRequestStatus
   invoice_amount: string | null

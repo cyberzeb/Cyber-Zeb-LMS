@@ -42,8 +42,12 @@ TEST_MODULES = [
 
 
 @pytest_asyncio.fixture
-async def db_engine():
-    engine = create_async_engine(settings.DATABASE_URL, pool_pre_ping=True)
+async def db_engine(tmp_path):
+    # A throwaway database per test, never settings.DATABASE_URL: running against
+    # the dev database left test rows behind (dozens of sa-*@example.com super
+    # admins) and could not pick up new columns, since create_all does not alter
+    # tables that already exist.
+    engine = create_async_engine(f"sqlite+aiosqlite:///{tmp_path / 'onboarding.db'}")
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield engine

@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.demo_auth import DemoPrincipal, get_demo_principal
 from app.core.dependencies import PlatformPrincipal, require_platform_super_admin
+from app.core.modules import assert_collection_allowed, locked_collections_for
 from app.modules.lms_store.schemas import (
     BootstrapOut,
     CollectionOut,
@@ -44,12 +45,16 @@ async def list_all_collections(
     principal: DemoPrincipal = Depends(get_demo_principal),
 ):
     service = LmsStoreService(db)
-    return await service.read_all_collections(
+    collections = await service.read_all_collections(
         principal.tenant_id,
         role=principal.role,
         person_id=principal.person_id,
         is_admin=principal.is_tenant_admin,
     )
+    # A module the institution did not buy contributes no data. Filtering here
+    # rather than erroring keeps the bulk read usable for every tenant.
+    locked = await locked_collections_for(db, principal.tenant_id)
+    return {key: value for key, value in collections.items() if key not in locked}
 
 
 @router.get("/{collection_key}", response_model=CollectionOut)
@@ -58,6 +63,7 @@ async def get_collection(
     db: AsyncSession = Depends(get_db),
     principal: DemoPrincipal = Depends(get_demo_principal),
 ):
+    await assert_collection_allowed(db, principal.tenant_id, collection_key)
     service = LmsStoreService(db)
     data = await service.read_collection(
         principal.tenant_id,
@@ -82,6 +88,7 @@ async def put_collection(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only administrators can replace a whole collection",
         )
+    await assert_collection_allowed(db, principal.tenant_id, collection_key)
     service = LmsStoreService(db)
     data = await service.put_collection(
         principal.tenant_id,
@@ -101,6 +108,7 @@ async def patch_collection(
     principal: DemoPrincipal = Depends(get_demo_principal),
 ):
     """Apply record-level changes; non-admin changes are checked against the write policy."""
+    await assert_collection_allowed(db, principal.tenant_id, collection_key)
     service = LmsStoreService(db)
     data = await service.patch_collection(
         principal.tenant_id,

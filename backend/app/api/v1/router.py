@@ -4,7 +4,10 @@ Single place that assembles every module's router into the versioned API.
 When a new module is implemented, uncomment/add its include_router line
 here. Do not import module internals anywhere except through `router`.
 """
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+
+from app.core.modules import require_module
+from app.modules.onboarding.constants import ModuleKey
 
 from app.modules.tenants.router import router as tenants_router
 from app.modules.identity.router import router as identity_router
@@ -37,26 +40,67 @@ api_router.include_router(tenants_router, prefix="/tenants", tags=["Tenants & Or
 api_router.include_router(identity_router, prefix="/auth", tags=["Identity & Access"])
 
 # Sprint 2-3
-api_router.include_router(academic_router, prefix="/academic", tags=["Academic Structure"])
-api_router.include_router(courses_router, prefix="/courses", tags=["Course Catalog & Content"])
-api_router.include_router(enrollment_router, prefix="/enrollments", tags=["Enrollment"])
+# Every router below is gated on the tenant's module selection: a request for
+# a module the institution did not take answers 403 naming that module.
+api_router.include_router(
+    academic_router, prefix="/academic", tags=["Academic Structure"],
+    dependencies=[Depends(require_module(ModuleKey.ACADEMIC_STRUCTURE))],
+)
+api_router.include_router(
+    courses_router, prefix="/courses", tags=["Course Catalog & Content"],
+    dependencies=[Depends(require_module(ModuleKey.COURSE_CATALOG_AUTHORING))],
+)
+api_router.include_router(
+    enrollment_router, prefix="/enrollments", tags=["Enrollment"],
+    dependencies=[Depends(require_module(ModuleKey.ENROLLMENT_COHORTS))],
+)
 
 # Sprint 4-6
-api_router.include_router(assessments_router, prefix="/assessments", tags=["Assessments & Gradebook"])
-api_router.include_router(attendance_router, prefix="/attendance", tags=["Attendance"])
-api_router.include_router(live_sessions_router, prefix="/live-sessions", tags=["Virtual Classroom / Zoom"])
+api_router.include_router(
+    assessments_router, prefix="/assessments", tags=["Assessments & Gradebook"],
+    dependencies=[Depends(require_module(ModuleKey.ASSIGNMENTS_ASSESSMENTS))],
+)
+api_router.include_router(
+    attendance_router, prefix="/attendance", tags=["Attendance"],
+    dependencies=[Depends(require_module(ModuleKey.ATTENDANCE))],
+)
+api_router.include_router(
+    live_sessions_router, prefix="/live-sessions", tags=["Virtual Classroom / Zoom"],
+    dependencies=[Depends(require_module(ModuleKey.VIRTUAL_CLASSROOM))],
+)
 
 # Sprint 7
-api_router.include_router(communication_router, prefix="/communication", tags=["Communication & Notifications"])
+api_router.include_router(
+    communication_router, prefix="/communication", tags=["Communication & Notifications"],
+    dependencies=[Depends(require_module(ModuleKey.COMMUNICATION_NOTIFICATIONS))],
+)
 
 # Sprint 8
-api_router.include_router(payments_router, prefix="/payments", tags=["Payments & Billing"])
+api_router.include_router(
+    payments_router, prefix="/payments", tags=["Payments & Billing"],
+    dependencies=[Depends(require_module(ModuleKey.PAYMENTS_BILLING))],
+)
 
 # Sprint 9-10
-api_router.include_router(parent_portal_router, prefix="/parent-portal", tags=["Parent / Guardian Portal"])
-api_router.include_router(certificates_router, prefix="/certificates", tags=["Certificates & Credentials"])
+api_router.include_router(
+    parent_portal_router, prefix="/parent-portal", tags=["Parent / Guardian Portal"],
+    dependencies=[Depends(require_module(ModuleKey.PARENT_MANAGER_PORTAL))],
+)
+api_router.include_router(
+    certificates_router, prefix="/certificates", tags=["Certificates & Credentials"],
+    dependencies=[Depends(require_module(ModuleKey.CERTIFICATES_CREDENTIALS))],
+)
 
 # Cross-cutting
-api_router.include_router(reports_router, prefix="/reports", tags=["Reports & Analytics"])
-api_router.include_router(integrations_router, prefix="/integrations", tags=["Integration Hub"])
-api_router.include_router(admin_router, prefix="/admin", tags=["Administration & Support"])
+api_router.include_router(
+    reports_router, prefix="/reports", tags=["Reports & Analytics"],
+    dependencies=[Depends(require_module(ModuleKey.REPORTS_ANALYTICS))],
+)
+api_router.include_router(
+    integrations_router, prefix="/integrations", tags=["Integration Hub"],
+    dependencies=[Depends(require_module(ModuleKey.INTEGRATION_HUB_API))],
+)
+api_router.include_router(
+    admin_router, prefix="/admin", tags=["Administration & Support"],
+    dependencies=[Depends(require_module(ModuleKey.ADMINISTRATION_SUPPORT))],
+)

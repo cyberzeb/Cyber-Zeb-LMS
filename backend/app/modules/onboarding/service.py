@@ -258,6 +258,8 @@ def serialize_service_request(
         estimated_users=sr.estimated_users,
         preferred_slug=sr.preferred_slug,
         requested_modules=list(sr.requested_modules or []),
+        master_data=sr.master_data,
+        institution_ref=sr.institution_ref,
         message=sr.message,
         status=sr.status,
         invoice_amount=sr.invoice_amount,
@@ -538,6 +540,35 @@ class OnboardingService:
         await self.db.commit()
         return SuperAdminTokenResponse(access_token=token, email=admin.email)
 
+    async def _next_institution_ref(self) -> str:
+        """
+        Allocate the next "INST-0001". System-generated and unique, per the
+        Master Data guide — never taken from the submitted form.
+
+        Counting rows is enough at onboarding volumes, and the unique constraint
+        on the column is the real guarantee if two requests ever race.
+        """
+        from sqlalchemy import func, select
+
+        used = (
+            await self.db.execute(
+                select(func.count())
+                .select_from(ServiceRequest)
+                .where(ServiceRequest.institution_ref.is_not(None))
+            )
+        ).scalar_one()
+        candidate = used + 1
+        while True:
+            ref = f"INST-{candidate:04d}"
+            taken = (
+                await self.db.execute(
+                    select(ServiceRequest.id).where(ServiceRequest.institution_ref == ref)
+                )
+            ).scalar_one_or_none()
+            if taken is None:
+                return ref
+            candidate += 1
+
     async def create_service_request(
         self,
         payload: ServiceRequestCreate,
@@ -568,6 +599,10 @@ class OnboardingService:
             estimated_users=payload.estimated_users.strip(),
             preferred_slug=(payload.preferred_slug or "").strip().lower() or None,
             requested_modules=modules,
+            master_data=(
+                payload.master_data.model_dump(mode="json") if payload.master_data else None
+            ),
+            institution_ref=await self._next_institution_ref(),
             message=(payload.message or "").strip() or None,
             status=ServiceRequestStatus.NEW,
             idempotency_key=idempotency_key,
@@ -910,6 +945,11 @@ class OnboardingService:
             slug=slug,
             service_request_id=sr.id,
             enabled_modules=modules,
+            # The workspace needs the master data the institution submitted
+            # (leadership, calendar, certificate signatory, …) after activation.
+            settings={"master_data": sr.master_data, "institution_ref": sr.institution_ref}
+            if sr.master_data
+            else {},
             currency=sr.invoice_currency or "ETB",
             subscription_start_date=date.today(),
             renewal_date=date.today() + timedelta(days=365),

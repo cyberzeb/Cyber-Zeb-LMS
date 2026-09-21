@@ -115,6 +115,9 @@ async def env(tmp_path):
         tenants["_platform_admin"] = root.id
         await db.commit()
 
+    # Exposed so tests can change tenant rows (e.g. module entitlement) directly.
+    tenants["_session_factory"] = Session
+
     async def override_get_db():
         async with Session() as session:
             yield session

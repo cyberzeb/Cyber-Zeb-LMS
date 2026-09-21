@@ -9,6 +9,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 from app.modules.onboarding.constants import ALWAYS_ON_MODULES, ModuleKey
+from app.modules.onboarding.master_data import InstitutionMasterData
 from app.modules.onboarding.models import (
     RequestKind,
     EmailStatus,
@@ -27,10 +28,13 @@ class ServiceRequestCreate(BaseModel):
     phone: str = Field(min_length=1, max_length=50)
     estimated_users: str = Field(min_length=1, max_length=100)
     preferred_slug: str | None = Field(default=None, max_length=80)
-    # Institutions now register by edition only; every tenant gets the full
-    # module suite. The field stays optional for API compatibility and, when
-    # omitted or empty, is expanded to the complete catalog.
+    # The institution picks its modules on the request page (every box ticked by
+    # default). An omitted or empty list still means "the whole catalog", so an
+    # older client keeps working; the core modules are always merged in.
     requested_modules: list[ModuleKey] = Field(default_factory=lambda: list(ModuleKey))
+    # Institution Master Data. Optional here so a short enquiry still works, but
+    # the request page always sends it.
+    master_data: InstitutionMasterData | None = None
     message: str | None = None
 
     @field_validator("requested_modules")
@@ -146,6 +150,10 @@ class ServiceRequestOut(BaseModel):
     estimated_users: str
     preferred_slug: str | None
     requested_modules: list[str]
+    # Submitted master data, as stored. None for requests made before the
+    # master data form existed, or for a short enquiry.
+    master_data: dict | None = None
+    institution_ref: str | None = None
     message: str | None
     status: ServiceRequestStatus
     invoice_amount: Decimal | None

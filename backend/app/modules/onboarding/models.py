@@ -117,7 +117,10 @@ class PlatformAdminUser(Base, UUIDPrimaryKeyMixin, TimestampMixin):
 
 class ServiceRequest(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __tablename__ = "service_requests"
-    __table_args__ = (UniqueConstraint("idempotency_key", name="uq_service_requests_idempotency"),)
+    __table_args__ = (
+        UniqueConstraint("idempotency_key", name="uq_service_requests_idempotency"),
+        UniqueConstraint("institution_ref", name="uq_service_requests_institution_ref"),
+    )
 
     institution_name: Mapped[str] = mapped_column(String(200))
     request_kind: Mapped[RequestKind] = mapped_column(
@@ -134,6 +137,11 @@ class ServiceRequest(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     estimated_users: Mapped[str] = mapped_column(String(100))
     preferred_slug: Mapped[str | None] = mapped_column(String(80), nullable=True)
     requested_modules: Mapped[list] = mapped_column(JSONB, default=list)
+    # Institution Master Data (Master_Data.pdf). One validated document rather
+    # than forty columns — see app/modules/onboarding/master_data.py for the shape.
+    master_data: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    # System-generated, unique, never supplied by the form: "INST-0001".
+    institution_ref: Mapped[str | None] = mapped_column(String(20), nullable=True, index=True)
     message: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[ServiceRequestStatus] = mapped_column(
         SAEnum(

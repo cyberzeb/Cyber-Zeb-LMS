@@ -14,6 +14,7 @@ import {
 } from '../api/serviceRequestApi'
 import { institutionTypeLabel } from '../../../shared/constants/institutionTypes'
 import { MODULE_LABELS, STATUS_LABELS, type ModuleKey, type ServiceRequestStatus } from '../types'
+import { MasterDataPanel } from '../components/MasterDataPanel'
 
 function statusTone(status: ServiceRequestStatus): StatusTone {
   switch (status) {
@@ -189,7 +190,14 @@ export function ServiceRequestDetailPage() {
                 Estimated total: {estimateLabel}
               </p>
             )}
+            <p className="mt-2 text-[12px] text-secondary-text">
+              Only these modules are activated for the institution.
+            </p>
           </div>
+          <MasterDataPanel
+            masterData={data.master_data}
+            institutionRef={data.institution_ref}
+          />
           {data.tenant && (
             <div className="rounded-xl bg-leaf-50 border border-leaf-200 p-3 text-[13px]">
               <p className="font-bold text-navy-900">Activated tenant</p>

@@ -43,3 +43,11 @@ class CampusOut(BaseModel):
     name: str
     code: str
     address: str | None
+
+
+class TenantModulesOut(BaseModel):
+    """The institution's module entitlement, as the workspace needs it."""
+
+    enabled: list[str]
+    locked: list[str]
+    labels: dict[str, str]

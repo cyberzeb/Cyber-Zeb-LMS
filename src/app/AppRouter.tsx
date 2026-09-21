@@ -46,6 +46,7 @@ import { AdminDiscussionForumPage } from '../modules/institution/pages/AdminDisc
 import { AdminCalendarPage } from '../modules/institution/pages/AdminCalendarPage'
 import { SettingsPage } from '../modules/institution/pages/SettingsPage'
 import { LandingPage } from '../modules/marketing/pages/LandingPage'
+import { RequestPage } from '../modules/marketing/pages/RequestPage'
 import { LoginPage } from '../modules/auth/pages/LoginPage'
 import { StudentLayout } from '../modules/students/layout/StudentLayout'
 import { StudentDashboardPage } from '../modules/students/pages/studentdashboard'
@@ -127,6 +128,11 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingPage />,
+  },
+  {
+    // Institution registration: master data + module selection.
+    path: '/request',
+    element: <RequestPage />,
   },
   {
     // Convenience redirects for the common no-hyphen typo.

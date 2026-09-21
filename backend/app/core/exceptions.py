@@ -12,8 +12,16 @@ class AppError(Exception):
     status_code = status.HTTP_400_BAD_REQUEST
     error_code = "app_error"
 
-    def __init__(self, detail: str, error_code: str | None = None):
+    def __init__(
+        self,
+        detail: str,
+        error_code: str | None = None,
+        details: list[dict] | None = None,
+    ):
         self.detail = detail
+        # Machine-readable extras for the client, e.g. which module was missing
+        # so the UI can offer to request it.
+        self.details = details or []
         if error_code:
             self.error_code = error_code
         super().__init__(detail)
@@ -50,7 +58,7 @@ def register_exception_handlers(app: FastAPI) -> None:
                     "code": exc.error_code,
                     "message": exc.detail,
                     "correlation_id": correlation_id,
-                    "details": [],
+                    "details": exc.details,
                 }
             },
         )
