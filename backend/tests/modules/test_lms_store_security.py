@@ -321,7 +321,7 @@ async def test_otp_is_random_emailed_and_attempt_limited(env, monkeypatch):
     otp_service._challenges.clear()
     sent: list[str] = []
 
-    def fake_send(*, to_email, subject, body):
+    def fake_send(*, to_email, subject, body, html_body=None):
         sent.append(body)
         from app.modules.onboarding.email_service import EmailSendResult
 
@@ -348,6 +348,76 @@ async def test_otp_is_random_emailed_and_attempt_limited(env, monkeypatch):
     res = await client.post("/api/v1/auth/otp/verify", json={**login, "code": code})
     assert res.status_code == 200
     assert res.json()["person_id"] == "stu-1"
+
+
+async def test_super_admin_otp_is_emailed_even_on_a_demo_server(env, monkeypatch):
+    """The platform console never accepts the fixed demo code (SUPER_ADMIN_OTP_REQUIRE_EMAIL)."""
+    client, _ = env
+    monkeypatch.setattr(settings, "DEMO_LOGIN_ENABLED", True)
+    monkeypatch.setattr(settings, "SUPER_ADMIN_OTP_REQUIRE_EMAIL", True)
+    monkeypatch.setattr(settings, "OTP_RESEND_COOLDOWN_SECONDS", 0)
+    otp_service._challenges.clear()
+    sent: list[str] = []
+
+    def fake_send(*, to_email, subject, body, html_body=None):
+        sent.append(body)
+        from app.modules.onboarding.email_service import EmailSendResult
+
+        return EmailSendResult(ok=True, body=body, subject=subject, to_email=to_email)
+
+    monkeypatch.setattr("app.modules.onboarding.email_service.send_email_sync", fake_send)
+
+    login = {"email": "root@example.com", "role": "SuperAdmin", "tenant_code": "tenant-a"}
+    res = await client.post("/api/v1/auth/otp/send", json=login)
+    assert res.status_code == 200
+    # No code is echoed back to the browser, and one was actually emailed.
+    assert res.json().get("demo_code") is None
+    assert len(sent) == 1
+
+    code = next(word for word in sent[0].split() if word.isdigit() and len(word) == 6)
+    assert code != otp_service.DEMO_OTP_CODE
+
+    bad = await client.post("/api/v1/auth/otp/verify", json={**login, "code": otp_service.DEMO_OTP_CODE})
+    assert bad.status_code == 422
+
+    ok = await client.post("/api/v1/auth/otp/verify", json={**login, "code": code})
+    assert ok.status_code == 200
+    assert ok.json()["frontend_role"] == "SuperAdmin"
+
+    # Tenant portal logins keep the demo shortcut on the same server.
+    student = await client.post(
+        "/api/v1/auth/otp/send",
+        json={"email": "sam@example.com", "role": "Student", "tenant_code": "tenant-a"},
+    )
+    assert student.json()["demo_code"] == otp_service.DEMO_OTP_CODE
+
+
+async def test_super_admin_otp_send_fails_loudly_when_email_is_down(env, monkeypatch):
+    """A failed send must not leave a challenge behind, or the retry hits the cooldown."""
+    client, _ = env
+    monkeypatch.setattr(settings, "DEMO_LOGIN_ENABLED", True)
+    monkeypatch.setattr(settings, "SUPER_ADMIN_OTP_REQUIRE_EMAIL", True)
+    monkeypatch.setattr(settings, "OTP_RESEND_COOLDOWN_SECONDS", 300)
+    otp_service._challenges.clear()
+
+    def failing_send(*, to_email, subject, body, html_body=None):
+        from app.modules.onboarding.email_service import EmailSendResult
+
+        return EmailSendResult(
+            ok=False, body=body, subject=subject, to_email=to_email, error_message="boom"
+        )
+
+    monkeypatch.setattr("app.modules.onboarding.email_service.send_email_sync", failing_send)
+
+    login = {"email": "root@example.com", "role": "SuperAdmin", "tenant_code": "tenant-a"}
+    first = await client.post("/api/v1/auth/otp/send", json=login)
+    assert first.status_code == 422
+    assert "could not send" in first.json()["error"]["message"].lower()
+
+    # Retrying reports the same mail failure, not "please wait N seconds".
+    second = await client.post("/api/v1/auth/otp/send", json=login)
+    assert second.status_code == 422
+    assert "wait" not in second.json()["error"]["message"].lower()
 
 
 async def test_portal_refresh_rechecks_account(env):

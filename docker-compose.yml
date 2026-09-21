@@ -44,5 +44,22 @@ services:
     depends_on:
       - api
 
+  # Optional local/staging mail catcher, started only on request:
+  #   docker compose --profile mail up -d mailpit
+  # Then set SMTP_HOST=mailpit and SMTP_PORT=1025 in .env and recreate the api.
+  # Never expose 8025 publicly — it shows every captured message.
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: brana_mailpit
+    restart: unless-stopped
+    profiles: ["mail"]
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
 volumes:
   brana_sqlite_data:

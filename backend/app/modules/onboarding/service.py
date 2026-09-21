@@ -609,7 +609,10 @@ class OnboardingService:
             )
             notify_to = await self.get_setting_value(
                 "SUPER_ADMIN_NOTIFY_EMAIL",
-                settings.SUPER_ADMIN_NOTIFY_EMAIL or settings.GMAIL_USER or "",
+                settings.SUPER_ADMIN_NOTIFY_EMAIL
+                or settings.PLATFORM_SUPER_ADMIN_EMAIL
+                or settings.GMAIL_USER
+                or "",
             )
             if not notify_to:
                 return

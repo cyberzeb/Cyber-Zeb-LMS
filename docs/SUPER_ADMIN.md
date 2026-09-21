@@ -5,8 +5,11 @@ platform: it turns a public registration into a live institution, and manages
 every institution after that. This guide lists each step and page, what it does,
 and its status. Use it as the checklist when cleaning up each step.
 
-**Sign in:** `/login` → super admin email → 6-digit code (emailed; `000000` on demo
-servers). Sessions last 30 minutes, then the console returns to sign-in.
+**Sign in:** `/login` → super admin email → 6-digit code, always random and always
+emailed — the demo code `000000` never works for the console. Sessions last 30
+minutes, then the console returns to sign-in. Setting up mail (Mailpit locally,
+Gmail or another provider in production) and managing super admin accounts:
+[EMAIL_AND_SUPER_ADMIN.md](EMAIL_AND_SUPER_ADMIN.md).
 
 Status legend: ✅ works end to end (tested in the browser) · 🟡 works with gaps · ❌ not usable yet
 

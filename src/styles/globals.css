@@ -872,3 +872,91 @@ body {
     transform: none !important;
   }
 }
+/* ── Dark mode contrast safety net ─────────────────────────
+   Some components were written for the light theme only. In dark mode the
+   navy tokens flip to near-white (they are text colours there), so a chip
+   styled `bg-navy-900 text-white` became white-on-white, and any literal
+   `bg-white` surface stayed bright. These rules repair those combinations
+   everywhere instead of patching each component. */
+
+/* Literal white surfaces become the dark card / field colours.
+   The sidebar logo tile keeps its white plate (it holds the logo image). */
+.dark .bg-white:not(.sidebar-logo-bg) {
+  background-color: #0a121e;
+}
+
+.dark input.bg-white,
+.dark textarea.bg-white,
+.dark select.bg-white {
+  background-color: #111b2e;
+  border-color: #1a2332;
+  color: var(--color-navy-900);
+}
+
+/* Dark chips (avatars, date tiles, solid buttons) must stay dark with light
+   text, not inherit the flipped near-white navy token. */
+.dark .bg-navy-900,
+.dark .bg-navy-800,
+.dark .bg-navy-700 {
+  background-color: #111b2e;
+}
+
+.dark .bg-navy-900.text-white:not(button),
+.dark .bg-navy-800.text-white:not(button),
+.dark .bg-navy-700.text-white:not(button),
+.dark .bg-navy-900:not(button) .text-white,
+.dark .bg-navy-700:not(button) .text-white {
+  color: var(--color-navy-900);
+}
+
+/* Hover states on those chips/buttons. */
+.dark .hover\:bg-navy-800:hover,
+.dark .hover\:bg-navy-900:hover {
+  background-color: #1a2740;
+}
+
+/* Light-tinted icon tiles written as hex literals. */
+.dark .bg-\[\#F5F3FF\] {
+  background-color: rgba(124, 58, 237, 0.16);
+}
+
+/* Hairline borders from the default palette are invisible on dark. */
+.dark .border-slate-100,
+.dark .border-slate-200 {
+  border-color: var(--color-divider);
+}
+
+/* Recharts renders legend labels with an inline light colour. */
+.dark .recharts-legend-item-text,
+.dark .recharts-cartesian-axis-tick-value {
+  fill: var(--color-secondary-text) !important;
+  color: var(--color-secondary-text) !important;
+}
+
+/* Solid navy buttons are primary actions: in dark mode use the lime accent so
+   they still read as the main action (chips and avatars stay dark). */
+.dark button.bg-navy-900,
+.dark button.bg-navy-800,
+.dark button.bg-navy-900.text-white,
+.dark button.bg-navy-800.text-white {
+  background-color: var(--color-lemon-500);
+  border-color: var(--color-lemon-500);
+  color: #020810;
+}
+
+.dark button.bg-navy-900:hover,
+.dark button.bg-navy-800:hover {
+  background-color: var(--color-lemon-200);
+}
+
+.dark button.bg-navy-900 svg,
+.dark button.bg-navy-800 svg {
+  color: #020810;
+}
+
+/* Small pill chips keep a visible surface in dark mode (navy-50 becomes the
+   page/card colour there, which made them disappear). */
+.dark span.bg-navy-50,
+.dark span.bg-navy-100 {
+  background-color: #111b2e;
+}

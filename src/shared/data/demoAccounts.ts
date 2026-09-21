@@ -49,7 +49,7 @@ export const DEMO_ACCOUNTS: Record<
   SuperAdmin: {
     id: 'super-admin',
     name: 'Platform Super Admin',
-    email: 'admin@berana.com',
+    email: 'superadmin@berana.edu',
   },
 }
 

@@ -4,6 +4,10 @@ Email OTP login for portal access.
 Codes are random 6-digit values delivered by email, stored only as hashes, and
 limited by expiry, attempt count and a resend cooldown. With DEMO_LOGIN_ENABLED
 the code is always 000000 and is echoed back so demos work without email.
+
+The platform Super Admin is the exception: while SUPER_ADMIN_OTP_REQUIRE_EMAIL is
+on (the default) its codes are always random and always emailed, even on a demo
+server, because the console can create, suspend and delete institutions.
 """
 from __future__ import annotations
 
@@ -42,13 +46,22 @@ def _hash_code(code: str) -> str:
     return hashlib.sha256(code.encode("utf-8")).hexdigest()
 
 
-def _new_code() -> str:
-    if settings.DEMO_LOGIN_ENABLED:
+def _demo_code_allowed(audience: str) -> bool:
+    """Whether this audience may use the fixed demo code instead of a real email."""
+    if not settings.DEMO_LOGIN_ENABLED:
+        return False
+    if audience == "SuperAdmin" and settings.SUPER_ADMIN_OTP_REQUIRE_EMAIL:
+        return False
+    return True
+
+
+def _new_code(audience: str) -> str:
+    if _demo_code_allowed(audience):
         return DEMO_OTP_CODE
     return f"{secrets.randbelow(1_000_000):06d}"
 
 
-def _start_challenge(key: str, extra: dict) -> str:
+def _start_challenge(key: str, extra: dict, audience: str) -> str:
     """Create (or refresh) a challenge and return the plain code to deliver."""
     existing = _challenges.get(key)
     if existing:
@@ -56,7 +69,7 @@ def _start_challenge(key: str, extra: dict) -> str:
         if elapsed < settings.OTP_RESEND_COOLDOWN_SECONDS:
             wait = int(settings.OTP_RESEND_COOLDOWN_SECONDS - elapsed) + 1
             raise ValidationAppError(f"Please wait {wait} seconds before requesting a new code.")
-    code = _new_code()
+    code = _new_code(audience)
     _challenges[key] = {
         **extra,
         "code_hash": _hash_code(code),
@@ -85,23 +98,43 @@ def _consume_challenge(key: str, code: str) -> dict:
     return challenge
 
 
-async def _deliver_code(email: str, code: str, audience: str) -> None:
-    if settings.DEMO_LOGIN_ENABLED:
+async def _deliver_code(
+    email: str, code: str, audience: str, challenge_key: str | None = None
+) -> None:
+    if _demo_code_allowed(audience):
         logger.info("Demo login code issued for %s (%s)", email, audience)
         return
-    from app.modules.onboarding.email_service import send_email_sync
+    from app.modules.onboarding.email_service import (
+        build_sign_in_code_email,
+        describe_email_config,
+        send_email_sync,
+    )
 
-    body = (
-        f"Your Berana LMS sign-in code is: {code}\n\n"
-        f"It expires in {settings.OTP_TTL_MINUTES} minutes. "
-        "If you did not try to sign in, you can ignore this email."
+    subject, body, html_body = build_sign_in_code_email(
+        code=code, ttl_minutes=settings.OTP_TTL_MINUTES, audience=audience
     )
     result = await run_in_threadpool(
-        send_email_sync, to_email=email, subject="Your Berana LMS sign-in code", body=body
+        send_email_sync,
+        to_email=email,
+        subject=subject,
+        body=body,
+        html_body=html_body,
     )
     if not result.ok:
+        # The code is useless if it never arrives, so drop the challenge: the user
+        # can retry at once instead of waiting out the resend cooldown.
+        if challenge_key:
+            _challenges.pop(challenge_key, None)
+        logger.error(
+            "Sign-in code email failed for %s (%s) via %s: %s",
+            email,
+            audience,
+            describe_email_config(),
+            result.error_message,
+        )
         raise ValidationAppError(
-            "We could not send the sign-in code by email. Please contact your administrator."
+            "We could not send the sign-in code by email. "
+            "Please try again in a moment or contact your administrator."
         )
 
 
@@ -112,7 +145,7 @@ def _code_response(message_email: str, role: str) -> dict:
         "role": role,
         "expires_in_seconds": settings.OTP_TTL_MINUTES * 60,
     }
-    if settings.DEMO_LOGIN_ENABLED:
+    if _demo_code_allowed(role):
         result["demo_code"] = DEMO_OTP_CODE
     return result
 
@@ -269,8 +302,9 @@ class OtpAuthService:
                 "role": role,
                 "tenant_id": str(tenant_id),
             },
+            role,
         )
-        await _deliver_code(email.strip().lower(), code, role)
+        await _deliver_code(email.strip().lower(), code, role, challenge_key=key)
         return _code_response(email.strip().lower(), role)
 
     # ── Platform Super Admin OTP (uses PlatformAdminUser, not tenant people) ──
@@ -287,8 +321,9 @@ class OtpAuthService:
         code = _start_challenge(
             key,
             {"admin_id": str(admin.id), "email": admin.email, "display_name": admin.email},
+            "SuperAdmin",
         )
-        await _deliver_code(admin.email, code, "SuperAdmin")
+        await _deliver_code(admin.email, code, "SuperAdmin", challenge_key=key)
         return _code_response(admin.email, "SuperAdmin")
 
     async def verify_super_admin_code(self, email: str, code: str) -> dict:

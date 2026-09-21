@@ -55,17 +55,21 @@ restarts automatically when you change a backend `.py` file.
 ```bash
 cd backend
 .venv/Scripts/python -m uvicorn app.main:app --host 127.0.0.1 --port 8001    # macOS/Linux: .venv/bin/python
-.venv/Scripts/python -m pytest -q                                               # 45 tests
+.venv/Scripts/python -m pytest -q                                               # 54 tests
 ```
 
 - API docs (Swagger): `http://127.0.0.1:8001/docs`
 - Health check: `http://127.0.0.1:8001/health`
-- Real emailed sign-in codes: set `DEMO_LOGIN_ENABLED=false` plus `GMAIL_USER` / `GMAIL_APP_PASSWORD`
+- Real emailed sign-in codes: start Mailpit (`docker compose -f docker-compose.mailpit.yml up -d`,
+  inbox at `http://localhost:8025`) — the defaults in `backend/.env.example` already point at it.
+  Check the wiring with `.venv/Scripts/python -m scripts.send_test_email you@example.com`
 - Online payments: set `CHAPA_SECRET_KEY` (otherwise demo servers settle invoices instantly,
   and real servers refuse online payment)
 
 For the feature status of each edition, see [docs/FEATURE_MATRIX.md](docs/FEATURE_MATRIX.md).
 For the Super Admin console step by step, see [docs/SUPER_ADMIN.md](docs/SUPER_ADMIN.md).
+For email setup and Super Admin accounts, see
+[docs/EMAIL_AND_SUPER_ADMIN.md](docs/EMAIL_AND_SUPER_ADMIN.md).
 
 ### Other scripts
 
@@ -96,6 +100,11 @@ random, emailed, single-use, expire after 10 minutes and allow 5 attempts.
 
 With `DEMO_LOGIN_ENABLED=true` in `backend/.env` (demo and development only), the
 code is always `000000` and is shown on screen, so no email setup is needed.
+
+The platform Super Admin is the exception: its code is always random and always
+emailed, even on a demo server, because the console can create, suspend and delete
+institutions. Read it in Mailpit at `http://localhost:8025` — see
+[docs/EMAIL_AND_SUPER_ADMIN.md](docs/EMAIL_AND_SUPER_ADMIN.md).
 
 | Role | Demo email |
 |------|------------|

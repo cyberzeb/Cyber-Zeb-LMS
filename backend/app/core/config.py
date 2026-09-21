@@ -64,17 +64,36 @@ class Settings(BaseSettings):
     CHAPA_SECRET_KEY: str = ""
 
     # --- Email / SMS (Blueprint Section 12) ---
-    SMTP_HOST: str = "smtp.gmail.com"
-    SMTP_PORT: int = 587
+    # Two ways to send mail, checked in this order by the email service:
+    #   1. GMAIL_USER + GMAIL_APP_PASSWORD  -> Gmail over STARTTLS (production)
+    #   2. SMTP_HOST / SMTP_PORT            -> any SMTP server
+    # The defaults point at Mailpit (docker compose --profile mail up -d mailpit),
+    # which accepts mail with no auth and no TLS and shows it at http://localhost:8025.
+    EMAIL_ENABLED: bool = True
+    SMTP_HOST: str = "localhost"
+    SMTP_PORT: int = 1025
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
+    SMTP_STARTTLS: bool = False  # True for port 587
+    SMTP_SSL: bool = False  # True for implicit TLS on port 465
+    SMTP_TIMEOUT_SECONDS: int = 15
+    # Envelope sender. Mailpit accepts anything; real providers require a domain
+    # they have authorised for you.
+    SMTP_FROM_EMAIL: str = "no-reply@berana-lms.local"
+    SMTP_FROM_NAME: str = "Berana LMS"
     # Prefer Gmail App Password (not the account password).
     GMAIL_USER: str = ""
     GMAIL_APP_PASSWORD: str = ""
     SMS_PROVIDER_API_KEY: str = ""
 
     # --- Onboarding / Super Admin ---
-    SUPER_ADMIN_NOTIFY_EMAIL: str = "mekashabetel@gmail.com"
+    # Platform console codes are always random and always emailed, even on a demo
+    # server, unless this is explicitly turned off. The console is the highest
+    # privilege surface on the platform, so it never accepts the fixed demo code.
+    SUPER_ADMIN_OTP_REQUIRE_EMAIL: bool = True
+    # Where "new service request" alerts go. Empty falls back to the platform
+    # super admin address.
+    SUPER_ADMIN_NOTIFY_EMAIL: str = ""
     PLATFORM_SUPER_ADMIN_EMAIL: str = "superadmin@berana.edu"
     PLATFORM_SUPER_ADMIN_PASSWORD: str = "Demo123!"
     FRONTEND_BASE_URL: str = "http://localhost:5173"

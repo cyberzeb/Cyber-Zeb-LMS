@@ -297,7 +297,9 @@ export function LoginPage() {
               </button>
 
               <p className="text-[12px] text-secondary-text text-center leading-relaxed">
-                {t('login.demoHint', { email: DEMO_ACCOUNTS[role].email, code: DEMO_OTP_CODE })}
+                {role === 'SuperAdmin'
+                  ? t('login.superAdminHint')
+                  : t('login.demoHint', { email: DEMO_ACCOUNTS[role].email, code: DEMO_OTP_CODE })}
               </p>
             </form>
           ) : step === 'credentials' ? (
@@ -388,7 +390,9 @@ export function LoginPage() {
               </button>
 
               <p className="text-[12px] text-secondary-text text-center leading-relaxed">
-                {t('login.demoHint', { email: DEMO_ACCOUNTS[role].email, code: DEMO_OTP_CODE })}
+                {role === 'SuperAdmin'
+                  ? t('login.superAdminHint')
+                  : t('login.demoHint', { email: DEMO_ACCOUNTS[role].email, code: DEMO_OTP_CODE })}
               </p>
             </form>
           ) : (
