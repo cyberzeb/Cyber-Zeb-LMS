@@ -362,6 +362,12 @@ export function LoginPage() {
                 </select>
               </label>
 
+              {sessionExpired && !error ? (
+                <p className="text-[13px] font-semibold text-info bg-info-bg px-3.5 py-2.5 rounded-lg">
+                  Your session has ended. Please sign in again.
+                </p>
+              ) : null}
+
               {error ? (
                 <p className="text-[13px] font-semibold text-danger bg-danger-bg px-3.5 py-2.5 rounded-lg">
                   {error}

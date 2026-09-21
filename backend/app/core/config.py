@@ -29,8 +29,12 @@ class Settings(BaseSettings):
     # --- Auth ---
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 14
+    # A working day. Portal sessions renew silently through the refresh token, but
+    # the Super Admin console holds only an access token, so this is how long a
+    # console session lasts before it asks for a new emailed code. A deleted or
+    # suspended admin is rejected on the next request regardless of the token.
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 480
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
     # --- Portal login ---
     # Demo login: fixed OTP code 000000, the demo account picker (/auth/demo-login)

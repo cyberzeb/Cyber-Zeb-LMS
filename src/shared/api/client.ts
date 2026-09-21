@@ -40,6 +40,44 @@ export function getAccessToken(): string | null {
   return getCookie(AUTH_TOKEN_KEY) ?? migrateLegacyToken()
 }
 
+/**
+ * Seconds-since-epoch that a JWT expires, read from its unverified payload.
+ * The server is still the authority — this only lets the app notice an expired
+ * session before making a request that is certain to be rejected.
+ */
+function tokenExpiry(token: string): number | null {
+  try {
+    const payload = token.split('.')[1]
+    if (!payload) return null
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/')
+    // atob rejects base64url payloads that are missing their padding.
+    const json = atob(base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '='))
+    const exp = (JSON.parse(json) as { exp?: unknown }).exp
+    return typeof exp === 'number' ? exp : null
+  } catch {
+    return null
+  }
+}
+
+/** True when the token is past its expiry. A token we cannot read is not expired. */
+export function isTokenExpired(token: string | null | undefined): boolean {
+  if (!token) return false
+  const exp = tokenExpiry(token)
+  return exp !== null && exp * 1000 <= Date.now()
+}
+
+/** True when a session exists but its access token has already run out. */
+export function hasExpiredAccessToken(): boolean {
+  return isTokenExpired(getAccessToken())
+}
+
+/** True when the refresh token is still usable, so the session can be renewed. */
+export function canRenewSession(): boolean {
+  const refresh = getCookie(REFRESH_TOKEN_KEY)
+  return Boolean(refresh) && !isTokenExpired(refresh)
+}
+
+
 export function setAccessToken(token: string | null) {
   if (token) {
     setCookie(AUTH_TOKEN_KEY, token, { maxAgeSeconds: TOKEN_MAX_AGE_SECONDS })

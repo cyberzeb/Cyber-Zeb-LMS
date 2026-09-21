@@ -6,8 +6,9 @@ every institution after that. This guide lists each step and page, what it does,
 and its status. Use it as the checklist when cleaning up each step.
 
 **Sign in:** `/login` → super admin email → 6-digit code, always random and always
-emailed — the demo code `000000` never works for the console. Sessions last 30
-minutes, then the console returns to sign-in. Setting up mail (Mailpit locally,
+emailed — the demo code `000000` never works for the console. A console session
+lasts 8 hours (`ACCESS_TOKEN_EXPIRE_MINUTES`); when it runs out the console sends
+you back to sign-in with "Your session has ended" rather than failing requests. Setting up mail (Mailpit locally,
 Gmail or another provider in production) and managing super admin accounts:
 [EMAIL_AND_SUPER_ADMIN.md](EMAIL_AND_SUPER_ADMIN.md).
 

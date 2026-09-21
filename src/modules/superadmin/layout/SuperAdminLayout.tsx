@@ -25,10 +25,12 @@ import { AdminFooter } from '../../../shared/layout/AdminFooter'
 import { ThemeToggle } from '../../../shared/components/ThemeToggle'
 import brandLogo from '../../../assets/Logo.jpg'
 import {
+  clearSuperAdminSession,
   getSuperAdminEmail,
   getSuperAdminToken,
   logoutSuperAdmin,
 } from '../api/superAdminAuthApi'
+import { isTokenExpired } from '../../../shared/api/client'
 
 const ICON_SIZE = 17
 
@@ -63,6 +65,12 @@ export function SuperAdminLayout() {
   // OTP), so an unauthenticated visit is bounced there with the role preset.
   if (!token) {
     return <Navigate to="/login?role=SuperAdmin" replace />
+  }
+  // An expired console token has no refresh path, so ask for a new code rather
+  // than rendering a console whose every request will 401.
+  if (isTokenExpired(token)) {
+    clearSuperAdminSession()
+    return <Navigate to="/login?role=SuperAdmin&expired=1" replace />
   }
 
   const isActive = (to: string) => {

@@ -190,7 +190,7 @@ password.
 4. Press **Send verification code**.
 5. Open <http://localhost:8025>, read the 6-digit code from the newest message,
    and type it in.
-6. You land on `/super-admin`. The session lasts 30 minutes.
+6. You land on `/super-admin`. The session lasts 8 hours.
 
 `000000` does **not** work here, and the code is never shown in the browser or in
 the API response — only in the inbox.
@@ -203,6 +203,15 @@ the API response — only in the inbox.
   the exact SMTP target and error.
 * Fallback that needs no email: `POST /api/v1/auth/super-admin/login` with the
   email and password still returns a console token.
+
+### When a session runs out
+
+An expired token never shows an error screen. The console and the portals both
+detect it and send the user to `/login?expired=1` with "Your session has ended.
+Please sign in again." Portal sessions renew themselves silently while the refresh
+token is alive (`REFRESH_TOKEN_EXPIRE_DAYS`, 30 days), so a portal user is only
+asked for a new code after a month away. The Super Admin console holds no refresh
+token, so it asks again after `ACCESS_TOKEN_EXPIRE_MINUTES` (8 hours).
 
 ---
 
@@ -265,3 +274,5 @@ Also do these, or your mail lands in spam:
 | `OTP_TTL_MINUTES` | `10` | How long a code stays valid |
 | `OTP_MAX_ATTEMPTS` | `5` | Wrong tries before the code is thrown away |
 | `OTP_RESEND_COOLDOWN_SECONDS` | `30` | Wait between resends (skipped when a send failed) |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | `480` | Sign-in length. Also the Super Admin console session, which has no refresh token |
+| `REFRESH_TOKEN_EXPIRE_DAYS` | `30` | How long a portal session can keep renewing itself before a new code is needed |

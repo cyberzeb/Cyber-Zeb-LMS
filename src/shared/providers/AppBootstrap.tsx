@@ -2,7 +2,12 @@ import { useCallback, useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { fetchAllCollections } from '../api/dataApi'
-import { getAccessToken } from '../api/client'
+import {
+  canRenewSession,
+  endPortalSession,
+  getAccessToken,
+  hasExpiredAccessToken,
+} from '../api/client'
 import { hydrateCache } from '../storage/dataCache'
 import { saveCollectionChange } from '../storage/collectionSync'
 import { readPortalSession } from '../storage/session'
@@ -24,6 +29,20 @@ function hydrateFromRecord(collections: Record<string, unknown>, queryClient: Re
   }
   return patched
 }
+
+/**
+ * True when the failure means "you are not signed in" rather than "the API is
+ * down". Only a real connection or server fault should reach the error screen.
+ */
+function isUnauthenticated(err: unknown): boolean {
+  const status = (err as { response?: { status?: number }; status?: number })?.response?.status
+  if (status === 401 || status === 403) return true
+  // The interceptor clears the tokens before re-throwing when a refresh fails,
+  // so an absent token after a failed load means the session was rejected.
+  if (!getAccessToken()) return true
+  return /\b40[13]\b/.test((err as { message?: string })?.message ?? '')
+}
+
 
 function BackendErrorScreen({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
@@ -63,13 +82,29 @@ export function AppBootstrap({ children }: AppBootstrapProps) {
       return
     }
 
+    // The access token has run out. If the refresh token is also gone the session
+    // cannot be renewed, so send the user to sign in rather than spend a request
+    // proving it. With a live refresh token the API client renews on the first 401.
+    if (hasExpiredAccessToken() && !canRenewSession()) {
+      endPortalSession('expired')
+      setError(null)
+      setReady(true)
+      return
+    }
+
     let collections: Record<string, unknown>
     try {
       collections = await fetchAllCollections()
     } catch (err) {
       // The API client already tried a token refresh and cleared the session;
       // show the (public) page instead of the "backend unavailable" screen.
-      if ((err as { response?: { status?: number } })?.response?.status === 401) {
+      // A rejected token is not an outage, so check every way a 401 can reach
+      // us: the axios error, an error the interceptor re-threw without its
+      // response, and the session the interceptor just cleared.
+      if (isUnauthenticated(err)) {
+        // Someone who was signed in gets told why they are back at sign-in.
+        // A visitor who never had a session just sees the public page.
+        if (readPortalSession()) endPortalSession('expired')
         setError(null)
         setReady(true)
         return
