@@ -7,15 +7,25 @@
 #
 # Point the API at it with SMTP_HOST=localhost and SMTP_PORT=1025
 # (already the defaults in backend/.env.example).
+#
+# This file is for a workstation running the API outside Docker. If the API runs
+# in the docker compose stack (any server deployment), start Mailpit as part of
+# that stack instead, so both land on the same network and no orphan containers
+# are reported:
+#   docker compose --profile mail up -d mailpit     # then SMTP_HOST=mailpit
 
 services:
   mailpit:
     image: axllent/mailpit:latest
     container_name: brana_mailpit
     restart: unless-stopped
+    # Loopback only. This inbox holds every sign-in code the platform issues,
+    # including the Super Admin's, so it must never be reachable from the internet.
+    # On a server, read it over an SSH tunnel:
+    #   ssh -L 8025:127.0.0.1:8025 user@your-server   → http://localhost:8025
     ports:
-      - "1025:1025"  # SMTP — the API sends here
-      - "8025:8025"  # Web UI — read the captured mail here
+      - "127.0.0.1:1025:1025"  # SMTP — the API sends here
+      - "127.0.0.1:8025:8025"  # Web UI — read the captured mail here
     environment:
       MP_MAX_MESSAGES: 5000
       # Accept any credentials and plain connections: this is a test server and

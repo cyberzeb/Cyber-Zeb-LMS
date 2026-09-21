@@ -48,17 +48,71 @@ Download `mailpit-windows-amd64.zip` from
 
 Same ports, same inbox URL.
 
-### Option C — inside the production compose stack
+### Option C — on a server, inside the compose stack
 
-The main `docker-compose.yml` carries Mailpit behind a profile, so it never starts
-by accident:
+**This is the one to use whenever the API itself runs in Docker.** The main
+`docker-compose.yml` carries Mailpit behind a profile, so it never starts by
+accident, and starting it this way puts it on the same network and project as the
+API — `docker-compose.mailpit.yml` would instead report `brana_web` and
+`brana_api` as orphan containers.
 
 ```bash
 docker compose --profile mail up -d mailpit
 ```
 
-Its ports are bound to `127.0.0.1` only. **Never expose 8025 publicly** — it shows
-every captured message, including sign-in codes.
+Ports are bound to `127.0.0.1` only in both files. **Never expose 8025 publicly** —
+the inbox holds every sign-in code the platform issues, including the Super
+Admin's. Read it through an SSH tunnel from your own machine:
+
+```bash
+ssh -L 8025:127.0.0.1:8025 user@your-server      # then open http://localhost:8025
+```
+
+---
+
+## 2b. Server (Docker) walkthrough
+
+On a server there is no `.venv` and no `backend/.env`: the API runs in the `api`
+container and reads the **root `.env`**. Commands that target the venv or
+`npm run dev:full` are for a workstation only.
+
+```bash
+cd /path/to/Cyber-Zeb-LMS
+
+# 1. Mailpit, on the same network as the API
+docker compose --profile mail up -d mailpit
+
+# 2. Add the email block to the ROOT .env (see .env.docker.example).
+#    SMTP_HOST must be the service name, not localhost:
+cat >> .env <<'EOF'
+EMAIL_ENABLED=true
+SMTP_HOST=mailpit
+SMTP_PORT=1025
+SMTP_USER=
+SMTP_PASSWORD=
+SMTP_STARTTLS=false
+SMTP_SSL=false
+SMTP_FROM_EMAIL=no-reply@berana-lms.local
+SMTP_FROM_NAME=Berana LMS
+SUPER_ADMIN_OTP_REQUIRE_EMAIL=true
+EOF
+
+# 3. Pick the API up on the new settings
+docker compose up -d --force-recreate api
+
+# 4. Prove mail works — run the script INSIDE the container
+docker compose exec api python -m scripts.send_test_email you@example.com
+
+# 5. Manage super admins the same way
+docker compose exec api python -m scripts.manage_super_admin list
+```
+
+`SMTP_HOST=localhost` inside the `api` container means *the container itself*, so
+it always fails there. Use `mailpit`.
+
+Because Mailpit captures everything, the super admin address does not have to be a
+real mailbox — `superadmin@berana.edu` is fine, and its code shows up in the
+Mailpit inbox like any other message.
 
 ---
 
