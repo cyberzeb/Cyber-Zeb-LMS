@@ -1,8 +1,14 @@
 """
-Seed the demo tenant, LMS collections, and identity users from backend/seed_data/demo.json.
+Seed the demo tenants, their LMS collections and identity users from
+backend/seed_data/*.json.
+
+One demo tenant per edition, so each can be signed into and shown:
+  berana  — Berana University (college_university)
+  horizon — Horizon Bank      (corporate)
 
 Usage (from backend/):
-    python scripts/seed_db.py
+    python scripts/seed_db.py             # every edition
+    python scripts/seed_db.py corporate   # just one
 """
 import asyncio
 import json
@@ -22,13 +28,34 @@ from app.core.database import AsyncSessionLocal, init_db
 from app.core.demo_auth import map_frontend_role
 from app.modules.identity.models import GuardianLink, GuardianRelationship, User, UserRoleAssignment, UserStatus
 from app.modules.lms_store.service import LmsStoreService
+from app.modules.onboarding.constants import ModuleKey
 from app.modules.tenants.models import Tenant, TenantStatus, TenantType
 
 
-SEED_FILE = Path(__file__).resolve().parents[1] / "seed_data" / "demo.json"
-TENANT_CODE = "berana"
-TENANT_NAME = "Berana University"
+SEED_DIR = Path(__file__).resolve().parents[1] / "seed_data"
 DEMO_PASSWORD = "Demo123!"
+
+
+class DemoTenant:
+    """One seedable demo tenant: which file, which code, which edition."""
+
+    def __init__(self, key: str, code: str, name: str, seed_file: str, tenant_type: TenantType):
+        self.key = key
+        self.code = code
+        self.name = name
+        self.seed_file = SEED_DIR / seed_file
+        self.tenant_type = tenant_type
+
+
+DEMO_TENANTS = [
+    DemoTenant("university", "berana", "Berana University", "demo.json", TenantType.COLLEGE_UNIVERSITY),
+    DemoTenant("corporate", "horizon", "Horizon Bank", "corporate.json", TenantType.CORPORATE),
+]
+
+# Kept for callers that still import these.
+SEED_FILE = DEMO_TENANTS[0].seed_file
+TENANT_CODE = DEMO_TENANTS[0].code
+TENANT_NAME = DEMO_TENANTS[0].name
 
 STATUS_MAP = {
     "active": UserStatus.ACTIVE,
@@ -37,22 +64,24 @@ STATUS_MAP = {
 }
 
 
-async def ensure_tenant(db) -> Tenant:
-    result = await db.execute(select(Tenant).where(Tenant.code == TENANT_CODE))
+async def ensure_tenant(db, demo: DemoTenant) -> Tenant:
+    result = await db.execute(select(Tenant).where(Tenant.code == demo.code))
     tenant = result.scalar_one_or_none()
     if tenant:
         return tenant
 
     tenant = Tenant(
-        code=TENANT_CODE,
-        name=TENANT_NAME,
-        tenant_type=TenantType.COLLEGE_UNIVERSITY,
-        institution_type=TenantType.COLLEGE_UNIVERSITY,
+        code=demo.code,
+        name=demo.name,
+        tenant_type=demo.tenant_type,
+        institution_type=demo.tenant_type,
         status=TenantStatus.ACTIVE,
         timezone="Africa/Addis_Ababa",
         locale="en",
         currency="ETB",
         settings={"demo": True},
+        # Demo tenants get the whole catalog so every page can be shown.
+        enabled_modules=[m.value for m in ModuleKey],
     )
     db.add(tenant)
     await db.flush()
@@ -132,34 +161,51 @@ async def seed_identity_users(db, tenant: Tenant, people: list) -> None:
         print(f"  {role}: {count}")
 
 
-async def main() -> None:
-    if not SEED_FILE.exists():
-        print(f"Seed file not found: {SEED_FILE}")
+async def seed_demo_tenant(demo: DemoTenant) -> bool:
+    if not demo.seed_file.exists():
+        print(f"Seed file not found: {demo.seed_file}")
         print("Run from repo root: npm run export-seed")
-        sys.exit(1)
+        return False
 
-    with SEED_FILE.open(encoding="utf-8") as f:
+    with demo.seed_file.open(encoding="utf-8") as f:
         payload = json.load(f)
 
     collections = payload.get("collections", payload)
     if not isinstance(collections, dict):
-        print("Invalid seed file: expected 'collections' object")
-        sys.exit(1)
-
-    await init_db()
+        print(f"Invalid seed file {demo.seed_file.name}: expected a 'collections' object")
+        return False
 
     async with AsyncSessionLocal() as db:
-        tenant = await ensure_tenant(db)
+        tenant = await ensure_tenant(db, demo)
         service = LmsStoreService(db)
         count = await service.seed_collections(tenant.id, collections)
-        print(f"Seeded {count} collections for tenant '{TENANT_CODE}'")
+        print(f"Seeded {count} collections for tenant '{demo.code}'")
 
         people = collections.get("people", [])
         if isinstance(people, list):
             await seed_identity_users(db, tenant, people)
         else:
             print("Skipped identity users: people collection is not a list")
+    return True
+
+
+async def main(keys: list[str] | None = None) -> None:
+    await init_db()
+    wanted = keys or [demo.key for demo in DEMO_TENANTS]
+    unknown = [key for key in wanted if key not in {d.key for d in DEMO_TENANTS}]
+    if unknown:
+        print(f"Unknown edition(s): {', '.join(unknown)}")
+        print(f"Available: {', '.join(d.key for d in DEMO_TENANTS)}")
+        sys.exit(1)
+
+    ok = True
+    for demo in DEMO_TENANTS:
+        if demo.key in wanted:
+            print(f"\n— {demo.name} ({demo.code}) —")
+            ok = await seed_demo_tenant(demo) and ok
+    if not ok:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main(sys.argv[1:] or None))

@@ -3,6 +3,8 @@
  * These are used by CorporateAdminLayout and TrainingAdminLayout.
  */
 import type { ReactNode } from 'react'
+
+import type { ModuleKey } from '../constants/modules'
 import {
   BookCheck,
   BookOpen,
@@ -22,7 +24,9 @@ import {
   ShieldCheck,
   SquarePen,
   Sparkles,
+  LibraryBig,
   UserCog,
+  UserRoundCheck,
   Users,
   UsersRound,
 } from 'lucide-react'
@@ -35,6 +39,12 @@ export interface NavItem {
   active: boolean
   icon: ReactNode
   badge?: number
+  /**
+   * The module this destination needs. The sidebar locks the row when the
+   * institution did not subscribe to it — same as the university layout.
+   */
+  module?: ModuleKey
+  show?: boolean
 }
 
 export interface NavSection {
@@ -63,18 +73,21 @@ export function buildCorporateNavSections(
         {
           label: 'Organization',
           to: '/admin/corporate/organization',
+          module: 'tenant_institution_mgmt',
           active: isActive(['/admin/corporate/organization'], path),
           icon: <Network size={ICON_SIZE} />,
         },
         {
           label: 'Departments',
           to: '/admin/corporate/departments',
+          module: 'academic_structure',
           active: isActive(['/admin/corporate/departments'], path),
           icon: <UserCog size={ICON_SIZE} />,
         },
         {
           label: 'Teams',
           to: '/admin/corporate/teams',
+          module: 'academic_structure',
           active: isActive(['/admin/corporate/teams'], path),
           icon: <UsersRound size={ICON_SIZE} />,
         },
@@ -86,32 +99,58 @@ export function buildCorporateNavSections(
         {
           label: 'Training Catalog',
           to: '/admin/courses',
+          module: 'course_catalog_authoring',
           active: isActive(['/admin/courses'], path),
           icon: <BookOpen size={ICON_SIZE} />,
         },
         {
           label: 'Training Assignments',
           to: '/admin/enrollments',
+          module: 'enrollment_cohorts',
           active: isActive(['/admin/enrollments'], path),
           icon: <ClipboardCheck size={ICON_SIZE} />,
         },
         {
           label: 'Live Training',
           to: '/admin/live-classes',
+          module: 'virtual_classroom',
           active: isActive(['/admin/live-classes'], path),
           icon: <MonitorPlay size={ICON_SIZE} />,
         },
         {
           label: 'Assignments',
           to: '/admin/assignments',
+          module: 'assignments_assessments',
           active: isActive(['/admin/assignments'], path),
           icon: <SquarePen size={ICON_SIZE} />,
         },
         {
           label: 'Assessments',
           to: '/admin/quizzes-exams',
+          module: 'assignments_assessments',
           active: isActive(['/admin/quizzes-exams'], path),
           icon: <ClipboardList size={ICON_SIZE} />,
+        },
+        {
+          label: 'Question Bank',
+          to: '/admin/question-bank',
+          module: 'assignments_assessments',
+          active: isActive(['/admin/question-bank'], path),
+          icon: <BookCheck size={ICON_SIZE} />,
+        },
+        {
+          label: 'Training Library',
+          to: '/admin/resources',
+          module: 'content_management',
+          active: isActive(['/admin/resources'], path),
+          icon: <LibraryBig size={ICON_SIZE} />,
+        },
+        {
+          label: 'Attendance',
+          to: '/admin/attendance',
+          module: 'attendance',
+          active: isActive(['/admin/attendance'], path),
+          icon: <UserRoundCheck size={ICON_SIZE} />,
         },
       ],
     },
@@ -151,24 +190,28 @@ export function buildCorporateNavSections(
         {
           label: 'Job Roles',
           to: '/admin/corporate/job-roles',
+          module: 'academic_structure',
           active: isActive(['/admin/corporate/job-roles'], path),
           icon: <Briefcase size={ICON_SIZE} />,
         },
         {
           label: 'Skills',
           to: '/admin/corporate/skills',
+          module: 'academic_structure',
           active: isActive(['/admin/corporate/skills'], path),
           icon: <Sparkles size={ICON_SIZE} />,
         },
         {
           label: 'Compliance',
           to: '/admin/corporate/compliance',
+          module: 'reports_analytics',
           active: isActive(['/admin/corporate/compliance'], path),
           icon: <ShieldCheck size={ICON_SIZE} />,
         },
         {
           label: 'Certifications',
           to: '/admin/certificates',
+          module: 'certificates_credentials',
           active: isActive(['/admin/certificates'], path),
           icon: <BookCheck size={ICON_SIZE} />,
         },
@@ -180,12 +223,14 @@ export function buildCorporateNavSections(
         {
           label: 'Announcements',
           to: '/admin/announcements',
+          module: 'communication_notifications',
           active: isActive(['/admin/announcements'], path),
           icon: <Megaphone size={ICON_SIZE} />,
         },
         {
           label: 'Discussion Forum',
           to: '/admin/discussion-forum',
+          module: 'communication_notifications',
           active: isActive(['/admin/discussion-forum'], path),
           icon: <MessageSquare size={ICON_SIZE} />,
         },
@@ -197,12 +242,14 @@ export function buildCorporateNavSections(
         {
           label: 'Reports & Analytics',
           to: '/admin/reports',
+          module: 'reports_analytics',
           active: isActive(['/admin/reports'], path),
           icon: <FileText size={ICON_SIZE} />,
         },
         {
           label: 'Help Desk',
           to: '/admin/help-desk',
+          module: 'administration_support',
           active: isActive(['/admin/help-desk'], path),
           icon: <Headset size={ICON_SIZE} />,
         },
@@ -234,24 +281,28 @@ export function buildTrainingNavSections(
         {
           label: 'Training Programs',
           to: '/admin/training/programs',
+          module: 'academic_structure',
           active: isActive(['/admin/training/programs'], path),
           icon: <GraduationCap size={ICON_SIZE} />,
         },
         {
           label: 'Cohorts',
           to: '/admin/training/cohorts',
+          module: 'enrollment_cohorts',
           active: isActive(['/admin/training/cohorts'], path),
           icon: <UsersRound size={ICON_SIZE} />,
         },
         {
           label: 'Course Catalog',
           to: '/admin/courses',
+          module: 'course_catalog_authoring',
           active: isActive(['/admin/courses'], path),
           icon: <BookOpen size={ICON_SIZE} />,
         },
         {
           label: 'Course Offerings',
           to: '/admin/course-offerings',
+          module: 'course_catalog_authoring',
           active: isActive(['/admin/course-offerings'], path),
           icon: <ClipboardCheck size={ICON_SIZE} />,
         },
@@ -263,20 +314,44 @@ export function buildTrainingNavSections(
         {
           label: 'Live Sessions',
           to: '/admin/live-classes',
+          module: 'virtual_classroom',
           active: isActive(['/admin/live-classes'], path),
           icon: <MonitorPlay size={ICON_SIZE} />,
         },
         {
           label: 'Assignments',
           to: '/admin/assignments',
+          module: 'assignments_assessments',
           active: isActive(['/admin/assignments'], path),
           icon: <SquarePen size={ICON_SIZE} />,
         },
         {
           label: 'Assessments',
           to: '/admin/quizzes-exams',
+          module: 'assignments_assessments',
           active: isActive(['/admin/quizzes-exams'], path),
           icon: <ClipboardList size={ICON_SIZE} />,
+        },
+        {
+          label: 'Question Bank',
+          to: '/admin/question-bank',
+          module: 'assignments_assessments',
+          active: isActive(['/admin/question-bank'], path),
+          icon: <BookCheck size={ICON_SIZE} />,
+        },
+        {
+          label: 'Library & Resources',
+          to: '/admin/resources',
+          module: 'content_management',
+          active: isActive(['/admin/resources'], path),
+          icon: <LibraryBig size={ICON_SIZE} />,
+        },
+        {
+          label: 'Attendance',
+          to: '/admin/attendance',
+          module: 'attendance',
+          active: isActive(['/admin/attendance'], path),
+          icon: <UserRoundCheck size={ICON_SIZE} />,
         },
       ],
     },
@@ -316,18 +391,21 @@ export function buildTrainingNavSections(
         {
           label: 'Certifications',
           to: '/admin/certificates',
+          module: 'certificates_credentials',
           active: isActive(['/admin/certificates'], path),
           icon: <BookCheck size={ICON_SIZE} />,
         },
         {
           label: 'Announcements',
           to: '/admin/announcements',
+          module: 'communication_notifications',
           active: isActive(['/admin/announcements'], path),
           icon: <Megaphone size={ICON_SIZE} />,
         },
         {
           label: 'Discussion Forum',
           to: '/admin/discussion-forum',
+          module: 'communication_notifications',
           active: isActive(['/admin/discussion-forum'], path),
           icon: <MessageSquare size={ICON_SIZE} />,
         },
@@ -339,12 +417,14 @@ export function buildTrainingNavSections(
         {
           label: 'Reports & Analytics',
           to: '/admin/reports',
+          module: 'reports_analytics',
           active: isActive(['/admin/reports'], path),
           icon: <FileText size={ICON_SIZE} />,
         },
         {
           label: 'Help Desk',
           to: '/admin/help-desk',
+          module: 'administration_support',
           active: isActive(['/admin/help-desk'], path),
           icon: <Headset size={ICON_SIZE} />,
         },
@@ -360,6 +440,9 @@ export function buildTrainingNavSections(
 }
 
 export const CORPORATE_BREADCRUMB_LABELS: Record<string, string> = {
+  '/admin/question-bank': 'Question Bank',
+  '/admin/resources': 'Training Library',
+  '/admin/attendance': 'Attendance',
   '/admin': 'Dashboard',
   '/admin/institution/overview': 'Dashboard',
   '/admin/corporate/organization': 'Organization Structure',
@@ -386,6 +469,9 @@ export const CORPORATE_BREADCRUMB_LABELS: Record<string, string> = {
 }
 
 export const TRAINING_BREADCRUMB_LABELS: Record<string, string> = {
+  '/admin/question-bank': 'Question Bank',
+  '/admin/resources': 'Library & Resources',
+  '/admin/attendance': 'Attendance',
   '/admin': 'Dashboard',
   '/admin/institution/overview': 'Dashboard',
   '/admin/training/programs': 'Training Programs',

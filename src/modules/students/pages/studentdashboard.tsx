@@ -14,6 +14,7 @@ import {
   TrendingUp,
   UserRoundCheck,
 } from 'lucide-react'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../../shared/components/Button'
 import { DashboardSummaryCard } from '../../../shared/components/DashboardSummaryCard'
@@ -57,6 +58,9 @@ function assignmentStatusTone(status: AssignmentItem['status']) {
 }
 
 export function StudentDashboardPage() {
+  const { edition } = useOrganizationConfig()
+  const isCorporate = edition === 'corporate'
+
   const { t } = useLanguage()
   const navigate = useNavigate()
   const { data, isLoading, isError, error, reload } = useStudentDashboard()
@@ -220,9 +224,9 @@ export function StudentDashboardPage() {
           iconBg="bg-navy-50 text-navy-700"
         />
         <StatBlock
-          label="Current GPA"
-          value={data.kpis.gpa.toFixed(2)}
-          sub="Based on graded credits"
+          label={isCorporate ? 'Assessment average' : 'Current GPA'}
+          value={isCorporate ? `${data.kpis.avgQuizScore}%` : data.kpis.gpa.toFixed(2)}
+          sub={isCorporate ? 'Across completed training' : 'Based on graded credits'}
           trend={gpaTrend.trend}
           trendValue={gpaTrend.trendValue}
           sparkline={data.kpiTrends.gpa.map((v) => Math.round(v * 100))}

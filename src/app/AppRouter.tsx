@@ -3,6 +3,7 @@ import { EditionAdminLayout } from './EditionAdminLayout'
 import { CorporateOverviewPage } from '../modules/corporate/dashboard/CorporateOverviewPage'
 import { CorporateDepartmentsPage } from '../modules/corporate/pages/CorporateDepartmentsPage'
 import { CorporateTeamsPage } from '../modules/corporate/pages/CorporateTeamsPage'
+import { CorporateTeamDetailPage } from '../modules/corporate/pages/CorporateTeamDetailPage'
 import { CorporateOrganizationPage } from '../modules/corporate/pages/CorporateOrganizationPage'
 import { CorporateCompliancePage } from '../modules/corporate/pages/CorporateCompliancePage'
 import { CorporateJobRolesPage } from '../modules/corporate/pages/CorporateJobRolesPage'
@@ -368,6 +369,7 @@ export const router = createBrowserRouter([
       { path: 'corporate/organization', element: <CorporateOrganizationPage /> },
       { path: 'corporate/departments', element: <CorporateDepartmentsPage /> },
       { path: 'corporate/teams', element: <CorporateTeamsPage /> },
+      { path: 'corporate/teams/:teamId', element: <CorporateTeamDetailPage /> },
       { path: 'corporate/compliance', element: <CorporateCompliancePage /> },
       { path: 'corporate/job-roles', element: <CorporateJobRolesPage /> },
       { path: 'corporate/skills', element: <CorporateSkillsPage /> },

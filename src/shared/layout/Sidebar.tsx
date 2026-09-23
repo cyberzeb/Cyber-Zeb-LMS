@@ -60,6 +60,15 @@ export function Sidebar({
     return () => cancelAnimationFrame(frame)
   }, [location.pathname, scrollToActiveItem])
 
+  // `show: false` hides an item for this edition. Done here so every portal gets
+  // it, rather than each layout remembering to filter.
+  const visibleSections = sections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => item.show !== false),
+    }))
+    .filter((section) => section.items.length > 0)
+
   return (
     <aside
       className="group/sidebar shrink-0 bg-admin-sidebar text-white flex flex-col h-screen sticky top-0 border-r border-white/[0.06] w-[72px] hover:w-64 transition-[width] duration-300 ease-in-out overflow-hidden"
@@ -82,7 +91,7 @@ export function Sidebar({
       </div>
 
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto app-scroll px-2 py-2">
-        {sections.map((section) => (
+        {visibleSections.map((section) => (
           <div key={section.title} className="relative">
             <div className="text-[9px] text-navy-300 uppercase tracking-[0.14em] font-semibold mx-2 mt-3 mb-1.5 overflow-hidden max-h-0 opacity-0 group-hover/sidebar:max-h-6 group-hover/sidebar:opacity-100 transition-all duration-300">
               {tx(section.title)}

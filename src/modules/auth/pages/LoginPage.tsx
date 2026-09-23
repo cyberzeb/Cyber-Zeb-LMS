@@ -164,15 +164,22 @@ export function LoginPage() {
         // SuperAdmin is handled above; the remaining roles are portal roles.
         role: result.frontend_role as Exclude<LoginRole, 'SuperAdmin'>,
       })
-      // A provisioned institution admin signs into their own tenant: switch the
-      // active tenant/edition, then hard-navigate so the data layer reloads that
-      // institution's workspace.
-      if (role === 'Admin' && result.tenant_code) {
+      // Switch the active tenant whenever sign-in resolved to a specific one —
+      // a provisioned institution admin, or any demo user whose tenant is not
+      // the default. Without this a corporate employee would land in a
+      // university-shaped workspace.
+      const resolvedTenant = result.tenant_code || lookupResult?.tenant_code
+      const resolvedType =
+        result.institution_type || lookupResult?.institution_type || 'college_university'
+      if (resolvedTenant) {
         setActiveTenant({
-          slug: result.tenant_code,
-          name: result.tenant_name || '',
-          institutionType: (result.institution_type as InstitutionType) || 'college_university',
+          slug: resolvedTenant,
+          name: result.tenant_name || lookupResult?.tenant_name || '',
+          institutionType: resolvedType as InstitutionType,
         })
+      }
+      if (role === 'Admin' && resolvedTenant) {
+        // Hard-navigate so the data layer reloads that institution's workspace.
         window.location.assign('/admin')
         return
       }

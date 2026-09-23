@@ -115,6 +115,10 @@ institutions. Read it in Mailpit at `http://localhost:8025` — see
 | Guardian | `yonas.t@gmail.com` |
 | Help desk | `m.haile@berana.edu` |
 
+The Corporate Edition demo tenant (`horizon` — Horizon Bank) is seeded too. Sign
+in as `selam.girma@horizonbank.et` (employee) or `m.bekele@horizonbank.et`
+(learning admin) to see job roles, required training and compliance.
+
 ### Data access rules
 
 Tenant admins can change all of their tenant's data. Other roles can only change

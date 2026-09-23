@@ -28,6 +28,8 @@ import { formatCurrency } from '../../../shared/storage/platformUtils'
 import { ReportCategoryCard } from '../components/ReportCategoryCard'
 import { GeneratedReportsList } from '../components/GeneratedReportsList'
 import { MiniBarChart } from '../components/MiniBarChart'
+import { CorporateReportsPanel } from '../../corporate/components/CorporateReportsPanel'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { TrendLineChart } from '../components/TrendLineChart'
 import { downloadInstitutionReport } from '../utils/exportInstitutionReport'
 import type { GeneratedReport, ReportCategory } from '../types'
@@ -42,6 +44,17 @@ const categories: ReportCategory[] = [
   { id: 'r5', title: 'Compliance & Audit', description: 'Access logs, policy acknowledgment and audit trails.', icon: '🛡️', reportCount: 6 },
   { id: 'r6', title: 'Instructor Activity', description: 'Teaching load, grading turnaround and responsiveness.', icon: '🧑‍🏫', reportCount: 7 },
 ]
+
+const corporateCategories: ReportCategory[] = [
+  { id: 'cr1', title: 'Workforce Compliance', description: 'Required training completion by employee, department and job role.', icon: '🛡️', reportCount: 10 },
+  { id: 'cr2', title: 'Overdue Training', description: 'Assignments past their due date and who they belong to.', icon: '⏰', reportCount: 6 },
+  { id: 'cr3', title: 'Recertification', description: 'Certifications expiring or already expired.', icon: '🔄', reportCount: 5 },
+  { id: 'cr4', title: 'Training Activity', description: 'Completion rates, time to complete and assessment scores.', icon: '📈', reportCount: 9 },
+  { id: 'cr5', title: 'Job Roles & Skills', description: 'Required skills per role and coverage across the workforce.', icon: '🧭', reportCount: 6 },
+  { id: 'cr6', title: 'Audit Trail', description: 'Who was assigned what, when, and by whom.', icon: '🧾', reportCount: 4 },
+]
+
+const corporateAnalyticsTabs = ['Overview', 'Compliance', 'Engagement']
 
 const categoryOptions = categories.map((c) => c.title)
 const formatOptions: GeneratedReport['format'][] = ['PDF', 'Excel', 'CSV']
@@ -59,6 +72,13 @@ function todayLabel(): string {
 
 export function ReportsPage() {
   const { notify } = useToast()
+  // A company reports on compliance, not on GPA and tuition, so the corporate
+  // edition gets its own tabs, categories and summary panel.
+  const { edition, modules } = useOrganizationConfig()
+  const isCorporate = edition === 'corporate'
+  const visibleCategories = isCorporate ? corporateCategories : categories
+  const visibleTabs = isCorporate ? corporateAnalyticsTabs : analyticsTabs
+  const visibleCategoryOptions = visibleCategories.map((c) => c.title)
   const analytics = useMemo(() => buildReportsAnalytics(), [])
   const [reports, setReports] = useApiCollection<GeneratedReport[]>(STORAGE_KEYS.reports, [])
   const [modalOpen, setModalOpen] = useState(false)
@@ -67,7 +87,7 @@ export function ReportsPage() {
   const [generating, setGenerating] = useState(false)
 
   const openModal = () => {
-    setForm(emptyForm)
+    setForm({ ...emptyForm, category: visibleCategoryOptions[0] })
     setModalOpen(true)
   }
 
@@ -132,9 +152,13 @@ export function ReportsPage() {
         }
       />
 
-      <FilterTabs tabs={analyticsTabs} active={activeTab} onChange={setActiveTab} />
+      <FilterTabs tabs={visibleTabs} active={activeTab} onChange={setActiveTab} />
 
-      {(activeTab === 'Overview' || activeTab === 'Academic') ? (
+      {isCorporate && (activeTab === 'Overview' || activeTab === 'Compliance') ? (
+        <CorporateReportsPanel />
+      ) : null}
+
+      {!isCorporate && (activeTab === 'Overview' || activeTab === 'Academic') ? (
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             <StatBlock label="Active learners" value={summary.activeStudents} sub={`${summary.totalStudents} total`} icon={<Users size={STAT} />} />
@@ -153,7 +177,7 @@ export function ReportsPage() {
         </>
       ) : null}
 
-      {(activeTab === 'Overview' || activeTab === 'Financial') ? (
+      {modules.payments && (activeTab === 'Overview' || activeTab === 'Financial') ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatBlock label="Revenue collected" value={formatCurrency(summary.revenueCollected)} sub="Paid invoices" icon={<Wallet size={STAT} />} iconBg="bg-success-bg text-success" />
           <StatBlock label="Outstanding" value={formatCurrency(summary.revenueOutstanding)} sub="Unpaid balance" icon={<Wallet size={STAT} />} iconBg="bg-warning-bg text-warning" />
@@ -164,7 +188,7 @@ export function ReportsPage() {
 
       {(activeTab === 'Overview' || activeTab === 'Financial' || activeTab === 'Engagement') ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {activeTab === 'Overview' || activeTab === 'Financial' ? (
+          {modules.payments && (activeTab === 'Overview' || activeTab === 'Financial') ? (
             <TrendLineChart
               title="Revenue trend"
               subtitle="Collected payments (ETB thousands) — last 6 months"
@@ -281,7 +305,7 @@ export function ReportsPage() {
       <div>
         <h2 className="text-[15px] font-extrabold text-navy-900 mb-4">Report categories</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
-          {categories.map((category) => (
+          {visibleCategories.map((category) => (
             <ReportCategoryCard
               key={category.id}
               category={category}
@@ -315,7 +339,7 @@ export function ReportsPage() {
       >
         <FormField label="Report Name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} placeholder="e.g. Fall Semester Grade Distribution" />
         <div className="grid grid-cols-2 gap-4">
-          <FormField label="Category" type="select" value={form.category} options={categoryOptions} onChange={(v) => setForm({ ...form, category: v })} />
+          <FormField label="Category" type="select" value={form.category} options={visibleCategoryOptions} onChange={(v) => setForm({ ...form, category: v })} />
           <FormField label="Format" type="select" value={form.format} options={formatOptions} onChange={(v) => setForm({ ...form, format: v as GeneratedReport['format'] })} />
         </div>
       </Modal>

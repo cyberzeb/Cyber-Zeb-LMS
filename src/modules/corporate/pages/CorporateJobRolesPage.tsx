@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Briefcase, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Briefcase, ClipboardCheck, Pencil, Plus, Trash2 } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { Button } from '../../../shared/components/Button'
@@ -9,6 +9,8 @@ import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useCampusContext } from '../../institution/context/CampusContext'
 import { useSkills } from '../hooks/useSkills'
+import { useRequiredTraining } from '../hooks/useRequiredTraining'
+import { employeesInRole } from '../utils/complianceUtils'
 import { useJobRoles } from '../hooks/useJobRoles'
 import { CorporateJobRoleFormModal } from '../components/CorporateJobRoleFormModal'
 import type { JobRole } from '../types'
@@ -19,6 +21,7 @@ export function CorporateJobRolesPage() {
   const { notify } = useToast()
   const { departments } = useCampusContext()
   const { jobRoles, createJobRole, updateJobRole, deleteJobRole } = useJobRoles()
+  const { activeEmployees, assignForRole } = useRequiredTraining()
   const { skills } = useSkills()
   const [query, setQuery] = useState('')
   const [modal, setModal] = useState<{ open: boolean; mode: 'create' | 'edit'; role: JobRole | null }>({
@@ -67,6 +70,8 @@ export function CorporateJobRolesPage() {
               <th className="px-4 py-3">Department</th>
               <th className="px-4 py-3">Required skills</th>
               <th className="px-4 py-3">Required training</th>
+              <th className="px-4 py-3">Employees</th>
+              <th className="px-4 py-3">Recertify</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3 text-end">Actions</th>
             </tr>
@@ -81,11 +86,36 @@ export function CorporateJobRolesPage() {
                 <td className="px-4 py-3 text-[13px]">{deptName(role.departmentId)}</td>
                 <td className="px-4 py-3 text-[13px]">{role.requiredSkillIds.length}</td>
                 <td className="px-4 py-3 text-[13px]">{role.requiredCourseIds.length}</td>
+                <td className="px-4 py-3 text-[13px]">
+                  {employeesInRole(role.id, activeEmployees).length}
+                </td>
+                <td className="px-4 py-3 text-[13px]">
+                  {role.recertificationMonths
+                    ? `every ${role.recertificationMonths} mo`
+                    : 'never'}
+                </td>
                 <td className="px-4 py-3">
                   <StatusPill label={role.status} tone={role.status === 'active' ? 'success' : 'neutral'} />
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title="Assign this role's required training to everyone who holds it"
+                      disabled={role.requiredCourseIds.length === 0}
+                      onClick={() => {
+                        const result = assignForRole(role)
+                        notify(
+                          result.created === 0
+                            ? 'Everyone in this role already has its training.'
+                            : `Assigned ${result.created} course${result.created === 1 ? '' : 's'} to ${result.employees} employee${result.employees === 1 ? '' : 's'}.`,
+                          'success',
+                        )
+                      }}
+                    >
+                      <ClipboardCheck size={14} />
+                    </Button>
                     <Button variant="ghost" size="sm" onClick={() => setModal({ open: true, mode: 'edit', role })}>
                       <Pencil size={14} />
                     </Button>
@@ -108,12 +138,18 @@ export function CorporateJobRolesPage() {
         skills={skills}
         onClose={() => setModal({ open: false, mode: 'create', role: null })}
         onSave={(values) => {
+          // The modal edits numbers as text; store them as numbers (or unset).
+          const patch = {
+            ...values,
+            trainingDueDays: Number(values.trainingDueDays) || undefined,
+            recertificationMonths: Number(values.recertificationMonths) || undefined,
+          }
           if (modal.mode === 'create') {
-            createJobRole(values)
-            notify('Job role created.', 'success')
+            createJobRole(patch)
+            notify('Job role created. Use "Assign training" to roll it out.', 'success')
           } else if (modal.role) {
-            updateJobRole(modal.role.id, values)
-            notify('Job role updated.', 'success')
+            updateJobRole(modal.role.id, patch)
+            notify('Job role updated. Use "Assign training" to roll out changes.', 'success')
           }
           setModal({ open: false, mode: 'create', role: null })
         }}

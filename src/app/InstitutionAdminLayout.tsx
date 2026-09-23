@@ -390,13 +390,9 @@ function InstitutionAdminShell() {
     },
   ]
 
-  // Drop items whose module is disabled for this edition, then any empty section.
+  // Items with `show: false` (module disabled for this edition) and modules the
+  // institution did not buy are both filtered by the sidebar itself.
   const navSections = rawSections
-    .map((section) => ({
-      ...section,
-      items: section.items.filter((item) => (item as { show?: boolean }).show !== false),
-    }))
-    .filter((section) => section.items.length > 0)
 
   const breadcrumb =
     getEditionConfig(org.edition).breadcrumbLabels[path] ??

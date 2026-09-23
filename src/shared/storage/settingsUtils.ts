@@ -14,6 +14,11 @@ export interface InstitutionSettingsState {
     grading: string
     attendance: string
     completion: string
+    /**
+     * Corporate edition: the default window an employee gets to finish training
+     * assigned from a job role, when that role does not set its own.
+     */
+    trainingDueDays?: string
   }
   modules: Record<string, boolean>
   integrations: Record<string, boolean>

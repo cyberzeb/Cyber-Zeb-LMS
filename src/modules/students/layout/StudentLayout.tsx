@@ -35,7 +35,10 @@ export function StudentLayout() {
   const location = useLocation()
   const path = location.pathname
   const mainRef = useRef<HTMLElement>(null)
-  const { terminology: t } = useOrganizationConfig()
+  const { terminology: t, edition, modules } = useOrganizationConfig()
+  // Corporate employees have no transcript, GPA or tuition: those belong to a
+  // university's academic record, not to workplace training.
+  const isCorporate = edition === 'corporate'
   const session = readPortalSession()
   const person = getSessionPerson()
 
@@ -43,9 +46,17 @@ export function StudentLayout() {
     mainRef.current?.scrollTo({ top: 0, behavior: 'auto' })
   }, [location.pathname])
 
+  const corporateBreadcrumbs: Record<string, string> = {
+    '/student/courses': 'My Training',
+    '/student/grades': 'Training Results',
+    '/student/live-classes': 'Live Training',
+    '/student/certificates': 'Certifications',
+  }
   const breadcrumb = path.includes('/courses/') && path.includes('/learn')
     ? 'Learning'
-    : breadcrumbLabels[path] ?? 'Dashboard'
+    : (isCorporate ? corporateBreadcrumbs[path] : undefined) ??
+      breadcrumbLabels[path] ??
+      'Dashboard'
 
   const isForumPage = path === '/student/forum'
 
@@ -113,7 +124,7 @@ export function StudentLayout() {
           icon: <CalendarDays size={ICON_SIZE} />,
         },
         {
-          label: 'Grades',
+          label: isCorporate ? 'My Results' : 'Grades',
           to: '/student/grades',
           active: isActive('/student/grades'),
           icon: <GraduationCap size={ICON_SIZE} />,
@@ -123,6 +134,7 @@ export function StudentLayout() {
           to: '/student/transcript',
           active: isActive('/student/transcript'),
           icon: <ScrollText size={ICON_SIZE} />,
+          show: !isCorporate,
         },
         {
           label: 'Attendance',
@@ -163,6 +175,8 @@ export function StudentLayout() {
           to: '/student/payments',
           active: isActive('/student/payments'),
           icon: <Wallet size={ICON_SIZE} />,
+          // Employees are not billed for their own training.
+          show: modules.payments,
         },
         {
           label: 'Help Desk',

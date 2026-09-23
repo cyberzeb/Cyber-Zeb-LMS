@@ -14,6 +14,10 @@ export interface JobRoleFormValues {
   departmentId: string
   requiredSkillIds: string[]
   requiredCourseIds: string[]
+  /** Days to complete required training once assigned. */
+  trainingDueDays: string
+  /** Months a completed course stays valid; empty means it never expires. */
+  recertificationMonths: string
   status: JobRoleStatus
 }
 
@@ -43,6 +47,8 @@ export function CorporateJobRoleFormModal({
     departmentId: '',
     requiredSkillIds: [],
     requiredCourseIds: [],
+    trainingDueDays: '30',
+    recertificationMonths: '',
     status: 'active',
   })
 
@@ -55,6 +61,10 @@ export function CorporateJobRoleFormModal({
         departmentId: role.departmentId ?? '',
         requiredSkillIds: role.requiredSkillIds,
         requiredCourseIds: role.requiredCourseIds,
+        trainingDueDays: String(role.trainingDueDays ?? 30),
+        recertificationMonths: role.recertificationMonths
+          ? String(role.recertificationMonths)
+          : '',
         status: role.status,
       })
     } else {
@@ -64,6 +74,8 @@ export function CorporateJobRoleFormModal({
         departmentId: departments[0]?.id ?? '',
         requiredSkillIds: [],
         requiredCourseIds: [],
+        trainingDueDays: '30',
+        recertificationMonths: '',
         status: 'active',
       })
     }
@@ -151,6 +163,24 @@ export function CorporateJobRoleFormModal({
             ))}
           </div>
         </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <FormField
+            label="Days to complete"
+            type="number"
+            value={form.trainingDueDays}
+            onChange={(value) => setForm((p) => ({ ...p, trainingDueDays: value }))}
+          />
+          <FormField
+            label="Recertify after (months)"
+            type="number"
+            value={form.recertificationMonths}
+            onChange={(value) => setForm((p) => ({ ...p, recertificationMonths: value }))}
+          />
+        </div>
+        <p className="-mt-1 text-[11.5px] text-secondary-text">
+          Required training is assigned with a due date this many days ahead. Leave
+          recertification empty if the training never expires.
+        </p>
         <FormField label="Status" type="select" value={form.status} onChange={(status) => setForm((p) => ({ ...p, status: status as JobRoleStatus }))} options={['active', 'inactive']} />
       </div>
     </Modal>

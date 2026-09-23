@@ -1,0 +1,791 @@
+{
+  "collections": {
+    "campuses": [
+      {
+        "id": "c1",
+        "name": "Head Office — Addis Ababa",
+        "code": "HQ",
+        "address": "Africa Avenue, Addis Ababa, Ethiopia",
+        "subtitle": "Corporate headquarters · Regulatory hub",
+        "status": "active"
+      },
+      {
+        "id": "c2",
+        "name": "Bole Branch",
+        "code": "BOLE",
+        "address": "Bole Road, Addis Ababa, Ethiopia",
+        "subtitle": "Retail banking · High-volume branch",
+        "status": "active"
+      },
+      {
+        "id": "c3",
+        "name": "Hawassa Regional Office",
+        "code": "HAW",
+        "address": "Hawassa, Sidama Region, Ethiopia",
+        "subtitle": "Southern region operations",
+        "status": "active"
+      }
+    ],
+    "colleges": [
+      {
+        "id": "col1",
+        "name": "Horizon Bank",
+        "deanName": "Executive Leadership",
+        "campusId": "c1",
+        "description": "Enterprise operating structure"
+      }
+    ],
+    "departments": [
+      {
+        "id": "d1",
+        "name": "Retail Banking",
+        "headName": "Tewodros Alemu",
+        "studentsCount": 842,
+        "facultyCount": 0,
+        "icon": "🏦",
+        "campusId": "c1",
+        "collegeId": "col1",
+        "description": "Branches, contact center, and customer-facing operations.",
+        "status": "active"
+      },
+      {
+        "id": "d2",
+        "name": "Digital Channels",
+        "headName": "Hanna Mekonnen",
+        "studentsCount": 318,
+        "facultyCount": 0,
+        "icon": "📱",
+        "campusId": "c1",
+        "collegeId": "col1",
+        "description": "Mobile banking, internet banking, and digital product teams.",
+        "status": "active"
+      },
+      {
+        "id": "d3",
+        "name": "Risk & Compliance",
+        "headName": "Sara Tadesse",
+        "studentsCount": 156,
+        "facultyCount": 0,
+        "icon": "🛡️",
+        "campusId": "c1",
+        "collegeId": "col1",
+        "description": "AML, KYC, regulatory reporting, and internal audit support.",
+        "status": "active"
+      },
+      {
+        "id": "d4",
+        "name": "HR & Learning",
+        "headName": "Martha Bekele",
+        "studentsCount": 64,
+        "facultyCount": 0,
+        "icon": "👥",
+        "campusId": "c1",
+        "collegeId": "col1",
+        "description": "Workforce planning, onboarding, and enterprise learning.",
+        "status": "active"
+      },
+      {
+        "id": "d5",
+        "name": "IT & Security",
+        "headName": "Mekonnen Alemu",
+        "studentsCount": 210,
+        "facultyCount": 0,
+        "icon": "💻",
+        "campusId": "c1",
+        "collegeId": "col1",
+        "description": "Core banking systems, infrastructure, and cybersecurity.",
+        "status": "active"
+      }
+    ],
+    "teams": [
+      {
+        "id": "team-1",
+        "name": "AML & Regulatory",
+        "description": "Anti-money laundering monitoring and regulatory reporting.",
+        "departmentId": "d3",
+        "managerId": null,
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      },
+      {
+        "id": "team-2",
+        "name": "Branch Operations",
+        "description": "Frontline branch staff and teller services.",
+        "departmentId": "d1",
+        "managerId": null,
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      },
+      {
+        "id": "team-3",
+        "name": "Digital Product",
+        "description": "Mobile and internet banking product delivery.",
+        "departmentId": "d2",
+        "managerId": null,
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      },
+      {
+        "id": "team-4",
+        "name": "Cybersecurity",
+        "description": "Security operations, access control, and incident response.",
+        "departmentId": "d5",
+        "managerId": null,
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      }
+    ],
+    "job-roles": [
+      {
+        "id": "jr-1",
+        "title": "Customer Service Officer",
+        "description": "Handles customer transactions, account inquiries, and frontline service.",
+        "departmentId": "d1",
+        "requiredSkillIds": [
+          "sk-1",
+          "sk-3"
+        ],
+        "requiredCourseIds": [
+          "c1",
+          "c4",
+          "c5"
+        ],
+        "trainingDueDays": 30,
+        "recertificationMonths": 12,
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      },
+      {
+        "id": "jr-2",
+        "title": "Compliance Analyst",
+        "description": "Monitors AML alerts, KYC reviews, and regulatory obligations.",
+        "departmentId": "d3",
+        "requiredSkillIds": [
+          "sk-2",
+          "sk-4"
+        ],
+        "requiredCourseIds": [
+          "c1",
+          "c3"
+        ],
+        "trainingDueDays": 21,
+        "recertificationMonths": 12,
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      },
+      {
+        "id": "jr-3",
+        "title": "Digital Banking Specialist",
+        "description": "Supports digital channel products and customer onboarding flows.",
+        "departmentId": "d2",
+        "requiredSkillIds": [
+          "sk-5",
+          "sk-3"
+        ],
+        "requiredCourseIds": [
+          "c2",
+          "c3"
+        ],
+        "trainingDueDays": 45,
+        "recertificationMonths": 24,
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      },
+      {
+        "id": "jr-4",
+        "title": "Branch Manager",
+        "description": "Leads branch teams and ensures training and compliance targets are met.",
+        "departmentId": "d1",
+        "requiredSkillIds": [
+          "sk-5"
+        ],
+        "requiredCourseIds": [
+          "c1",
+          "c2",
+          "c5"
+        ],
+        "trainingDueDays": 30,
+        "recertificationMonths": 24,
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      }
+    ],
+    "skills": [
+      {
+        "id": "sk-1",
+        "name": "Application Development",
+        "category": "technical",
+        "description": "Design, build, and maintain software applications.",
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      },
+      {
+        "id": "sk-2",
+        "name": "Cybersecurity Fundamentals",
+        "category": "compliance",
+        "description": "Core security practices, threat awareness, and incident response.",
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      },
+      {
+        "id": "sk-3",
+        "name": "Cloud Infrastructure",
+        "category": "technical",
+        "description": "Deploy and operate cloud-based systems and services.",
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      },
+      {
+        "id": "sk-4",
+        "name": "Data Privacy & GDPR",
+        "category": "compliance",
+        "description": "Handle personal data according to privacy regulations.",
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      },
+      {
+        "id": "sk-5",
+        "name": "People Management",
+        "category": "leadership",
+        "description": "Lead teams, provide feedback, and support employee development.",
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      },
+      {
+        "id": "sk-6",
+        "name": "Workplace Safety",
+        "category": "safety",
+        "description": "Follow occupational health and safety procedures.",
+        "status": "active",
+        "createdAt": "2026-01-15T09:00:00.000Z",
+        "updatedAt": "2026-01-15T09:00:00.000Z"
+      }
+    ],
+    "people": [
+      {
+        "id": "u-demo-amina",
+        "name": "Amina Lemma",
+        "email": "amina.lemma@student.berana.edu",
+        "role": "Student",
+        "department": "Computer Science",
+        "departmentId": "d1",
+        "studyYear": 2,
+        "programSemester": 1,
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "30 min ago",
+        "initials": "AL",
+        "verificationStatus": "verified",
+        "jobRoleId": "jr-1",
+        "teamId": "team-1"
+      },
+      {
+        "id": "u1",
+        "name": "Selam Girma",
+        "email": "selam.girma@horizonbank.et",
+        "role": "Student",
+        "department": "Retail Banking",
+        "departmentId": "d1",
+        "teamId": "team-2",
+        "jobRoleId": "jr-1",
+        "campusId": "c2",
+        "status": "active",
+        "lastActive": "2 hours ago",
+        "initials": "SG",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u2",
+        "name": "Sara Tadesse",
+        "email": "s.tadesse@horizonbank.et",
+        "role": "Instructor",
+        "department": "Risk & Compliance",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "10 min ago",
+        "initials": "ST",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u3",
+        "name": "Martha Bekele",
+        "email": "m.bekele@horizonbank.et",
+        "role": "Admin",
+        "department": "HR & Learning",
+        "departmentId": "d4",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "1 day ago",
+        "initials": "MB",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u6",
+        "name": "Mekonnen Alemu",
+        "email": "m.alemun@horizonbank.et",
+        "role": "Instructor",
+        "department": "IT & Security",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "5 hours ago",
+        "initials": "MA",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u7",
+        "name": "Kidist Yohannes",
+        "email": "k.yohannes@horizonbank.et",
+        "role": "Staff",
+        "department": "HR & Learning",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "1 hour ago",
+        "initials": "KY",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u9",
+        "name": "Hanna Mekonnen",
+        "email": "h.mekonnen@horizonbank.et",
+        "role": "Instructor",
+        "department": "Digital Channels",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "3 hours ago",
+        "initials": "HM",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u10",
+        "name": "Bruk Alemu",
+        "email": "b.alemu@horizonbank.et",
+        "role": "Student",
+        "department": "Digital Channels",
+        "departmentId": "d2",
+        "teamId": "team-3",
+        "jobRoleId": "jr-3",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "Yesterday",
+        "initials": "BA",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u14",
+        "name": "Mekdes Haile",
+        "email": "m.haile@horizonbank.et",
+        "role": "HelpDesk",
+        "department": "IT & Security",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "20 min ago",
+        "initials": "MH",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u17",
+        "name": "Sara Negash",
+        "email": "s.negash@horizonbank.et",
+        "role": "Student",
+        "department": "Risk & Compliance",
+        "departmentId": "d3",
+        "teamId": "team-1",
+        "jobRoleId": "jr-2",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "4 hours ago",
+        "initials": "SN",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u18",
+        "name": "Tomas Bekele",
+        "email": "t.bekele@horizonbank.et",
+        "role": "Student",
+        "department": "Retail Banking",
+        "departmentId": "d1",
+        "teamId": "team-2",
+        "jobRoleId": "jr-1",
+        "campusId": "c2",
+        "status": "active",
+        "lastActive": "1 week ago",
+        "initials": "TB",
+        "verificationStatus": "verified"
+      }
+    ],
+    "courses": [
+      {
+        "id": "c1",
+        "code": "AML-101",
+        "title": "Anti-Money Laundering & KYC",
+        "instructor": "Sara Tadesse",
+        "department": "Risk & Compliance",
+        "level": "Mandatory",
+        "enrolledCount": 1240,
+        "moduleCount": 8,
+        "status": "published",
+        "progressPercent": 100,
+        "icon": "🏛️",
+        "description": "Anti-Money Laundering & KYC — mandatory training for Risk & Compliance.",
+        "credits": 0,
+        "departmentId": "d1",
+        "createdAt": "2026-09-21T09:00:00.000Z",
+        "updatedAt": "2026-09-21T09:00:00.000Z"
+      },
+      {
+        "id": "c2",
+        "code": "CYB-AWR",
+        "title": "Cybersecurity Awareness (All Staff)",
+        "instructor": "Mekonnen Alemu",
+        "department": "IT & Security",
+        "level": "Mandatory",
+        "enrolledCount": 3420,
+        "moduleCount": 6,
+        "status": "published",
+        "progressPercent": 100,
+        "icon": "🔐",
+        "description": "Cybersecurity Awareness (All Staff) — mandatory training for IT & Security.",
+        "credits": 0,
+        "departmentId": "d2",
+        "createdAt": "2026-09-21T09:00:00.000Z",
+        "updatedAt": "2026-09-21T09:00:00.000Z"
+      },
+      {
+        "id": "c3",
+        "code": "PRIV-001",
+        "title": "Customer Data Privacy & Protection",
+        "instructor": "Sara Tadesse",
+        "department": "Risk & Compliance",
+        "level": "Mandatory",
+        "enrolledCount": 2100,
+        "moduleCount": 5,
+        "status": "published",
+        "progressPercent": 100,
+        "icon": "🔒",
+        "description": "Customer Data Privacy & Protection — mandatory training for Risk & Compliance.",
+        "credits": 0,
+        "departmentId": "d3",
+        "createdAt": "2026-09-21T09:00:00.000Z",
+        "updatedAt": "2026-09-21T09:00:00.000Z"
+      },
+      {
+        "id": "c4",
+        "code": "FRAUD-201",
+        "title": "Fraud Detection for Frontline Staff",
+        "instructor": "Tewodros Alemu",
+        "department": "Retail Banking",
+        "level": "Role-based",
+        "enrolledCount": 890,
+        "moduleCount": 7,
+        "status": "published",
+        "progressPercent": 100,
+        "icon": "🚨",
+        "description": "Fraud Detection for Frontline Staff — mandatory training for Retail Banking.",
+        "credits": 0,
+        "departmentId": "d4",
+        "createdAt": "2026-09-21T09:00:00.000Z",
+        "updatedAt": "2026-09-21T09:00:00.000Z"
+      },
+      {
+        "id": "c5",
+        "code": "SVC-EXC",
+        "title": "Customer Service Excellence",
+        "instructor": "Hanna Mekonnen",
+        "department": "Retail Banking",
+        "level": "Role-based",
+        "enrolledCount": 760,
+        "moduleCount": 6,
+        "status": "published",
+        "progressPercent": 100,
+        "icon": "⭐",
+        "description": "Customer Service Excellence — mandatory training for Retail Banking.",
+        "credits": 0,
+        "departmentId": "d1",
+        "createdAt": "2026-09-21T09:00:00.000Z",
+        "updatedAt": "2026-09-21T09:00:00.000Z"
+      },
+      {
+        "id": "c6",
+        "code": "LEAD-301",
+        "title": "People Leadership for Managers",
+        "instructor": "Martha Bekele",
+        "department": "HR & Learning",
+        "level": "Leadership",
+        "enrolledCount": 0,
+        "moduleCount": 9,
+        "status": "draft",
+        "progressPercent": 40,
+        "icon": "📋",
+        "description": "People Leadership for Managers — mandatory training for HR & Learning.",
+        "credits": 0,
+        "departmentId": "d2",
+        "createdAt": "2026-09-21T09:00:00.000Z",
+        "updatedAt": "2026-09-21T09:00:00.000Z"
+      }
+    ],
+    "enrollments": [
+      {
+        "id": "enr-u-demo-amina-c1",
+        "studentId": "u-demo-amina",
+        "studentName": "Amina Lemma",
+        "courseId": "c1",
+        "courseCode": "AML-101",
+        "courseTitle": "Anti-Money Laundering & KYC",
+        "enrolledOn": "2026-07-23",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 100,
+        "completedOn": "2026-09-01",
+        "dueDate": "2026-09-16"
+      },
+      {
+        "id": "enr-u-demo-amina-c4",
+        "studentId": "u-demo-amina",
+        "studentName": "Amina Lemma",
+        "courseId": "c4",
+        "courseCode": "FRAUD-201",
+        "courseTitle": "Fraud Detection for Frontline Staff",
+        "enrolledOn": "2026-07-23",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 100,
+        "completedOn": "2026-09-01",
+        "dueDate": "2026-09-16"
+      },
+      {
+        "id": "enr-u-demo-amina-c5",
+        "studentId": "u-demo-amina",
+        "studentName": "Amina Lemma",
+        "courseId": "c5",
+        "courseCode": "SVC-EXC",
+        "courseTitle": "Customer Service Excellence",
+        "enrolledOn": "2026-07-23",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 100,
+        "completedOn": "2026-09-01",
+        "dueDate": "2026-09-16"
+      },
+      {
+        "id": "enr-u1-c1",
+        "studentId": "u1",
+        "studentName": "Selam Girma",
+        "courseId": "c1",
+        "courseCode": "AML-101",
+        "courseTitle": "Anti-Money Laundering & KYC",
+        "enrolledOn": "2026-07-23",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 100,
+        "completedOn": "2026-09-01",
+        "dueDate": "2026-09-16"
+      },
+      {
+        "id": "enr-u1-c4",
+        "studentId": "u1",
+        "studentName": "Selam Girma",
+        "courseId": "c4",
+        "courseCode": "FRAUD-201",
+        "courseTitle": "Fraud Detection for Frontline Staff",
+        "enrolledOn": "2026-07-23",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 45,
+        "dueDate": "2026-09-26"
+      },
+      {
+        "id": "enr-u1-c5",
+        "studentId": "u1",
+        "studentName": "Selam Girma",
+        "courseId": "c5",
+        "courseCode": "SVC-EXC",
+        "courseTitle": "Customer Service Excellence",
+        "enrolledOn": "2026-07-23",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 60,
+        "dueDate": "2026-10-16"
+      },
+      {
+        "id": "enr-u10-c2",
+        "studentId": "u10",
+        "studentName": "Bruk Alemu",
+        "courseId": "c2",
+        "courseCode": "CYB-AWR",
+        "courseTitle": "Cybersecurity Awareness (All Staff)",
+        "enrolledOn": "2026-07-23",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 100,
+        "completedOn": "2026-09-01",
+        "dueDate": "2026-09-16"
+      },
+      {
+        "id": "enr-u10-c3",
+        "studentId": "u10",
+        "studentName": "Bruk Alemu",
+        "courseId": "c3",
+        "courseCode": "PRIV-001",
+        "courseTitle": "Customer Data Privacy & Protection",
+        "enrolledOn": "2026-07-23",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 20,
+        "dueDate": "2026-09-09"
+      },
+      {
+        "id": "enr-u17-c1",
+        "studentId": "u17",
+        "studentName": "Sara Negash",
+        "courseId": "c1",
+        "courseCode": "AML-101",
+        "courseTitle": "Anti-Money Laundering & KYC",
+        "enrolledOn": "2025-07-18",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 100,
+        "completedOn": "2025-08-17",
+        "dueDate": "2025-09-06"
+      },
+      {
+        "id": "enr-u17-c3",
+        "studentId": "u17",
+        "studentName": "Sara Negash",
+        "courseId": "c3",
+        "courseCode": "PRIV-001",
+        "courseTitle": "Customer Data Privacy & Protection",
+        "enrolledOn": "2026-07-23",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 100,
+        "completedOn": "2026-09-01",
+        "dueDate": "2026-09-16"
+      },
+      {
+        "id": "enr-u18-c1",
+        "studentId": "u18",
+        "studentName": "Tomas Bekele",
+        "courseId": "c1",
+        "courseCode": "AML-101",
+        "courseTitle": "Anti-Money Laundering & KYC",
+        "enrolledOn": "2026-07-23",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 60,
+        "dueDate": "2026-10-16"
+      },
+      {
+        "id": "enr-u18-c4",
+        "studentId": "u18",
+        "studentName": "Tomas Bekele",
+        "courseId": "c4",
+        "courseCode": "FRAUD-201",
+        "courseTitle": "Fraud Detection for Frontline Staff",
+        "enrolledOn": "2026-07-23",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 20,
+        "dueDate": "2026-09-09"
+      },
+      {
+        "id": "enr-u18-c5",
+        "studentId": "u18",
+        "studentName": "Tomas Bekele",
+        "courseId": "c5",
+        "courseCode": "SVC-EXC",
+        "courseTitle": "Customer Service Excellence",
+        "enrolledOn": "2026-07-23",
+        "status": "active",
+        "isMandatory": true,
+        "assignedBy": "Job role",
+        "progress": 45,
+        "dueDate": "2026-09-26"
+      }
+    ],
+    "academic-years": [],
+    "academic-terms": [],
+    "course-offerings": [],
+    "programs": [],
+    "settings": {
+      "general": {
+        "name": "Horizon Bank",
+        "timezone": "(GMT+3) East Africa Time",
+        "language": "English",
+        "currency": "ETB — Ethiopian Birr"
+      },
+      "branding": {
+        "domain": "learn.berana.edu",
+        "sender": "no-reply@berana.edu",
+        "primary": "Lemon / Navy"
+      },
+      "academic": {
+        "grading": "Letter Grade (A–F)",
+        "attendance": "75% minimum",
+        "completion": "All modules + passing grade"
+      },
+      "modules": {
+        "virtualClassroom": true,
+        "attendance": true,
+        "assessments": true,
+        "payments": false,
+        "certificates": true,
+        "parentPortal": false
+      },
+      "integrations": {
+        "zoom": true,
+        "googleSso": true,
+        "microsoftSso": false,
+        "stripe": false,
+        "emailSms": true
+      }
+    },
+    "selectedCampus": "all",
+    "certificates": [],
+    "attendances": [],
+    "reports": [],
+    "announcements": [],
+    "forum-chats": [],
+    "forum-messages": [],
+    "forum-read-state": {},
+    "live-sessions": [],
+    "assignments": [],
+    "quizzes": [],
+    "question-bank": [],
+    "student-submissions": [],
+    "payments": [],
+    "help-desk-tickets": [],
+    "integrations": [],
+    "lesson-progress": {},
+    "lesson-responses": {},
+    "student-settings": {},
+    "instructor-settings": {},
+    "staff-settings": {},
+    "guardian-settings": {},
+    "help-desk-settings": {}
+  }
+}

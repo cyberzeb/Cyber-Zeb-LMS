@@ -1,3 +1,4 @@
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { useMemo } from 'react'
 import { Award, GraduationCap, Sparkles, Target, TrendingUp, Trophy } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
@@ -9,6 +10,9 @@ import { StudentPageError, StudentPageLoading } from '../components/StudentPageS
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
 
 export function StudentGradesPage() {
+  const { edition } = useOrganizationConfig()
+  const isCorporate = edition === 'corporate'
+
   const { data, isLoading, isError } = useStudentDashboard()
 
   const currentSemester = useMemo(
@@ -60,35 +64,46 @@ export function StudentGradesPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="Grades & Feedback"
-        subtitle="View current scores, instructor feedback, and past semester transcripts."
+        title={isCorporate ? 'My Results' : 'Grades & Feedback'}
+        subtitle={
+          isCorporate
+            ? 'Your scores and trainer feedback across assigned training.'
+            : 'View current scores, instructor feedback, and past semester transcripts.'
+        }
         actions={
-          <Button variant="primary">
-            <GraduationCap size={15} />
-            Download transcript
-          </Button>
+          // A transcript is an academic record — corporate employees have none.
+          isCorporate ? null : (
+            <Button variant="primary">
+              <GraduationCap size={15} />
+              Download transcript
+            </Button>
+          )
         }
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <StatBlock
-          label="Current term GPA"
-          value={currentSemester?.gpa.toFixed(2) ?? data.kpis.gpa.toFixed(2)}
-          sub={data.term}
+          label={isCorporate ? 'Assessment average' : 'Current term GPA'}
+          value={
+            isCorporate
+              ? `${data.kpis.avgQuizScore}%`
+              : (currentSemester?.gpa.toFixed(2) ?? data.kpis.gpa.toFixed(2))
+          }
+          sub={isCorporate ? 'Across your training' : data.term}
           icon={<Award size={17} />}
           iconBg="bg-lemon-100 text-lemon-800"
         />
         <StatBlock
-          label="Cumulative GPA"
-          value={cumulativeGpa}
-          sub={data.standing}
+          label={isCorporate ? 'Training completed' : 'Cumulative GPA'}
+          value={isCorporate ? String(stats.courses) : cumulativeGpa}
+          sub={isCorporate ? 'Assigned to you' : data.standing}
           icon={<Sparkles size={17} />}
           iconBg="bg-success-bg text-success"
         />
         <StatBlock
-          label="Term average"
+          label={isCorporate ? 'Recent average' : 'Term average'}
           value={stats.average}
-          sub="Current semester"
+          sub={isCorporate ? 'Latest results' : 'Current semester'}
           icon={<TrendingUp size={17} />}
           iconBg="bg-info-bg text-info"
         />

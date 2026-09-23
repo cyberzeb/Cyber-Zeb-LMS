@@ -16,7 +16,7 @@ resolved at runtime in `src/shared/config/tenant.ts`.
 - ❌ Missing: not built
 - ➖ Not applicable to this edition
 
-Status as of Phase 3 (2026-09-20). Super Admin details: [SUPER_ADMIN.md](SUPER_ADMIN.md). Update this file whenever a row changes.
+Status as of Phase 4 (2026-09-21) — Corporate Edition complete, including its demo tenant. Super Admin details: [SUPER_ADMIN.md](SUPER_ADMIN.md). Update this file whenever a row changes.
 
 ---
 
@@ -27,6 +27,7 @@ Status as of Phase 3 (2026-09-20). Super Admin details: [SUPER_ADMIN.md](SUPER_A
 | Runtime edition switching (terminology and module toggles) | ✅ | `src/shared/config/editions/*` |
 | Edition-specific admin dashboard at `/admin` | ✅ | Fixed in Phase 0 (`EditionDashboardPage`) |
 | Login (email + OTP) and role routing | ✅ | Random, emailed, single-use codes with expiry, attempt limit and resend cooldown. Sessions renew automatically. Demo mode (`DEMO_LOGIN_ENABLED`) uses code 000000 |
+| Per-institution module entitlement | ✅ | An institution only gets the modules it chose at registration. Enforced on module routers and on `/data/<collection>`; locked areas show in the nav with "Request this module" |
 | Backend authorization and tenant isolation | ✅ | Every data call requires a token, and the tenant comes from the token. Role/ownership write policy in `lms_store/policy.py`. 16 security tests |
 | Data persistence | 🟡 | Record-level saves (no lost updates across records). Failed saves roll back and show an error. Still JSON collections, not normalized tables |
 | Normalized backend domain modules | ❌ | 12 of 17 backend modules are empty stubs (courses, enrollment, assessments, …) |
@@ -36,7 +37,7 @@ Status as of Phase 3 (2026-09-20). Super Admin details: [SUPER_ADMIN.md](SUPER_A
 | Payment gateway | 🟡 | Server checkout: Chapa (ETB) when `CHAPA_SECRET_KEY` is set, verified with Chapa before marking paid; demo provider on demo servers. Chapa not yet tested with real keys |
 | Email notifications | 🟡 | SMTP for onboarding only. No LMS event emails |
 | Report PDF export | ✅ | `exportInstitutionReport.ts` |
-| Automated tests | 🟡 | Backend: 52 tests (onboarding, tenants, security, scoping, structure, grading, payments, tenant controls). Frontend: none |
+| Automated tests | 🟡 | Backend: 74 tests (onboarding, tenants, security, scoping, structure, grading, payments, tenant controls). Frontend: none |
 | Lint / type-check / build | ✅ | 0 lint errors (60 warnings tracked), `tsc` clean, build passes |
 | Read scoping per role | ✅ | Server builds each role's view (`lms_store/scope.py`): own records, own/taught courses, linked children; others as directory entries only. Answer keys never sent to students |
 | Per-person portal settings | ✅ | Fixed in Phase 1 (previously one shared object for all users) |
@@ -52,28 +53,28 @@ Status as of Phase 3 (2026-09-20). Super Admin details: [SUPER_ADMIN.md](SUPER_A
 | Audit logs, roles, settings, notifications, export | ✅ | Verified in Phase 2 |
 | Appearance, integrations, system health, backup, security, analytics | 🟡 | Backup/analytics fixed for SQLite; super admin suspension enforced. User reports/bans not connected to portal users (decision needed) |
 | Institution controls (suspend, reactivate, reset admin code, renew) | ✅ | Added in Phase 2 |
-| Demo tenant per edition | ❌ | Only the university demo tenant (`berana`) is seeded |
+| Demo tenant per edition | 🟡 | University (`berana`) and Corporate (`horizon` — Horizon Bank) are seeded. Training still has no backend demo tenant |
 
 ## 3. Shared learning engine (all editions)
 
 | Feature | University | Corporate | Training | Notes |
 |---|---|---|---|---|
-| Course catalog and authoring | ✅ | 🟡 | 🟡 | Corporate/Training reuse university pages with relabeling only |
-| Course content / lessons (learner player) | ✅ | 🟡 | 🟡 | |
-| Library & Resources | ✅ | ❌ | ❌ | Restored from `main` in Phase 0. Not in corp/training nav |
-| Enrollment | ✅ | 🟡 | 🟡 | Corporate = "Training Assignments" (relabel only) |
+| Course catalog and authoring | ✅ | ✅ | 🟡 | Corporate has its own catalog of mandatory training, driven by job roles. Training still reuses the university pages with relabeling |
+| Course content / lessons (learner player) | ✅ | ✅ | 🟡 | Shared player; the corporate learner portal is edition-correct |
+| Library & Resources | ✅ | ✅ | ✅ | Added to the corporate and training admin nav in Phase 4 |
+| Enrollment | ✅ | ✅ | 🟡 | Corporate assignments come from job roles with due dates and recertification, not manual enrolment |
 | Live classes | ✅ | ✅ | ✅ | |
 | Assignments | ✅ | ✅ | ✅ | |
 | Quizzes / exams | ✅ | ✅ | ✅ | |
-| Question bank | ✅ | ❌ | ❌ | Not in corp/training nav |
-| Grading / gradebook | ✅ | 🟡 | 🟡 | Quizzes graded on the server. Learner view is university-shaped (GPA) |
-| Attendance | ✅ | ❌ | ❌ | Not in corp/training admin nav |
+| Question bank | ✅ | ✅ | ✅ | Added to the corporate and training admin nav in Phase 4 |
+| Grading / gradebook | ✅ | ✅ | 🟡 | Quizzes graded on the server. The corporate learner view shows an assessment average instead of GPA; training still shows GPA wording |
+| Attendance | ✅ | ✅ | ✅ | Added to the corporate and training admin nav in Phase 4 |
 | Certificates | ✅ | 🟡 | 🟡 | No automatic issue on completion |
 | Announcements | ✅ | ✅ | ✅ | |
 | Discussion forum | ✅ | ✅ | ✅ | |
 | Help desk | ✅ | ✅ | ✅ | |
-| Reports & analytics | ✅ | 🟡 | 🟡 | University-oriented metrics |
-| Settings | ✅ | 🟡 | 🟡 | |
+| Reports & analytics | ✅ | ✅ | 🟡 | Corporate gets a compliance report pack (by department and job role, CSV export). Training still uses the university metrics |
+| Settings | ✅ | ✅ | 🟡 | Corporate reads "Organization" and "Training Defaults", adds a completion window, and drops tuition |
 
 ## 4. Berana University Edition
 
@@ -99,21 +100,33 @@ Target model: Company → Departments → Teams → Employees → Job roles → 
 
 | Feature | Status | Notes |
 |---|---|---|
-| Corporate dashboard | 🟡 | Now reachable at `/admin`. Links fixed in Phase 0 |
+| Corporate dashboard | ✅ | Reachable at `/admin`; KPIs come from the compliance engine |
 | Organization structure | ✅ | |
 | Departments | ✅ | |
 | Teams | ✅ | |
-| Employees | 🟡 | Uses the shared students page, relabeled |
-| Trainers | 🟡 | Uses the shared instructors page, relabeled |
+| Employees | ✅ | Shared people page, relabeled, with job role and team on each record and compliance tracked against them |
+| Trainers | ✅ | Shared people page, relabeled |
 | Job roles | ✅ | |
 | Skills | ✅ | |
-| Job role → required skills → required training mapping | 🟡 | Job role holds requirements. No automation |
-| Automatic training assignment from job role | ❌ | |
-| Compliance tracking | 🟡 | Page and utilities exist |
-| Compliance deadlines, overdue alerts, re-certification | ❌ | |
-| Manager / team-lead view | ❌ | |
-| Employee portal (no GPA, semesters or transcripts) | ❌ | Employees see the student portal |
-| University-only features hidden (guardians, tuition, semesters) | 🟡 | Hidden in admin nav. Still visible in the learner portal |
+| Job role → required skills → required training mapping | ✅ | A job role carries required skills, required training, a completion window and a recertification interval |
+| Automatic training assignment from job role | ✅ | `useRequiredTraining`: assign per employee, per role, or organization-wide. Idempotent, sets due dates, and reassigns expired certifications |
+| Compliance tracking | ✅ | Per-employee required/completed/overdue/due-soon/recertification counts, with unassigned requirements called out |
+| Compliance deadlines, overdue alerts, re-certification | ✅ | Due dates from the job role, a prioritised alerts list (overdue → unassigned → due soon → recertification), and expired certifications stop counting as complete |
+| Manager / team-lead view | ✅ | Team detail at `/admin/corporate/teams/:teamId`: members, team compliance rate, overdue members and the team's alerts |
+| Employee portal (no GPA, semesters or transcripts) | ✅ | Transcript and tuition hidden for corporate; "Grades" reads "My Results" and breadcrumbs use training wording |
+| University-only features hidden (guardians, tuition, semesters) | ✅ | Hidden in the admin nav and now in the learner portal too |
+
+### Corporate demo tenant
+
+`horizon` (Horizon Bank) is seeded alongside `berana`, from
+`backend/seed_data/corporate.json`. Sign in with any employee email and the
+demo code — the email lookup resolves the tenant, and the workspace switches to
+the Corporate Edition automatically.
+
+Its data is built from the job roles, so the compliance page has one employee in
+each state: fully compliant, due soon, overdue and recertification due. Dates are
+relative to when the seed was generated — re-run `npm run export-seed` if they
+drift out of date.
 
 ## 6. Berana Training Edition
 
@@ -138,8 +151,8 @@ Target flow: create program → create cohort → open enrollment → learner re
 
 | Portal | Route | University | Corporate | Training |
 |---|---|---|---|---|
-| Admin | `/admin` | ✅ | 🟡 | 🟡 |
-| Learner (student) | `/student` | ✅ | 🟡 | 🟡 |
+| Admin | `/admin` | ✅ | ✅ | 🟡 |
+| Learner (student) | `/student` | ✅ | ✅ | 🟡 |
 | Instructor / trainer | `/instructor` | ✅ | 🟡 | 🟡 |
 | Staff | `/staff` | 🟡 | ➖ | ➖ |
 | Guardian | `/guardian` | 🟡 | ➖ | ➖ |

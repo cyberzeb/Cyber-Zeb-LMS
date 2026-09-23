@@ -387,25 +387,48 @@ class OtpAuthService:
                 institution_type=tenant.institution_type.value if hasattr(tenant.institution_type, 'value') else str(tenant.institution_type),
             )
 
-        # 3. Demo tenant people (berana)?
-        try:
-            tenant_id = await self.store.resolve_tenant_id("berana")
-            people = await self.store.get_collection(tenant_id, "people", [])
-            if isinstance(people, list):
-                for person in people:
-                    if not isinstance(person, dict):
-                        continue
-                    person_email = str(person.get("email", "")).strip().lower()
-                    if person_email == normalized:
-                        frontend_role = str(person.get("role", "Student"))
-                        return EmailLookupResponse(
-                            found=True,
-                            is_demo=True,
-                            role=frontend_role,
-                            tenant_code="berana",
-                        )
-        except Exception:
-            pass
+        # 3. A demo tenant's people collection. There is one demo tenant per
+        #    edition, so search them all rather than assuming the university one:
+        #    otherwise a corporate demo user can never sign in email-first.
+        from sqlalchemy import select
+
+        from app.modules.tenants.models import Tenant, TenantStatus
+
+        demo_tenants = (
+            await self.db.execute(
+                select(Tenant)
+                .where(Tenant.status == TenantStatus.ACTIVE)
+                .order_by(Tenant.created_at)
+            )
+        ).scalars().all()
+
+        for tenant in demo_tenants:
+            try:
+                people = await self.store.get_collection(tenant.id, "people", [])
+            except Exception:
+                continue
+            if not isinstance(people, list):
+                continue
+            for person in people:
+                if not isinstance(person, dict):
+                    continue
+                if str(person.get("email", "")).strip().lower() != normalized:
+                    continue
+                if str(person.get("status", "active")) == "suspended":
+                    continue
+                institution_type = tenant.institution_type
+                return EmailLookupResponse(
+                    found=True,
+                    is_demo=True,
+                    role=str(person.get("role", "Student")),
+                    tenant_code=tenant.code,
+                    tenant_name=tenant.name,
+                    institution_type=(
+                        institution_type.value
+                        if hasattr(institution_type, "value")
+                        else str(institution_type)
+                    ),
+                )
 
         return EmailLookupResponse(found=False)
 

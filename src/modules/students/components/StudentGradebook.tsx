@@ -1,3 +1,4 @@
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { useMemo, useState } from 'react'
 import { BookOpen, ChevronDown, ChevronUp, GraduationCap, Layers } from 'lucide-react'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
@@ -124,6 +125,9 @@ function CourseGradeCard({ grade, defaultExpanded }: { grade: GradeItem; default
 const TERM_SORT_ORDER = ['Fall 2026', 'Spring 2026', 'Fall 2025', 'Spring 2025']
 
 export function StudentGradebook({ gradeHistory }: StudentGradebookProps) {
+  const { edition } = useOrganizationConfig()
+  const isCorporate = edition === 'corporate'
+
   const sorted = useMemo(
     () =>
       [...gradeHistory].sort(
@@ -190,7 +194,9 @@ export function StudentGradebook({ gradeHistory }: StudentGradebookProps) {
           </div>
           <div className="flex gap-6">
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-secondary-text">Term GPA</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-secondary-text">
+                {isCorporate ? 'Average score' : 'Term GPA'}
+              </div>
               <div className="text-[28px] font-extrabold text-navy-900 leading-none mt-1">{semester.gpa.toFixed(2)}</div>
             </div>
             <div>

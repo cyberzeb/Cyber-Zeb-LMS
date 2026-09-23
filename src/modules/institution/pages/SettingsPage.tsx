@@ -10,6 +10,8 @@ import {
 } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
+
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useApiCollection } from '../../../shared/hooks/useApiCollection'
 import { STORAGE_KEYS } from '../../../shared/storage/keys'
@@ -29,6 +31,9 @@ type SettingsState = InstitutionSettingsState
 
 export function SettingsPage() {
   const { notify } = useToast()
+  // A company configures training rules, not academic ones, and has no tuition.
+  const { edition } = useOrganizationConfig()
+  const isCorporate = edition === 'corporate'
   const { isDark, setTheme } = useTheme()
   const [storedRaw, setStoredRaw] = useApiCollection<SettingsState>(
     STORAGE_KEYS.settings,
@@ -93,10 +98,14 @@ export function SettingsPage() {
         <SettingsSection
           icon={<Building2 size={SEC} />}
           title="General"
-          description="Core identity and localization for your institution."
+          description={
+            isCorporate
+              ? 'Core identity and localization for your organization.'
+              : 'Core identity and localization for your institution.'
+          }
         >
           <SettingField
-            label="Institution Name"
+            label={isCorporate ? 'Organization Name' : 'Institution Name'}
             value={general.name}
             onChange={(v) => setGeneral({ name: v })}
           />
@@ -175,14 +184,22 @@ export function SettingsPage() {
 
         <SettingsSection
           icon={<GraduationCap size={SEC} />}
-          title="Academic Defaults"
-          description="Grading, attendance and completion rules applied to new courses."
+          title={isCorporate ? 'Training Defaults' : 'Academic Defaults'}
+          description={
+            isCorporate
+              ? 'Scoring, attendance and completion rules applied to new training.'
+              : 'Grading, attendance and completion rules applied to new courses.'
+          }
         >
           <SettingField
-            label="Grading Scheme"
+            label={isCorporate ? 'Scoring Scheme' : 'Grading Scheme'}
             type="select"
             value={academic.grading}
-            options={['Letter Grade (A–F)', 'Percentage (0–100)', 'Pass / Fail', 'GPA (4.0)']}
+            options={
+              isCorporate
+                ? ['Pass / Fail', 'Percentage (0–100)', 'Competency levels']
+                : ['Letter Grade (A–F)', 'Percentage (0–100)', 'Pass / Fail', 'GPA (4.0)']
+            }
             onChange={(v) => setAcademic({ grading: v })}
           />
           <SettingField
@@ -203,6 +220,15 @@ export function SettingsPage() {
             ]}
             onChange={(v) => setAcademic({ completion: v })}
           />
+          {isCorporate ? (
+            <SettingField
+              label="Default completion window"
+              type="select"
+              value={academic.trainingDueDays ?? '30 days'}
+              options={['14 days', '30 days', '60 days', '90 days']}
+              onChange={(v) => setAcademic({ trainingDueDays: v })}
+            />
+          ) : null}
         </SettingsSection>
 
         <SettingsSection
@@ -228,24 +254,35 @@ export function SettingsPage() {
             enabled={modules.assessments}
             onToggle={() => toggleModule('assessments')}
           />
-          <ToggleRow
-            label="Payments & Billing"
-            description="Invoices, checkout and reconciliation."
-            enabled={modules.payments}
-            onToggle={() => toggleModule('payments')}
-          />
+          {isCorporate ? null : (
+            <ToggleRow
+              label="Payments & Billing"
+              description="Invoices, checkout and reconciliation."
+              enabled={modules.payments}
+              onToggle={() => toggleModule('payments')}
+            />
+          )}
           <ToggleRow
             label="Certificates"
             description="Verifiable credentials and QR verification."
             enabled={modules.certificates}
             onToggle={() => toggleModule('certificates')}
           />
-          <ToggleRow
-            label="Parent / Guardian Portal"
-            description="Controlled visibility for linked learners."
-            enabled={modules.parentPortal}
-            onToggle={() => toggleModule('parentPortal')}
-          />
+          {isCorporate ? (
+            <ToggleRow
+              label="Manager Visibility"
+              description="Let team managers see their team's training compliance."
+              enabled={modules.parentPortal}
+              onToggle={() => toggleModule('parentPortal')}
+            />
+          ) : (
+            <ToggleRow
+              label="Parent / Guardian Portal"
+              description="Controlled visibility for linked learners."
+              enabled={modules.parentPortal}
+              onToggle={() => toggleModule('parentPortal')}
+            />
+          )}
         </SettingsSection>
 
         <SettingsSection

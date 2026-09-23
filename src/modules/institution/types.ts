@@ -440,6 +440,8 @@ export interface CourseEnrollment {
   isMandatory?: boolean
   /** Corporate edition: who assigned this enrollment. */
   assignedBy?: string
+  /** Corporate edition: when the learner finished, for recertification timing. */
+  completedOn?: string
 }
 
 /* ── People ───────────────────────────────────────────────── */

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Pencil, Plus, Trash2, UsersRound } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { PageHeader } from '../../../shared/components/PageHeader'
@@ -195,7 +196,12 @@ export function CorporateTeamsPage() {
                   return (
                     <tr key={team.id} className="border-b border-divider/60 last:border-0 hover:bg-navy-50/20">
                       <td className="px-4 py-3">
-                        <div className="text-[13px] font-semibold text-navy-900">{team.name}</div>
+                        <Link
+                          to={`/admin/corporate/teams/${team.id}`}
+                          className="text-[13px] font-semibold text-navy-900 hover:text-lemon-700 dark:hover:text-lemon-500 hover:underline"
+                        >
+                          {team.name}
+                        </Link>
                         {team.description ? (
                           <div className="text-[12px] text-secondary-text mt-0.5 max-w-xs truncate">
                             {team.description}

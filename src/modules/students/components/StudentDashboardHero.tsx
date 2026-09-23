@@ -1,3 +1,4 @@
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { Building2, CalendarDays, GraduationCap, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Monogram } from '../../../shared/components/Monogram'
@@ -12,6 +13,9 @@ interface StudentDashboardHeroProps {
 }
 
 export function StudentDashboardHero({ data }: StudentDashboardHeroProps) {
+  const { edition } = useOrganizationConfig()
+  const isCorporate = edition === 'corporate'
+
   const { t } = useLanguage()
   const firstName = data.studentName.split(' ')[0]
 
@@ -53,7 +57,15 @@ export function StudentDashboardHero({ data }: StudentDashboardHeroProps) {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 xl:min-w-[420px]">
           {[
-            { label: 'GPA', value: data.kpis.gpa.toFixed(2), sub: '/ 4.00' },
+            // Corporate employees are not graded on a 4.00 scale; show how much
+            // of their assigned training is done instead.
+            isCorporate
+              ? {
+                  label: 'Completed',
+                  value: `${data.kpis.avgQuizScore}%`,
+                  sub: 'assessment avg',
+                }
+              : { label: 'GPA', value: data.kpis.gpa.toFixed(2), sub: '/ 4.00' },
             { label: 'Attendance', value: `${data.kpis.attendanceRate}%`, sub: 'this term' },
             { label: 'Due soon', value: String(data.kpis.dueThisWeek), sub: 'this week' },
             { label: 'Quiz avg', value: `${data.kpis.avgQuizScore}%`, sub: 'last 3' },

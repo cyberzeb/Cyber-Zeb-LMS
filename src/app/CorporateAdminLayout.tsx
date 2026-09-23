@@ -55,7 +55,10 @@ function CorporateAdminShell() {
     'verify-people': pendingVerifications,
   })
 
-  const breadcrumb = CORPORATE_BREADCRUMB_LABELS[path] ?? ''
+  // Team detail is a dynamic route, so it has no entry in the static map.
+  const breadcrumb =
+    CORPORATE_BREADCRUMB_LABELS[path] ??
+    (path.startsWith('/admin/corporate/teams/') ? 'Team' : '')
   const isForumPage = path === '/admin/discussion-forum'
 
   return (
