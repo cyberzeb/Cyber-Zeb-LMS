@@ -8,13 +8,16 @@ import { SearchInput } from '../../../shared/components/SearchInput'
 import { SelectMenu } from '../../../shared/components/SelectMenu'
 import { DepartmentSelectMenu } from '../../../shared/components/DepartmentSelectMenu'
 import { Modal } from '../../../shared/components/Modal'
+import { FilterTabs } from '../../../shared/components/FilterTabs'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useCampusContext } from '../context/CampusContext'
 import { useSyncCampusFilter } from '../hooks/useSyncCampusFilter'
 import { useCertificates } from '../hooks/useCertificates'
 import { usePeople } from '../hooks/usePeople'
 import { useCourses } from '../hooks/useCourses'
-import { certificateTemplates } from '../data/certificatesSeedData'
+import { CertificateTemplatesPanel } from '../certificates/CertificateTemplatesPanel'
+import { certificateDataFrom, useCertificateTemplates } from '../certificates/useCertificateTemplates'
+import { downloadCertificatePdf } from '../certificates/certificatePdf'
 import { CertificatesTable } from '../components/CertificatesTable'
 import { CertificateDetailsModal } from '../components/CertificateDetailsModal'
 import {
@@ -29,6 +32,9 @@ const STATUS_OPTIONS = [
   { value: 'pending', label: 'Pending' },
   { value: 'revoked', label: 'Revoked' },
 ]
+
+const ISSUED_TAB = 'Issued certificates'
+const TEMPLATES_TAB = 'Templates & designer'
 
 const DATE_OPTIONS = [
   { value: 'all', label: 'All dates' },
@@ -55,10 +61,10 @@ function matchesDateFilter(cert: CertificateRecord, filter: string): boolean {
   return date >= cutoff
 }
 
-const emptyIssueForm = (): IssueCertificateForm => ({
+const emptyIssueForm = (templateId: string): IssueCertificateForm => ({
   studentId: '',
   courseId: '',
-  templateId: certificateTemplates[0]?.id ?? '',
+  templateId,
   issueDate: todayIso(),
   expirationDate: '',
 })
@@ -69,6 +75,10 @@ export function CertificatesPage() {
   const { certificates, issueCertificate, revokeCertificate } = useCertificates()
   const { people } = usePeople()
   const { courses } = useCourses()
+  const { templates, templateFor } = useCertificateTemplates()
+  const defaultTemplateId = templateFor().id
+  const [tab, setTab] = useState<'issued' | 'templates'>('issued')
+  const [downloadingId, setDownloadingId] = useState<string | null>(null)
 
   const [query, setQuery] = useState('')
   const [campusFilter, setCampusFilter] = useState<string>('all')
@@ -78,7 +88,7 @@ export function CertificatesPage() {
   const [dateFilter, setDateFilter] = useState<string>('all')
 
   const [issueOpen, setIssueOpen] = useState(false)
-  const [issueForm, setIssueForm] = useState<IssueCertificateForm>(emptyIssueForm)
+  const [issueForm, setIssueForm] = useState<IssueCertificateForm>(() => emptyIssueForm(''))
   const [detailCert, setDetailCert] = useState<CertificateRecord | null>(null)
   const [revokeTarget, setRevokeTarget] = useState<CertificateRecord | null>(null)
 
@@ -189,17 +199,14 @@ export function CertificatesPage() {
   )
 
   const openIssue = () => {
-    setIssueForm({
-      ...emptyIssueForm(),
-      templateId: certificateTemplates[0]?.id ?? '',
-    })
+    setIssueForm(emptyIssueForm(defaultTemplateId))
     setIssueOpen(true)
   }
 
   const handleIssue = () => {
     const student = students.find((s) => s.id === issueForm.studentId)
     const course = certEnabledCourses.find((c) => c.id === issueForm.courseId)
-    const template = certificateTemplates.find((t) => t.id === issueForm.templateId)
+    const template = templates.find((t) => t.id === issueForm.templateId)
     if (!student || !course || !template || !issueForm.issueDate) {
       notify('Please complete all required fields.', 'error')
       return
@@ -236,9 +243,28 @@ export function CertificatesPage() {
     notify(`Certificate issued to ${student.name}.`)
   }
 
-  const handleDownload = (cert: CertificateRecord) => {
-    notify(`Downloading ${cert.certificateId}…`, 'info')
+  const handleDownload = async (cert: CertificateRecord) => {
+    if (cert.status !== 'issued') {
+      notify('Only issued certificates can be downloaded.', 'error')
+      return
+    }
+    setDownloadingId(cert.id)
+    try {
+      await downloadCertificatePdf(templateFor(cert.templateId), certificateDataFrom(cert))
+    } catch (err) {
+      notify(err instanceof Error ? err.message : 'Could not create the PDF.', 'error')
+    } finally {
+      setDownloadingId(null)
+    }
   }
+
+  const templateUsage = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const c of certificates) {
+      if (c.status !== 'revoked') counts[c.templateId] = (counts[c.templateId] ?? 0) + 1
+    }
+    return counts
+  }, [certificates])
 
   const confirmRevoke = () => {
     if (!revokeTarget) return
@@ -260,6 +286,17 @@ export function CertificatesPage() {
           </Button>
         }
       />
+
+      <FilterTabs
+        tabs={[ISSUED_TAB, TEMPLATES_TAB]}
+        active={tab === 'issued' ? ISSUED_TAB : TEMPLATES_TAB}
+        onChange={(v) => setTab(v === ISSUED_TAB ? 'issued' : 'templates')}
+      />
+
+      {tab === 'templates' ? (
+        <CertificateTemplatesPanel usage={templateUsage} />
+      ) : (
+      <>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
         <StatBlock
@@ -349,7 +386,7 @@ export function CertificatesPage() {
         <CertificatesTable
           certificates={filtered}
           onView={setDetailCert}
-          onDownload={handleDownload}
+          onDownload={(cert) => void handleDownload(cert)}
           onRevoke={setRevokeTarget}
         />
       ) : (
@@ -357,13 +394,15 @@ export function CertificatesPage() {
           No certificates match your filters.
         </GlassCard>
       )}
+      </>
+      )}
 
       <CertificateIssueModal
         open={issueOpen}
         form={issueForm}
         studentOptions={studentOptions}
         courseOptions={courseOptions}
-        templates={certificateTemplates}
+        templates={templates}
         onClose={() => setIssueOpen(false)}
         onChange={setIssueForm}
         onSubmit={handleIssue}
@@ -373,8 +412,10 @@ export function CertificatesPage() {
         open={detailCert !== null}
         certificate={detailCert}
         campuses={campuses}
+        template={templateFor(detailCert?.templateId)}
+        downloading={downloadingId !== null && downloadingId === detailCert?.id}
         onClose={() => setDetailCert(null)}
-        onDownload={handleDownload}
+        onDownload={(cert) => void handleDownload(cert)}
         onRevoke={(cert) => setRevokeTarget(cert)}
       />
 

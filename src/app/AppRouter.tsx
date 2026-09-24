@@ -48,6 +48,7 @@ import { AdminCalendarPage } from '../modules/institution/pages/AdminCalendarPag
 import { SettingsPage } from '../modules/institution/pages/SettingsPage'
 import { LandingPage } from '../modules/marketing/pages/LandingPage'
 import { RequestPage } from '../modules/marketing/pages/RequestPage'
+import { VerifyCertificatePage } from '../modules/marketing/pages/VerifyCertificatePage'
 import { LoginPage } from '../modules/auth/pages/LoginPage'
 import { StudentLayout } from '../modules/students/layout/StudentLayout'
 import { StudentDashboardPage } from '../modules/students/pages/studentdashboard'
@@ -134,6 +135,15 @@ export const router = createBrowserRouter([
     // Institution registration: master data + module selection.
     path: '/request',
     element: <RequestPage />,
+  },
+  {
+    // Public certificate verification (QR codes and share links).
+    path: '/verify',
+    element: <VerifyCertificatePage />,
+  },
+  {
+    path: '/verify/:certificateId',
+    element: <VerifyCertificatePage />,
   },
   {
     // Convenience redirects for the common no-hyphen typo.

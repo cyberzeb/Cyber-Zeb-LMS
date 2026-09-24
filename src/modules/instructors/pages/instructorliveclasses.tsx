@@ -7,8 +7,9 @@ import { StatusPill } from '../../../shared/components/StatusPill'
 import { ZoomIcon } from '../../../shared/components/ZoomIcon'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
-import { endZoomMeeting } from '../../../shared/api/zoomApi'
-import { openMeetingUrl } from '../../../shared/utils/liveSessionUtils'
+import { endZoomMeeting, fetchZoomStartUrl } from '../../../shared/api/zoomApi'
+import { useInterval } from '../../../shared/hooks/useInterval'
+import { normalizeMeetingUrl, openMeetingUrl } from '../../../shared/utils/liveSessionUtils'
 import { useLiveSessions } from '../../institution/hooks/useAssessments'
 import { useSyncZoomMeetingStatus } from '../../institution/hooks/useSyncZoomMeetingStatus'
 import { InstructorPageError, InstructorPageLoading } from '../components/InstructorPageStates'
@@ -168,7 +169,7 @@ function LiveSessionCard({
             ) : null}
           </div>
         ) : (
-          <span className="text-[11px] font-semibold text-secondary-text shrink-0">Recording saved</span>
+          <span className="text-[11px] font-semibold text-secondary-text shrink-0">Session ended</span>
         )}
       </div>
     </GlassCard>
@@ -233,10 +234,34 @@ export function InstructorLiveClassesPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [endingId, setEndingId] = useState<string | null>(null)
   useSyncZoomMeetingStatus()
+  // Status follows the clock: move classes into "On air" as they start.
+  useInterval(() => void reload(), 30_000)
 
-  const handleJoin = (session: LiveClassSession) => {
-    if (!openMeetingUrl(session.startUrl || session.meetingUrl)) {
-      notify('No Zoom meeting has been created for this session yet.', 'error')
+  const handleJoin = async (session: LiveClassSession) => {
+    if (!session.zoomMeetingId) {
+      if (!openMeetingUrl(session.startUrl || session.meetingUrl)) {
+        notify('No Zoom meeting has been created for this session yet.', 'error')
+      }
+      return
+    }
+    // Open the tab now, while we still have the click; a window opened after an
+    // await is blocked as a pop-up.
+    const tab = window.open('', '_blank')
+    try {
+      const url = normalizeMeetingUrl(await fetchZoomStartUrl(session.zoomMeetingId))
+      if (!url) throw new Error('Zoom returned an invalid start link.')
+      if (tab) {
+        tab.opener = null
+        tab.location.href = url
+      } else {
+        window.location.assign(url)
+      }
+    } catch (error) {
+      tab?.close()
+      notify(
+        error instanceof Error ? error.message : 'Could not get a start link from Zoom.',
+        'error',
+      )
     }
   }
 
@@ -292,14 +317,14 @@ export function InstructorLiveClassesPage() {
         <StatBlock
           label="Upcoming"
           value={upcoming.length}
-          sub="Scheduled this week"
+          sub="Scheduled ahead"
           icon={<CalendarClock size={17} />}
           iconBg="bg-info-bg text-info"
         />
         <StatBlock
           label="Completed"
           value={ended.length}
-          sub="Recordings available"
+          sub="Past sessions"
           icon={<Video size={17} />}
           iconBg="bg-navy-50 text-navy-600"
         />
@@ -310,7 +335,7 @@ export function InstructorLiveClassesPage() {
         subtitle="Sessions happening right now."
         sessions={liveNow}
         featuredFirst
-        onJoin={handleJoin}
+        onJoin={(session) => void handleJoin(session)}
         onEnd={(session) => void handleEnd(session)}
         endingId={endingId}
       />
@@ -319,16 +344,16 @@ export function InstructorLiveClassesPage() {
         title="Coming up"
         subtitle="Prepare materials before class starts."
         sessions={upcoming}
-        onJoin={handleJoin}
+        onJoin={(session) => void handleJoin(session)}
         onEnd={(session) => void handleEnd(session)}
         endingId={endingId}
       />
 
       <SessionSection
         title="Recent sessions"
-        subtitle="Review attendance and recordings from past sessions."
+        subtitle="Sessions that have already taken place."
         sessions={ended}
-        onJoin={handleJoin}
+        onJoin={(session) => void handleJoin(session)}
         onEnd={(session) => void handleEnd(session)}
         endingId={endingId}
       />

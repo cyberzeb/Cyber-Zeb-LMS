@@ -12,6 +12,7 @@ export const STORAGE_KEYS = {
   courses: 'berana:courses',
   enrollments: 'berana:enrollments',
   certificates: 'berana:certificates',
+  certificateTemplates: 'berana:certificate-templates',
   attendances: 'berana:attendances',
   lessonProgress: 'berana:lesson-progress',
   lessonResponses: 'berana:lesson-responses',

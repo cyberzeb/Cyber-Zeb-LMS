@@ -19,6 +19,7 @@ from app.modules.attendance.router import router as attendance_router
 from app.modules.assessments.router import router as assessments_router
 from app.modules.communication.router import router as communication_router
 from app.modules.payments.router import router as payments_router
+from app.modules.certificates.router import public_router as certificates_public_router
 from app.modules.certificates.router import router as certificates_router
 from app.modules.parent_portal.router import router as parent_portal_router
 from app.modules.reports.router import router as reports_router
@@ -31,6 +32,11 @@ api_router = APIRouter()
 
 # Onboarding / Super Admin (public service requests + platform console)
 api_router.include_router(onboarding_router)
+
+# Public certificate verification (QR codes and share links point here)
+api_router.include_router(
+    certificates_public_router, prefix="/public/certificates", tags=["Certificates & Credentials"]
+)
 
 # LMS Data Store (generic per-tenant collections consumed by the portal frontends)
 api_router.include_router(lms_store_router, prefix="/data", tags=["LMS Data Store"])

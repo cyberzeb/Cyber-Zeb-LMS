@@ -128,6 +128,7 @@ COLLECTION_MODULES: dict[str, ModuleKey] = {
     "payments": ModuleKey.PAYMENTS_BILLING,
     # Certificates
     "certificates": ModuleKey.CERTIFICATES_CREDENTIALS,
+    "certificate-templates": ModuleKey.CERTIFICATES_CREDENTIALS,
     # Parent / manager portal
     "guardian-settings": ModuleKey.PARENT_MANAGER_PORTAL,
     # Reports

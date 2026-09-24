@@ -62,6 +62,18 @@ export async function fetchZoomMeetingStatus(
   }
 }
 
+/** A fresh host start link — the saved one expires about two hours after scheduling. */
+export async function fetchZoomStartUrl(meetingId: string): Promise<string> {
+  try {
+    const { data } = await apiClient.get<{ start_url: string }>(
+      `/live-sessions/zoom/meetings/${encodeURIComponent(meetingId)}/start-url`,
+    )
+    return data.start_url
+  } catch (error) {
+    throw new Error(zoomErrorMessage(error), { cause: error })
+  }
+}
+
 export async function endZoomMeeting(
   meetingId: string,
 ): Promise<{ meeting_id: string; status: string }> {

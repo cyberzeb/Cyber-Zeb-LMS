@@ -182,6 +182,29 @@ async def create_meeting(*, topic: str, start_time_iso: str, duration_minutes: i
     }
 
 
+async def get_start_url(meeting_id: str) -> dict[str, str]:
+    """
+    A fresh host start link. Zoom's start_url embeds a token that expires about
+    two hours after it is issued, so the one saved at scheduling time is useless
+    for a class held days later.
+    """
+    token = await get_access_token()
+    async with httpx.AsyncClient(timeout=20) as client:
+        response = await client.get(
+            f"{_API_BASE}/meetings/{meeting_id.strip()}",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+    if response.status_code == 404:
+        raise ValidationAppError("This Zoom meeting no longer exists. Schedule the session again.")
+    if response.status_code >= 400:
+        raise ValidationAppError(_zoom_error_message(response))
+    data = response.json() or {}
+    start_url = data.get("start_url") or data.get("join_url")
+    if not start_url:
+        raise ValidationAppError("Zoom did not return a start link for this meeting.")
+    return {"meeting_id": meeting_id, "start_url": start_url, "join_url": data.get("join_url") or ""}
+
+
 def _normalize_meeting_status(raw: str) -> str:
     value = (raw or "").strip().lower()
     if value in {"waiting", "started", "finished"}:

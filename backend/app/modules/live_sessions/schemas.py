@@ -21,6 +21,12 @@ class ZoomStatusOut(BaseModel):
     configured: bool
 
 
+class ZoomStartUrlOut(BaseModel):
+    meeting_id: str
+    start_url: str
+    join_url: str = ""
+
+
 class ZoomMeetingStatusOut(BaseModel):
     meeting_id: str
     status: str

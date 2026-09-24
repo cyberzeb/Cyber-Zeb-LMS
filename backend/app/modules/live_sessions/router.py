@@ -1,5 +1,5 @@
 """Zoom live-session endpoints."""
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -9,6 +9,7 @@ from app.modules.live_sessions.schemas import (
     ZoomMeetingCreate,
     ZoomMeetingOut,
     ZoomMeetingStatusOut,
+    ZoomStartUrlOut,
     ZoomStatusOut,
 )
 from app.modules.live_sessions.service import LiveSessionsService
@@ -17,6 +18,10 @@ router = APIRouter()
 
 # Creating or ending meetings uses the institution's Zoom account.
 require_session_host = require_portal_roles(Role.INSTRUCTOR, Role.TEACHING_ASSISTANT)
+
+# Zoom meeting ids are numeric. Anything else must never reach the Zoom API URL,
+# where a value such as "../users" would address a different endpoint.
+MeetingId = Path(pattern=r"^\d{6,15}$", description="Numeric Zoom meeting id")
 
 
 @router.get("/zoom/status", response_model=ZoomStatusOut)
@@ -35,16 +40,26 @@ async def create_zoom_meeting(
 
 @router.get("/zoom/meetings/{meeting_id}", response_model=ZoomMeetingStatusOut)
 async def zoom_meeting_status(
-    meeting_id: str,
+    meeting_id: str = MeetingId,
     db: AsyncSession = Depends(get_db),
     _principal: DemoPrincipal = Depends(get_demo_principal),
 ):
     return await LiveSessionsService(db).zoom_meeting_status(meeting_id)
 
 
+@router.get("/zoom/meetings/{meeting_id}/start-url", response_model=ZoomStartUrlOut)
+async def zoom_start_url(
+    meeting_id: str = MeetingId,
+    db: AsyncSession = Depends(get_db),
+    _principal: DemoPrincipal = Depends(require_session_host),
+):
+    """A fresh host link; the one saved when scheduling expires after ~2 hours."""
+    return await LiveSessionsService(db).zoom_start_url(meeting_id)
+
+
 @router.post("/zoom/meetings/{meeting_id}/end", response_model=ZoomMeetingStatusOut)
 async def end_zoom_meeting(
-    meeting_id: str,
+    meeting_id: str = MeetingId,
     db: AsyncSession = Depends(get_db),
     _principal: DemoPrincipal = Depends(require_session_host),
 ):

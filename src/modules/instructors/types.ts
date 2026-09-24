@@ -86,6 +86,8 @@ export interface LiveClassSession {
   platform: string
   meetingUrl?: string
   startUrl?: string
+  /** Lets the host fetch a fresh start link; Zoom's saved one expires. */
+  zoomMeetingId?: string
   status: 'live' | 'upcoming' | 'ended'
   attendees?: number
 }

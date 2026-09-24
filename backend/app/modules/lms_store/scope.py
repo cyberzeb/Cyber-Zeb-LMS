@@ -35,6 +35,8 @@ PUBLIC_COLLECTIONS = frozenset(
         "training-divisions",
         "training-programs",
         "cohorts",
+        # Designs only; every member needs them to render their certificates.
+        "certificate-templates",
     }
 )
 

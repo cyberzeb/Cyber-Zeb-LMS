@@ -6,6 +6,7 @@ import { Modal } from '../../../shared/components/Modal'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { createZoomMeeting, fetchZoomStatus } from '../../../shared/api/zoomApi'
 import { useLiveSessions } from '../../institution/hooks/useAssessments'
+import { readCourses } from '../../../shared/storage/readers'
 import type { TeachingCourse } from '../types'
 
 const emptyForm = {
@@ -77,13 +78,26 @@ export function ScheduleLiveSessionModal({
       notify('Pick a valid start date and time.', 'error')
       return
     }
+    // A few minutes' grace so "now" still counts while the form is filled in.
+    if (start.getTime() < Date.now() - 5 * 60_000) {
+      notify('The start time is in the past. Pick a time from now on.', 'error')
+      return
+    }
+    const duration = Number(form.durationMinutes)
+    if (!Number.isInteger(duration) || duration < 15 || duration > 480) {
+      notify('Duration must be a whole number of minutes between 15 and 480.', 'error')
+      return
+    }
+    const campusId =
+      (readCourses().find((c) => c.id === teachingCourse.id) as { campusId?: string } | undefined)
+        ?.campusId || 'c1'
 
     setSubmitting(true)
     try {
       const meeting = await createZoomMeeting({
         topic: `${teachingCourse.code} — ${form.title.trim()}`,
         startAt: start.toISOString(),
-        durationMinutes: Number(form.durationMinutes) || 60,
+        durationMinutes: duration,
       })
 
       createSession({
@@ -93,10 +107,10 @@ export function ScheduleLiveSessionModal({
         courseTitle: teachingCourse.title,
         instructorId,
         instructorName,
-        campusId: 'c1',
+        campusId,
         department: teachingCourse.department,
         startAt: start.toISOString(),
-        durationMinutes: Number(form.durationMinutes) || 60,
+        durationMinutes: duration,
         platform: 'Zoom',
         meetingUrl: meeting.join_url,
         startUrl: meeting.start_url,
@@ -177,6 +191,7 @@ export function ScheduleLiveSessionModal({
           value={form.durationMinutes}
           onChange={(v) => setForm((f) => ({ ...f, durationMinutes: v }))}
           type="number"
+          hint="Between 15 and 480 minutes."
         />
         <p className="text-[12px] text-secondary-text">
           A Zoom meeting is created through the Server-to-Server API. Instructors open the host start

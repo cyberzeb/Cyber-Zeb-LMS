@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   Award,
   BadgeCheck,
@@ -7,7 +7,7 @@ import {
   Download,
   ExternalLink,
   Hourglass,
-  QrCode,
+  Loader2,
   Share2,
   ShieldCheck,
   ShieldOff,
@@ -22,6 +22,14 @@ import { StatusPill } from '../../../shared/components/StatusPill'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
+import { useCertificates } from '../../institution/hooks/useCertificates'
+import {
+  certificateDataFrom,
+  useCertificateTemplates,
+} from '../../institution/certificates/useCertificateTemplates'
+import { CertificateArt, QrCodeSvg } from '../../institution/certificates/CertificateArt'
+import { downloadCertificatePdf } from '../../institution/certificates/certificatePdf'
+import { useToast } from '../../../shared/components/toast/ToastProvider'
 import type { CertificateItem, CertificatePendingReason } from '../types'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -88,12 +96,8 @@ function QrPanel({ url }: { url: string }) {
 
   return (
     <div className="rounded-xl border border-divider bg-navy-50/50 p-4 flex flex-col sm:flex-row items-center gap-4">
-      {/* QR placeholder — a real implementation would use a library like qrcode.react */}
-      <div className="w-24 h-24 rounded-lg bg-white border border-divider flex flex-col items-center justify-center shrink-0 text-navy-300 gap-1">
-        <QrCode size={36} />
-        <span className="text-[9px] font-semibold text-secondary-text text-center leading-tight px-1">
-          QR Code
-        </span>
+      <div className="w-24 h-24 rounded-lg bg-white border border-divider p-1 shrink-0">
+        <QrCodeSvg text={url} size={88} className="h-full w-full" />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-[12px] font-semibold text-navy-900">Verification link</p>
@@ -119,9 +123,12 @@ interface CertDetailsModalProps {
   cert: CertificateItem | null
   open: boolean
   onClose: () => void
+  onDownload: (cert: CertificateItem) => void
+  downloading: boolean
+  preview: React.ReactNode
 }
 
-function CertDetailsModal({ cert, open, onClose }: CertDetailsModalProps) {
+function CertDetailsModal({ cert, open, onClose, onDownload, downloading, preview }: CertDetailsModalProps) {
   const [shareTooltip, setShareTooltip] = useState(false)
 
   if (!cert) return null
@@ -151,7 +158,7 @@ function CertDetailsModal({ cert, open, onClose }: CertDetailsModalProps) {
       title="Certificate Details"
       description={cert.title}
       icon={<Award size={18} />}
-      size="lg"
+      size={preview ? 'xl' : 'lg'}
       footer={
         <div className="flex flex-wrap gap-2">
           <Button variant="ghost" size="sm" onClick={onClose}>
@@ -165,15 +172,17 @@ function CertDetailsModal({ cert, open, onClose }: CertDetailsModalProps) {
             </Button>
           </div>
           {isIssued && (
-            <Button variant="primary" size="sm">
-              <Download size={13} />
+            <Button variant="primary" size="sm" onClick={() => onDownload(cert)} disabled={downloading}>
+              {downloading ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
               Download PDF
             </Button>
           )}
         </div>
       }
     >
-      {/* Certificate banner */}
+      {preview ? (
+        <div className="shrink-0 rounded-xl bg-canvas p-3">{preview}</div>
+      ) : (
       <div className="relative rounded-xl overflow-hidden p-0">
         <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900" />
         <div className="absolute right-0 top-0 w-40 h-40 rounded-full bg-lemon-500/15 blur-3xl" />
@@ -194,6 +203,7 @@ function CertDetailsModal({ cert, open, onClose }: CertDetailsModalProps) {
           </div>
         </div>
       </div>
+      )}
 
       {/* Verification status badge */}
       <div
@@ -241,9 +251,11 @@ function CertDetailsModal({ cert, open, onClose }: CertDetailsModalProps) {
 interface CertCardProps {
   cert: CertificateItem
   onView: (cert: CertificateItem) => void
+  onDownload: (cert: CertificateItem) => void
+  downloading: boolean
 }
 
-function CertCard({ cert, onView }: CertCardProps) {
+function CertCard({ cert, onView, onDownload, downloading }: CertCardProps) {
   const [copied, setCopied] = useState(false)
   const isIssued = cert.status === 'issued'
   const verifyUrl = buildVerificationUrl(cert.credentialId)
@@ -338,8 +350,8 @@ function CertCard({ cert, onView }: CertCardProps) {
 
           {isIssued && (
             <>
-              <Button variant="primary" size="sm">
-                <Download size={13} />
+              <Button variant="primary" size="sm" onClick={() => onDownload(cert)} disabled={downloading}>
+                {downloading ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
                 Download PDF
               </Button>
 
@@ -456,6 +468,45 @@ export function StudentCertificatesPage() {
   const { data, isLoading, isError } = useStudentDashboard()
   const [activeTab, setActiveTab] = useState('All')
   const [selectedCert, setSelectedCert] = useState<CertificateItem | null>(null)
+  const [downloadingId, setDownloadingId] = useState<string | null>(null)
+  const { notify } = useToast()
+  const { certificates: records } = useCertificates()
+  const { templateFor } = useCertificateTemplates()
+
+  const recordFor = useCallback(
+    (item: CertificateItem) => records.find((r) => r.id === item.id),
+    [records],
+  )
+
+  const handleDownload = useCallback(
+    async (item: CertificateItem) => {
+      const record = recordFor(item)
+      if (!record || record.status !== 'issued') {
+        notify('This certificate is not available for download yet.', 'error')
+        return
+      }
+      setDownloadingId(item.id)
+      try {
+        await downloadCertificatePdf(templateFor(record.templateId), certificateDataFrom(record))
+      } catch (err) {
+        notify(err instanceof Error ? err.message : 'Could not create the PDF.', 'error')
+      } finally {
+        setDownloadingId(null)
+      }
+    },
+    [notify, recordFor, templateFor],
+  )
+
+  const selectedRecord = selectedCert ? recordFor(selectedCert) : undefined
+  const selectedPreview =
+    selectedRecord && selectedRecord.status === 'issued' ? (
+      <CertificateArt
+        template={templateFor(selectedRecord.templateId)}
+        data={certificateDataFrom(selectedRecord)}
+        uid="student-details"
+        className="mx-auto block h-auto w-full shadow-md"
+      />
+    ) : null
 
   const stats = useMemo(() => {
     if (!data) return { issued: 0, pending: 0 }
@@ -527,8 +578,16 @@ export function StudentCertificatesPage() {
                   <ExternalLink size={13} />
                   View
                 </Button>
-                <Button variant="primary">
-                  <Download size={15} />
+                <Button
+                  variant="primary"
+                  onClick={() => void handleDownload(latestIssued)}
+                  disabled={downloadingId === latestIssued.id}
+                >
+                  {downloadingId === latestIssued.id ? (
+                    <Loader2 size={15} className="animate-spin" />
+                  ) : (
+                    <Download size={15} />
+                  )}
                   Download PDF
                 </Button>
               </div>
@@ -555,7 +614,7 @@ export function StudentCertificatesPage() {
           <StatBlock
             label="Verified"
             value={stats.issued}
-            sub="Blockchain-backed IDs"
+            sub="Verifiable online by QR code"
             icon={<ShieldCheck size={17} />}
             iconBg="bg-lemon-50 text-lemon-900"
           />
@@ -573,7 +632,13 @@ export function StudentCertificatesPage() {
         {filtered.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filtered.map((cert) => (
-              <CertCard key={cert.id} cert={cert} onView={setSelectedCert} />
+              <CertCard
+                key={cert.id}
+                cert={cert}
+                onView={setSelectedCert}
+                onDownload={(c) => void handleDownload(c)}
+                downloading={downloadingId === cert.id}
+              />
             ))}
           </div>
         ) : (
@@ -591,6 +656,9 @@ export function StudentCertificatesPage() {
         cert={selectedCert}
         open={selectedCert !== null}
         onClose={() => setSelectedCert(null)}
+        onDownload={(c) => void handleDownload(c)}
+        downloading={selectedCert !== null && downloadingId === selectedCert.id}
+        preview={selectedPreview}
       />
     </>
   )

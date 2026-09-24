@@ -1,8 +1,11 @@
-import { Award, Download, ShieldOff } from 'lucide-react'
+import { Award, Download, Loader2, ShieldOff } from 'lucide-react'
 import { Modal } from '../../../shared/components/Modal'
 import { Button } from '../../../shared/components/Button'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import type { CampusRecord, CertificateRecord, CertificateStatus } from '../types'
+import { CertificateArt } from '../certificates/CertificateArt'
+import { certificateDataFrom } from '../certificates/useCertificateTemplates'
+import type { CertificateTemplateDesign } from '../certificates/templateModel'
 
 const statusConfig: Record<
   CertificateStatus,
@@ -45,6 +48,8 @@ interface CertificateDetailsModalProps {
   open: boolean
   certificate: CertificateRecord | null
   campuses: CampusRecord[]
+  template: CertificateTemplateDesign
+  downloading?: boolean
   onClose: () => void
   onDownload: (cert: CertificateRecord) => void
   onRevoke: (cert: CertificateRecord) => void
@@ -54,6 +59,8 @@ export function CertificateDetailsModal({
   open,
   certificate,
   campuses,
+  template,
+  downloading,
   onClose,
   onDownload,
   onRevoke,
@@ -69,7 +76,7 @@ export function CertificateDetailsModal({
     <Modal
       open={open}
       onClose={onClose}
-      size="lg"
+      size="xl"
       icon={<Award size={18} />}
       title="Certificate Details"
       description={`${certificate.certificateId} · ${certificate.studentName}`}
@@ -85,14 +92,26 @@ export function CertificateDetailsModal({
             </Button>
           ) : null}
           {canDownload ? (
-            <Button variant="primary" onClick={() => onDownload(certificate)}>
-              <Download size={15} />
-              Download
+            <Button variant="primary" onClick={() => onDownload(certificate)} disabled={downloading}>
+              {downloading ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
+              Download PDF
             </Button>
           ) : null}
         </>
       }
     >
+      <div className="relative shrink-0 overflow-hidden rounded-xl bg-canvas p-3">
+        <div className={`mx-auto shadow-md ring-1 ring-black/5 ${template.orientation === 'portrait' ? 'max-w-[320px]' : ''}`}>
+          <CertificateArt template={template} data={certificateDataFrom(certificate)} uid="details" className="block h-auto w-full" />
+        </div>
+        {certificate.status === 'revoked' ? (
+          <span className="absolute inset-0 flex items-center justify-center">
+            <span className="-rotate-12 rounded-lg border-4 border-danger px-6 py-2 text-[32px] font-black tracking-[0.2em] text-danger bg-white/80 dark:bg-black/60">
+              REVOKED
+            </span>
+          </span>
+        ) : null}
+      </div>
       <div className="mb-2">
         <StatusPill label={status.label} tone={status.tone} />
       </div>

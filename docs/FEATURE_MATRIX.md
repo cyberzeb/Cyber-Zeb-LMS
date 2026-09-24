@@ -63,13 +63,13 @@ Status as of Phase 4 (2026-09-21) — Corporate Edition complete, including its 
 | Course content / lessons (learner player) | ✅ | ✅ | 🟡 | Shared player; the corporate learner portal is edition-correct |
 | Library & Resources | ✅ | ✅ | ✅ | Added to the corporate and training admin nav in Phase 4 |
 | Enrollment | ✅ | ✅ | 🟡 | Corporate assignments come from job roles with due dates and recertification, not manual enrolment |
-| Live classes | ✅ | ✅ | ✅ | |
+| Live classes | ✅ | ✅ | ✅ | Hosts get a fresh Zoom start link on each start (Zoom's expires after ~2h). Status follows the clock without a reload |
 | Assignments | ✅ | ✅ | ✅ | |
 | Quizzes / exams | ✅ | ✅ | ✅ | |
 | Question bank | ✅ | ✅ | ✅ | Added to the corporate and training admin nav in Phase 4 |
 | Grading / gradebook | ✅ | ✅ | 🟡 | Quizzes graded on the server. The corporate learner view shows an assessment average instead of GPA; training still shows GPA wording |
 | Attendance | ✅ | ✅ | ✅ | Added to the corporate and training admin nav in Phase 4 |
-| Certificates | ✅ | 🟡 | 🟡 | No automatic issue on completion |
+| Certificates | ✅ | 🟡 | 🟡 | Template designer (presets, colours, frames, patterns, seals, fonts, placeholders, logo, signatures), PDF download for admins and learners, QR code to the public `/verify` page. No automatic issue on completion |
 | Announcements | ✅ | ✅ | ✅ | |
 | Discussion forum | ✅ | ✅ | ✅ | |
 | Help desk | ✅ | ✅ | ✅ | |

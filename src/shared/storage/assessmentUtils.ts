@@ -92,6 +92,18 @@ function deadlineStatus(iso: string): 'upcoming' | 'today' | 'overdue' {
   return 'upcoming'
 }
 
+const STATUS_ORDER = { live: 0, upcoming: 1, ended: 2 } as const
+
+/** Live first, then the next upcoming class, then the most recent past one. */
+function byStatusThenTime(a: LiveSessionRecord, b: LiveSessionRecord): number {
+  const sa = resolveLiveSessionStatus(a)
+  const sb = resolveLiveSessionStatus(b)
+  if (sa !== sb) return STATUS_ORDER[sa] - STATUS_ORDER[sb]
+  const ta = new Date(a.startAt).getTime()
+  const tb = new Date(b.startAt).getTime()
+  return sa === 'ended' ? tb - ta : ta - tb
+}
+
 export function toStudentLiveClasses(
   sessions: LiveSessionRecord[],
   studentId: string,
@@ -100,6 +112,7 @@ export function toStudentLiveClasses(
 
   return sessions
     .filter((s) => courseIds.has(s.courseId) && s.status !== 'cancelled')
+    .sort(byStatusThenTime)
     .map((s) => ({
       id: s.id,
       title: s.title,
@@ -111,10 +124,6 @@ export function toStudentLiveClasses(
       meetingUrl: s.meetingUrl,
       status: resolveLiveSessionStatus(s),
     }))
-    .sort((a, b) => {
-      const order = { live: 0, upcoming: 1, ended: 2 }
-      return order[a.status] - order[b.status]
-    })
 }
 
 export function toInstructorLiveClasses(
@@ -129,6 +138,7 @@ export function toInstructorLiveClasses(
         s.instructorName === instructorName,
     )
     .filter((s) => s.status !== 'cancelled')
+    .sort(byStatusThenTime)
     .map((s) => ({
       id: s.id,
       title: s.title,
@@ -140,11 +150,8 @@ export function toInstructorLiveClasses(
       startUrl: s.startUrl,
       status: resolveLiveSessionStatus(s),
       attendees: s.attendees,
+      zoomMeetingId: s.zoomMeetingId,
     }))
-    .sort((a, b) => {
-      const order = { live: 0, upcoming: 1, ended: 2 }
-      return order[a.status] - order[b.status]
-    })
 }
 
 export function toStudentQuizzes(

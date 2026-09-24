@@ -5,12 +5,14 @@ from app.modules.live_sessions.schemas import (
     ZoomMeetingCreate,
     ZoomMeetingOut,
     ZoomMeetingStatusOut,
+    ZoomStartUrlOut,
     ZoomStatusOut,
 )
 from app.modules.live_sessions.zoom_client import (
     create_meeting,
     end_meeting,
     get_meeting_status,
+    get_start_url,
     zoom_configured,
 )
 
@@ -33,6 +35,9 @@ class LiveSessionsService:
 
     async def zoom_meeting_status(self, meeting_id: str) -> ZoomMeetingStatusOut:
         return ZoomMeetingStatusOut(**await get_meeting_status(meeting_id))
+
+    async def zoom_start_url(self, meeting_id: str) -> ZoomStartUrlOut:
+        return ZoomStartUrlOut(**await get_start_url(meeting_id))
 
     async def end_zoom_meeting(self, meeting_id: str) -> ZoomMeetingStatusOut:
         return ZoomMeetingStatusOut(**await end_meeting(meeting_id))

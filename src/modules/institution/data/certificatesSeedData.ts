@@ -1,10 +1,5 @@
-import type { CertificateRecord, CertificateTemplate } from '../types'
+import type { CertificateRecord } from '../types'
 import { DEFAULT_CAMPUS_ID } from './orgSeedData'
-
-export const certificateTemplates: CertificateTemplate[] = [
-  { id: 'tpl-standard', name: 'Standard Completion Certificate' },
-  { id: 'tpl-professional', name: 'Professional Certificate' },
-]
 
 export const seedCertificates: CertificateRecord[] = [
   {

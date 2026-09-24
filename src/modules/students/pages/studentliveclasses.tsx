@@ -7,6 +7,7 @@ import { ZoomIcon } from '../../../shared/components/ZoomIcon'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { openMeetingUrl } from '../../../shared/utils/liveSessionUtils'
+import { useInterval } from '../../../shared/hooks/useInterval'
 import { useSyncZoomMeetingStatus } from '../../institution/hooks/useSyncZoomMeetingStatus'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
@@ -146,7 +147,7 @@ function LiveSessionCard({
             {session.status === 'live' ? 'Join' : session.meetingUrl ? 'Open link' : 'Join'}
           </Button>
         ) : (
-          <span className="text-[11px] font-semibold text-secondary-text shrink-0">Recording available</span>
+          <span className="text-[11px] font-semibold text-secondary-text shrink-0">Session ended</span>
         )}
       </div>
     </GlassCard>
@@ -188,8 +189,10 @@ function SessionSection({
 
 export function StudentLiveClassesPage() {
   const { notify } = useToast()
-  const { data, isLoading, isError } = useStudentDashboard()
+  const { data, isLoading, isError, reload } = useStudentDashboard()
   useSyncZoomMeetingStatus()
+  // Status follows the clock: the Join button appears as the class starts.
+  useInterval(() => void reload(), 30_000)
 
   const handleJoin = (session: LiveClassSession) => {
     if (!openMeetingUrl(session.meetingUrl)) {
@@ -230,14 +233,14 @@ export function StudentLiveClassesPage() {
         <StatBlock
           label="Upcoming"
           value={upcoming.length}
-          sub="Scheduled this week"
+          sub="Scheduled ahead"
           icon={<CalendarClock size={17} />}
           iconBg="bg-info-bg text-info"
         />
         <StatBlock
           label="Completed"
           value={ended.length}
-          sub="Recordings on demand"
+          sub="Past sessions"
           icon={<Video size={17} />}
           iconBg="bg-navy-50 text-navy-600"
         />

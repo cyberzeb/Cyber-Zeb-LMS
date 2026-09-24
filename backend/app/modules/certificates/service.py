@@ -3,19 +3,82 @@ Certificates & Credentials module - business logic layer.
 
 Blueprint reference: Section 14.1 (Certificates & Credentials) + Section 18 Phase 5
 
-Rules to enforce here (not in the router):
-- Validate every business rule from the blueprint section above.
-- Call app.common.audit.write_audit_log(...) for any high-risk action
-  (Section 16.1: grade changes after publish, refunds, guardian-link
-  changes, impersonation, role changes, certificate overrides, etc).
-- Never trust tenant_id/amount/ownership from client input - always use
-  the Principal from app.core.dependencies.
+Certificates are issued in the portal and stored in the tenant's `certificates`
+data-store collection. Verification reads them from there so anyone holding a
+certificate (or scanning its QR code) can check it is genuine and still valid.
 """
+from datetime import date
+
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.modules.certificates.schemas import CertificateVerificationOut
+from app.modules.lms_store.models import LmsCollection
+from app.modules.tenants.models import Tenant
 
 
 class CertificatesService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    # TODO(Sprint 10): implement service methods backing: POST /certificates/issue, GET /certificates/{code}/verify
+    async def _institution_name(self, tenant_id) -> str | None:
+        settings = (
+            await self.db.execute(
+                select(LmsCollection.data).where(
+                    LmsCollection.tenant_id == tenant_id,
+                    LmsCollection.collection_key == "settings",
+                )
+            )
+        ).scalar_one_or_none()
+        if isinstance(settings, dict):
+            name = (settings.get("general") or {}).get("name")
+            if isinstance(name, str) and name.strip():
+                return name.strip()
+        tenant = await self.db.get(Tenant, tenant_id)
+        return tenant.name if tenant else None
+
+    async def verify(self, certificate_id: str) -> CertificateVerificationOut:
+        wanted = certificate_id.strip().upper()
+        rows = (
+            await self.db.execute(
+                select(LmsCollection.tenant_id, LmsCollection.data).where(
+                    LmsCollection.collection_key == "certificates"
+                )
+            )
+        ).all()
+        for tenant_id, data in rows:
+            if not isinstance(data, list):
+                continue
+            for cert in data:
+                if not isinstance(cert, dict):
+                    continue
+                if str(cert.get("certificateId", "")).strip().upper() != wanted:
+                    continue
+                status = str(cert.get("status") or "")
+                expiration = cert.get("expirationDate") or None
+                expired = False
+                if expiration:
+                    try:
+                        expired = date.fromisoformat(str(expiration)[:10]) < date.today()
+                    except ValueError:
+                        expired = False
+                # A pending certificate has not been awarded yet, so it shows as
+                # not found rather than leaking in-progress records.
+                if status == "pending":
+                    return CertificateVerificationOut(found=False, certificate_id=certificate_id)
+                return CertificateVerificationOut(
+                    found=True,
+                    certificate_id=str(cert.get("certificateId")),
+                    status=status,
+                    valid=status == "issued" and not expired,
+                    expired=expired,
+                    student_name=cert.get("studentName"),
+                    course_code=cert.get("courseCode"),
+                    course_title=cert.get("courseTitle"),
+                    institution_name=await self._institution_name(tenant_id),
+                    issue_date=cert.get("issueDate"),
+                    completion_date=cert.get("completionDate"),
+                    expiration_date=expiration,
+                    revoked_at=cert.get("revokedAt"),
+                )
+        return CertificateVerificationOut(found=False, certificate_id=certificate_id)

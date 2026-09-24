@@ -14,6 +14,7 @@ import {
   resolveLiveSessionStatus,
 } from '../../../shared/storage/assessmentUtils'
 import { openMeetingUrl } from '../../../shared/utils/liveSessionUtils'
+import { useInterval } from '../../../shared/hooks/useInterval'
 import { useCampusContext } from '../context/CampusContext'
 import { useSyncCampusFilter } from '../hooks/useSyncCampusFilter'
 import { useLiveSessions } from '../hooks/useAssessments'
@@ -33,6 +34,9 @@ export function LiveClassesAdminPage() {
   const { activeCampuses, selectedCampusId } = useCampusContext()
   const { records } = useLiveSessions()
   useSyncZoomMeetingStatus()
+  // Status is derived from the clock; re-evaluate it as classes start and end.
+  const [now, setNow] = useState(() => Date.now())
+  useInterval(() => setNow(Date.now()), 30_000)
   const [activeTab, setActiveTab] = useState('All')
   const [query, setQuery] = useState('')
   const [campusFilter, setCampusFilter] = useState('all')
@@ -49,7 +53,7 @@ export function LiveClassesAdminPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return records.filter((r) => {
+    const list = records.filter((r) => {
       const resolved = resolveLiveSessionStatus(r)
       if (activeTab === 'Live' && resolved !== 'live') return false
       if (activeTab === 'Upcoming' && resolved !== 'upcoming') return false
@@ -62,7 +66,18 @@ export function LiveClassesAdminPage() {
         r.instructorName.toLowerCase().includes(q)
       )
     })
-  }, [records, activeTab, query, campusFilter])
+    const order = { live: 0, upcoming: 1, ended: 2 }
+    // Live first, then the next class, then the most recent past one.
+    return list.sort((a, b) => {
+      const sa = resolveLiveSessionStatus(a)
+      const sb = resolveLiveSessionStatus(b)
+      if (sa !== sb) return order[sa] - order[sb]
+      const diff = new Date(a.startAt).getTime() - new Date(b.startAt).getTime()
+      return sa === 'ended' ? -diff : diff
+    })
+    // `now` is not read here, but the statuses above depend on the clock.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [records, activeTab, query, campusFilter, now])
 
   const stats = useMemo(
     () => ({
@@ -70,7 +85,8 @@ export function LiveClassesAdminPage() {
       upcoming: records.filter((r) => resolveLiveSessionStatus(r) === 'upcoming').length,
       ended: records.filter((r) => resolveLiveSessionStatus(r) === 'ended').length,
     }),
-    [records],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [records, now],
   )
 
   return (
