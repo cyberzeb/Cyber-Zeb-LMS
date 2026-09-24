@@ -50,7 +50,7 @@ if (-not (Test-Path $ConfigPath)) {
         $vpsHost = Read-Required "VPS IP or hostname"
         $cfg = [ordered]@{
             host       = $vpsHost
-            user       = Read-WithDefault "SSH user" "root"
+            user       = Read-Required "SSH user name (the Linux login, e.g. root - NOT the password)"
             port       = [int](Read-WithDefault "SSH port" "22")
             sshKey     = Read-WithDefault "SSH key file (blank = default)" "$env:USERPROFILE\.ssh\id_ed25519"
             remoteDir  = Read-WithDefault "Project folder on the VPS" "/home/lms/Cyber-Zeb-LMS"
@@ -58,12 +58,17 @@ if (-not (Test-Path $ConfigPath)) {
             useSudo    = ((Read-WithDefault "Run the deploy script with sudo? (y/n)" "n") -match '^[yY]')
         }
         $cfg | ConvertTo-Json | Out-File -FilePath $ConfigPath -Encoding utf8
-        Write-Host "Saved. Edit $ConfigPath to change these later." -ForegroundColor Green
+        Write-Host "Saved to $ConfigPath (edit it to change these later):" -ForegroundColor Green
+        Get-Content $ConfigPath | Write-Host
     }
 }
 $config = $null
 if (Test-Path $ConfigPath) {
     $config = Get-Content $ConfigPath -Raw | ConvertFrom-Json
+    if ((-not $NoDeploy -or $DeployOnly) -and [string]::IsNullOrWhiteSpace($config.user)) {
+        $config.user = Read-Required "SSH user name (the Linux login, e.g. root - NOT the password)"
+        $config | ConvertTo-Json | Out-File -FilePath $ConfigPath -Encoding utf8
+    }
 }
 
 # -- Branch --------------------------------------------------------------------
