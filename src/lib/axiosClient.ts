@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { isTokenExpired } from '../shared/api/client'
+import { apiErrorMessage, isTokenExpired } from '../shared/api/client'
 
 const baseURL = import.meta.env.DEV
   ? '/api/v1'
@@ -49,10 +49,7 @@ axiosClient.interceptors.response.use(
     if (status === 401 && localStorage.getItem('berana_super_admin_token')) {
       endSuperAdminSession()
     }
-    const message =
-      error?.response?.data?.error?.message ??
-      error?.message ??
-      'Request failed'
+    const message = apiErrorMessage(error) ?? error?.message ?? 'Request failed'
     // Keep the status on the error: without it callers cannot tell a rejected
     // session from a backend outage, and report one as the other.
     const wrapped: ApiError = new Error(message)

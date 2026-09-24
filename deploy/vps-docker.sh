@@ -6,7 +6,7 @@
 #   ./deploy/vps-docker.sh
 #
 # Optional:
-#   ./deploy/vps-docker.sh --ip 195.201.117.22
+#   ./deploy/vps-docker.sh --ip YOUR_VPS_IP
 #   ./deploy/vps-docker.sh --http-port 7777 --https-port 8443
 #   ./deploy/vps-docker.sh --http-only
 #

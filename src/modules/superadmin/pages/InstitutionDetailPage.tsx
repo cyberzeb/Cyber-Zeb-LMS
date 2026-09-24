@@ -111,7 +111,7 @@ export function InstitutionDetailPage() {
       {notice && (
         <p
           className={`text-[13px] font-semibold px-3.5 py-2.5 rounded-lg ${
-            notice.tone === 'ok' ? 'text-leaf-700 bg-lemon-50' : 'text-danger bg-danger-bg'
+            notice.tone === 'ok' ? 'text-success bg-success-bg' : 'text-danger bg-danger-bg'
           }`}
         >
           {notice.text}
@@ -186,7 +186,7 @@ export function InstitutionDetailPage() {
             {resetCode.isPending ? 'Issuing…' : 'Reset admin access code'}
           </button>
           {newCode && (
-            <div className="rounded-lg border border-leaf-300 bg-white px-3 py-2">
+            <div className="rounded-lg border border-success/30 bg-white px-3 py-2">
               <p className="text-[11px] font-bold text-secondary-text uppercase tracking-wide">
                 New access code for {newCode.email}
               </p>

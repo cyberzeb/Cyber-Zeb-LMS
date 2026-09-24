@@ -1,6 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { CheckCircle, Link2, Link2Off, RefreshCw, AlertTriangle } from 'lucide-react'
+import {
+  AlertTriangle,
+  Camera,
+  CheckCircle,
+  Link2,
+  Link2Off,
+  MonitorPlay,
+  Plug,
+  RefreshCw,
+  UsersRound,
+  Video,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { Button } from '../../../shared/components/Button'
@@ -11,12 +23,14 @@ import {
 } from '../api/serviceRequestApi'
 import type { Integration } from '../types'
 
-const PLATFORM_ICONS: Record<string, string> = {
-  zoom: '🎥',
-  microsoft_teams: '🟦',
-  google_meet: '🟢',
-  webex: '🔵',
+/** Lucide icon on the provider's brand tint. */
+const PLATFORM_ICONS: Record<string, { icon: LucideIcon; tile: string }> = {
+  zoom: { icon: Video, tile: 'bg-[#2D8CFF]/12 text-[#2D8CFF]' },
+  microsoft_teams: { icon: UsersRound, tile: 'bg-[#5B5FC7]/12 text-[#5B5FC7]' },
+  google_meet: { icon: Camera, tile: 'bg-[#00897B]/12 text-[#00897B]' },
+  webex: { icon: MonitorPlay, tile: 'bg-[#07C1E4]/12 text-[#0891B2]' },
 }
+const FALLBACK_ICON = { icon: Plug, tile: 'bg-canvas text-secondary-text' }
 
 const PLATFORM_DESCRIPTIONS: Record<string, string> = {
   zoom: 'Schedule and host live classes via Zoom meetings.',
@@ -57,12 +71,19 @@ function IntegrationCard({ integration }: { integration: Integration }) {
     onError: (e: Error) => setActionError(e.message),
   })
 
+  const { icon: PlatformIcon, tile } = PLATFORM_ICONS[integration.platform] ?? FALLBACK_ICON
+
   return (
     <GlassCard className="p-5 space-y-4">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl leading-none">{PLATFORM_ICONS[integration.platform] ?? '🔗'}</span>
-          <div>
+        <div className="flex items-center gap-3 min-w-0">
+          <span
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tile}`}
+            aria-hidden
+          >
+            <PlatformIcon size={20} strokeWidth={2} />
+          </span>
+          <div className="min-w-0">
             <p className="text-[14px] font-extrabold text-navy-900">{integration.display_name}</p>
             <p className="text-[12px] text-secondary-text mt-0.5">
               {PLATFORM_DESCRIPTIONS[integration.platform] ?? ''}

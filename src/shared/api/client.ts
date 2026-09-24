@@ -160,9 +160,61 @@ apiClient.interceptors.response.use(
   },
 )
 
-/** The server's human-readable error message, if the response carried one. */
+type ErrorLike = {
+  code?: string
+  request?: unknown
+  response?: {
+    status?: number
+    data?: { error?: { message?: unknown }; detail?: unknown }
+  }
+}
+
+/** "master_data.contact.official_email" → "Official email". */
+function fieldLabel(loc: unknown): string | null {
+  if (!Array.isArray(loc)) return null
+  const last = [...loc].reverse().find((part) => typeof part === 'string' && part !== 'body')
+  if (typeof last !== 'string') return null
+  const words = last.replace(/_/g, ' ')
+  return words.charAt(0).toUpperCase() + words.slice(1)
+}
+
+/** FastAPI's own validation errors: `{"detail": [{"loc": [...], "msg": "..."}]}`. */
+function validationDetailMessage(detail: unknown): string | null {
+  if (typeof detail === 'string') return detail || null
+  if (!Array.isArray(detail) || !detail.length) return null
+  const first = detail[0] as { loc?: unknown; msg?: unknown }
+  if (typeof first?.msg !== 'string') return null
+  const msg = first.msg.replace(/^Value error,\s*/i, '')
+  const field = fieldLabel(first.loc)
+  const text = field ? `${field}: ${msg}` : msg
+  return detail.length > 1 ? `${text} (and ${detail.length - 1} more)` : text
+}
+
+/**
+ * A human-readable message for a failed API call: the server's own message when
+ * it sent one, otherwise a description of what went wrong (offline, timeout,
+ * server fault). Null only when nothing more specific than a generic fallback
+ * can be said, so callers can supply one that fits their action.
+ */
 export function apiErrorMessage(err: unknown): string | null {
-  const message = (err as { response?: { data?: { error?: { message?: unknown } } } })?.response?.data
-    ?.error?.message
-  return typeof message === 'string' && message ? message : null
+  const e = err as ErrorLike | null
+  if (!e || typeof e !== 'object') return null
+  const data = e.response?.data
+  const serverMessage = data?.error?.message
+  if (typeof serverMessage === 'string' && serverMessage) return serverMessage
+  const detail = validationDetailMessage(data?.detail)
+  if (detail) return detail
+
+  if (e.code === 'ECONNABORTED' || e.code === 'ETIMEDOUT') {
+    return 'The server took too long to respond. Please try again.'
+  }
+  const status = e.response?.status
+  if (!e.response && (e.request || e.code === 'ERR_NETWORK')) {
+    return 'Cannot reach the server. Check your internet connection and try again.'
+  }
+  if (status === 429) return 'Too many attempts. Please wait a moment and try again.'
+  if (status && status >= 500) {
+    return 'The server ran into a problem. Please try again in a moment.'
+  }
+  return null
 }

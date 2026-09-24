@@ -6,8 +6,12 @@
  * guide) and picks the modules it wants. Only the selected modules are
  * activated, so the picker starts with everything ticked and the institution
  * removes what it does not need.
+ *
+ * Only the University Edition picks modules. The Corporate and Training
+ * editions are sold as a whole and always receive the full catalog.
  */
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import {
   ArrowLeft,
   Briefcase,
@@ -28,14 +32,16 @@ import {
   ALL_MODULE_KEYS,
   ALWAYS_ON_MODULES,
   MODULE_CATALOG,
+  type ModuleInfo,
   type ModuleKey,
 } from '../../../shared/constants/modules'
-import { submitServiceRequest } from '../api/leadApi'
+import { listPublicModules, submitServiceRequest } from '../api/leadApi'
 import {
   BILLING_CYCLE_OPTIONS,
   EMPTY_MASTER_DATA,
   OWNERSHIP_OPTIONS,
   TERM_STRUCTURE_OPTIONS,
+  invalidEmailFields,
   missingRequiredFields,
   type MasterDataForm,
 } from '../masterData'
@@ -66,6 +72,9 @@ const INSTITUTION_EDITIONS: {
     icon: Building2,
   },
 ]
+
+/** The only edition whose institutions choose their own modules. */
+const SELECTABLE_EDITION: InstitutionType = 'college_university'
 
 const STEPS = [
   'Institution',
@@ -108,10 +117,35 @@ export function RequestPage() {
   const [submitted, setSubmitted] = useState<{ ref?: string } | null>(null)
   const [error, setError] = useState('')
 
-  const missing = useMemo(
-    () => missingRequiredFields(master, basic.institutionName),
-    [master, basic.institutionName],
-  )
+  // The live catalog, so a module the Super Admin switched off is not offered and
+  // edited descriptions show. Falls back to the built-in list if it cannot load.
+  const { data: liveCatalog } = useQuery({
+    queryKey: ['public', 'modules'],
+    queryFn: listPublicModules,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  })
+  const catalog: ModuleInfo[] = useMemo(() => {
+    if (!liveCatalog?.length) return MODULE_CATALOG
+    const live = new Map(liveCatalog.map((m) => [m.key, m]))
+    return MODULE_CATALOG.flatMap((mod) => {
+      const item = live.get(mod.key)
+      // Core modules are always offered, even if switched off by mistake.
+      if (!item && !mod.core) return []
+      return [{ ...mod, description: item?.description || mod.description }]
+    })
+  }, [liveCatalog])
+  const catalogKeys = useMemo(() => catalog.map((m) => m.key), [catalog])
+
+  const canPickModules = basic.institutionType === SELECTABLE_EDITION
+  const modulesToSend = canPickModules
+    ? selected.filter((key) => catalogKeys.includes(key) || ALWAYS_ON_MODULES.includes(key))
+    : ALL_MODULE_KEYS
+  const editionLabel =
+    INSTITUTION_EDITIONS.find((e) => e.value === basic.institutionType)?.label ?? 'This edition'
+
+  const missing = useMemo(() => missingRequiredFields(master, basic), [master, basic])
+  const invalidEmails = useMemo(() => invalidEmailFields(master, basic), [master, basic])
 
   function setSection<K extends keyof MasterDataForm>(
     section: K,
@@ -130,20 +164,22 @@ export function RequestPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError('')
-    if (missing.length) {
-      setError(`Please complete: ${missing.join(', ')}.`)
-      return
-    }
+    // Submit only exists on the review step, which already lists these problems.
+    if (missing.length || invalidEmails.length) return
     setSubmitting(true)
     try {
       const result = await submitServiceRequest({
         ...basic,
-        selectedModules: selected,
+        selectedModules: modulesToSend,
         masterData: master,
       })
       setSubmitted({ ref: (result as { institution_ref?: string })?.institution_ref })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not submit your request.')
+      setError(
+        err instanceof Error && err.message
+          ? err.message
+          : 'We could not submit your request. Please check your details and try again.',
+      )
     } finally {
       setSubmitting(false)
     }
@@ -527,7 +563,7 @@ export function RequestPage() {
                     onChange={(v) => setBasic({ ...basic, email: v })}
                   />
                 </Field>
-                <Field label="Phone">
+                <Field label="Phone" required>
                   <Input
                     value={basic.phone}
                     onChange={(v) => setBasic({ ...basic, phone: v })}
@@ -722,12 +758,13 @@ export function RequestPage() {
 
           {step === 4 ? (
             <>
+              {canPickModules ? (
               <Section
                 title="Choose your modules"
                 hint="Every module is selected. Untick anything you do not need — only what you keep is activated."
               >
                 <div className="sm:col-span-2 grid gap-2.5">
-                  {MODULE_CATALOG.map((mod) => {
+                  {catalog.map((mod) => {
                     const isCore = ALWAYS_ON_MODULES.includes(mod.key)
                     const checked = isCore || selected.includes(mod.key)
                     return (
@@ -764,10 +801,25 @@ export function RequestPage() {
                   })}
                 </div>
                 <p className="sm:col-span-2 text-[12.5px] marketing-body-text">
-                  {selected.length} of {ALL_MODULE_KEYS.length} modules selected. You can request
+                  {modulesToSend.length} of {catalog.length} modules selected. You can request
                   more at any time after activation.
                 </p>
               </Section>
+              ) : (
+                <Section title="Modules">
+                  <div className="sm:col-span-2 flex items-start gap-3 rounded-xl border border-lemon-500/60 bg-lemon-500/5 p-4">
+                    <CheckCircle2
+                      size={18}
+                      className="mt-0.5 shrink-0 text-lemon-600 dark:text-lemon-500"
+                    />
+                    <p className="text-[13px] marketing-body-text">
+                      <strong className="marketing-section-heading">{editionLabel}</strong>{' '}
+                      includes the complete Berana platform — all {ALL_MODULE_KEYS.length} modules
+                      are activated for your institution, so there is nothing to choose here.
+                    </p>
+                  </div>
+                </Section>
+              )}
 
               <Section title="Subscription & licensing">
                 <Field label="Berana package">
@@ -850,7 +902,11 @@ export function RequestPage() {
                 />
                 <Row
                   label="Modules"
-                  value={`${selected.length} of ${ALL_MODULE_KEYS.length} selected`}
+                  value={
+                    canPickModules
+                      ? `${modulesToSend.length} of ${catalog.length} selected`
+                      : `All ${ALL_MODULE_KEYS.length} modules (full edition)`
+                  }
                 />
               </div>
 
@@ -869,6 +925,11 @@ export function RequestPage() {
               {missing.length ? (
                 <p className="sm:col-span-2 text-[13px] font-semibold text-danger bg-danger-bg px-3.5 py-2.5 rounded-lg">
                   Still required: {missing.join(', ')}.
+                </p>
+              ) : null}
+              {invalidEmails.length ? (
+                <p className="sm:col-span-2 text-[13px] font-semibold text-danger bg-danger-bg px-3.5 py-2.5 rounded-lg">
+                  Not a valid email address: {invalidEmails.join(', ')}.
                 </p>
               ) : null}
             </Section>
@@ -900,8 +961,8 @@ export function RequestPage() {
             ) : (
               <button
                 type="submit"
-                disabled={submitting}
-                className="inline-flex items-center gap-2 rounded-xl bg-lemon-500 px-6 py-2.5 text-[13.5px] font-bold text-[#020810] hover:bg-lemon-400 transition-colors disabled:opacity-60 cursor-pointer"
+                disabled={submitting || missing.length > 0 || invalidEmails.length > 0}
+                className="inline-flex items-center gap-2 rounded-xl bg-lemon-500 px-6 py-2.5 text-[13.5px] font-bold text-[#020810] hover:bg-lemon-400 transition-colors disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
               >
                 {submitting ? <Loader2 size={15} className="animate-spin" /> : null}
                 {submitting ? 'Submitting…' : 'Submit request'}

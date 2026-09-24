@@ -199,7 +199,7 @@ export function ServiceRequestDetailPage() {
             institutionRef={data.institution_ref}
           />
           {data.tenant && (
-            <div className="rounded-xl bg-leaf-50 border border-leaf-200 p-3 text-[13px]">
+            <div className="rounded-xl bg-success-bg border border-success/30 p-3 text-[13px]">
               <p className="font-bold text-navy-900">Activated tenant</p>
               <p className="mt-1">
                 Slug: <code>{data.tenant.slug}</code>
@@ -211,7 +211,7 @@ export function ServiceRequestDetailPage() {
                 </a>
               </p>
               {accessCode && (
-                <div className="mt-3 rounded-lg bg-white border border-leaf-300 px-3 py-2">
+                <div className="mt-3 rounded-lg bg-white border border-success/30 px-3 py-2">
                   <p className="text-[11px] font-bold text-secondary-text uppercase tracking-wide">
                     Institution admin access code
                   </p>
@@ -313,7 +313,7 @@ export function ServiceRequestDetailPage() {
           )}
 
           {status === 'activated' && (
-            <p className="text-[12.5px] font-semibold text-leaf-700">
+            <p className="text-[12.5px] font-semibold text-success">
               Tenant activated. Credentials were emailed to the client.
             </p>
           )}

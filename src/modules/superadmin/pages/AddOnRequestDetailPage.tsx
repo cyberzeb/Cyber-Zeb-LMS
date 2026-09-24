@@ -295,7 +295,7 @@ export function AddOnRequestDetailPage() {
           )}
 
           {status === 'activated' && (
-            <p className="text-[12.5px] font-semibold text-leaf-700">
+            <p className="text-[12.5px] font-semibold text-success">
               Add-on modules activated for this tenant.
             </p>
           )}

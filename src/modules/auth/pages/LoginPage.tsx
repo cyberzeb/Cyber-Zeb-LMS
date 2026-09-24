@@ -117,9 +117,15 @@ export function LoginPage() {
         setRole(result.role as LoginRole)
       }
       setStep('credentials')
-    } catch {
-      // Lookup failed (network error) — fall back to manual role selection
+    } catch (err) {
       setLookupResult(null)
+      const status = (err as { response?: { status?: number } })?.response?.status
+      if (!status || status >= 500 || status === 429) {
+        // Server unreachable or failing: sending a code would fail too, so say why now.
+        setError(apiErrorMessage(err) ?? t('login.sendError'))
+        return
+      }
+      // The lookup itself was refused — fall back to manual role selection.
       setStep('credentials')
     } finally {
       setLoading(false)

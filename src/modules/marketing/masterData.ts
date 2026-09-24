@@ -377,18 +377,47 @@ export function toMasterDataPayload(form: MasterDataForm): Record<string, unknow
   }
 }
 
+/** The reply-to details from the request page, which the API also requires. */
+export interface RequestContact {
+  institutionName: string
+  contactName: string
+  email: string
+  phone: string
+}
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 /**
  * The guide's required minimum, checked in the browser so the user is told which
  * step to go back to. The backend enforces the same rules regardless.
  */
-export function missingRequiredFields(form: MasterDataForm, institutionName: string): string[] {
+export function missingRequiredFields(form: MasterDataForm, contact: RequestContact): string[] {
   const missing: string[] = []
-  if (!institutionName.trim()) missing.push('Legal institution name')
-  if (!form.address.country.trim()) missing.push('Country')
-  if (!form.contact.official_email.trim()) missing.push('Official institution email')
-  if (!form.primary_contact.full_name.trim()) missing.push('Primary contact name')
-  if (!form.primary_contact.email.trim()) missing.push('Primary contact email')
-  if (!form.lms_administrator.full_name.trim()) missing.push('LMS administrator name')
-  if (!form.lms_administrator.email.trim()) missing.push('LMS administrator email')
+  if (!contact.institutionName.trim()) missing.push('Legal institution name (step 1)')
+  if (!form.address.country.trim()) missing.push('Country (step 1)')
+  if (!form.contact.official_email.trim()) missing.push('Official institution email (step 2)')
+  if (!form.primary_contact.full_name.trim()) missing.push('Primary contact name (step 2)')
+  if (!form.primary_contact.email.trim()) missing.push('Primary contact email (step 2)')
+  if (!form.lms_administrator.full_name.trim()) missing.push('LMS administrator name (step 3)')
+  if (!form.lms_administrator.email.trim()) missing.push('LMS administrator email (step 3)')
+  if (!contact.contactName.trim()) missing.push('Reply-to contact person (step 3)')
+  if (!contact.email.trim()) missing.push('Reply-to email (step 3)')
+  if (!contact.phone.trim()) missing.push('Reply-to phone (step 3)')
   return missing
+}
+
+/** Email fields that were filled in but are not valid addresses. */
+export function invalidEmailFields(form: MasterDataForm, contact: RequestContact): string[] {
+  const emails: [string, string][] = [
+    ['Official email (step 2)', form.contact.official_email],
+    ['General inquiry email (step 2)', form.contact.inquiry_email],
+    ['Admissions email (step 2)', form.contact.admissions_email],
+    ['Registrar email (step 2)', form.contact.registrar_email],
+    ['Primary contact email (step 2)', form.primary_contact.email],
+    ['LMS administrator email (step 3)', form.lms_administrator.email],
+    ['Reply-to email (step 3)', contact.email],
+  ]
+  return emails
+    .filter(([, value]) => value.trim() && !EMAIL_PATTERN.test(value.trim()))
+    .map(([label]) => label)
 }

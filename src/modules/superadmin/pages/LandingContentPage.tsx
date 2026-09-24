@@ -87,7 +87,7 @@ export function LandingContentPage() {
               })
             }
             className={`rounded-lg px-3 py-2 text-[12px] font-bold disabled:opacity-50 ${
-              announcementActive ? 'bg-leaf-50 text-leaf-700' : 'bg-danger-bg text-danger'
+              announcementActive ? 'bg-success-bg text-success' : 'bg-danger-bg text-danger'
             }`}
           >
             {announce.isPending
@@ -171,7 +171,7 @@ export function LandingContentPage() {
                   patch.mutate({ id: item.id, body: { is_active: !item.is_active } })
                 }
                 className={`rounded-lg px-3 py-2 text-[12px] font-bold disabled:opacity-50 ${
-                  item.is_active ? 'bg-leaf-50 text-leaf-700' : 'bg-danger-bg text-danger'
+                  item.is_active ? 'bg-success-bg text-success' : 'bg-danger-bg text-danger'
                 }`}
               >
                 {item.is_active ? 'Active' : 'Inactive'}

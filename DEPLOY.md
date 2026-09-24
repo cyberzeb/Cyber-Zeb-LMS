@@ -11,7 +11,7 @@ Works on a **shared VPS** — HTTP **7777** and HTTPS **8443** so it does not ne
 ```bash
 cd /home/lms/Cyber-Zeb-LMS
 chmod +x deploy/vps-docker.sh
-./deploy/vps-docker.sh --ip 195.201.117.22
+./deploy/vps-docker.sh --ip YOUR_VPS_IP
 ```
 
 IP is auto-detected if you omit `--ip`. First run takes a few minutes.
@@ -50,7 +50,7 @@ Marketplace scopes: `meeting:write:meeting:admin` and `user:read:list_users:admi
 ### Options
 
 ```bash
-./deploy/vps-docker.sh --ip 195.201.117.22
+./deploy/vps-docker.sh --ip YOUR_VPS_IP
 ./deploy/vps-docker.sh --http-port 7777 --https-port 8443
 ./deploy/vps-docker.sh --http-only
 ```
@@ -92,6 +92,20 @@ docker compose down -v                     # stop + wipe database
 ```
 
 If `curl` works on the VPS but the browser does not, open **TCP 7777** and **TCP 8443** in the cloud firewall panel (Hetzner, etc.). Host `ufw` is not enough by itself.
+
+---
+
+## Ship from Windows in one command
+
+Commits, pushes, then pulls on the VPS and reruns `deploy/vps-docker.sh`:
+
+```powershell
+deploy\ship.cmd -Message "Fix login messages"
+deploy\ship.cmd -NoDeploy        # commit + push only
+deploy\ship.cmd -DeployOnly      # pull + redeploy only
+```
+
+The first run asks for the server details and saves them to `deploy\ship.config.json`, which is not committed. If files tracked by git were edited on the server, it stops without overwriting them.
 
 ---
 

@@ -31,3 +31,9 @@ export async function submitServiceRequest(payload: ServiceRequestPayload) {
   })
   return data
 }
+
+/** The active module catalog, as the Super Admin currently maintains it. */
+export async function listPublicModules() {
+  const { data } = await axiosClient.get<{ key: string; description: string }[]>('/modules')
+  return data
+}

@@ -40,3 +40,6 @@ deploy/berana-release.zip
 backend/brana_lms.db
 backend/.venv/
 __pycache__/
+
+# Personal deploy target for deploy/ship.ps1
+deploy/ship.config.json
