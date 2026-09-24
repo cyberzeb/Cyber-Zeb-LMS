@@ -4,6 +4,7 @@
  * lands in the Super Admin console's Add-On Requests queue.
  */
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Lock, Loader2, CheckCircle2, X } from 'lucide-react'
 
 import { apiClient, apiErrorMessage, activeTenantCode } from '../api/client'
@@ -51,16 +52,18 @@ export function ModuleUpsellDialog({ moduleKey, moduleLabel, onClose }: Props) {
     }
   }
 
-  return (
+  // Portalled to <body>: rendered inside the sticky sidebar, the dialog would be
+  // trapped in its stacking context and the page content would paint over it.
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-navy-900/40 dark:bg-black/60 backdrop-blur-sm p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="module-upsell-title"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl bg-surface p-6 text-start shadow-xl"
+        className="w-full max-w-md rounded-2xl border border-white/80 dark:border-divider bg-white dark:bg-[#0a121e] p-6 text-start shadow-[0_24px_70px_-12px_rgba(27,35,64,0.45)] dark:shadow-[0_24px_70px_-12px_rgba(0,0,0,0.65)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-4">
@@ -122,6 +125,7 @@ export function ModuleUpsellDialog({ moduleKey, moduleLabel, onClose }: Props) {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

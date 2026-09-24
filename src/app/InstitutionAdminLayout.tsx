@@ -3,6 +3,7 @@ import { Sidebar } from '../shared/layout/Sidebar'
 import { AdminTopHeader } from '../shared/layout/AdminTopHeader'
 import { AdminFooter } from '../shared/layout/AdminFooter'
 import { Outlet, useLocation } from 'react-router-dom'
+import { LockedModuleGate } from '../shared/components/LockedModuleGate'
 import { useEffect, useState } from 'react'
 import brandLogo from '../assets/Logo.jpg'
 import { canUsePortal } from '../shared/auth/portalRoutes'
@@ -432,7 +433,9 @@ function InstitutionAdminShell() {
             key={path}
             className={isForumPage ? 'flex-1 min-h-0 flex flex-col' : 'animate-fade-in-up'}
           >
-            <Outlet />
+            <LockedModuleGate path={path} sections={navSections}>
+              <Outlet />
+            </LockedModuleGate>
           </div>
         </main>
 
