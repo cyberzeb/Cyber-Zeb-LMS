@@ -8,13 +8,8 @@ import { GlassCard } from '../../../shared/layout/GlassCard'
 import { readInstitutionName } from '../../../shared/storage/readers'
 import { CertificateArt } from './CertificateArt'
 import { CertificateDesigner } from './CertificateDesigner'
-import {
-  PRESET_TEMPLATES,
-  blankTemplate,
-  duplicateTemplate,
-  sampleCertificateData,
-  type CertificateTemplateDesign,
-} from './templateModel'
+import { PRESET_TEMPLATES, blankTemplate, duplicateTemplate } from './presets'
+import { sampleCertificateData, type CertificateTemplateDesign } from './templateModel'
 import { useCertificateTemplates } from './useCertificateTemplates'
 
 interface Props {

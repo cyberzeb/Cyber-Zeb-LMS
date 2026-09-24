@@ -4,13 +4,8 @@ import { useApiCollection } from '../../../shared/hooks/useApiCollection'
 import { readInstitutionName } from '../../../shared/storage/readers'
 import { STORAGE_KEYS } from '../../../shared/storage/keys'
 import type { CertificateRecord } from '../types'
-import {
-  mergeWithPresets,
-  resolveTemplate,
-  verifyUrlFor,
-  type CertificateData,
-  type CertificateTemplateDesign,
-} from './templateModel'
+import { verifyUrlFor, type CertificateData, type CertificateTemplateDesign } from './templateModel'
+import { mergeWithPresets, normalizeTemplate, resolveTemplate } from './presets'
 
 const EMPTY: CertificateTemplateDesign[] = []
 
@@ -23,11 +18,10 @@ export function useCertificateTemplates() {
     STORAGE_KEYS.certificateTemplates,
     EMPTY,
   )
-  const templates = useMemo(() => mergeWithPresets(Array.isArray(stored) ? stored : []), [stored])
-  const storedIds = useMemo(
-    () => new Set((Array.isArray(stored) ? stored : []).map((t) => t.id)),
-    [stored],
-  )
+  // Templates saved in the first format are converted as they are read.
+  const saved = useMemo(() => (Array.isArray(stored) ? stored.map(normalizeTemplate) : []), [stored])
+  const templates = useMemo(() => mergeWithPresets(saved), [saved])
+  const storedIds = useMemo(() => new Set(saved.map((t) => t.id)), [saved])
 
   const saveTemplate = useCallback(
     (template: CertificateTemplateDesign) => {
@@ -53,7 +47,7 @@ export function useCertificateTemplates() {
   const setDefault = useCallback(
     (id: string) => {
       setStored((prev) => {
-        const list = Array.isArray(prev) ? prev : []
+        const list = (Array.isArray(prev) ? prev : []).map(normalizeTemplate)
         const merged = mergeWithPresets(list)
         const target = merged.find((t) => t.id === id)
         if (!target) return list

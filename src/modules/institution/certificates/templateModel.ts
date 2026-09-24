@@ -1,12 +1,14 @@
 /**
  * Certificate templates.
  *
- * A template is plain JSON (stored in the `certificate-templates` collection) that
- * describes a design: page, colours, frame, background pattern, seal, fonts, text
- * with {{placeholders}}, signatories and a verification QR code. One renderer
- * (`CertificateArt`) turns it into SVG for the designer preview, the gallery
- * thumbnails and the downloaded PDF, so what the admin designs is exactly what
- * the learner downloads.
+ * A template is plain JSON (stored in the `certificate-templates` collection):
+ * a page (size, colours, frame, background pattern) plus a list of free-form
+ * elements — text, images, signatures, a seal, a QR code, lines and boxes — each
+ * with its own position, size and style. Text may contain {{placeholders}} that
+ * are filled from each certificate.
+ *
+ * One renderer (`CertificateArt`) draws it for the designer, the gallery and the
+ * downloaded PDF, so what the admin designs is exactly what the learner gets.
  */
 
 export type Orientation = 'landscape' | 'portrait'
@@ -16,80 +18,149 @@ export const PAGE_SIZE = {
   landscape: { width: 1123, height: 794 },
   portrait: { width: 794, height: 1123 },
 } as const
+
 export type FrameStyle = 'none' | 'classic' | 'double' | 'ornate' | 'modern' | 'band' | 'geometric'
 export type PatternStyle = 'none' | 'guilloche' | 'dots' | 'diagonal' | 'waves' | 'grid' | 'radial'
-export type SealStyle = 'none' | 'rosette' | 'ribbon' | 'stamp' | 'star'
+export type SealStyle = 'rosette' | 'ribbon' | 'stamp' | 'star'
 export type FontKey = 'serif' | 'sans' | 'script' | 'display' | 'mono'
-export type Align = 'center' | 'left'
-export type NameStyle = 'plain' | 'underline' | 'caps'
+export type TextAlign = 'start' | 'middle' | 'end'
 
-export interface Signatory {
-  id: string
-  name: string
-  title: string
-  /** PNG/JPEG data URL of a handwritten signature, optional. */
-  signatureImage?: string
+export interface ThemeColors {
+  background: string
+  primary: string
+  accent: string
+  text: string
+  muted: string
 }
+
+/** A theme colour name (follows palette changes) or a fixed '#rrggbb'. */
+export type ColorRef = keyof ThemeColors | string
+
+interface ElementBase {
+  id: string
+  /** Shown in the layers list. */
+  name: string
+  x: number
+  y: number
+  rotation?: number
+  /** 0–100. */
+  opacity?: number
+  hidden?: boolean
+  locked?: boolean
+}
+
+export interface TextElement extends ElementBase {
+  type: 'text'
+  text: string
+  /** Wrap width; also the width a single line shrinks to fit. */
+  width: number
+  font: FontKey
+  fontSize: number
+  bold: boolean
+  italic: boolean
+  color: ColorRef
+  /** x is the left edge, centre or right edge of the text. */
+  align: TextAlign
+  letterSpacing: number
+  uppercase: boolean
+  lineHeight: number
+  /** Single line that shrinks to fit the width (good for names). */
+  fit: boolean
+  maxLines: number
+  /** Hide when a placeholder in it has no value, e.g. an expiry date. */
+  hideIfBlank: boolean
+}
+
+export interface ImageElement extends ElementBase {
+  type: 'image'
+  /** Data URL. Without one, a monogram tile is drawn. */
+  src?: string
+  monogram: string
+  w: number
+  h: number
+  radius: number
+  fill: ColorRef
+  textColor: ColorRef
+}
+
+export interface SignatureElement extends ElementBase {
+  type: 'signature'
+  signer: string
+  title: string
+  image?: string
+  width: number
+  font: FontKey
+  color: ColorRef
+}
+
+export interface SealElement extends ElementBase {
+  type: 'seal'
+  style: SealStyle
+  text: string
+  r: number
+  color: ColorRef
+  ring: ColorRef
+}
+
+export interface QrElement extends ElementBase {
+  type: 'qr'
+  size: number
+  color: ColorRef
+  showLabel: boolean
+  showId: boolean
+  labelColor: ColorRef
+}
+
+export interface LineElement extends ElementBase {
+  type: 'line'
+  width: number
+  thickness: number
+  color: ColorRef
+  dashed: boolean
+}
+
+export interface BoxElement extends ElementBase {
+  type: 'box'
+  w: number
+  h: number
+  /** 'none' for no fill. */
+  fill: ColorRef
+  stroke: ColorRef
+  strokeWidth: number
+  radius: number
+}
+
+export type CertElement =
+  | TextElement
+  | ImageElement
+  | SignatureElement
+  | SealElement
+  | QrElement
+  | LineElement
+  | BoxElement
+
+export type ElementType = CertElement['type']
 
 export interface CertificateTemplateDesign {
   id: string
   name: string
   description?: string
-  /** Built-in templates cannot be deleted, only duplicated. */
+  /** Built-in templates cannot be deleted, only reset. */
   builtIn?: boolean
   isDefault?: boolean
   updatedAt?: string
+  version: 2
 
   orientation: Orientation
-  align: Align
-
-  colors: {
-    background: string
-    primary: string
-    accent: string
-    text: string
-    muted: string
-  }
-
+  colors: ThemeColors
   frame: FrameStyle
   pattern: PatternStyle
   /** 0–100: how visible the background pattern is. */
   patternOpacity: number
-  /** Soft gradient wash from the top-left corner. */
+  /** Soft glow from the top-left corner. */
   gradient: boolean
-
-  seal: SealStyle
-  sealText: string
-
-  logo?: string
-  /** Shown as a monogram when there is no logo image. */
-  monogram: string
-  showLogo: boolean
-
-  fonts: {
-    heading: FontKey
-    name: FontKey
-    body: FontKey
-  }
-  nameStyle: NameStyle
-
-  text: {
-    eyebrow: string
-    title: string
-    subtitle: string
-    preamble: string
-    body: string
-    footer: string
-  }
-
-  signatories: Signatory[]
-
-  show: {
-    qr: boolean
-    certificateId: boolean
-    issueDate: boolean
-    expiration: boolean
-  }
+  /** Drawn in order: later elements sit on top. */
+  elements: CertElement[]
 }
 
 /** The values placeholders resolve to. */
@@ -116,7 +187,7 @@ export const PLACEHOLDERS: { token: string; label: string }[] = [
   { token: '{{department}}', label: 'Department' },
   { token: '{{issue_date}}', label: 'Issue date' },
   { token: '{{completion_date}}', label: 'Completion date' },
-  { token: '{{expiration_date}}', label: 'Expiration date' },
+  { token: '{{expiration_date}}', label: 'Expiry date' },
   { token: '{{certificate_id}}', label: 'Certificate ID' },
 ]
 
@@ -131,6 +202,13 @@ export const FONT_STACKS: Record<FontKey, { label: string; stack: string }> = {
   mono: { label: 'Technical mono', stack: "'Courier New', Courier, monospace" },
 }
 
+export const THEME_COLOR_KEYS: (keyof ThemeColors)[] = ['background', 'primary', 'accent', 'text', 'muted']
+
+export function resolveColor(ref: ColorRef, colors: ThemeColors): string {
+  if (ref === 'none') return 'none'
+  return (colors as unknown as Record<string, string>)[ref] ?? ref
+}
+
 export function formatCertDate(iso?: string): string {
   if (!iso) return ''
   const d = new Date(iso)
@@ -138,9 +216,8 @@ export function formatCertDate(iso?: string): string {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-/** Replace {{tokens}} with the certificate's values. Unknown tokens are left as-is. */
-export function fillPlaceholders(text: string, data: CertificateData): string {
-  const values: Record<string, string> = {
+function placeholderValues(data: CertificateData): Record<string, string> {
+  return {
     student_name: data.studentName,
     course_title: data.courseTitle,
     course_code: data.courseCode,
@@ -152,7 +229,25 @@ export function fillPlaceholders(text: string, data: CertificateData): string {
     expiration_date: formatCertDate(data.expirationDate),
     certificate_id: data.certificateId,
   }
-  return text.replace(/\{\{\s*([a-z_]+)\s*\}\}/g, (match, key: string) => values[key] ?? match)
+}
+
+/**
+ * Replace {{tokens}} with the certificate's values. `blank` is true when a known
+ * token had no value, so an element can hide itself (e.g. "Valid until …").
+ */
+export function resolveText(text: string, data: CertificateData): { text: string; blank: boolean } {
+  const values = placeholderValues(data)
+  let blank = false
+  const out = text.replace(/\{\{\s*([a-z_]+)\s*\}\}/g, (match, key: string) => {
+    if (!(key in values)) return match
+    if (!values[key]) blank = true
+    return values[key]
+  })
+  return { text: out, blank }
+}
+
+export function fillPlaceholders(text: string, data: CertificateData): string {
+  return resolveText(text, data).text
 }
 
 export function verifyUrlFor(certificateId: string): string {
@@ -181,220 +276,49 @@ export function newId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}${seq.toString(36)}`
 }
 
-const BASE_TEXT = {
-  eyebrow: '{{institution_name}}',
-  title: 'Certificate of Completion',
-  subtitle: 'This is proudly presented to',
-  preamble: '',
-  body: 'for successfully completing {{course_code}} — {{course_title}}, offered by the Department of {{department}}.',
-  footer: '',
-}
+/* ── Element factories (used by the designer's "Add" panel) ─────────────── */
 
-const BASE: Omit<CertificateTemplateDesign, 'id' | 'name'> = {
-  orientation: 'landscape',
-  align: 'center',
-  colors: {
-    background: '#FFFDF7',
-    primary: '#1B2340',
-    accent: '#B8913A',
-    text: '#1B2340',
-    muted: '#5B6478',
-  },
-  frame: 'classic',
-  pattern: 'guilloche',
-  patternOpacity: 35,
-  gradient: false,
-  seal: 'rosette',
-  sealText: 'OFFICIAL',
-  monogram: 'B',
-  showLogo: true,
-  fonts: { heading: 'serif', name: 'script', body: 'serif' },
-  nameStyle: 'underline',
-  text: BASE_TEXT,
-  signatories: [
-    { id: 'sig-1', name: 'Dr. Hana Tesfaye', title: 'President' },
-    { id: 'sig-2', name: '{{instructor_name}}', title: 'Course Instructor' },
-  ],
-  show: { qr: true, certificateId: true, issueDate: true, expiration: true },
-}
-
-/**
- * Ready-made designs. The two original template ids are kept so certificates
- * issued before the designer existed still render with a sensible design.
- */
-export const PRESET_TEMPLATES: CertificateTemplateDesign[] = [
-  {
-    ...BASE,
-    id: 'tpl-standard',
-    name: 'Standard Completion Certificate',
-    description: 'Ivory paper, gold accents and a guilloche security pattern.',
-    builtIn: true,
-    isDefault: true,
-  },
-  {
-    ...BASE,
-    id: 'tpl-professional',
-    name: 'Professional Certificate',
-    description: 'Deep navy band with a crisp modern layout.',
-    builtIn: true,
-    colors: {
-      background: '#FFFFFF',
-      primary: '#0F1B3D',
-      accent: '#A3CF3F',
-      text: '#0F1B3D',
-      muted: '#5B6478',
-    },
-    frame: 'band',
-    pattern: 'dots',
-    patternOpacity: 25,
-    seal: 'ribbon',
-    sealText: 'CERTIFIED',
-    fonts: { heading: 'sans', name: 'display', body: 'sans' },
-    nameStyle: 'caps',
-    text: { ...BASE_TEXT, title: 'Professional Certificate', subtitle: 'Awarded to' },
-  },
-  {
-    ...BASE,
-    id: 'tpl-emerald',
-    name: 'Emerald Academic',
-    description: 'Ornate corners on a mint wash — traditional and warm.',
-    builtIn: true,
-    colors: {
-      background: '#F6FBF7',
-      primary: '#0B4F3C',
-      accent: '#C8A04A',
-      text: '#12352A',
-      muted: '#4E6B60',
-    },
-    frame: 'ornate',
-    pattern: 'waves',
-    patternOpacity: 30,
-    gradient: true,
-    seal: 'stamp',
-    sealText: 'EXCELLENCE',
-    fonts: { heading: 'display', name: 'script', body: 'serif' },
-    text: { ...BASE_TEXT, title: 'Certificate of Achievement' },
-  },
-  {
-    ...BASE,
-    id: 'tpl-royal',
-    name: 'Royal Honours',
-    description: 'Burgundy and gold with a star seal, for distinctions.',
-    builtIn: true,
-    colors: {
-      background: '#FFFBF5',
-      primary: '#6B1530',
-      accent: '#C9A23F',
-      text: '#3A0C1A',
-      muted: '#7A5A63',
-    },
-    frame: 'double',
-    pattern: 'radial',
-    patternOpacity: 30,
-    seal: 'star',
-    sealText: 'HONOURS',
-    fonts: { heading: 'display', name: 'script', body: 'display' },
-    text: {
-      ...BASE_TEXT,
-      title: 'Certificate of Distinction',
-      subtitle: 'With great honour, this recognises',
-      body: 'for outstanding performance in {{course_title}} ({{course_code}}).',
-    },
-  },
-  {
-    ...BASE,
-    id: 'tpl-minimal',
-    name: 'Minimal Mono',
-    description: 'Quiet, left-aligned and modern. No ornament.',
-    builtIn: true,
-    align: 'left',
-    colors: {
-      background: '#FFFFFF',
-      primary: '#111111',
-      accent: '#E4572E',
-      text: '#111111',
-      muted: '#6B6B6B',
-    },
-    frame: 'modern',
-    pattern: 'none',
-    patternOpacity: 0,
-    seal: 'none',
-    fonts: { heading: 'sans', name: 'sans', body: 'sans' },
-    nameStyle: 'plain',
-    text: { ...BASE_TEXT, eyebrow: 'Certificate', title: '{{course_title}}', subtitle: 'Completed by' },
-  },
-  {
-    ...BASE,
-    id: 'tpl-tech',
-    name: 'Tech Blueprint',
-    description: 'Blueprint grid and geometric frame for technical courses.',
-    builtIn: true,
-    colors: {
-      background: '#0E1A33',
-      primary: '#7DD3FC',
-      accent: '#A3E635',
-      text: '#E6F0FF',
-      muted: '#9FB3D1',
-    },
-    frame: 'geometric',
-    pattern: 'grid',
-    patternOpacity: 45,
-    gradient: true,
-    seal: 'stamp',
-    sealText: 'VERIFIED',
-    fonts: { heading: 'mono', name: 'sans', body: 'sans' },
-    nameStyle: 'caps',
-    text: { ...BASE_TEXT, title: 'Certificate of Completion', subtitle: 'Issued to' },
-  },
-]
-
-export function blankTemplate(): CertificateTemplateDesign {
+export function makeText(partial: Partial<TextElement> = {}): TextElement {
   return {
-    ...structuredClone(PRESET_TEMPLATES[0]),
-    id: newId('tpl'),
-    name: 'Untitled template',
-    description: '',
-    builtIn: false,
-    isDefault: false,
+    id: newId('el'),
+    type: 'text',
+    name: 'Text',
+    x: 0,
+    y: 0,
+    text: 'New text',
+    width: 500,
+    font: 'serif',
+    fontSize: 24,
+    bold: false,
+    italic: false,
+    color: 'text',
+    align: 'middle',
+    letterSpacing: 0,
+    uppercase: false,
+    lineHeight: 1.4,
+    fit: false,
+    maxLines: 6,
+    hideIfBlank: false,
+    ...partial,
   }
 }
 
-export function duplicateTemplate(source: CertificateTemplateDesign): CertificateTemplateDesign {
-  return {
-    ...structuredClone(source),
-    id: newId('tpl'),
-    name: `${source.name} (copy)`,
-    builtIn: false,
-    isDefault: false,
+export function makeElement(type: ElementType, x: number, y: number): CertElement {
+  const base = { id: newId('el'), x, y }
+  switch (type) {
+    case 'text':
+      return makeText({ x, y })
+    case 'image':
+      return { ...base, type, name: 'Image', monogram: 'B', w: 90, h: 90, radius: 14, fill: 'primary', textColor: 'background' }
+    case 'signature':
+      return { ...base, type, name: 'Signature', signer: 'Name Surname', title: 'Title', width: 200, font: 'serif', color: 'text' }
+    case 'seal':
+      return { ...base, type, name: 'Seal', style: 'rosette', text: 'OFFICIAL', r: 46, color: 'primary', ring: 'accent' }
+    case 'qr':
+      return { ...base, type, name: 'QR code', size: 92, color: 'primary', showLabel: true, showId: true, labelColor: 'muted' }
+    case 'line':
+      return { ...base, type, name: 'Line', width: 300, thickness: 2, color: 'accent', dashed: false }
+    case 'box':
+      return { ...base, type, name: 'Box', w: 240, h: 120, fill: 'none', stroke: 'accent', strokeWidth: 2, radius: 12 }
   }
-}
-
-/** The template a certificate should render with, falling back to the default. */
-export function resolveTemplate(
-  templates: CertificateTemplateDesign[],
-  templateId?: string,
-): CertificateTemplateDesign {
-  return (
-    templates.find((t) => t.id === templateId) ??
-    templates.find((t) => t.isDefault) ??
-    templates[0] ??
-    PRESET_TEMPLATES[0]
-  )
-}
-
-/**
- * Stored templates plus any built-in preset the institution has not saved its
- * own version of, so the gallery is never empty and old certificates render.
- */
-export function mergeWithPresets(stored: CertificateTemplateDesign[]): CertificateTemplateDesign[] {
-  const storedIds = new Set(stored.map((t) => t.id))
-  const storedHasDefault = stored.some((t) => t.isDefault)
-  const presets = PRESET_TEMPLATES.filter((p) => !storedIds.has(p.id)).map((p) =>
-    storedHasDefault ? { ...p, isDefault: false } : p,
-  )
-  const merged = [...stored, ...presets]
-  if (!merged.some((t) => t.isDefault)) {
-    return merged.map((t, i) => (i === 0 ? { ...t, isDefault: true } : t))
-  }
-  return merged
 }

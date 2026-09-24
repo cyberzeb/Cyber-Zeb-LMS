@@ -1,7 +1,7 @@
 /**
  * Renders a certificate template to SVG. Pure and synchronous (no web fonts, no
- * network), so the same markup drives the live designer preview, gallery
- * thumbnails and the rasterised PDF.
+ * network), so the same markup drives the designer, gallery thumbnails and the
+ * rasterised PDF.
  */
 import QRCode from 'qrcode'
 import type { ReactNode } from 'react'
@@ -9,11 +9,16 @@ import type { ReactNode } from 'react'
 import {
   FONT_STACKS,
   PAGE_SIZE,
-  fillPlaceholders,
-  formatCertDate,
+  resolveColor,
+  resolveText,
+  type CertElement,
   type CertificateData,
   type CertificateTemplateDesign,
+  type FontKey,
+  type SealStyle,
+  type ThemeColors,
 } from './templateModel'
+import { rotationTransform } from './elementGeometry'
 
 interface Props {
   template: CertificateTemplateDesign
@@ -33,6 +38,17 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`
 }
 
+function isDark(hex: string): boolean {
+  const clean = hex.replace('#', '')
+  const n = parseInt(clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean, 16)
+  if (Number.isNaN(n)) return false
+  return 0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255) < 110
+}
+
+function gcd(a: number, b: number): number {
+  return b === 0 ? a : gcd(b, a % b)
+}
+
 /** Spirograph (hypotrochoid) — the classic banknote guilloche rosette. */
 function guillochePath(cx: number, cy: number, R: number, r: number, d: number, scale: number): string {
   const pts: string[] = []
@@ -47,10 +63,6 @@ function guillochePath(cx: number, cy: number, R: number, r: number, d: number, 
   return `M${pts.join('L')}Z`
 }
 
-function gcd(a: number, b: number): number {
-  return b === 0 ? a : gcd(b, a % b)
-}
-
 function starPoints(cx: number, cy: number, outer: number, inner: number, points: number, rot = -90): string {
   const pts: string[] = []
   for (let i = 0; i < points * 2; i++) {
@@ -61,9 +73,15 @@ function starPoints(cx: number, cy: number, outer: number, inner: number, points
   return pts.join(' ')
 }
 
+/** Approximate glyph width per font, as a fraction of the font size. */
+function widthFactor(font: FontKey, uppercase: boolean, bold: boolean): number {
+  const base = { serif: 0.5, sans: 0.52, script: 0.4, display: 0.5, mono: 0.6 }[font]
+  return base * (uppercase ? 1.25 : 1) * (bold ? 1.06 : 1)
+}
+
 /** Greedy word wrap by estimated glyph width (no font metrics in SVG-as-image). */
-function wrap(text: string, fontSize: number, maxWidth: number, widthFactor = 0.52): string[] {
-  const maxChars = Math.max(10, Math.floor(maxWidth / (fontSize * widthFactor)))
+function wrap(text: string, fontSize: number, maxWidth: number, factor: number): string[] {
+  const maxChars = Math.max(4, Math.floor(maxWidth / (fontSize * factor)))
   const lines: string[] = []
   for (const paragraph of text.split('\n')) {
     let line = ''
@@ -81,13 +99,7 @@ function wrap(text: string, fontSize: number, maxWidth: number, widthFactor = 0.
   return lines
 }
 
-function fitSize(text: string, maxWidth: number, preferred: number, factor: number, min = 18): number {
-  const needed = text.length * preferred * factor
-  if (needed <= maxWidth) return preferred
-  return Math.max(min, Math.floor(maxWidth / (text.length * factor)))
-}
-
-/* ── Pieces ───────────────────────────────────────────────────────────────── */
+/* ── Page ─────────────────────────────────────────────────────────────────── */
 
 function Pattern({ t, w, h, id }: { t: CertificateTemplateDesign; w: number; h: number; id: string }) {
   const opacity = Math.max(0, Math.min(100, t.patternOpacity)) / 100
@@ -96,14 +108,12 @@ function Pattern({ t, w, h, id }: { t: CertificateTemplateDesign; w: number; h: 
 
   let content: ReactNode = null
   if (t.pattern === 'guilloche') {
-    const cx = w / 2
-    const cy = h / 2
     const scale = Math.min(w, h) / 260
     content = (
       <g fill="none" stroke={stroke} strokeWidth={0.6}>
-        <path d={guillochePath(cx, cy, 96, 36, 58, scale)} />
-        <path d={guillochePath(cx, cy, 96, 28, 44, scale * 0.95)} />
-        <path d={guillochePath(cx, cy, 90, 20, 36, scale * 0.8)} />
+        <path d={guillochePath(w / 2, h / 2, 96, 36, 58, scale)} />
+        <path d={guillochePath(w / 2, h / 2, 96, 28, 44, scale * 0.95)} />
+        <path d={guillochePath(w / 2, h / 2, 90, 20, 36, scale * 0.8)} />
       </g>
     )
   } else if (t.pattern === 'dots') {
@@ -148,32 +158,20 @@ function Pattern({ t, w, h, id }: { t: CertificateTemplateDesign; w: number; h: 
     for (let i = 0; i < 26; i++) {
       const y0 = (h / 26) * i + 10
       let d = `M0 ${y0}`
-      for (let x = 0; x <= w; x += 40) {
-        d += ` Q${x + 20} ${y0 + (i % 2 ? 12 : -12)} ${x + 40} ${y0}`
-      }
+      for (let x = 0; x <= w; x += 40) d += ` Q${x + 20} ${y0 + (i % 2 ? 12 : -12)} ${x + 40} ${y0}`
       lines.push(<path key={i} d={d} fill="none" stroke={stroke} strokeWidth="0.7" />)
     }
     content = <g>{lines}</g>
   } else if (t.pattern === 'radial') {
-    const rays = []
-    const cx = w / 2
-    const cy = h / 2
     const len = Math.hypot(w, h)
-    for (let i = 0; i < 120; i++) {
-      const a = (i / 120) * Math.PI * 2
-      rays.push(
-        <line
-          key={i}
-          x1={cx}
-          y1={cy}
-          x2={cx + Math.cos(a) * len}
-          y2={cy + Math.sin(a) * len}
-          stroke={stroke}
-          strokeWidth="0.6"
-        />,
-      )
-    }
-    content = <g>{rays}</g>
+    content = (
+      <g>
+        {Array.from({ length: 120 }, (_, i) => {
+          const a = (i / 120) * Math.PI * 2
+          return <line key={i} x1={w / 2} y1={h / 2} x2={w / 2 + Math.cos(a) * len} y2={h / 2 + Math.sin(a) * len} stroke={stroke} strokeWidth="0.6" />
+        })}
+      </g>
+    )
   }
   return <g opacity={opacity}>{content}</g>
 }
@@ -253,71 +251,104 @@ function Frame({ t, w, h }: { t: CertificateTemplateDesign; w: number; h: number
   }
 }
 
-function Seal({ t, cx, cy, r, id }: { t: CertificateTemplateDesign; cx: number; cy: number; r: number; id: string }) {
-  if (t.seal === 'none') return null
-  const { primary, accent, background } = t.colors
-  const label = (t.sealText || '').toUpperCase().slice(0, 18)
-  const ringPath = `M ${cx - r * 0.72} ${cy} A ${r * 0.72} ${r * 0.72} 0 1 1 ${cx + r * 0.72} ${cy} A ${r * 0.72} ${r * 0.72} 0 1 1 ${cx - r * 0.72} ${cy}`
-  const ringText = (
-    <>
+/** Paper, glow, pattern and frame — everything that is not an element. */
+export function PageBackground({ template: t, uid }: { template: CertificateTemplateDesign; uid: string }) {
+  const { width: w, height: h } = PAGE_SIZE[t.orientation]
+  return (
+    <g pointerEvents="none">
       <defs>
-        <path id={`${id}-ring`} d={ringPath} />
+        <radialGradient id={`${uid}-wash`} cx="0" cy="0" r="1.2">
+          <stop offset="0" stopColor={t.colors.accent} stopOpacity="0.22" />
+          <stop offset="0.6" stopColor={t.colors.accent} stopOpacity="0" />
+        </radialGradient>
       </defs>
-      <text fontFamily={FONT_STACKS.sans.stack} fontSize={r * 0.2} fontWeight={700} letterSpacing={2} fill={background}>
-        <textPath href={`#${id}-ring`} startOffset="25%" textAnchor="middle">
-          {label}
-        </textPath>
-      </text>
-    </>
+      <rect width={w} height={h} fill={t.colors.background} />
+      {t.gradient ? <rect width={w} height={h} fill={`url(#${uid}-wash)`} /> : null}
+      <Pattern t={t} w={w} h={h} id={uid} />
+      <Frame t={t} w={w} h={h} />
+    </g>
   )
-  if (t.seal === 'rosette') {
+}
+
+/* ── Elements ─────────────────────────────────────────────────────────────── */
+
+function SealArt({
+  style,
+  text,
+  cx,
+  cy,
+  r,
+  color,
+  ring,
+  paper,
+  id,
+}: {
+  style: SealStyle
+  text: string
+  cx: number
+  cy: number
+  r: number
+  color: string
+  ring: string
+  paper: string
+  id: string
+}) {
+  const label = (text || '').toUpperCase().slice(0, 18)
+  const ringPath = `M ${cx - r * 0.72} ${cy} A ${r * 0.72} ${r * 0.72} 0 1 1 ${cx + r * 0.72} ${cy} A ${r * 0.72} ${r * 0.72} 0 1 1 ${cx - r * 0.72} ${cy}`
+  if (style === 'rosette') {
     return (
       <g>
-        <polygon points={starPoints(cx, cy, r, r * 0.88, 32)} fill={accent} />
-        <circle cx={cx} cy={cy} r={r * 0.86} fill={primary} />
-        <circle cx={cx} cy={cy} r={r * 0.56} fill="none" stroke={accent} strokeWidth={1.5} />
-        {ringText}
-        <polygon points={starPoints(cx, cy, r * 0.3, r * 0.13, 5)} fill={accent} />
+        <polygon points={starPoints(cx, cy, r, r * 0.88, 32)} fill={ring} />
+        <circle cx={cx} cy={cy} r={r * 0.86} fill={color} />
+        <circle cx={cx} cy={cy} r={r * 0.56} fill="none" stroke={ring} strokeWidth={1.5} />
+        <defs>
+          <path id={`${id}-ring`} d={ringPath} />
+        </defs>
+        <text fontFamily={FONT_STACKS.sans.stack} fontSize={r * 0.2} fontWeight={700} letterSpacing={2} fill={paper}>
+          <textPath href={`#${id}-ring`} startOffset="25%" textAnchor="middle">
+            {label}
+          </textPath>
+        </text>
+        <polygon points={starPoints(cx, cy, r * 0.3, r * 0.13, 5)} fill={ring} />
       </g>
     )
   }
-  if (t.seal === 'ribbon') {
+  if (style === 'ribbon') {
     return (
       <g>
-        <polygon points={`${cx - r * 0.5},${cy + r * 0.4} ${cx - r * 0.85},${cy + r * 1.7} ${cx - r * 0.45},${cy + r * 1.45} ${cx - r * 0.2},${cy + r * 1.8} ${cx},${cy + r * 0.5}`} fill={primary} />
-        <polygon points={`${cx + r * 0.5},${cy + r * 0.4} ${cx + r * 0.85},${cy + r * 1.7} ${cx + r * 0.45},${cy + r * 1.45} ${cx + r * 0.2},${cy + r * 1.8} ${cx},${cy + r * 0.5}`} fill={accent} />
-        <circle cx={cx} cy={cy} r={r} fill={accent} />
-        <circle cx={cx} cy={cy} r={r * 0.86} fill="none" stroke={background} strokeWidth={1.5} strokeDasharray="3 3" />
-        <text x={cx} y={cy + r * 0.12} textAnchor="middle" fontFamily={FONT_STACKS.sans.stack} fontSize={r * 0.26} fontWeight={800} fill={background} letterSpacing={1}>
+        <polygon points={`${cx - r * 0.5},${cy + r * 0.4} ${cx - r * 0.85},${cy + r * 1.7} ${cx - r * 0.45},${cy + r * 1.45} ${cx - r * 0.2},${cy + r * 1.8} ${cx},${cy + r * 0.5}`} fill={color} />
+        <polygon points={`${cx + r * 0.5},${cy + r * 0.4} ${cx + r * 0.85},${cy + r * 1.7} ${cx + r * 0.45},${cy + r * 1.45} ${cx + r * 0.2},${cy + r * 1.8} ${cx},${cy + r * 0.5}`} fill={ring} />
+        <circle cx={cx} cy={cy} r={r} fill={ring} />
+        <circle cx={cx} cy={cy} r={r * 0.86} fill="none" stroke={paper} strokeWidth={1.5} strokeDasharray="3 3" />
+        <text x={cx} y={cy + r * 0.12} textAnchor="middle" fontFamily={FONT_STACKS.sans.stack} fontSize={r * 0.26} fontWeight={800} fill={paper} letterSpacing={1}>
           {label}
         </text>
       </g>
     )
   }
-  if (t.seal === 'stamp') {
+  if (style === 'stamp') {
     return (
       <g transform={`rotate(-14 ${cx} ${cy})`} opacity={0.9}>
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke={accent} strokeWidth={3} />
-        <circle cx={cx} cy={cy} r={r * 0.84} fill="none" stroke={accent} strokeWidth={1} />
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke={ring} strokeWidth={3} />
+        <circle cx={cx} cy={cy} r={r * 0.84} fill="none" stroke={ring} strokeWidth={1} />
         <defs>
           <path id={`${id}-ring`} d={ringPath} />
         </defs>
-        <text fontFamily={FONT_STACKS.mono.stack} fontSize={r * 0.19} fontWeight={700} letterSpacing={3} fill={accent}>
+        <text fontFamily={FONT_STACKS.mono.stack} fontSize={r * 0.19} fontWeight={700} letterSpacing={3} fill={ring}>
           <textPath href={`#${id}-ring`} startOffset="25%" textAnchor="middle">
             {`★ ${label} ★`}
           </textPath>
         </text>
-        <polygon points={starPoints(cx, cy, r * 0.28, r * 0.12, 5)} fill={accent} />
+        <polygon points={starPoints(cx, cy, r * 0.28, r * 0.12, 5)} fill={ring} />
       </g>
     )
   }
-  // star
   return (
     <g>
-      <circle cx={cx} cy={cy} r={r} fill={primary} />
-      <circle cx={cx} cy={cy} r={r * 0.9} fill="none" stroke={accent} strokeWidth={2} />
-      <polygon points={starPoints(cx, cy, r * 0.72, r * 0.3, 5)} fill={accent} />
-      <text x={cx} y={cy + r * 1.35} textAnchor="middle" fontFamily={FONT_STACKS.sans.stack} fontSize={r * 0.22} fontWeight={800} letterSpacing={2} fill={primary}>
+      <circle cx={cx} cy={cy} r={r} fill={color} />
+      <circle cx={cx} cy={cy} r={r * 0.9} fill="none" stroke={ring} strokeWidth={2} />
+      <polygon points={starPoints(cx, cy, r * 0.72, r * 0.3, 5)} fill={ring} />
+      <text x={cx} y={cy + r * 1.35} textAnchor="middle" fontFamily={FONT_STACKS.sans.stack} fontSize={r * 0.22} fontWeight={800} letterSpacing={2} fill={color}>
         {label}
       </text>
     </g>
@@ -356,66 +387,169 @@ export function QrCodeSvg({ text, size = 96, className }: { text: string; size?:
   )
 }
 
+/** Draw one element (without its rotation/opacity wrapper). */
+function ElementBody({ el, colors, data, uid }: { el: CertElement; colors: ThemeColors; data: CertificateData; uid: string }) {
+  const c = (ref: string) => resolveColor(ref, colors)
+  switch (el.type) {
+    case 'text': {
+      const resolved = resolveText(el.text, data)
+      if (el.hideIfBlank && resolved.blank) return null
+      const content = el.uppercase ? resolved.text.toUpperCase() : resolved.text
+      if (!content.trim()) return null
+      const factor = widthFactor(el.font, el.uppercase, el.bold) + el.letterSpacing / Math.max(el.fontSize, 1)
+      let size = el.fontSize
+      let lines: string[]
+      if (el.fit) {
+        const single = content.replace(/\s*\n\s*/g, ' ')
+        const needed = single.length * size * factor
+        if (needed > el.width) size = Math.max(8, el.width / (single.length * factor))
+        lines = [single]
+      } else {
+        lines = wrap(content, size, el.width, factor).slice(0, Math.max(1, el.maxLines))
+      }
+      return (
+        <text
+          textAnchor={el.align}
+          fontFamily={FONT_STACKS[el.font].stack}
+          fontSize={size}
+          fontWeight={el.bold ? 700 : 400}
+          fontStyle={el.italic ? 'italic' : 'normal'}
+          letterSpacing={el.letterSpacing}
+          fill={c(el.color)}
+        >
+          {lines.map((line, i) => (
+            <tspan key={i} x={el.x} y={el.y + i * size * el.lineHeight}>
+              {line}
+            </tspan>
+          ))}
+        </text>
+      )
+    }
+    case 'image': {
+      const clipId = `${uid}-${el.id}-clip`
+      if (el.src) {
+        return (
+          <g>
+            <defs>
+              <clipPath id={clipId}>
+                <rect x={el.x} y={el.y} width={el.w} height={el.h} rx={el.radius} />
+              </clipPath>
+            </defs>
+            <image href={el.src} x={el.x} y={el.y} width={el.w} height={el.h} preserveAspectRatio="xMidYMid meet" clipPath={`url(#${clipId})`} />
+          </g>
+        )
+      }
+      const mono = (el.monogram || 'B').slice(0, 3).toUpperCase()
+      const side = Math.min(el.w, el.h)
+      return (
+        <g>
+          <rect x={el.x} y={el.y} width={el.w} height={el.h} rx={el.radius} fill={c(el.fill)} />
+          <text x={el.x + el.w / 2} y={el.y + el.h / 2 + side * (mono.length > 2 ? 0.11 : 0.15)} textAnchor="middle" fontFamily={FONT_STACKS.serif.stack} fontWeight={700} fontSize={side * (mono.length > 2 ? 0.32 : 0.44)} fill={c(el.textColor)}>
+            {mono}
+          </text>
+        </g>
+      )
+    }
+    case 'signature': {
+      const signer = resolveText(el.signer, data).text
+      const title = resolveText(el.title, data).text
+      const half = el.width / 2
+      return (
+        <g>
+          {el.image ? (
+            <image href={el.image} x={el.x - half} y={el.y - 58} width={el.width} height={54} preserveAspectRatio="xMidYMax meet" />
+          ) : (
+            <text x={el.x} y={el.y - 10} textAnchor="middle" fontFamily={FONT_STACKS.script.stack} fontSize={26} fill={c('primary')} opacity={0.85}>
+              {signer}
+            </text>
+          )}
+          <line x1={el.x - half} x2={el.x + half} y1={el.y} y2={el.y} stroke={c('muted')} strokeWidth={1} />
+          <text x={el.x} y={el.y + 20} textAnchor="middle" fontFamily={FONT_STACKS[el.font].stack} fontSize={14} fontWeight={700} fill={c(el.color)}>
+            {signer}
+          </text>
+          <text x={el.x} y={el.y + 38} textAnchor="middle" fontFamily={FONT_STACKS[el.font].stack} fontSize={12} fill={c('muted')}>
+            {title}
+          </text>
+        </g>
+      )
+    }
+    case 'seal':
+      return <SealArt style={el.style} text={el.text} cx={el.x} cy={el.y} r={el.r} color={c(el.color)} ring={c(el.ring)} paper={colors.background} id={`${uid}-${el.id}`} />
+    case 'qr':
+      return (
+        <g>
+          <Qr text={data.verifyUrl} x={el.x} y={el.y} size={el.size} color={c(el.color)} bg={isDark(colors.background) ? '#FFFFFF' : hexToRgba('#FFFFFF', 0.9)} />
+          {el.showLabel ? (
+            <text x={el.x + el.size / 2} y={el.y + el.size + 14} textAnchor="middle" fontFamily={FONT_STACKS.sans.stack} fontSize={9} fontWeight={700} letterSpacing={1} fill={c(el.labelColor)}>
+              SCAN TO VERIFY
+            </text>
+          ) : null}
+          {el.showId ? (
+            <text x={el.x + el.size / 2} y={el.y + el.size + (el.showLabel ? 27 : 14)} textAnchor="middle" fontFamily={FONT_STACKS.mono.stack} fontSize={9} fill={c(el.labelColor)}>
+              {data.certificateId}
+            </text>
+          ) : null}
+        </g>
+      )
+    case 'line':
+      return (
+        <line
+          x1={el.x}
+          x2={el.x + el.width}
+          y1={el.y}
+          y2={el.y}
+          stroke={c(el.color)}
+          strokeWidth={el.thickness}
+          strokeDasharray={el.dashed ? `${el.thickness * 4} ${el.thickness * 3}` : undefined}
+          strokeLinecap="round"
+        />
+      )
+    case 'box':
+      return (
+        <rect
+          x={el.x}
+          y={el.y}
+          width={el.w}
+          height={el.h}
+          rx={el.radius}
+          fill={c(el.fill)}
+          stroke={el.strokeWidth > 0 ? c(el.stroke) : 'none'}
+          strokeWidth={el.strokeWidth}
+        />
+      )
+  }
+}
+
+/** One element with its rotation and opacity applied. */
+export function ElementView({
+  el,
+  colors,
+  data,
+  uid,
+  children,
+}: {
+  el: CertElement
+  colors: ThemeColors
+  data: CertificateData
+  uid: string
+  /** Designer-only overlay drawn in the element's rotated space. */
+  children?: ReactNode
+}) {
+  return (
+    <g transform={rotationTransform(el)} opacity={el.opacity === undefined ? undefined : el.opacity / 100}>
+      <g data-el={el.id}>
+        <ElementBody el={el} colors={colors} data={data} uid={uid} />
+      </g>
+      {children}
+    </g>
+  )
+}
+
 /* ── Certificate ──────────────────────────────────────────────────────────── */
 
 export function CertificateArt({ template: t, data, uid = 'c', className }: Props) {
   const { width: w, height: h } = PAGE_SIZE[t.orientation]
-  const portrait = t.orientation === 'portrait'
   const id = `${uid}-${t.id}`.replace(/[^a-zA-Z0-9_-]/g, '')
-  const left = t.align === 'left'
-  const margin = t.frame === 'modern' ? 110 : 96
-  const x = left ? margin : w / 2
-  const anchor = left ? 'start' : 'middle'
-  const textWidth = w - margin * 2
-  const onBand = t.frame === 'band'
-
-  const f = (key: keyof CertificateTemplateDesign['fonts']) => FONT_STACKS[t.fonts[key]].stack
-  const fill = (s: string) => fillPlaceholders(s, data)
-
-  // Vertical rhythm as fractions of the page height.
-  const Y = portrait
-    ? { logo: 0.1, eyebrow: 0.2, title: 0.26, subtitle: 0.32, name: 0.4, body: 0.46, dates: 0.62, sig: 0.76 }
-    : { logo: 0.085, eyebrow: 0.24, title: 0.315, subtitle: 0.385, name: 0.475, body: 0.55, dates: 0.7, sig: 0.83 }
-  if (onBand) Object.assign(Y, { logo: portrait ? 0.05 : 0.025 })
-
-  const eyebrow = fill(t.text.eyebrow)
-  const title = fill(t.text.title)
-  const subtitle = fill(t.text.subtitle)
-  const preamble = fill(t.text.preamble)
-  const body = fill(t.text.body)
-  const footer = fill(t.text.footer)
-
-  const nameText = t.nameStyle === 'caps' ? data.studentName.toUpperCase() : data.studentName
-  const nameFactor = t.fonts.name === 'script' ? 0.42 : t.nameStyle === 'caps' ? 0.68 : 0.55
-  const nameSize = fitSize(nameText, textWidth, portrait ? 54 : 62, nameFactor, 26)
-  const titleSize = fitSize(title, textWidth, portrait ? 38 : 46, 0.56, 22)
-  const bodySize = portrait ? 16 : 17
-  const bodyLines = wrap([preamble, body].filter(Boolean).join('\n'), bodySize, left ? textWidth * 0.8 : textWidth * 0.78)
-
-  const dateParts: string[] = []
-  if (t.show.issueDate && data.issueDate) dateParts.push(`Issued ${formatCertDate(data.issueDate)}`)
-  if (t.show.expiration && data.expirationDate) dateParts.push(`Valid until ${formatCertDate(data.expirationDate)}`)
-
-  const sigs = t.signatories.slice(0, 3)
-  const sigSpan = left ? textWidth * 0.62 : textWidth * 0.72
-  const sigStart = left ? margin : (w - sigSpan) / 2
-  const sigW = sigs.length ? Math.min(220, sigSpan / sigs.length - 24) : 0
-
-  // How far corner items (QR, seal, ID) sit from the edge, clear of the frame.
-  const inset = { none: 48, classic: 72, double: 84, ornate: 100, modern: 64, band: 64, geometric: 96 }[t.frame]
-  const qrSize = portrait ? 96 : 92
-  const qrX = w - inset - qrSize
-  const qrY = h - (onBand ? 60 : inset) - qrSize - 14
-  const sealR = portrait ? 50 : 46
-  const sealX = left ? w - margin - sealR - (t.show.qr ? qrSize + 40 : 0) : inset + sealR
-  const sealY = h - (onBand ? 62 : inset) - sealR - 8 - (t.seal === 'ribbon' ? sealR * 0.8 : 0)
-
-  const logoSize = portrait ? 78 : 70
-  const logoX = left ? margin : w / 2 - logoSize / 2
-  const logoY = h * Y.logo
-  const logoOnDark = onBand
-  const monogram = (t.monogram || data.institutionName.charAt(0) || 'B').slice(0, 3).toUpperCase()
-
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -425,144 +559,14 @@ export function CertificateArt({ template: t, data, uid = 'c', className }: Prop
       height={h}
       className={className}
       role="img"
-      aria-label={`${title} — ${data.studentName}`}
+      aria-label={`${t.name} — ${data.studentName}`}
     >
-      <defs>
-        <radialGradient id={`${id}-wash`} cx="0" cy="0" r="1.2">
-          <stop offset="0" stopColor={t.colors.accent} stopOpacity="0.22" />
-          <stop offset="0.6" stopColor={t.colors.accent} stopOpacity="0" />
-        </radialGradient>
-        <clipPath id={`${id}-logo`}>
-          <rect x={logoX} y={logoY} width={logoSize} height={logoSize} rx={logoSize * 0.22} />
-        </clipPath>
-      </defs>
-
-      <rect width={w} height={h} fill={t.colors.background} />
-      {t.gradient ? <rect width={w} height={h} fill={`url(#${id}-wash)`} /> : null}
-      <Pattern t={t} w={w} h={h} id={id} />
-      <Frame t={t} w={w} h={h} />
-
-      {t.showLogo ? (
-        t.logo ? (
-          <g>
-            {logoOnDark ? <rect x={logoX - 4} y={logoY - 4} width={logoSize + 8} height={logoSize + 8} rx={logoSize * 0.25} fill="#FFFFFF" /> : null}
-            <image href={t.logo} x={logoX} y={logoY} width={logoSize} height={logoSize} preserveAspectRatio="xMidYMid meet" clipPath={`url(#${id}-logo)`} />
-          </g>
-        ) : (
-          <g>
-            <rect x={logoX} y={logoY} width={logoSize} height={logoSize} rx={logoSize * 0.22} fill={logoOnDark ? t.colors.accent : t.colors.primary} />
-            <text x={logoX + logoSize / 2} y={logoY + logoSize * 0.64} textAnchor="middle" fontFamily={f('heading')} fontWeight={700} fontSize={logoSize * (monogram.length > 2 ? 0.32 : 0.44)} fill={logoOnDark ? t.colors.primary : t.colors.background}>
-              {monogram}
-            </text>
-          </g>
-        )
-      ) : null}
-
-      {eyebrow ? (
-        <text x={x} y={h * Y.eyebrow} textAnchor={anchor} fontFamily={f('body')} fontSize={portrait ? 15 : 16} fontWeight={700} letterSpacing={4} fill={t.colors.accent}>
-          {eyebrow.toUpperCase()}
-        </text>
-      ) : null}
-
-      <text x={x} y={h * Y.title} textAnchor={anchor} fontFamily={f('heading')} fontSize={titleSize} fontWeight={700} fill={t.colors.primary}>
-        {title}
-      </text>
-
-      {subtitle ? (
-        <text x={x} y={h * Y.subtitle} textAnchor={anchor} fontFamily={f('body')} fontSize={portrait ? 17 : 19} fontStyle="italic" fill={t.colors.muted}>
-          {subtitle}
-        </text>
-      ) : null}
-
-      <text x={x} y={h * Y.name} textAnchor={anchor} fontFamily={f('name')} fontSize={nameSize} fontWeight={t.fonts.name === 'script' ? 400 : 700} letterSpacing={t.nameStyle === 'caps' ? 3 : 0} fill={t.colors.text}>
-        {nameText}
-      </text>
-      {t.nameStyle === 'underline' ? (
-        <line
-          x1={left ? margin : w / 2 - Math.min(textWidth * 0.34, 300)}
-          x2={left ? margin + Math.min(textWidth * 0.6, 520) : w / 2 + Math.min(textWidth * 0.34, 300)}
-          y1={h * Y.name + 16}
-          y2={h * Y.name + 16}
-          stroke={t.colors.accent}
-          strokeWidth={1.5}
-        />
-      ) : null}
-
-      <text textAnchor={anchor} fontFamily={f('body')} fontSize={bodySize} fill={t.colors.text}>
-        {bodyLines.slice(0, 5).map((line, i) => (
-          <tspan key={i} x={x} y={h * Y.body + i * bodySize * 1.55}>
-            {line}
-          </tspan>
+      <PageBackground template={t} uid={id} />
+      {t.elements
+        .filter((el) => !el.hidden)
+        .map((el) => (
+          <ElementView key={el.id} el={el} colors={t.colors} data={data} uid={id} />
         ))}
-      </text>
-
-      {dateParts.length ? (
-        <text x={x} y={h * Y.dates} textAnchor={anchor} fontFamily={f('body')} fontSize={14} fontWeight={600} letterSpacing={1} fill={t.colors.muted}>
-          {dateParts.join('   •   ')}
-        </text>
-      ) : null}
-
-      {sigs.map((s, i) => {
-        const cx = sigStart + (sigSpan / sigs.length) * (i + 0.5)
-        const lineY = h * Y.sig
-        return (
-          <g key={s.id}>
-            {s.signatureImage ? (
-              <image href={s.signatureImage} x={cx - sigW / 2} y={lineY - 58} width={sigW} height={54} preserveAspectRatio="xMidYMax meet" />
-            ) : (
-              <text x={cx} y={lineY - 10} textAnchor="middle" fontFamily={FONT_STACKS.script.stack} fontSize={26} fill={t.colors.primary} opacity={0.85}>
-                {fill(s.name)}
-              </text>
-            )}
-            <line x1={cx - sigW / 2} x2={cx + sigW / 2} y1={lineY} y2={lineY} stroke={t.colors.muted} strokeWidth={1} />
-            <text x={cx} y={lineY + 20} textAnchor="middle" fontFamily={f('body')} fontSize={14} fontWeight={700} fill={t.colors.text}>
-              {fill(s.name)}
-            </text>
-            <text x={cx} y={lineY + 38} textAnchor="middle" fontFamily={f('body')} fontSize={12} fill={t.colors.muted}>
-              {fill(s.title)}
-            </text>
-          </g>
-        )
-      })}
-
-      <Seal t={t} cx={sealX} cy={sealY} r={sealR} id={id} />
-
-      {t.show.qr ? (
-        <g>
-          <Qr text={data.verifyUrl} x={qrX} y={qrY} size={qrSize} color={t.colors.primary === t.colors.background ? '#000' : t.colors.primary} bg={isDark(t.colors.background) ? '#FFFFFF' : hexToRgba('#FFFFFF', 0.9)} />
-          <text x={qrX + qrSize / 2} y={qrY + qrSize + 14} textAnchor="middle" fontFamily={FONT_STACKS.sans.stack} fontSize={9} fontWeight={700} letterSpacing={1} fill={onBand ? t.colors.background : t.colors.muted}>
-            SCAN TO VERIFY
-          </text>
-        </g>
-      ) : null}
-
-      {t.show.certificateId ? (
-        t.show.qr ? (
-          <text x={qrX + qrSize / 2} y={qrY + qrSize + 27} textAnchor="middle" fontFamily={FONT_STACKS.mono.stack} fontSize={9} fill={onBand ? t.colors.background : t.colors.muted}>
-            {data.certificateId}
-          </text>
-        ) : (
-          <text x={w - inset} y={h - (onBand ? 38 : inset)} textAnchor="end" fontFamily={FONT_STACKS.mono.stack} fontSize={11} fill={onBand ? t.colors.background : t.colors.muted}>
-            {`ID ${data.certificateId}`}
-          </text>
-        )
-      ) : null}
-
-      {footer ? (
-        <text x={w / 2} y={h - (onBand ? 38 : 42)} textAnchor="middle" fontFamily={f('body')} fontSize={11} fill={onBand ? t.colors.background : t.colors.muted}>
-          {footer}
-        </text>
-      ) : null}
     </svg>
   )
-}
-
-function isDark(hex: string): boolean {
-  const clean = hex.replace('#', '')
-  const n = parseInt(clean.length === 3 ? clean.split('').map((c) => c + c).join('') : clean, 16)
-  if (Number.isNaN(n)) return false
-  const r = (n >> 16) & 255
-  const g = (n >> 8) & 255
-  const b = n & 255
-  return 0.299 * r + 0.587 * g + 0.114 * b < 110
 }
