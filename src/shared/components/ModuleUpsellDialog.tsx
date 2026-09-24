@@ -34,7 +34,7 @@ export function ModuleUpsellDialog({ moduleKey, moduleLabel, onClose }: Props) {
     setSending(true)
     try {
       await apiClient.post(
-        '/addon-requests',
+        '/addon-module-requests',
         {
           tenant_lookup: activeTenantCode(),
           contact_name: person?.name || 'Institution Admin',
