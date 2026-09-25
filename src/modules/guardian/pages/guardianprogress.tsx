@@ -3,19 +3,13 @@ import { BookOpen } from 'lucide-react'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { GlassCard } from '../../../shared/layout/GlassCard'
-import { getSessionPerson } from '../../../shared/storage/session'
-import { readCourses, readEnrollments, readPeople } from '../../../shared/storage/readers'
-import { useLanguage } from '../../../shared/i18n/LanguageProvider'
+import { readCourses, readEnrollments } from '../../../shared/storage/readers'
+import { useLinkedStudent } from '../hooks/useLinkedStudent'
 
 export function GuardianProgressPage() {
-  const { t } = useLanguage()
-  const person = getSessionPerson()
+  const { student } = useLinkedStudent()
 
   const enrollments = useMemo(() => {
-    if (!person) return []
-    const student = readPeople().find(
-      (p) => p.role === 'Student' && p.name === person.department && p.status !== 'suspended',
-    )
     if (!student) return []
     const courses = readCourses()
     return readEnrollments()
@@ -30,15 +24,21 @@ export function GuardianProgressPage() {
           status: e.status,
         }
       })
-  }, [person])
+  }, [student])
 
-  if (!person) return null
+  if (!student) {
+    return (
+      <GlassCard className="p-6 text-[13px] text-secondary-text">
+        No student is linked to your account yet. Ask the registrar to link one.
+      </GlassCard>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Student Progress"
-        subtitle={t('page.progress.sub', { department: person.department })}
+        subtitle={`Course progress for ${student.name}.`}
       />
 
       <GlassCard className="p-0 overflow-hidden">

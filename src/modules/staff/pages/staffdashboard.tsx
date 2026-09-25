@@ -14,13 +14,21 @@ export function StaffDashboardPage() {
   const { t } = useLanguage()
   const person = getSessionPerson()
 
-  const { pendingSubmissions, mySubmissions } = useMemo(() => {
+  const { pendingSubmissions, mySubmissions, myPending } = useMemo(() => {
     const people = readPeople()
     const pending = people.filter((p) => p.verificationStatus === 'pending')
-    const mine = pending.filter((p) =>
-      p.submittedById ? p.submittedById === person?.id : p.submittedByName === person?.name,
-    )
-    return { pendingSubmissions: pending.length, mySubmissions: mine }
+    const mine = people
+      .filter(
+        (p) =>
+          p.addedByRole === 'Staff' &&
+          (p.submittedById ? p.submittedById === person?.id : p.submittedByName === person?.name),
+      )
+      .reverse()
+    return {
+      pendingSubmissions: pending.length,
+      mySubmissions: mine,
+      myPending: mine.filter((p) => p.verificationStatus === 'pending').length,
+    }
   }, [person?.id, person?.name])
 
   if (!person) return null
@@ -50,7 +58,7 @@ export function StaffDashboardPage() {
         <StatBlock
           label="Your submissions"
           value={mySubmissions.length}
-          sub="Awaiting admin review"
+          sub={`${myPending} awaiting admin review`}
           icon={<UserPlus size={17} />}
           iconBg="bg-info-bg text-info"
         />
@@ -93,7 +101,7 @@ export function StaffDashboardPage() {
         <GlassCard className="p-5">
           <h3 className="text-[15px] font-bold text-navy-900">Your recent submissions</h3>
           {mySubmissions.length === 0 ? (
-            <p className="mt-3 text-[13px] text-secondary-text">No pending submissions from you yet.</p>
+            <p className="mt-3 text-[13px] text-secondary-text">You have not submitted anyone yet.</p>
           ) : (
             <div className="mt-4 space-y-2">
               {mySubmissions.slice(0, 5).map((p) => (
@@ -103,7 +111,10 @@ export function StaffDashboardPage() {
                     <div className="text-[13px] font-semibold text-navy-900 truncate">{p.name}</div>
                     <div className="text-[11px] text-secondary-text">{p.role} · {p.submittedAt}</div>
                   </div>
-                  <StatusPill label="Pending" tone="warning" />
+                  <StatusPill
+                    label={p.verificationStatus === 'verified' ? 'Verified' : p.verificationStatus === 'rejected' ? 'Rejected' : 'Pending'}
+                    tone={p.verificationStatus === 'verified' ? 'success' : p.verificationStatus === 'rejected' ? 'danger' : 'warning'}
+                  />
                 </div>
               ))}
             </div>

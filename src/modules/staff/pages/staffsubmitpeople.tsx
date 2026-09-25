@@ -55,8 +55,8 @@ export function StaffSubmitPeoplePage() {
         </div>
         <h3 className="text-[16px] font-bold text-navy-900">Submit a new person record</h3>
         <p className="mt-2 text-[13px] text-secondary-text leading-relaxed">
-          Submissions from {person.department} are sent to the admin verification queue.
-          You will be recorded as the submitter in local storage.
+          Submissions from {person.department} go to the institution admin for verification.
+          You can follow their status under My Submissions.
         </p>
         <Button variant="primary" className="mt-5" onClick={() => setSubmitOpen(true)}>
           <UserPlus size={15} />

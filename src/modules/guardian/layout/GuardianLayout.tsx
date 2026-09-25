@@ -8,12 +8,17 @@ import brandLogo from '../../../assets/Logo.jpg'
 import { PortalAuthRedirect } from '../../../shared/components/PortalAuthRedirect'
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 import { readInstitutionName } from '../../../shared/storage/readers'
+import { LinkedStudentsProvider } from '../hooks/useLinkedStudent'
+import { ChildSwitcher } from '../components/ChildSwitcher'
 
 const ICON_SIZE = 17
 
 const breadcrumbLabels: Record<string, string> = {
   '/guardian': 'Dashboard',
   '/guardian/progress': 'Student Progress',
+  '/guardian/grades': 'Grades & Transcript',
+  '/guardian/attendance': 'Attendance',
+  '/guardian/payments': 'Fees & Payments',
   '/guardian/announcements': 'Announcements',
   '/guardian/settings': 'Settings',
 }
@@ -112,9 +117,12 @@ export function GuardianLayout() {
         />
 
         <main ref={mainRef} className="page-content flex-1 min-h-0 app-scroll overflow-y-auto p-5 md:p-6">
-          <div key={location.pathname} className="animate-fade-in-up">
-            <Outlet />
-          </div>
+          <LinkedStudentsProvider>
+            <ChildSwitcher />
+            <div key={location.pathname} className="animate-fade-in-up">
+              <Outlet />
+            </div>
+          </LinkedStudentsProvider>
         </main>
 
         <AdminFooter />

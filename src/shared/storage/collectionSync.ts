@@ -84,10 +84,26 @@ async function rollback(apiKey: string) {
 }
 
 /** Persist a change from `prev` to `next` (fire-and-forget; failures roll back and notify). */
+const inFlight = new Map<string, Promise<unknown>>()
+
+/** Resolves once every save started so far for this collection has settled. */
+export function whenSaved(apiKey: string): Promise<void> {
+  return (inFlight.get(apiKey) ?? Promise.resolve()).then(
+    () => undefined,
+    () => undefined,
+  )
+}
+
 export function saveCollectionChange(apiKey: string, prev: unknown, next: unknown): void {
   const change = diffCollection(apiKey, prev, next)
   if (change === null) return
   const request = change === 'replace' ? putCollection(apiKey, next) : patchCollection(apiKey, change)
+  const previous = inFlight.get(apiKey) ?? Promise.resolve()
+  const tracked = Promise.allSettled([previous, request])
+  inFlight.set(apiKey, tracked)
+  void tracked.then(() => {
+    if (inFlight.get(apiKey) === tracked) inFlight.delete(apiKey)
+  })
   void request.catch((err) => {
     console.error(`Failed to save "${apiKey}"`, err)
     window.dispatchEvent(new CustomEvent(PERSIST_ERROR_EVENT, { detail: { message: errorMessage(err) } }))

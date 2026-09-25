@@ -90,3 +90,112 @@ async def test_verification_reports_issued_revoked_and_unknown(env):
 
     unknown = (await client.get("/api/v1/public/certificates/NOPE-123")).json()
     assert unknown["found"] is False
+
+
+# ── Automatic certificates ────────────────────────────────────────────────────
+
+from sqlalchemy import select  # noqa: E402
+
+COURSE = {
+    "id": "c1",
+    "code": "CS-101",
+    "title": "Intro",
+    "department": "CS",
+    "instructorId": "ins-1",
+    "modules": [{"id": "m1", "lessons": [{"id": "l1"}, {"id": "l2"}]}],
+}
+
+
+async def _replace(session_factory, tenant_id, key: str, data) -> None:
+    async with session_factory() as db:
+        row = (
+            await db.execute(
+                select(LmsCollection).where(LmsCollection.tenant_id == tenant_id, LmsCollection.collection_key == key)
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            db.add(LmsCollection(tenant_id=tenant_id, collection_key=key, data=data))
+        else:
+            row.data = data
+        await db.commit()
+
+
+async def _setup(tenants, *, rules: dict, score: float, lessons: list[str]):
+    sf, t = tenants["_session_factory"], tenants["tenant-a"]
+    await _replace(sf, t, "courses", [COURSE])
+    await _replace(sf, t, "assignments", [{"id": "asg-1", "courseId": "c1", "maxPoints": 100}])
+    await _replace(sf, t, "quizzes", [])
+    await _replace(
+        sf,
+        t,
+        "student-submissions",
+        [{"id": "s1", "studentId": "stu-1", "assessmentId": "asg-1", "status": "graded", "score": score, "maxScore": 100}],
+    )
+    await _replace(sf, t, "lesson-progress", {"stu-1": {"c1": lessons}})
+    await _replace(sf, t, "settings", {"general": {"name": "A"}, "certificates": rules})
+    await _replace(sf, t, "certificates", [])
+
+
+async def test_student_passing_gets_a_pending_certificate_by_default(env):
+    client, tenants = env
+    await _setup(tenants, rules={}, score=80, lessons=[])
+    res = await client.post(
+        "/api/v1/certificates/auto-issue", json={}, headers=_auth(tenants["tenant-a"], "stu-1", "Student")
+    )
+    assert res.status_code == 200, res.text
+    body = res.json()
+    # Default rules: passed ≥ 50%, admin approval required.
+    assert body["issued"] == [] and len(body["pending"]) == 1
+    cert = body["records"][0]
+    assert cert["studentId"] == "stu-1" and cert["status"] == "pending"
+    assert cert["certificateId"].startswith("BER-CERT-") and len(cert["certificateId"]) == 23
+
+    # Running again does not issue a duplicate.
+    again = await client.post(
+        "/api/v1/certificates/auto-issue", json={}, headers=_auth(tenants["tenant-a"], "stu-1", "Student")
+    )
+    assert again.json()["pending"] == []
+
+
+async def test_rules_lessons_and_both(env):
+    client, tenants = env
+    admin = _auth(tenants["tenant-a"], "admin-1", "Admin")
+
+    await _setup(tenants, rules={"rule": "both", "requireApproval": False}, score=90, lessons=["l1"])
+    assert (await client.post("/api/v1/certificates/auto-issue", json={}, headers=admin)).json()["issued"] == []
+
+    await _setup(tenants, rules={"rule": "both", "requireApproval": False}, score=90, lessons=["l1", "l2"])
+    assert len((await client.post("/api/v1/certificates/auto-issue", json={}, headers=admin)).json()["issued"]) == 1
+
+    await _setup(tenants, rules={"rule": "passed", "minPercent": 85, "requireApproval": False}, score=80, lessons=[])
+    assert (await client.post("/api/v1/certificates/auto-issue", json={}, headers=admin)).json()["issued"] == []
+
+    await _setup(tenants, rules={"autoIssue": False}, score=100, lessons=["l1", "l2"])
+    assert (await client.post("/api/v1/certificates/auto-issue", json={}, headers=admin)).json()["records"] == []
+
+
+async def test_a_student_cannot_trigger_someone_elses_certificate(env):
+    client, tenants = env
+    await _setup(tenants, rules={"requireApproval": False}, score=90, lessons=[])
+    # stu-2 asks for stu-1: the request is narrowed to stu-2, who has nothing to earn.
+    res = await client.post(
+        "/api/v1/certificates/auto-issue",
+        json={"student_id": "stu-1"},
+        headers=_auth(tenants["tenant-a"], "stu-2", "Student"),
+    )
+    assert res.json()["records"] == []
+
+
+async def test_revoked_certificates_are_not_reissued(env):
+    client, tenants = env
+    await _setup(tenants, rules={"requireApproval": False}, score=90, lessons=[])
+    await _replace(
+        tenants["_session_factory"],
+        tenants["tenant-a"],
+        "certificates",
+        [{"id": "x", "certificateId": "OLD", "studentId": "stu-1", "courseId": "c1", "status": "revoked"}],
+    )
+    res = await client.post(
+        "/api/v1/certificates/auto-issue", json={}, headers=_auth(tenants["tenant-a"], "admin-1", "Admin")
+    )
+    assert res.json()["records"] == []

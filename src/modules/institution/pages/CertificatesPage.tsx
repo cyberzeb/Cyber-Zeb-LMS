@@ -1,5 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Award, BadgeCheck, Clock, Plus, ShieldOff } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Award, BadgeCheck, Clock, Loader2, Plus, RefreshCw, ShieldOff } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { runCertificateAutoIssue } from '../api/autoIssueApi'
+import { apiErrorMessage } from '../../../shared/api/client'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { StatBlock } from '../../../shared/components/StatBlock'
@@ -72,7 +75,9 @@ const emptyIssueForm = (templateId: string): IssueCertificateForm => ({
 export function CertificatesPage() {
   const { notify } = useToast()
   const { campuses, departments, activeCampuses, selectedCampusId } = useCampusContext()
-  const { certificates, issueCertificate, revokeCertificate } = useCertificates()
+  const { certificates, setCertificates, issueCertificate, revokeCertificate, updateCertificate } = useCertificates()
+  const queryClient = useQueryClient()
+  const [checking, setChecking] = useState(false)
   const { people } = usePeople()
   const { courses } = useCourses()
   const { templates, templateFor } = useCertificateTemplates()
@@ -258,6 +263,68 @@ export function CertificatesPage() {
     }
   }
 
+  const runCompletionCheck = useCallback(
+    async (quiet = false) => {
+      setChecking(true)
+      try {
+        const result = await runCertificateAutoIssue(queryClient)
+        const created = result.issued.length + result.pending.length
+        if (!result.enabled) {
+          if (!quiet) notify('Automatic certificates are turned off in Settings.', 'info')
+        } else if (created) {
+          notify(
+            result.pending.length
+              ? `${result.pending.length} student${result.pending.length === 1 ? '' : 's'} completed a course — certificate${result.pending.length === 1 ? '' : 's'} awaiting your approval.`
+              : `${result.issued.length} certificate${result.issued.length === 1 ? '' : 's'} issued automatically.`,
+          )
+        } else if (!quiet) {
+          notify('Everyone who has met the requirements already has a certificate.', 'info')
+        }
+      } catch (err) {
+        if (!quiet) notify(apiErrorMessage(err) ?? 'Could not run the completion check.', 'error')
+      } finally {
+        setChecking(false)
+      }
+    },
+    [notify, queryClient],
+  )
+
+  // Catch up on completions whenever an admin opens the page (quietly).
+  useEffect(() => {
+    let cancelled = false
+    runCertificateAutoIssue(queryClient)
+      .then((result) => {
+        if (cancelled || !result.pending.length) return
+        notify(
+          `${result.pending.length} student${result.pending.length === 1 ? '' : 's'} completed a course — certificate${result.pending.length === 1 ? '' : 's'} awaiting your approval.`,
+          'info',
+        )
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [notify, queryClient])
+
+  const approveCertificate = (cert: CertificateRecord) => {
+    const today = todayIso()
+    updateCertificate(cert.id, { status: 'issued', issueDate: today })
+    if (detailCert?.id === cert.id) setDetailCert({ ...cert, status: 'issued', issueDate: today })
+    notify(`${cert.certificateId} issued to ${cert.studentName}.`)
+  }
+
+  const pendingCount = certificates.filter((c) => c.status === 'pending').length
+  const [confirmApproveAll, setConfirmApproveAll] = useState(false)
+
+  const approveAll = () => {
+    const today = todayIso()
+    setCertificates((prev) =>
+      prev.map((c) => (c.status === 'pending' ? { ...c, status: 'issued', issueDate: today } : c)),
+    )
+    setConfirmApproveAll(false)
+    notify(`${pendingCount} certificate${pendingCount === 1 ? '' : 's'} issued.`)
+  }
+
   const templateUsage = useMemo(() => {
     const counts: Record<string, number> = {}
     for (const c of certificates) {
@@ -280,10 +347,16 @@ export function CertificatesPage() {
         title="Certificates"
         subtitle="Manage and monitor certificates across your institution."
         actions={
-          <Button variant="primary" onClick={openIssue}>
-            <Plus size={16} />
-            Issue Certificate
-          </Button>
+          <>
+            <Button variant="secondary" onClick={() => void runCompletionCheck(false)} disabled={checking}>
+              {checking ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
+              Run completion check
+            </Button>
+            <Button variant="primary" onClick={openIssue}>
+              <Plus size={16} />
+              Issue Certificate
+            </Button>
+          </>
         }
       />
 
@@ -297,6 +370,23 @@ export function CertificatesPage() {
         <CertificateTemplatesPanel usage={templateUsage} />
       ) : (
       <>
+      {pendingCount > 0 ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-warning/40 bg-warning-bg px-4 py-3">
+          <p className="text-[13px] font-semibold text-[#8A6D00] dark:text-warning">
+            {pendingCount} certificate{pendingCount === 1 ? '' : 's'} waiting for approval — students have met the
+            completion rules.
+          </p>
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" onClick={() => setStatusFilter('pending')}>
+              Review
+            </Button>
+            <Button variant="primary" size="sm" onClick={() => setConfirmApproveAll(true)}>
+              <BadgeCheck size={14} />
+              Approve all
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
         <StatBlock
@@ -388,6 +478,7 @@ export function CertificatesPage() {
           onView={setDetailCert}
           onDownload={(cert) => void handleDownload(cert)}
           onRevoke={setRevokeTarget}
+          onApprove={approveCertificate}
         />
       ) : (
         <GlassCard className="p-10 text-center text-secondary-text text-[13.5px] font-medium">
@@ -417,7 +508,31 @@ export function CertificatesPage() {
         onClose={() => setDetailCert(null)}
         onDownload={(cert) => void handleDownload(cert)}
         onRevoke={(cert) => setRevokeTarget(cert)}
+        onApprove={approveCertificate}
       />
+
+      <Modal
+        open={confirmApproveAll}
+        onClose={() => setConfirmApproveAll(false)}
+        icon={<BadgeCheck size={18} />}
+        title="Approve all pending certificates"
+        description={`Issue ${pendingCount} certificate${pendingCount === 1 ? '' : 's'} now?`}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setConfirmApproveAll(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={approveAll}>
+              Approve all
+            </Button>
+          </>
+        }
+      >
+        <p className="text-[13px] text-secondary-text">
+          Students can download them straight away, and each student (and their guardians) gets an email if
+          certificate notifications are on.
+        </p>
+      </Modal>
 
       <Modal
         open={revokeTarget !== null}

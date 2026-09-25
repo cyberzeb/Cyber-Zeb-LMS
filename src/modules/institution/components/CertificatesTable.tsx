@@ -1,4 +1,4 @@
-import { Download, Eye, ShieldOff } from 'lucide-react'
+import { BadgeCheck, Download, Eye, ShieldOff } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { Button } from '../../../shared/components/Button'
 import { StatusPill } from '../../../shared/components/StatusPill'
@@ -27,6 +27,7 @@ interface CertificatesTableProps {
   onView: (cert: CertificateRecord) => void
   onDownload: (cert: CertificateRecord) => void
   onRevoke: (cert: CertificateRecord) => void
+  onApprove: (cert: CertificateRecord) => void
 }
 
 export function CertificatesTable({
@@ -34,6 +35,7 @@ export function CertificatesTable({
   onView,
   onDownload,
   onRevoke,
+  onApprove,
 }: CertificatesTableProps) {
   return (
     <GlassCard className="overflow-hidden">
@@ -86,6 +88,12 @@ export function CertificatesTable({
                         <Button variant="ghost" size="sm" onClick={() => onDownload(cert)}>
                           <Download size={14} />
                           Download
+                        </Button>
+                      ) : null}
+                      {cert.status === 'pending' ? (
+                        <Button variant="ghost" size="sm" onClick={() => onApprove(cert)}>
+                          <BadgeCheck size={14} />
+                          Approve
                         </Button>
                       ) : null}
                       {canRevoke ? (

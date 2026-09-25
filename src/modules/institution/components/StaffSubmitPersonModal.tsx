@@ -1,3 +1,4 @@
+import { guardianLinkFields } from '../../../shared/people/guardianLinks'
 import { useEffect, useMemo, useState } from 'react'
 import { UserPlus } from 'lucide-react'
 import { Modal } from '../../../shared/components/Modal'
@@ -86,8 +87,7 @@ export function StaffSubmitPersonModal({
         name: form.name.trim(),
         email: form.email.trim().toLowerCase(),
         role: 'Guardian',
-        department: student.name,
-        campusId: student.campusId,
+        ...guardianLinkFields([student]),
         status: 'invited',
         lastActive: 'Never',
         initials: initialsFromName(form.name),

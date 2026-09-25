@@ -1,7 +1,7 @@
 import re
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -15,6 +15,7 @@ from app.modules.lms_store.schemas import (
     CollectionPut,
     SeedPayload,
 )
+from app.modules.communication.notifications import NOTIFY_KEYS, changes_between, dispatch
 from app.modules.lms_store.service import LmsStoreService
 
 router = APIRouter()
@@ -79,6 +80,7 @@ async def get_collection(
 async def put_collection(
     collection_key: str,
     payload: CollectionPut,
+    background: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     principal: DemoPrincipal = Depends(get_demo_principal),
 ):
@@ -90,6 +92,11 @@ async def put_collection(
         )
     await assert_collection_allowed(db, principal.tenant_id, collection_key)
     service = LmsStoreService(db)
+    before = (
+        await service.get_collection(principal.tenant_id, collection_key)
+        if collection_key in NOTIFY_KEYS
+        else None
+    )
     data = await service.put_collection(
         principal.tenant_id,
         _valid_key(collection_key),
@@ -97,6 +104,9 @@ async def put_collection(
         person_id=principal.person_id,
         role=principal.role,
     )
+    # An empty collection being filled is the initial data load, not news.
+    if before:
+        background.add_task(dispatch, principal.tenant_id, collection_key, changes_between(before, data))
     return CollectionOut(key=collection_key, data=data)
 
 
@@ -104,12 +114,15 @@ async def put_collection(
 async def patch_collection(
     collection_key: str,
     payload: CollectionPatch,
+    background: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     principal: DemoPrincipal = Depends(get_demo_principal),
 ):
     """Apply record-level changes; non-admin changes are checked against the write policy."""
     await assert_collection_allowed(db, principal.tenant_id, collection_key)
     service = LmsStoreService(db)
+    notify = collection_key in NOTIFY_KEYS and bool(payload.upserts)
+    before = await service.get_collection(principal.tenant_id, collection_key) if notify else None
     data = await service.patch_collection(
         principal.tenant_id,
         _valid_key(collection_key),
@@ -121,6 +134,10 @@ async def patch_collection(
         set_entries=payload.set,
         unset_keys=payload.unset,
     )
+    if notify:
+        after = await service.get_collection(principal.tenant_id, collection_key)
+        ids = [u.record.get("id") for u in payload.upserts]
+        background.add_task(dispatch, principal.tenant_id, collection_key, changes_between(before, after, ids))
     return CollectionOut(key=collection_key, data=data)
 
 

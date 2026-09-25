@@ -1,3 +1,4 @@
+import { guardianLinkFields } from '../../../shared/people/guardianLinks'
 import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { DEFAULT_CAMPUS_ID } from '../data/orgSeedData'
 import { INSTRUCTOR_FACULTY_LABEL } from '../utils/courseAssignmentUtils'
@@ -60,7 +61,7 @@ export interface UpdateStaffInput {
 export interface UpdateGuardianInput {
   name: string
   email: string
-  linkedStudentId: string
+  linkedStudentIds: string[]
   status: PersonRow['status']
 }
 
@@ -456,29 +457,30 @@ export async function updateAdmin(
   }
 }
 
-/** Simulates a backend PUT endpoint for updating a guardian record. */
+/**
+ * Apply an edit to a guardian record. Everything not edited here (phone,
+ * verification, settings …) is kept.
+ */
 export async function updateGuardian(
-  guardianId: string,
+  guardian: PersonRow,
   input: UpdateGuardianInput,
   students: PersonRow[],
 ): Promise<PersonRow> {
-  await new Promise((resolve) => setTimeout(resolve, 350))
-
   if (!input.name.trim()) throw new Error('Guardian name is required.')
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) throw new Error('Invalid email address.')
 
-  const student = students.find((s) => s.id === input.linkedStudentId)
-  if (!student) throw new Error('Linked student is required.')
+  const linked = input.linkedStudentIds
+    .map((id) => students.find((s) => s.id === id))
+    .filter((s): s is PersonRow => Boolean(s))
+  if (!linked.length) throw new Error('Link at least one student.')
 
   return {
-    id: guardianId,
+    ...guardian,
     name: input.name.trim(),
     email: input.email.trim().toLowerCase(),
     role: 'Guardian',
-    department: student.name,
-    campusId: student.campusId,
+    ...guardianLinkFields(linked),
     status: input.status,
-    lastActive: 'Just now',
     initials: initialsFromName(input.name),
   }
 }

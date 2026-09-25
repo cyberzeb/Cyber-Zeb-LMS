@@ -84,7 +84,7 @@ export function VerifyCertificatePage() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="e.g. BER-CERT-2026-00001"
+              placeholder="e.g. BER-CERT-2026-7K3M-Q9TD"
               className="flex-1 px-3.5 py-2.5 text-[14px] font-mono input-surface rounded-xl outline-none focus:ring-2 focus:ring-lemon-500/25"
               aria-label="Certificate ID"
             />

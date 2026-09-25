@@ -1,4 +1,4 @@
-import { Award, Download, Loader2, ShieldOff } from 'lucide-react'
+import { Award, BadgeCheck, Download, Loader2, ShieldOff } from 'lucide-react'
 import { Modal } from '../../../shared/components/Modal'
 import { Button } from '../../../shared/components/Button'
 import { StatusPill } from '../../../shared/components/StatusPill'
@@ -53,6 +53,7 @@ interface CertificateDetailsModalProps {
   onClose: () => void
   onDownload: (cert: CertificateRecord) => void
   onRevoke: (cert: CertificateRecord) => void
+  onApprove: (cert: CertificateRecord) => void
 }
 
 export function CertificateDetailsModal({
@@ -64,6 +65,7 @@ export function CertificateDetailsModal({
   onClose,
   onDownload,
   onRevoke,
+  onApprove,
 }: CertificateDetailsModalProps) {
   if (!certificate) return null
 
@@ -89,6 +91,12 @@ export function CertificateDetailsModal({
             <Button variant="secondary" onClick={() => onRevoke(certificate)}>
               <ShieldOff size={15} />
               Revoke
+            </Button>
+          ) : null}
+          {certificate.status === 'pending' ? (
+            <Button variant="primary" onClick={() => onApprove(certificate)}>
+              <BadgeCheck size={15} />
+              Approve &amp; issue
             </Button>
           ) : null}
           {canDownload ? (

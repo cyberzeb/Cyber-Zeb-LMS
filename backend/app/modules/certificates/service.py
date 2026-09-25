@@ -12,9 +12,26 @@ from datetime import date
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.certificates.schemas import CertificateVerificationOut
+from app.core.permissions import Role
+from app.modules.certificates.auto_issue import Rules, evaluate
+from app.modules.certificates.schemas import AutoIssueOut, CertificateVerificationOut
 from app.modules.lms_store.models import LmsCollection
+from app.modules.lms_store.service import LmsStoreService
 from app.modules.tenants.models import Tenant
+
+# What the completion rules read.
+_AUTO_ISSUE_KEYS = (
+    "people",
+    "courses",
+    "enrollments",
+    "certificates",
+    "lesson-progress",
+    "assignments",
+    "quizzes",
+    "student-submissions",
+    "certificate-templates",
+    "settings",
+)
 
 
 class CertificatesService:
@@ -82,3 +99,36 @@ class CertificatesService:
                     revoked_at=cert.get("revokedAt"),
                 )
         return CertificateVerificationOut(found=False, certificate_id=certificate_id)
+
+    async def auto_issue(
+        self,
+        tenant_id,
+        *,
+        student_id: str | None = None,
+        course_id: str | None = None,
+    ) -> AutoIssueOut:
+        """Create every certificate the institution's completion rules now call for."""
+        store = LmsStoreService(self.db)
+        collections = {key: await store.get_collection(tenant_id, key) for key in _AUTO_ISSUE_KEYS}
+        rules = Rules.from_settings(collections.get("settings"))
+        new = evaluate(collections, rules, student_id=student_id, course_id=course_id)
+        if new:
+            # The server is the authority here, so the write skips the per-role
+            # policy — the rules above decided what may be created.
+            await store.patch_collection(
+                tenant_id,
+                "certificates",
+                role=Role.INSTITUTION_ADMIN,
+                person_id="system:auto-issue",
+                is_admin=True,
+                upserts=[(record, None) for record in new],
+                deletes=[],
+                set_entries={},
+                unset_keys=[],
+            )
+        return AutoIssueOut(
+            enabled=rules.enabled,
+            issued=[r["certificateId"] for r in new if r["status"] == "issued"],
+            pending=[r["certificateId"] for r in new if r["status"] == "pending"],
+            records=new,
+        )

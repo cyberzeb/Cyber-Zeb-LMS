@@ -35,9 +35,9 @@ Status as of Phase 4 (2026-09-21) — Corporate Edition complete, including its 
 | Multi-language (i18n) | 🟡 | Provider exists. Coverage is not complete |
 | Zoom live sessions | ✅ | Real Zoom API (`live_sessions/zoom_client.py`). Only instructors/admins can create or end meetings |
 | Payment gateway | 🟡 | Server checkout: Chapa (ETB) when `CHAPA_SECRET_KEY` is set, verified with Chapa before marking paid; demo provider on demo servers. Chapa not yet tested with real keys |
-| Email notifications | 🟡 | SMTP for onboarding only. No LMS event emails |
+| Email notifications | ✅ | LMS events email the right people: announcements, published assignments/quizzes, grades (student + guardians), live classes, certificates, invoices. Per-event switches in Settings; personal switches respected (`communication/notifications.py`) |
 | Report PDF export | ✅ | `exportInstitutionReport.ts` |
-| Automated tests | 🟡 | Backend: 74 tests (onboarding, tenants, security, scoping, structure, grading, payments, tenant controls). Frontend: none |
+| Automated tests | ✅ | Backend: 90 tests (adds certificates, auto-issue, verification, notifications, guardian links, Zoom guards). Frontend: Vitest, `npm test` (certificates, grading, guardian links, API errors) |
 | Lint / type-check / build | ✅ | 0 lint errors (60 warnings tracked), `tsc` clean, build passes |
 | Read scoping per role | ✅ | Server builds each role's view (`lms_store/scope.py`): own records, own/taught courses, linked children; others as directory entries only. Answer keys never sent to students |
 | Per-person portal settings | ✅ | Fixed in Phase 1 (previously one shared object for all users) |
@@ -69,7 +69,7 @@ Status as of Phase 4 (2026-09-21) — Corporate Edition complete, including its 
 | Question bank | ✅ | ✅ | ✅ | Added to the corporate and training admin nav in Phase 4 |
 | Grading / gradebook | ✅ | ✅ | 🟡 | Quizzes graded on the server. The corporate learner view shows an assessment average instead of GPA; training still shows GPA wording |
 | Attendance | ✅ | ✅ | ✅ | Added to the corporate and training admin nav in Phase 4 |
-| Certificates | ✅ | 🟡 | 🟡 | Template designer (presets, colours, frames, patterns, seals, fonts, placeholders, logo, signatures), PDF download for admins and learners, QR code to the public `/verify` page. No automatic issue on completion |
+| Certificates | ✅ | 🟡 | 🟡 | Free-form template designer, PDF download (admin, learner, guardian), QR code to the public `/verify` page with unguessable IDs. Automatic issue on completion (lessons / passed / both, optional approval) run on the server |
 | Announcements | ✅ | ✅ | ✅ | |
 | Discussion forum | ✅ | ✅ | ✅ | |
 | Help desk | ✅ | ✅ | ✅ | |
@@ -91,7 +91,7 @@ Status as of Phase 4 (2026-09-21) — Corporate Edition complete, including its 
 | Tuition / fees | 🟡 | Server checkout (Chapa / demo). Students and guardians can pay |
 | Transcripts | ✅ | Per term with GPA, credits and standing; PDF download. Student, registrar and guardian views |
 | GPA computed from real grades | ✅ | Credit-weighted from graded work (`shared/academics`). Term GPA, cumulative GPA and academic standing |
-| Guardian portal | ✅ | Child's grades/transcript, attendance, fees (can pay online) and announcements |
+| Guardian portal | ✅ | Several children per guardian with a switcher; grades/transcript, attendance, fees (pay online), coming-up work, certificates and announcements |
 | Staff portal | ✅ | Department view (programs, sections, instructors, average GPA) for staff and heads of department |
 
 ## 5. Berana Corporate Edition
@@ -154,8 +154,8 @@ Target flow: create program → create cohort → open enrollment → learner re
 | Admin | `/admin` | ✅ | ✅ | 🟡 |
 | Learner (student) | `/student` | ✅ | ✅ | 🟡 |
 | Instructor / trainer | `/instructor` | ✅ | 🟡 | 🟡 |
-| Staff | `/staff` | 🟡 | ➖ | ➖ |
-| Guardian | `/guardian` | 🟡 | ➖ | ➖ |
+| Staff | `/staff` | ✅ | ➖ | ➖ |
+| Guardian | `/guardian` | ✅ | ➖ | ➖ |
 | Help desk | `/help-desk` | ✅ | ✅ | ✅ |
 | Super Admin | `/super-admin` | ✅ (platform-wide) | | |
 

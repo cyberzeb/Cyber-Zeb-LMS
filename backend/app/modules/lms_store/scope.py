@@ -86,13 +86,21 @@ class ScopeContext:
         return next((p for p in await self._list("people") if p.get("id") == self.person_id), None)
 
     async def children_ids(self) -> set[str]:
-        """Students linked to a guardian (by linkedStudentId, or legacy: child's name in `department`)."""
+        """
+        Students linked to a guardian: every id in `linkedStudentIds`, the single
+        `linkedStudentId`, and (legacy) a student named in the guardian's `department`.
+        """
         me = await self.me()
         if not me:
             return set()
         people = await self._list("people")
-        linked = me.get("linkedStudentId") or me.get("linkedStudentIds") or []
-        ids = {linked} if isinstance(linked, str) else set(linked)
+        ids: set[str] = set()
+        many = me.get("linkedStudentIds")
+        if isinstance(many, list):
+            ids |= {str(i) for i in many if isinstance(i, str)}
+        one = me.get("linkedStudentId")
+        if isinstance(one, str):
+            ids.add(one)
         ids |= {
             p["id"]
             for p in people

@@ -7,6 +7,8 @@ import {
   Blocks,
   Plug,
   AlertTriangle,
+  Award,
+  Mail,
 } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
@@ -46,7 +48,11 @@ export function SettingsPage() {
     setDraft(stored)
   }, [stored])
 
-  const { general, branding, academic, modules, integrations } = draft
+  const { general, branding, academic, modules, integrations, certificates, notifications } = draft
+  const toggleNotification = (key: keyof SettingsState['notifications']) =>
+    setDraft((d) => ({ ...d, notifications: { ...d.notifications, [key]: !d.notifications[key] } }))
+  const setCertificates = (patch: Partial<SettingsState['certificates']>) =>
+    setDraft((d) => ({ ...d, certificates: { ...d.certificates, ...patch } }))
 
   const isDirty = useMemo(
     () => JSON.stringify(draft) !== JSON.stringify(stored),
@@ -283,6 +289,80 @@ export function SettingsPage() {
               onToggle={() => toggleModule('parentPortal')}
             />
           )}
+        </SettingsSection>
+
+        <SettingsSection
+          icon={<Award size={SEC} />}
+          title="Certificates"
+          description="Issue certificates automatically when students complete a course."
+        >
+          <ToggleRow
+            label="Issue automatically"
+            description="Checked when students finish lessons, when work is graded, and when you open Certificates."
+            enabled={certificates.autoIssue}
+            onToggle={() => setCertificates({ autoIssue: !certificates.autoIssue })}
+          />
+          {certificates.autoIssue ? (
+            <>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-[12px] font-semibold text-navy-900">A student has completed a course when</span>
+                <select
+                  value={certificates.rule}
+                  onChange={(e) => setCertificates({ rule: e.target.value as SettingsState['certificates']['rule'] })}
+                  className="w-full bg-white/70 dark:bg-navy-50 border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:ring-2 focus:ring-lemon-500/25 cursor-pointer dark:[color-scheme:dark]"
+                >
+                  <option value="passed">They pass the course (graded work)</option>
+                  <option value="lessons">They finish every lesson</option>
+                  <option value="both">They finish every lesson and pass</option>
+                </select>
+              </label>
+              {certificates.rule !== 'lessons' ? (
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-[12px] font-semibold text-navy-900">Minimum course grade (%)</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={certificates.minPercent}
+                    onChange={(e) =>
+                      setCertificates({ minPercent: Math.max(0, Math.min(100, Number(e.target.value) || 0)) })
+                    }
+                    className="w-32 bg-white/70 dark:bg-navy-50 border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:ring-2 focus:ring-lemon-500/25"
+                  />
+                  <span className="text-[11.5px] text-secondary-text">The pass mark on the grading scale is 50%.</span>
+                </label>
+              ) : null}
+              <ToggleRow
+                label="Hold for approval"
+                description="New certificates wait as Pending until an admin approves them on the Certificates page."
+                enabled={certificates.requireApproval}
+                onToggle={() => setCertificates({ requireApproval: !certificates.requireApproval })}
+              />
+            </>
+          ) : null}
+        </SettingsSection>
+
+        <SettingsSection
+          icon={<Mail size={SEC} />}
+          title="Email notifications"
+          description="Emails sent automatically as things happen. People can also turn off their own in their portal settings."
+        >
+          <ToggleRow
+            label="Send notification emails"
+            description="Uses the email server configured for your workspace."
+            enabled={notifications.email}
+            onToggle={() => toggleNotification('email')}
+          />
+          {notifications.email ? (
+            <>
+              <ToggleRow label="Announcements" description="To the roles or course an announcement targets." enabled={notifications.announcements} onToggle={() => toggleNotification('announcements')} />
+              <ToggleRow label="New assignments and quizzes" description="To enrolled students when work is published." enabled={notifications.assessments} onToggle={() => toggleNotification('assessments')} />
+              <ToggleRow label="Grades" description="To the student and their guardians when work is graded." enabled={notifications.grades} onToggle={() => toggleNotification('grades')} />
+              <ToggleRow label="Live classes" description="To enrolled students when a class is scheduled." enabled={notifications.liveClasses} onToggle={() => toggleNotification('liveClasses')} />
+              <ToggleRow label="Certificates" description="To the student and their guardians when one is issued." enabled={notifications.certificates} onToggle={() => toggleNotification('certificates')} />
+              <ToggleRow label="Invoices" description="To the student and their guardians when an invoice is created." enabled={notifications.invoices} onToggle={() => toggleNotification('invoices')} />
+            </>
+          ) : null}
         </SettingsSection>
 
         <SettingsSection

@@ -4,6 +4,8 @@ import { Modal } from '../../../shared/components/Modal'
 import { Button } from '../../../shared/components/Button'
 import { FormField } from '../../../shared/components/FormField'
 import { updateGuardian, type UpdateGuardianInput } from '../api/peopleApi'
+import { linkedStudentIdsOf } from '../../../shared/people/guardianLinks'
+import { StudentMultiPicker } from './StudentMultiPicker'
 import type { PersonRow } from '../types'
 
 interface GuardianEditModalProps {
@@ -28,7 +30,7 @@ export function GuardianEditModal({
   const [form, setForm] = useState<UpdateGuardianInput>({
     name: '',
     email: '',
-    linkedStudentId: '',
+    linkedStudentIds: [],
     status: 'active',
   })
 
@@ -39,22 +41,21 @@ export function GuardianEditModal({
 
   useEffect(() => {
     if (!guardian || !open) return
-    const linked = studentOptions.find((s) => s.name === guardian.department)
     setForm({
       name: guardian.name,
       email: guardian.email,
-      linkedStudentId: linked?.id ?? studentOptions[0]?.id ?? '',
+      linkedStudentIds: linkedStudentIdsOf(guardian, students),
       status: guardian.status,
     })
     setError('')
-  }, [guardian, open, studentOptions])
+  }, [guardian, open, students])
 
   const handleSave = async () => {
     if (!guardian) return
     setSaving(true)
     setError('')
     try {
-      const updated = await updateGuardian(guardian.id, form, students)
+      const updated = await updateGuardian(guardian, form, students)
       onSaved(updated)
       onClose()
     } catch (err) {
@@ -70,13 +71,13 @@ export function GuardianEditModal({
       onClose={onClose}
       icon={<UserRoundPen size={18} />}
       title="Edit Guardian"
-      description="Update guardian profile, linked student and portal access status."
+      description="Update the guardian, the students they follow, and portal access."
       footer={
         <>
           <Button variant="secondary" onClick={onClose} disabled={saving}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSave} disabled={saving || !form.linkedStudentId}>
+          <Button variant="primary" onClick={handleSave} disabled={saving || form.linkedStudentIds.length === 0}>
             {saving ? 'Saving…' : 'Save Changes'}
           </Button>
         </>
@@ -94,23 +95,14 @@ export function GuardianEditModal({
         onChange={(v) => setForm({ ...form, email: v })}
         placeholder="e.g. yonas.t@gmail.com"
       />
-      <label className="flex flex-col gap-1.5">
-        <span className="text-[12px] font-semibold text-navy-900">Linked Student</span>
-        <select
-          value={form.linkedStudentId}
-          onChange={(e) => setForm({ ...form, linkedStudentId: e.target.value })}
-          className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
-        >
-          {studentOptions.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name} · {s.department}
-            </option>
-          ))}
-        </select>
-        <span className="text-[11px] text-secondary-text">
-          Campus is inherited from the linked student&apos;s enrollment.
-        </span>
-      </label>
+      <StudentMultiPicker
+        students={studentOptions}
+        value={form.linkedStudentIds}
+        onChange={(ids) => setForm({ ...form, linkedStudentIds: ids })}
+      />
+      <span className="-mt-2 text-[11px] text-secondary-text">
+        A parent with several children at the institution can follow all of them from one account.
+      </span>
       <FormField
         label="Status"
         type="select"

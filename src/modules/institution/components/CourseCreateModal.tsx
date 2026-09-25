@@ -1,3 +1,4 @@
+import { useCertificateTemplates } from '../certificates/useCertificateTemplates'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   BookOpen,
@@ -90,6 +91,7 @@ export function CourseCreateModal({
   const resourceFileRef = useRef<HTMLInputElement>(null)
   const [activeTab, setActiveTab] = useState('Basics')
   const [form, setForm] = useState<CourseCreateInput>(() => createEmptyCourseForm())
+  const { templates: certificateTemplates } = useCertificateTemplates()
   const [tagInput, setTagInput] = useState('')
   const [error, setError] = useState('')
   const [pendingResourceId, setPendingResourceId] = useState<string | null>(null)
@@ -932,6 +934,23 @@ export function CourseCreateModal({
               enabled={form.certificateEnabled ?? true}
               onToggle={() => updateForm({ certificateEnabled: !form.certificateEnabled })}
             />
+            {form.certificateEnabled ?? true ? (
+              <label className="ml-1 flex flex-col gap-1 pb-2">
+                <span className="text-[11.5px] font-semibold text-navy-900">Certificate design</span>
+                <select
+                  value={form.certificateTemplateId ?? ''}
+                  onChange={(e) => updateForm({ certificateTemplateId: e.target.value })}
+                  className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
+                >
+                  <option value="">Institution default</option>
+                  {certificateTemplates.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
             <ToggleRow
               label="Discussion forum"
               description="Enable course-wide Q&A and peer discussion."

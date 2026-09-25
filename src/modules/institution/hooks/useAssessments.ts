@@ -1,4 +1,6 @@
 import { useCallback } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { runCertificateAutoIssue } from '../api/autoIssueApi'
 import { useApiCollection } from '../../../shared/hooks/useApiCollection'
 import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { STORAGE_EVENTS, STORAGE_KEYS } from '../../../shared/storage/keys'
@@ -249,6 +251,7 @@ export function useStudentSubmissions() {
     [setRecords],
   )
 
+  const queryClient = useQueryClient()
   const gradeSubmission = useCallback(
     (
       submissionId: string,
@@ -256,15 +259,20 @@ export function useStudentSubmissions() {
       feedback: string,
       maxScore: number,
     ) => {
+      let studentId: string | undefined
       setRecords((prev) =>
-        prev.map((s) =>
-          s.id === submissionId
-            ? { ...s, status: 'graded' as const, score, feedback, maxScore }
-            : s,
-        ),
+        prev.map((s) => {
+          if (s.id !== submissionId) return s
+          studentId = s.studentId
+          return { ...s, status: 'graded' as const, score, feedback, maxScore }
+        }),
       )
+      // A grade can complete a course; let the server apply the certificate rules.
+      if (studentId) {
+        void runCertificateAutoIssue(queryClient, { studentId }).catch(() => undefined)
+      }
     },
-    [setRecords],
+    [queryClient, setRecords],
   )
 
   return {

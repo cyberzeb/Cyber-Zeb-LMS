@@ -265,8 +265,8 @@ export function sampleCertificateData(institutionName: string): CertificateData 
     issueDate: new Date().toISOString().slice(0, 10),
     completionDate: new Date().toISOString().slice(0, 10),
     expirationDate: undefined,
-    certificateId: 'BER-CERT-2026-00001',
-    verifyUrl: `${window.location.origin}/verify/BER-CERT-2026-00001`,
+    certificateId: 'BER-CERT-2026-7K3M-Q9TD',
+    verifyUrl: `${window.location.origin}/verify/BER-CERT-2026-7K3M-Q9TD`,
   }
 }
 

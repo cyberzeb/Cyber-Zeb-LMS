@@ -366,6 +366,8 @@ export interface CourseRecord extends CourseSummary {
   maxEnrollment?: number
   allowSelfEnrollment?: boolean
   certificateEnabled?: boolean
+  /** Template for this course's certificates; the default template when unset. */
+  certificateTemplateId?: string
   discussionForumEnabled?: boolean
   gradingPolicy?: string
   visibility?: CourseVisibility
@@ -476,8 +478,10 @@ export interface PersonRow {
   submittedAt?: string
   submittedByName?: string
   submittedById?: string
-  /** Guardian accounts: the student they may follow. */
+  /** Guardian accounts: the first linked student (kept for older readers). */
   linkedStudentId?: string
+  /** Guardian accounts: every student they may follow. */
+  linkedStudentIds?: string[]
   status: 'active' | 'invited' | 'suspended'
   lastActive: string
   initials: string

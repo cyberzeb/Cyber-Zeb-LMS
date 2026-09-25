@@ -3,16 +3,27 @@ import type { CertificateRecord, CertificateStatus } from '../types'
 import type { CertificatePendingReason } from '../../../modules/students/types'
 import { readInstitutionName } from '../../../shared/storage/readers'
 
+// Crockford base32: no I, L, O or U, so IDs read back without confusion.
+const ID_ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'
+
+function randomBlock(length: number): string {
+  const bytes = new Uint8Array(length)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, (b) => ID_ALPHABET[b % 32]).join('')
+}
+
+/**
+ * A certificate ID such as BER-CERT-2026-7K3M-Q9TD. The random part (40 bits)
+ * makes IDs impossible to guess, so the public verification page cannot be used
+ * to list who holds which certificate by counting through numbers.
+ */
 export function generateCertificateId(existing: CertificateRecord[]): string {
   const year = new Date().getFullYear()
-  const prefix = `BER-CERT-${year}-`
-  const nums = existing
-    .map((c) => c.certificateId)
-    .filter((id) => id.startsWith(prefix))
-    .map((id) => parseInt(id.slice(prefix.length), 10))
-    .filter((n) => !Number.isNaN(n))
-  const next = nums.length > 0 ? Math.max(...nums) + 1 : 1
-  return `${prefix}${String(next).padStart(5, '0')}`
+  const taken = new Set(existing.map((c) => c.certificateId))
+  for (;;) {
+    const id = `BER-CERT-${year}-${randomBlock(4)}-${randomBlock(4)}`
+    if (!taken.has(id)) return id
+  }
 }
 
 export interface IssueCertificateInput {

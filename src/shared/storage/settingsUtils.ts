@@ -22,6 +22,23 @@ export interface InstitutionSettingsState {
   }
   modules: Record<string, boolean>
   integrations: Record<string, boolean>
+  /** Automatic certificates on course completion (applied by the server). */
+  certificates: {
+    autoIssue: boolean
+    rule: 'lessons' | 'passed' | 'both'
+    minPercent: number
+    requireApproval: boolean
+  }
+  /** Which LMS events send email (the server also honours each person's own switches). */
+  notifications: {
+    email: boolean
+    announcements: boolean
+    assessments: boolean
+    grades: boolean
+    liveClasses: boolean
+    certificates: boolean
+    invoices: boolean
+  }
 }
 
 export const defaultInstitutionSettings: InstitutionSettingsState = {
@@ -55,6 +72,21 @@ export const defaultInstitutionSettings: InstitutionSettingsState = {
     microsoftSso: false,
     stripe: false,
     emailSms: true,
+  },
+  certificates: {
+    autoIssue: true,
+    rule: 'passed',
+    minPercent: 50,
+    requireApproval: true,
+  },
+  notifications: {
+    email: true,
+    announcements: true,
+    assessments: true,
+    grades: true,
+    liveClasses: true,
+    certificates: true,
+    invoices: true,
   },
 }
 
@@ -90,5 +122,7 @@ export function normalizeInstitutionSettings(
     academic: { ...defaultInstitutionSettings.academic, ...raw?.academic },
     modules: { ...defaultInstitutionSettings.modules, ...raw?.modules },
     integrations: { ...defaultInstitutionSettings.integrations, ...raw?.integrations },
+    certificates: { ...defaultInstitutionSettings.certificates, ...raw?.certificates },
+    notifications: { ...defaultInstitutionSettings.notifications, ...raw?.notifications },
   }
 }

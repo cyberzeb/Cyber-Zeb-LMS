@@ -18,6 +18,8 @@ import { peoplePageConfigs } from '../data/peoplePageConfig'
 import { migrateGuardianRecord } from '../api/peopleApi'
 import { CampusRoleTable } from '../components/CampusRoleTable'
 import { GuardianEditModal } from '../components/GuardianEditModal'
+import { StudentMultiPicker } from '../components/StudentMultiPicker'
+import { guardianLinkFields } from '../../../shared/people/guardianLinks'
 import type { PersonRow } from '../types'
 
 const config = peoplePageConfigs.Guardian
@@ -43,7 +45,7 @@ export function GuardiansPage() {
   const [inviteForm, setInviteForm] = useState({
     name: '',
     email: '',
-    linkedStudentId: '',
+    linkedStudentIds: [] as string[],
   })
 
   useEffect(() => {
@@ -82,32 +84,33 @@ export function GuardiansPage() {
     [activeCampuses],
   )
 
-  useEffect(() => {
-    if (!students.some((s) => s.id === inviteForm.linkedStudentId)) {
-      setInviteForm((prev) => ({ ...prev, linkedStudentId: students[0]?.id ?? '' }))
-    }
-  }, [students, inviteForm.linkedStudentId])
-
   const openInvite = () => {
-    setInviteForm({ name: '', email: '', linkedStudentId: students[0]?.id ?? '' })
+    setInviteForm({ name: '', email: '', linkedStudentIds: [] })
     setInviteOpen(true)
   }
 
   const handleInvite = () => {
-    if (!inviteForm.name.trim() || !inviteForm.email.trim() || !inviteForm.linkedStudentId) {
-      notify('Please complete all required fields.', 'error')
+    const linked = students.filter((s) => inviteForm.linkedStudentIds.includes(s.id))
+    if (!inviteForm.name.trim() || !inviteForm.email.trim() || linked.length === 0) {
+      notify('Enter a name and email, and link at least one student.', 'error')
       return
     }
-    const student = students.find((s) => s.id === inviteForm.linkedStudentId)
-    if (!student) return
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteForm.email.trim())) {
+      notify('Enter a valid email address.', 'error')
+      return
+    }
+    const email = inviteForm.email.trim().toLowerCase()
+    if (people.some((p) => p.email.toLowerCase() === email)) {
+      notify('Someone with this email already exists.', 'error')
+      return
+    }
 
     const newGuardian = withAdminVerification({
       id: createId('user'),
       name: inviteForm.name.trim(),
-      email: inviteForm.email.trim().toLowerCase(),
+      email,
       role: 'Guardian',
-      department: student.name,
-      campusId: student.campusId,
+      ...guardianLinkFields(linked),
       status: 'invited',
       lastActive: 'Never',
       initials: initialsFromName(inviteForm.name),
@@ -184,24 +187,17 @@ export function GuardiansPage() {
         footer={
           <>
             <Button variant="secondary" onClick={() => setInviteOpen(false)}>Cancel</Button>
-            <Button variant="primary" onClick={handleInvite} disabled={!inviteForm.linkedStudentId}>Send Invite</Button>
+            <Button variant="primary" onClick={handleInvite} disabled={inviteForm.linkedStudentIds.length === 0}>Send Invite</Button>
           </>
         }
       >
         <FormField label="Full Name" value={inviteForm.name} onChange={(v) => setInviteForm({ ...inviteForm, name: v })} placeholder="e.g. Yonas Tadesse" />
         <FormField label="Email Address" value={inviteForm.email} onChange={(v) => setInviteForm({ ...inviteForm, email: v })} placeholder="e.g. yonas.t@gmail.com" />
-        <label className="flex flex-col gap-1.5">
-          <span className="text-[12px] font-semibold text-navy-900">Linked Student</span>
-          <select
-            value={inviteForm.linkedStudentId}
-            onChange={(e) => setInviteForm({ ...inviteForm, linkedStudentId: e.target.value })}
-            className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
-          >
-            {students.map((s) => (
-              <option key={s.id} value={s.id}>{s.name} · {s.department}</option>
-            ))}
-          </select>
-        </label>
+        <StudentMultiPicker
+          students={students}
+          value={inviteForm.linkedStudentIds}
+          onChange={(ids) => setInviteForm({ ...inviteForm, linkedStudentIds: ids })}
+        />
       </Modal>
 
       <GuardianEditModal

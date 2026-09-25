@@ -15,7 +15,9 @@ const ICON_SIZE = 17
 
 const breadcrumbLabels: Record<string, string> = {
   '/staff': 'Dashboard',
+  '/staff/department': 'My Department',
   '/staff/submit-people': 'Submit People',
+  '/staff/submissions': 'My Submissions',
   '/staff/announcements': 'Announcements',
   '/staff/settings': 'Settings',
 }

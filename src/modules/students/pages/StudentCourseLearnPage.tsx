@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
+import { runCertificateAutoIssue } from '../../institution/api/autoIssueApi'
 import {
   ArrowLeft,
   ArrowRight,
@@ -220,6 +222,7 @@ export function StudentCourseLearnPage() {
   const { courseId, lessonId: lessonIdParam } = useParams<{ courseId: string; lessonId?: string }>()
   const navigate = useNavigate()
   const { notify } = useToast()
+  const queryClient = useQueryClient()
 
   const personId = readPortalSession()?.personId ?? null
   const person = personId ? readPersonById(personId) : null
@@ -338,6 +341,20 @@ export function StudentCourseLearnPage() {
 
     const wasComplete = lessonComplete
     markLessonComplete(studentId, course, resolvedLessonId)
+    if (!wasComplete) {
+      // The server decides whether this completes the course's certificate rules.
+      void runCertificateAutoIssue(queryClient, { courseId: course.id })
+        .then((result) => {
+          if (result.issued.length) {
+            notify('You earned a certificate! Find it under My Certificates.', 'success')
+          } else if (result.pending.length) {
+            notify('Course requirements met — your certificate is awaiting approval.', 'info')
+          }
+        })
+        .catch(() => {
+          /* A missing certificate is picked up by the next check; never block learning. */
+        })
+    }
 
     if (!wasComplete) {
       notify('Lesson marked as completed.', 'success')
