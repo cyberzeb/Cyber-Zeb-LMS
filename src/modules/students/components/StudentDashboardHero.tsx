@@ -14,7 +14,8 @@ interface StudentDashboardHeroProps {
 
 export function StudentDashboardHero({ data }: StudentDashboardHeroProps) {
   const { edition } = useOrganizationConfig()
-  const isCorporate = edition === 'corporate'
+  // Only the University Edition keeps GPA, terms and transcripts.
+  const noGpa = edition !== 'university'
 
   const { t } = useLanguage()
   const firstName = data.studentName.split(' ')[0]
@@ -59,7 +60,7 @@ export function StudentDashboardHero({ data }: StudentDashboardHeroProps) {
           {[
             // Corporate employees are not graded on a 4.00 scale; show how much
             // of their assigned training is done instead.
-            isCorporate
+            noGpa
               ? {
                   label: 'Completed',
                   value: `${data.kpis.avgQuizScore}%`,

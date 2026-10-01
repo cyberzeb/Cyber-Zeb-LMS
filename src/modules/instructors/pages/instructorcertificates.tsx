@@ -1,3 +1,4 @@
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import { useMemo, useState } from 'react'
 import {
   Award,
@@ -127,6 +128,7 @@ interface DetailsModalProps {
 }
 
 function DetailsModal({ row, open, onClose }: DetailsModalProps) {
+  const { tx } = useLanguage()
   if (!row) return null
 
   const isIssued = row.certStatus === 'issued'
@@ -201,8 +203,8 @@ function DetailsModal({ row, open, onClose }: DetailsModalProps) {
             : isPending
               ? 'Certificate pending — approval required before issue.'
               : row.certStatus === 'eligible'
-                ? 'Student is eligible. Certificate has not been issued yet.'
-                : 'Student has not yet met the completion threshold.'}
+                ? tx('Student is eligible. Certificate has not been issued yet.')
+                : tx('Student has not yet met the completion threshold.')}
         </span>
       </div>
 
@@ -230,18 +232,19 @@ function DetailsModal({ row, open, onClose }: DetailsModalProps) {
 // ─── Empty State ──────────────────────────────────────────────────────────────
 
 function EmptyState({ hasFilters }: { hasFilters: boolean }) {
+  const { tx } = useLanguage()
   return (
     <tr>
       <td colSpan={7}>
         <div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
           <Award size={32} className="text-navy-300" />
           <p className="text-[14px] font-semibold text-navy-900">
-            {hasFilters ? 'No students match your filters' : 'No students in your courses yet'}
+            {tx(hasFilters ? 'No students match your filters' : 'No students in your courses yet')}
           </p>
           <p className="text-[12px] text-secondary-text max-w-xs leading-relaxed">
             {hasFilters
               ? 'Try adjusting your search or filter criteria.'
-              : 'Students will appear here once they are enrolled in your courses by an admin.'}
+              : tx('Students will appear here once they are enrolled in your courses by an admin.')}
           </p>
         </div>
       </td>
@@ -252,6 +255,7 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function InstructorCertificatesPage() {
+  const { tx } = useLanguage()
   const { rows, isLoading, isError } = useInstructorCertificates()
 
   const [search, setSearch] = useState('')
@@ -387,7 +391,7 @@ export function InstructorCertificatesPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <FilterTabs tabs={STATUS_TABS} active={statusTab} onChange={setStatusTab} />
             <span className="text-[12px] text-secondary-text shrink-0">
-              {sorted.length} student{sorted.length === 1 ? '' : 's'}
+              {tx(`${sorted.length} student${sorted.length === 1 ? '' : 's'}`)}
             </span>
           </div>
 
@@ -560,7 +564,7 @@ export function InstructorCertificatesPage() {
         {rows.length === 0 && !isLoading && (
           <GlassCard className="p-10 text-center max-w-lg mx-auto">
             <Award size={32} className="mx-auto text-navy-300 mb-3" />
-            <p className="text-[14px] font-semibold text-navy-900">No students yet</p>
+            <p className="text-[14px] font-semibold text-navy-900">{tx('No students yet')}</p>
             <p className="text-[12.5px] text-secondary-text mt-2 leading-relaxed">
               Students appear here after they are enrolled in your courses. Ask an admin to
               assign enrollments at <strong>Admin → Enrollments</strong>.
@@ -572,9 +576,8 @@ export function InstructorCertificatesPage() {
         <GlassCard className="p-4 flex items-start gap-3 border-info/20 bg-info-bg/40">
           <ShieldCheck size={16} className="text-info shrink-0 mt-0.5" />
           <p className="text-[12px] text-info leading-relaxed">
-            <span className="font-semibold">Instructor scope: </span>
-            You can view and approve certificates only for students enrolled in your own courses.
-            Certificate templates and institution-wide revocations are managed by an admin.
+            <span className="font-semibold">{tx('Instructor scope: ')}</span>
+            {tx('You can view and approve certificates only for students enrolled in your own courses. Certificate templates and institution-wide revocations are managed by an admin.')}
           </p>
         </GlassCard>
       </div>

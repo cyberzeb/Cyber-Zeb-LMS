@@ -417,6 +417,12 @@ export interface CertificateRecord {
   templateName: string
   status: CertificateStatus
   revokedAt?: string
+  /** Training edition: a program certificate. */
+  programId?: string
+  cohortId?: string
+  cohortName?: string
+  totalHours?: number
+  attendancePercent?: number | null
 }
 
 /* ── Enrollments ──────────────────────────────────────────── */
@@ -444,6 +450,10 @@ export interface CourseEnrollment {
   assignedBy?: string
   /** Corporate edition: when the learner finished, for recertification timing. */
   completedOn?: string
+  /** Training edition: the cohort, program and registration this enrollment belongs to. */
+  cohortId?: string
+  programId?: string
+  registrationId?: string
 }
 
 /* ── People ───────────────────────────────────────────────── */
@@ -458,6 +468,8 @@ export type PersonRole =
   /** Head of department: runs one department (staff portal). */
   | 'HeadOfDepartment'
   | 'HelpDesk'
+  /** Corporate Edition: line manager of one or more teams (manager portal). */
+  | 'Manager'
 
 export interface PersonRow {
   id: string
@@ -489,6 +501,11 @@ export interface PersonRow {
   jobRoleId?: string
   /** Corporate edition: FK to team. */
   teamId?: string
+  /** Training edition: contact details from registration. */
+  phone?: string | null
+  organization?: string | null
+  joinedAt?: string
+  source?: 'registration' | 'admin'
 }
 
 /* ── Reports ──────────────────────────────────────────────── */

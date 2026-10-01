@@ -56,6 +56,8 @@ def map_frontend_role(role: str) -> Role:
         "Staff": Role.DEPARTMENT_ADMIN,
         "HeadOfDepartment": Role.DEPARTMENT_ADMIN,
         "HelpDesk": Role.SUPPORT_AGENT,
+        # Corporate Edition: a line manager follows their own teams.
+        "Manager": Role.MANAGER,
     }
     return mapping.get(role, Role.STUDENT)
 

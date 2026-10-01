@@ -13,7 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.permissions import Role
-from app.modules.certificates.auto_issue import Rules, evaluate
+from app.modules.certificates.auto_issue import Rules, evaluate, evaluate_training
 from app.modules.certificates.schemas import AutoIssueOut, CertificateVerificationOut
 from app.modules.lms_store.models import LmsCollection
 from app.modules.lms_store.service import LmsStoreService
@@ -31,6 +31,11 @@ _AUTO_ISSUE_KEYS = (
     "student-submissions",
     "certificate-templates",
     "settings",
+    "job-roles",
+    "training-programs",
+    "cohorts",
+    "cohort-registrations",
+    "cohort-attendance",
 )
 
 
@@ -110,8 +115,14 @@ class CertificatesService:
         """Create every certificate the institution's completion rules now call for."""
         store = LmsStoreService(self.db)
         collections = {key: await store.get_collection(tenant_id, key) for key in _AUTO_ISSUE_KEYS}
-        rules = Rules.from_settings(collections.get("settings"))
-        new = evaluate(collections, rules, student_id=student_id, course_id=course_id)
+        edition = await store.edition(tenant_id)
+        rules = Rules.from_settings(collections.get("settings"), edition=edition)
+        if edition == "training":
+            new = evaluate_training(collections, rules, student_id=student_id, course_id=course_id)
+        else:
+            new = evaluate(
+                collections, rules, student_id=student_id, course_id=course_id, corporate=edition == "corporate"
+            )
         if new:
             # The server is the authority here, so the write skips the per-role
             # policy — the rules above decided what may be created.

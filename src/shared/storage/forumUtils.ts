@@ -1,3 +1,4 @@
+import { vocab } from '../../shared/i18n/editionGlossary'
 import type { PersonRole, PersonRow } from '../../modules/institution/types'
 import { courseTeachesInstructor } from '../../modules/institution/utils/courseAssignmentUtils'
 import type {
@@ -56,7 +57,7 @@ export function ensureCampusChat(): ForumChatRecord {
     id: CAMPUS_CHAT_ID,
     type: 'campus',
     name: `${institutionName} Community`,
-    description: 'Campus-wide discussion for all students, instructors, and staff.',
+    description: vocab('Campus-wide discussion for all students, instructors, and staff.'),
     memberIds: [],
     createdById: 'system',
     createdAt: now,
@@ -278,7 +279,7 @@ export function buildWelcomeCampusMessage(chatId: string, institutionName: strin
     chatId,
     senderId: 'system',
     senderName: institutionName,
-    body: `Welcome to the ${institutionName} community chat. Connect with classmates, instructors, and staff across campus.`,
+    body: vocab(`Welcome to the ${institutionName} community chat. Connect with classmates, instructors, and staff across campus.`),
     createdAt: now,
   }
 }

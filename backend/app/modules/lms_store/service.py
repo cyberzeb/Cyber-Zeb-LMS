@@ -18,6 +18,25 @@ class LmsStoreService:
         self.repo = LmsCollectionRepository(db)
         self.tenant_repo = TenantRepository(db)
 
+    async def edition(self, tenant_id: uuid.UUID) -> str:
+        """The tenant's edition: "university", "corporate" or "training"."""
+        from app.modules.tenants.models import Tenant
+
+        tenant = await self.db.get(Tenant, tenant_id)
+        kind = getattr(getattr(tenant, "institution_type", None), "value", None) or str(
+            getattr(tenant, "institution_type", "") or ""
+        )
+        kind = kind.lower().replace("institutiontype.", "")
+        if kind == "corporate":
+            return "corporate"
+        if kind == "training":
+            return "training"
+        return "university"
+
+    async def is_university(self, tenant_id: uuid.UUID) -> bool:
+        """University tenants run courses as term offerings; other editions do not."""
+        return await self.edition(tenant_id) == "university"
+
     def scope_context(self, tenant_id: uuid.UUID, person_id: str, role: Role) -> ScopeContext:
         async def loader(key: str) -> Any:
             return await self.get_collection(tenant_id, key)
@@ -88,11 +107,12 @@ class LmsStoreService:
     ) -> Any:
         if key in VALIDATED_COLLECTIONS and isinstance(data, list):
             ctx = self.scope_context(tenant_id, person_id, role)
+            university = await self.is_university(tenant_id)
             try:
                 for record in data:
                     if isinstance(record, dict):
                         # Replacing the collection re-creates every record.
-                        await check_structure(key, None, record, ctx.load)
+                        await check_structure(key, None, record, ctx.load, university=university)
             except StructureViolation as exc:
                 raise ValidationAppError(str(exc)) from exc
         await self.repo.ensure_row(tenant_id, key, data)
@@ -141,6 +161,7 @@ class LmsStoreService:
         row = await self.repo.get(tenant_id, key, for_update=True)
         ctx = self.scope_context(tenant_id, person_id, role)
         current = row.data if row is not None else ({} if keyed else [])
+        university = await self.is_university(tenant_id) if key in VALIDATED_COLLECTIONS else True
 
         try:
             if keyed:
@@ -170,7 +191,7 @@ class LmsStoreService:
                     if not is_admin:
                         await policy.check_record_change(key, ctx, old, record)
                     if key in VALIDATED_COLLECTIONS:
-                        await check_structure(key, old, record, ctx.load)
+                        await check_structure(key, old, record, ctx.load, university=university)
                     if old is not None:
                         data[index[record_id]] = record
                         continue
@@ -198,11 +219,54 @@ class LmsStoreService:
             await self.db.rollback()
             raise ValidationAppError(str(exc)) from exc
 
+        if key == "enrollments" and isinstance(current, list):
+            await self._reset_progress_for_new_rounds(tenant_id, current, upserts, deletes)
+
         row = await self.repo.upsert(tenant_id, key, data)
         await self.db.commit()
         if is_admin:
             return row.data
         return await filter_collection(key, row.data, self.scope_context(tenant_id, person_id, role))
+
+    async def _reset_progress_for_new_rounds(
+        self,
+        tenant_id: uuid.UUID,
+        before: list[Any],
+        upserts: list[tuple[dict[str, Any], Optional[str]]],
+        deletes: list[str],
+    ) -> None:
+        """
+        Recertification: when a new assignment replaces a completed one for the same
+        course, the lessons from the old round must not count towards the new one.
+        """
+        by_id = {r.get("id"): r for r in before if isinstance(r, dict)}
+        finished = {
+            (by_id[i].get("studentId"), by_id[i].get("courseId"))
+            for i in deletes
+            if i in by_id and float(by_id[i].get("progress") or 0) >= 100
+        }
+        fresh = {
+            (record.get("studentId"), record.get("courseId"))
+            for record, _ in upserts
+            if record.get("id") not in by_id
+        }
+        renewals = finished & fresh
+        if not renewals:
+            return
+        progress = await self.get_collection(tenant_id, "lesson-progress", default={})
+        if not isinstance(progress, dict):
+            return
+        changed = False
+        updated = dict(progress)
+        for student_id, course_id in renewals:
+            courses = dict(updated.get(student_id) or {})
+            if course_id in courses:
+                courses[course_id] = []
+                updated[student_id] = courses
+                changed = True
+        if changed:
+            await self.repo.ensure_row(tenant_id, "lesson-progress", {})
+            await self.repo.upsert(tenant_id, "lesson-progress", updated)
 
     async def bootstrap(self, tenant_code: str) -> dict[str, Any]:
         tenant = await self.tenant_repo.get_by_code(tenant_code)

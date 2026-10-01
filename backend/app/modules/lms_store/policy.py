@@ -64,6 +64,14 @@ class Rule:
 # ── Instructor course ownership ─────────────────────────────────────────────
 
 
+async def _managed_employee(record: Record, ctx: ScopeContext) -> bool:
+    return record.get("studentId") in await ctx.managed_employee_ids()
+
+
+async def _led_cohort(record: Record, ctx: ScopeContext) -> bool:
+    return record.get("cohortId") in await ctx.led_cohort_ids()
+
+
 async def _in_taught_course(record: Record, ctx: ScopeContext) -> bool:
     course_id = record.get("courseId")
     if course_id:
@@ -171,6 +179,10 @@ POLICY: dict[str, dict[Role, Rule]] = {
     "quizzes": dict(_teaching),
     "attendances": dict(_teaching),
     "certificates": dict(_teaching),
+    # Training: a cohort's trainer takes its attendance.
+    "cohort-attendance": {
+        role: Rule(owner=_led_cohort, create=True, update=True, delete=True) for role in TEACHING_ROLES
+    },
     "question-bank": {
         role: Rule(owner=_question_owned, create=True, update=True, delete=True) for role in TEACHING_ROLES
     },
@@ -203,8 +215,11 @@ POLICY: dict[str, dict[Role, Rule]] = {
         Role.STUDENT: Rule(
             owner=owned_by("studentId"),
             update=True,
-            owned_update_fields=frozenset({"progress"}),
+            # completedOn: recertification counts from when a course is finished.
+            owned_update_fields=frozenset({"progress", "completedOn"}),
         ),
+        # A line manager may assign training to their own team members.
+        Role.MANAGER: Rule(owner=_managed_employee, create=True, update=True),
     },
     "payments": {Role.FINANCE_OFFICER: Rule(create=True, update=True, delete=True)},
     # Support.

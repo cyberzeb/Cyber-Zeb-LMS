@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Megaphone } from 'lucide-react'
+import { useOrganizationConfig } from '../config/useOrganizationConfig'
 import { Modal } from './Modal'
 import { Button } from './Button'
 import { FormField } from './FormField'
@@ -16,7 +17,7 @@ import type {
 } from '../types/announcements'
 import {
   ALL_ANNOUNCEMENT_TARGET_ROLES,
-  ANNOUNCEMENT_TARGET_ROLE_LABELS,
+  announcementRolesFor,
 } from '../types/announcements'
 
 interface CourseOption {
@@ -200,9 +201,10 @@ function RoleCheckboxGroup({
     onChange([...selectedRoles, role])
   }
 
+  const { edition } = useOrganizationConfig()
   return (
     <div className="rounded-xl border border-divider divide-y divide-divider bg-white">
-      {ALL_ANNOUNCEMENT_TARGET_ROLES.map((role) => (
+      {announcementRolesFor(edition).map(({ role, label }) => (
         <label
           key={role}
           className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition-colors hover:bg-navy-50/70 ${
@@ -215,9 +217,7 @@ function RoleCheckboxGroup({
             onChange={() => toggleRole(role)}
             className="accent-lemon-600"
           />
-          <span className="text-[13px] font-medium text-navy-900">
-            {ANNOUNCEMENT_TARGET_ROLE_LABELS[role]}
-          </span>
+          <span className="text-[13px] font-medium text-navy-900">{label}</span>
         </label>
       ))}
     </div>

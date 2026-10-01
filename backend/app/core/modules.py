@@ -110,10 +110,14 @@ COLLECTION_MODULES: dict[str, ModuleKey] = {
     "lesson-responses": ModuleKey.CONTENT_MANAGEMENT,
     # Enrollment
     "enrollments": ModuleKey.ENROLLMENT_COHORTS,
+    "training-programs": ModuleKey.ENROLLMENT_COHORTS,
+    "cohorts": ModuleKey.ENROLLMENT_COHORTS,
+    "cohort-registrations": ModuleKey.ENROLLMENT_COHORTS,
     # Virtual classroom
     "live-sessions": ModuleKey.VIRTUAL_CLASSROOM,
     # Attendance
     "attendances": ModuleKey.ATTENDANCE,
+    "cohort-attendance": ModuleKey.ATTENDANCE,
     # Assignments and assessments
     "assignments": ModuleKey.ASSIGNMENTS_ASSESSMENTS,
     "quizzes": ModuleKey.ASSIGNMENTS_ASSESSMENTS,

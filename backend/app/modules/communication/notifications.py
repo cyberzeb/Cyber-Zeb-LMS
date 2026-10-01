@@ -29,7 +29,16 @@ Change = tuple[Optional[Record], Record]
 
 # Collections whose changes can trigger an email.
 NOTIFY_KEYS = frozenset(
-    {"announcements", "assignments", "quizzes", "student-submissions", "live-sessions", "certificates", "payments"}
+    {
+        "announcements",
+        "assignments",
+        "quizzes",
+        "student-submissions",
+        "live-sessions",
+        "certificates",
+        "payments",
+        "enrollments",
+    }
 )
 # What planning needs to resolve recipients.
 CONTEXT_KEYS = (
@@ -55,6 +64,8 @@ EVENT_DEFAULTS = {
     "liveClasses": True,
     "certificates": True,
     "invoices": True,
+    "training": True,
+    "reminders": True,
 }
 
 # Portal role names (as stored on people) per settings collection.
@@ -282,6 +293,21 @@ def plan_emails(key: str, changes: list[Change], data: dict[str, Any]) -> list[E
                 f"{student.get('name', 'Your child')} earned a certificate",
                 [f"For {new.get('courseCode', '')} — {new.get('courseTitle', '')}."],
                 ("Open the guardian portal", _link("/guardian")),
+            )
+
+        elif key == "enrollments" and old is None and new.get("status", "active") == "active" and event_enabled(data, "training"):
+            person = people.get(new.get("studentId"))
+            if not person:
+                continue
+            title = new.get("courseTitle") or "a course"
+            due = str(new.get("dueDate") or "")[:10]
+            send(
+                [person],
+                {"Student": "assignments"},
+                f"New training: {title}" if due else f"You are enrolled in {title}",
+                f"You have been assigned “{title}”" if due else f"You are enrolled in “{title}”",
+                [f"Please complete it by {due}." if due else "", "Required for your role." if new.get("isMandatory") else ""],
+                ("Start now", _link("/student/courses")),
             )
 
         elif key == "payments" and old is None and new.get("status") in ("pending", "overdue") and event_enabled(data, "invoices"):

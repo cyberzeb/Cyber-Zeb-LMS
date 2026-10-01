@@ -1,3 +1,4 @@
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { useMemo, useState } from 'react'
 import { UserPlus } from 'lucide-react'
 import { PageHeader } from '../../../shared/components/PageHeader'
@@ -23,6 +24,7 @@ function readCampusesForStaffModal(): Campus[] {
 
 export function StaffSubmitPeoplePage() {
   const { notify } = useToast()
+  const { edition } = useOrganizationConfig()
   const person = getSessionPerson()
   const { people, setPeople } = usePeople()
   const [submitOpen, setSubmitOpen] = useState(false)
@@ -46,7 +48,11 @@ export function StaffSubmitPeoplePage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Submit People"
-        subtitle="Add students, instructors or guardians for institution admin verification."
+        subtitle={
+          edition === 'corporate'
+            ? 'Add employees, trainers or managers for admin verification.'
+            : 'Add students, instructors or guardians for institution admin verification.'
+        }
       />
 
       <GlassCard className="p-6 text-center max-w-xl">

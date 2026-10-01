@@ -61,6 +61,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           return (
             <div
               key={toast.id}
+              role="status"
               className={`animate-fade-in-up flex items-start gap-3 bg-white/95 dark:bg-[#0a121e]/95 backdrop-blur-md border border-divider dark:border-divider border-l-4 ${style.accent} rounded-xl shadow-[0_12px_32px_-8px_rgba(27,35,64,0.25)] dark:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.45)] px-4 py-3`}
             >
               <span className={`mt-0.5 shrink-0 ${style.color}`}>{style.icon}</span>

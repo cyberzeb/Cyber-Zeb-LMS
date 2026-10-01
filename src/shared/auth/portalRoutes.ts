@@ -10,6 +10,7 @@ export const LOGIN_ROLES: { value: LoginRole; label: string }[] = [
   { value: 'Staff', label: 'Staff' },
   { value: 'Guardian', label: 'Guardian' },
   { value: 'HelpDesk', label: 'Help Desk' },
+  { value: 'Manager', label: 'Manager' },
   { value: 'Admin', label: 'Institution Admin' },
   { value: 'SuperAdmin', label: 'Super Admin' },
 ]
@@ -23,6 +24,7 @@ export const ROLE_HOME: Record<LoginRole, string> = {
   Staff: '/staff',
   Guardian: '/guardian',
   HelpDesk: '/help-desk',
+  Manager: '/manager',
   Admin: '/admin',
   SuperAdmin: '/super-admin',
 }
@@ -47,6 +49,7 @@ export const PORTAL_ROLES: Record<string, PersonRole[]> = {
   '/student': ['Student'],
   '/guardian': ['Guardian'],
   '/help-desk': ['HelpDesk'],
+  '/manager': ['Manager'],
 }
 
 /** True when this session role may use the given portal. */

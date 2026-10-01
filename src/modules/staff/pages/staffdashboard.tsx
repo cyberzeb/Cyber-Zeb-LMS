@@ -1,3 +1,4 @@
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { useMemo } from 'react'
 import { Briefcase, ClipboardCheck, UserPlus } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -12,6 +13,7 @@ import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 
 export function StaffDashboardPage() {
   const { t } = useLanguage()
+  const { edition } = useOrganizationConfig()
   const person = getSessionPerson()
 
   const { pendingSubmissions, mySubmissions, myPending } = useMemo(() => {
@@ -82,7 +84,11 @@ export function StaffDashboardPage() {
               <UserPlus size={18} className="text-navy-600" />
               <div>
                 <div className="text-[13px] font-semibold text-navy-900">Submit a new person</div>
-                <div className="text-[12px] text-secondary-text">Students, instructors or guardians for admin verification</div>
+                <div className="text-[12px] text-secondary-text">
+                  {edition === 'corporate'
+                    ? 'Employees, trainers or managers for admin verification'
+                    : 'Students, instructors or guardians for admin verification'}
+                </div>
               </div>
             </Link>
             <Link

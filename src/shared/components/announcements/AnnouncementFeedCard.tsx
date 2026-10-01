@@ -1,3 +1,4 @@
+import { vocab } from '../../../shared/i18n/editionGlossary'
 import type { ReactNode } from 'react'
 import { Building2, Calendar, Eye, Shield, Users } from 'lucide-react'
 import { Button } from '../Button'
@@ -43,7 +44,7 @@ export function AnnouncementFeedCard({ item, variant, onEdit, onDelete }: Announ
 
   const audienceLabel =
     item.audience ??
-    (item.course ? item.course : variant === 'student' ? 'Campus-wide' : undefined)
+    (item.course ? item.course : variant === 'student' ? vocab('Campus-wide') : undefined)
 
   return (
     <GlassCard

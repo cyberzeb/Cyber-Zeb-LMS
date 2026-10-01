@@ -1,3 +1,4 @@
+import { vocab } from '../../../shared/i18n/editionGlossary'
 import { useEffect, useMemo, useState } from 'react'
 import { Bell, Briefcase, Lock, UserRound } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
@@ -69,7 +70,7 @@ export function StaffSettingsPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Settings"
-        subtitle="Staff portal preferences stored in your browser."
+        subtitle="Your profile and notification preferences."
         actions={
           <>
             <Button variant="secondary" onClick={() => setDraft(stored)} disabled={!isDirty}>
@@ -125,7 +126,7 @@ export function StaffSettingsPage() {
         />
         <ToggleRow
           label="Announcements"
-          description="Campus-wide staff announcements"
+          description={vocab('Campus-wide staff announcements')}
           enabled={draft.notifications.announcements}
           onToggle={() =>
             setDraft((s) => ({

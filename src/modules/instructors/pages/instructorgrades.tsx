@@ -1,3 +1,4 @@
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import { useMemo } from 'react'
 import { AlertTriangle, Award, Download, GraduationCap, Target, TrendingUp, Trophy } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
@@ -24,6 +25,7 @@ const statusLabel: Record<GradebookEntry['status'], string> = {
 }
 
 export function InstructorGradesPage() {
+  const { tx } = useLanguage()
   const { data, isLoading, isError } = useInstructorDashboard()
 
   const stats = useMemo(() => {
@@ -85,14 +87,14 @@ export function InstructorGradesPage() {
         <div className="lg:col-span-2">
           <GlassCard className="p-0 overflow-hidden">
             <div className="p-5 border-b border-divider">
-              <h3 className="text-[15px] font-bold text-navy-900">Student Grades</h3>
-              <p className="text-[12px] text-secondary-text mt-0.5">Current term performance by student</p>
+              <h3 className="text-[15px] font-bold text-navy-900">{tx('Student Grades')}</h3>
+              <p className="text-[12px] text-secondary-text mt-0.5">{tx('Current term performance by student')}</p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-left">
                 <thead>
                   <tr className="text-[10px] uppercase tracking-wider text-secondary-text border-b border-divider">
-                    <th className="py-3 px-5 font-semibold">Student</th>
+                    <th className="py-3 px-5 font-semibold">{tx('Student')}</th>
                     <th className="py-3 px-2 font-semibold">Course</th>
                     <th className="py-3 px-2 font-semibold">Grade</th>
                     <th className="py-3 px-2 font-semibold">Score</th>
@@ -142,7 +144,7 @@ export function InstructorGradesPage() {
               </li>
               <li className="flex items-start gap-2">
                 <AlertTriangle size={14} className="text-danger mt-0.5 shrink-0" />
-                {stats.atRisk} student{stats.atRisk === 1 ? '' : 's'} flagged for follow-up
+                {tx(`${stats.atRisk} student${stats.atRisk === 1 ? '' : 's'} flagged for follow-up`)}
               </li>
             </ul>
           </GlassCard>

@@ -16,7 +16,7 @@ resolved at runtime in `src/shared/config/tenant.ts`.
 - ❌ Missing: not built
 - ➖ Not applicable to this edition
 
-Status as of Phase 4 (2026-09-21) — Corporate Edition complete, including its demo tenant. Super Admin details: [SUPER_ADMIN.md](SUPER_ADMIN.md). Update this file whenever a row changes.
+Status as of 2026-09-27 — University, Corporate and Training Editions complete, each with a demo tenant. Super Admin details: [SUPER_ADMIN.md](SUPER_ADMIN.md). Update this file whenever a row changes.
 
 ---
 
@@ -32,13 +32,13 @@ Status as of Phase 4 (2026-09-21) — Corporate Edition complete, including its 
 | Data persistence | 🟡 | Record-level saves (no lost updates across records). Failed saves roll back and show an error. Still JSON collections, not normalized tables |
 | Normalized backend domain modules | ❌ | 12 of 17 backend modules are empty stubs (courses, enrollment, assessments, …) |
 | Dark mode / light mode | ✅ | |
-| Multi-language (i18n) | 🟡 | Provider exists. Coverage is not complete |
+| Multi-language (i18n) | 🟡 | Provider exists. Coverage is not complete. Edition vocabulary (Student → Employee, Instructor → Trainer, …) is applied to shared screens by `shared/i18n/editionGlossary.ts` |
 | Zoom live sessions | ✅ | Real Zoom API (`live_sessions/zoom_client.py`). Only instructors/admins can create or end meetings |
 | Payment gateway | 🟡 | Server checkout: Chapa (ETB) when `CHAPA_SECRET_KEY` is set, verified with Chapa before marking paid; demo provider on demo servers. Chapa not yet tested with real keys |
-| Email notifications | ✅ | LMS events email the right people: announcements, published assignments/quizzes, grades (student + guardians), live classes, certificates, invoices. Per-event switches in Settings; personal switches respected (`communication/notifications.py`) |
+| Email notifications | ✅ | LMS events email the right people: announcements, published assignments/quizzes, grades (student + guardians), live classes, certificates, invoices, training assigned (corporate), cohort registration / seat confirmed / cancelled (training). Per-event switches in Settings; personal switches respected (`communication/notifications.py`) |
 | Report PDF export | ✅ | `exportInstitutionReport.ts` |
-| Automated tests | ✅ | Backend: 90 tests (adds certificates, auto-issue, verification, notifications, guardian links, Zoom guards). Frontend: Vitest, `npm test` (certificates, grading, guardian links, API errors) |
-| Lint / type-check / build | ✅ | 0 lint errors (60 warnings tracked), `tsc` clean, build passes |
+| Automated tests | ✅ | Backend: 115 tests (adds corporate assignments, manager scope, training reminders, certification expiry/renewal, training registration → payment → enrollment, cohort scoping, program certificates). Frontend: Vitest, `npm test` (certificates, grading, guardian links, API errors, edition vocabulary, training rules) |
+| Lint / type-check / build | ✅ | 0 lint errors (59 warnings tracked), `tsc` clean, build passes |
 | Read scoping per role | ✅ | Server builds each role's view (`lms_store/scope.py`): own records, own/taught courses, linked children; others as directory entries only. Answer keys never sent to students |
 | Per-person portal settings | ✅ | Fixed in Phase 1 (previously one shared object for all users) |
 
@@ -53,28 +53,28 @@ Status as of Phase 4 (2026-09-21) — Corporate Edition complete, including its 
 | Audit logs, roles, settings, notifications, export | ✅ | Verified in Phase 2 |
 | Appearance, integrations, system health, backup, security, analytics | 🟡 | Backup/analytics fixed for SQLite; super admin suspension enforced. User reports/bans not connected to portal users (decision needed) |
 | Institution controls (suspend, reactivate, reset admin code, renew) | ✅ | Added in Phase 2 |
-| Demo tenant per edition | 🟡 | University (`berana`) and Corporate (`horizon` — Horizon Bank) are seeded. Training still has no backend demo tenant |
+| Demo tenant per edition | ✅ | University (`berana`), Corporate (`horizon` — Horizon Bank) and Training (`apex` — Apex Training Institute) are seeded |
 
 ## 3. Shared learning engine (all editions)
 
 | Feature | University | Corporate | Training | Notes |
 |---|---|---|---|---|
-| Course catalog and authoring | ✅ | ✅ | 🟡 | Corporate has its own catalog of mandatory training, driven by job roles. Training still reuses the university pages with relabeling |
+| Course catalog and authoring | ✅ | ✅ | ✅ | Corporate has its own catalog of mandatory training, driven by job roles. Training builds programs out of catalog courses |
 | Course content / lessons (learner player) | ✅ | ✅ | 🟡 | Shared player; the corporate learner portal is edition-correct |
 | Library & Resources | ✅ | ✅ | ✅ | Added to the corporate and training admin nav in Phase 4 |
-| Enrollment | ✅ | ✅ | 🟡 | Corporate assignments come from job roles with due dates and recertification, not manual enrolment |
+| Enrollment | ✅ | ✅ | ✅ | Corporate assignments come from job roles with due dates and recertification, plus manual "Assign training" by admins and managers (`/admin/enrollments`). Training enrolls a learner in every course of a program when their cohort seat is confirmed |
 | Live classes | ✅ | ✅ | ✅ | Hosts get a fresh Zoom start link on each start (Zoom's expires after ~2h). Status follows the clock without a reload |
 | Assignments | ✅ | ✅ | ✅ | |
 | Quizzes / exams | ✅ | ✅ | ✅ | |
 | Question bank | ✅ | ✅ | ✅ | Added to the corporate and training admin nav in Phase 4 |
-| Grading / gradebook | ✅ | ✅ | 🟡 | Quizzes graded on the server. The corporate learner view shows an assessment average instead of GPA; training still shows GPA wording |
-| Attendance | ✅ | ✅ | ✅ | Added to the corporate and training admin nav in Phase 4 |
-| Certificates | ✅ | 🟡 | 🟡 | Free-form template designer, PDF download (admin, learner, guardian), QR code to the public `/verify` page with unguessable IDs. Automatic issue on completion (lessons / passed / both, optional approval) run on the server |
+| Grading / gradebook | ✅ | ✅ | ✅ | Quizzes graded on the server. Corporate and training learners see an assessment average ("My Results") instead of GPA and transcripts |
+| Attendance | ✅ | ✅ | ✅ | Training takes attendance per cohort session (trainer or admin), and it counts towards the certificate |
+| Certificates | ✅ | ✅ | ✅ | Free-form template designer, PDF download (admin, learner, guardian), QR code to the public `/verify` page with unguessable IDs. Automatic issue on completion (lessons / passed / both, optional approval) run on the server. Corporate: issued when a module is finished, expires after the job role's recertification interval, and a new round is assigned for renewal. Training: one certificate per program, issued when every course is finished (and passed) and attendance reaches the program minimum |
 | Announcements | ✅ | ✅ | ✅ | |
 | Discussion forum | ✅ | ✅ | ✅ | |
 | Help desk | ✅ | ✅ | ✅ | |
-| Reports & analytics | ✅ | ✅ | 🟡 | Corporate gets a compliance report pack (by department and job role, CSV export). Training still uses the university metrics |
-| Settings | ✅ | ✅ | 🟡 | Corporate reads "Organization" and "Training Defaults", adds a completion window, and drops tuition |
+| Reports & analytics | ✅ | ✅ | ✅ | Corporate gets a compliance report pack (by department and job role, CSV export). Training gets enrollment, completion, attendance and fee income by program and cohort (CSV) |
+| Settings | ✅ | ✅ | ✅ | Corporate and training read "Organization" and "Training Defaults" and drop GPA and guardians; corporate adds a completion window and drops tuition; training certifies programs |
 
 ## 4. Berana University Edition
 
@@ -112,7 +112,9 @@ Target model: Company → Departments → Teams → Employees → Job roles → 
 | Automatic training assignment from job role | ✅ | `useRequiredTraining`: assign per employee, per role, or organization-wide. Idempotent, sets due dates, and reassigns expired certifications |
 | Compliance tracking | ✅ | Per-employee required/completed/overdue/due-soon/recertification counts, with unassigned requirements called out |
 | Compliance deadlines, overdue alerts, re-certification | ✅ | Due dates from the job role, a prioritised alerts list (overdue → unassigned → due soon → recertification), and expired certifications stop counting as complete |
-| Manager / team-lead view | ✅ | Team detail at `/admin/corporate/teams/:teamId`: members, team compliance rate, overdue members and the team's alerts |
+| Manager / team-lead view | ✅ | Admin team detail at `/admin/corporate/teams/:teamId`, plus a dedicated Manager portal (`/manager`) for line managers: team compliance, assign training, remind, certifications and reports. The server scopes managers to their own teams |
+| Training reminders | ✅ | Daily server job: due-soon, overdue (weekly) and recertification emails to employees, plus a weekly digest to each manager. "Remind" buttons and "Send reminders now" for manual sends. Switch in Settings → Notifications |
+| Employees and assignments pages | ✅ | `/admin/students` is an Employees page (job role, team, manager, compliance, CSV). `/admin/enrollments` is a Training Assignments page with due dates, status filters and CSV |
 | Employee portal (no GPA, semesters or transcripts) | ✅ | Transcript and tuition hidden for corporate; "Grades" reads "My Results" and breadcrumbs use training wording |
 | University-only features hidden (guardians, tuition, semesters) | ✅ | Hidden in the admin nav and now in the learner portal too |
 
@@ -124,7 +126,10 @@ demo code — the email lookup resolves the tenant, and the workspace switches t
 the Corporate Edition automatically.
 
 Its data is built from the job roles, so the compliance page has one employee in
-each state: fully compliant, due soon, overdue and recertification due. Dates are
+each state: fully compliant, due soon, overdue and recertification due. Courses
+have real lessons and knowledge checks, and two managers (Dawit Kebede
+`d.kebede@horizonbank.et`, Liya Mekonnen `l.mekonnen@horizonbank.et`) each own
+two teams. Dates are
 relative to when the seed was generated — re-run `npm run export-seed` if they
 drift out of date.
 
@@ -134,27 +139,39 @@ Target flow: create program → create cohort → open enrollment → learner re
 
 | Feature | Status | Notes |
 |---|---|---|
-| Training dashboard | 🟡 | Reachable at `/admin`. **Numbers are hardcoded** (`useTrainingOverview.ts`) |
-| Training programs (create/edit/delete) | 🟡 | Restored from the `training-edition` branch in Phase 0. Needs QA |
-| Cohorts (seats, dates, trainer, delivery mode) | 🟡 | Restored in Phase 0. Needs QA |
-| Training divisions | 🟡 | Uses the shared departments page |
-| Learners | 🟡 | Two sources: the `people` collection (login accounts, in nav) and the restored `learners` collection (`/admin/training/learners`, not in nav). Must be unified (Phase 5) |
-| Trainers | 🟡 | Same split as learners (`/admin/training/trainers`) |
-| Open enrollment / public learner registration | ❌ | |
-| Payment at registration | ❌ | |
-| Cohort attendance | ❌ | |
-| Completion rules → automatic certificate | ❌ | |
-| Learner portal organized around cohorts | ❌ | Learners see the student portal |
-| Training demo seed data | 🟡 | Frontend seed only (`training/data/trainingSeedData.ts`). No backend demo tenant |
+| Training dashboard | ✅ | Live numbers: learners, running/upcoming cohorts, seat fill, completion rate, certificates, fees collected, and a "needs attention" list (expired holds, missing trainers, low sign-ups, missing or low attendance) |
+| Training programs | ✅ | A program bundles catalog courses and has a price, level, delivery mode, hours, minimum attendance and certificate design (`/admin/training/programs`) |
+| Cohorts | ✅ | Dated intakes with seats, trainer, location/schedule/online link, optional price override and registration deadline. Cohort page: roster with payment, progress, attendance and certificate per learner; add learners; take attendance; withdraw with refund |
+| Training divisions | ✅ | Own page (`/admin/training/divisions`) with lead trainer and program counts |
+| Learners | ✅ | People with the learner role (`/admin/students`): cohorts, progress, attendance, certificates and balance; add, edit, enroll |
+| Trainers | ✅ | Shared people page, relabeled. A cohort's trainer can see and teach its learners |
+| Public registration | ✅ | `/join/<institution code>`: program catalog with open cohorts and seats left; registering creates the learner account. Copy the link from Cohorts |
+| Payment at registration | ✅ | A paid program creates an invoice and holds the seat for 7 days. Paying online (Chapa, or the demo provider) or an admin "Mark paid" / "Waive fee" confirms the seat and enrolls the learner. Free programs enroll at once |
+| Registrations | ✅ | `/admin/enrollments`: every sign-up with status (enrolled / awaiting payment / hold expired / cancelled), fees and CSV |
+| Cohort attendance | ✅ | Trainers and admins mark present / late / absent / excused per session; learners see only their own marks |
+| Completion rules → automatic certificate | ✅ | Program certificate on the server (`certificates/auto_issue.py`), re-checked when lessons are finished and when attendance is taken |
+| Learner portal organized around cohorts | ✅ | "My Programs" (`/student/programs`): cohorts, courses, progress, attendance vs. minimum, certificate; open intakes to register for; pay to confirm |
+| Trainer portal | ✅ | "My Cohorts" (`/instructor/cohorts`): roster with progress and attendance, take attendance |
+| Emails | ✅ | Registration received (with how to pay), seat confirmed, and cancelled — one email per step, not per course |
+| Training demo seed data | ✅ | `apex` (Apex Training Institute): 4 programs, 7 cohorts in every state, 14 learners, invoices, attendance and certificates |
+
+### Training demo tenant
+
+`apex` is seeded from `backend/seed_data/training.json` (`python scripts/seed_db.py training`).
+Sign in as the admin `h.wolde@apexacademy.et`, the trainer `y.alemu@apexacademy.et`,
+or the learner `selam.hailu@learner.apex.et` (code 000000 in demo mode). The public
+registration page is `/join/apex`. Dates are relative to when the seed was generated —
+re-run `npm run export-seed` if they drift.
 
 ## 7. Role portals
 
 | Portal | Route | University | Corporate | Training |
 |---|---|---|---|---|
-| Admin | `/admin` | ✅ | ✅ | 🟡 |
-| Learner (student) | `/student` | ✅ | ✅ | 🟡 |
-| Instructor / trainer | `/instructor` | ✅ | 🟡 | 🟡 |
-| Staff | `/staff` | ✅ | ➖ | ➖ |
+| Admin | `/admin` | ✅ | ✅ | ✅ |
+| Learner (student) | `/student` | ✅ | ✅ | ✅ |
+| Instructor / trainer | `/instructor` | ✅ | ✅ | ✅ |
+| Staff (HR / learning team) | `/staff` | ✅ | ✅ | ➖ |
+| Manager | `/manager` | ➖ | ✅ | ➖ |
 | Guardian | `/guardian` | ✅ | ➖ | ➖ |
 | Help desk | `/help-desk` | ✅ | ✅ | ✅ |
 | Super Admin | `/super-admin` | ✅ (platform-wide) | | |

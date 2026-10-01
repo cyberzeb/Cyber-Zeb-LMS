@@ -1,3 +1,4 @@
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import type { ReactNode } from 'react'
 import { Building2, CalendarDays, Clock, Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -37,6 +38,7 @@ function ProfileField({
 }
 
 export function InstructorProfileCard({ data }: InstructorProfileCardProps) {
+  const { tx } = useLanguage()
   const navigate = useNavigate()
 
   return (
@@ -69,7 +71,7 @@ export function InstructorProfileCard({ data }: InstructorProfileCardProps) {
           <span className="text-[12px] text-[#c5cade] mb-1">active courses</span>
         </div>
         <p className="mt-2 text-[11px] text-[#c5cade]">
-          {data.kpis.totalStudents} students · {data.kpis.pendingGrading} pending to grade
+          {tx(`${data.kpis.totalStudents} students`)} · {data.kpis.pendingGrading} pending to grade
         </p>
       </div>
 

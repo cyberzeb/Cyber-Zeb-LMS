@@ -58,6 +58,7 @@ function assignmentStatusTone(status: AssignmentSubmission['status']) {
 
 export function InstructorDashboardPage() {
   const { t } = useLanguage()
+  const { tx } = useLanguage()
   const navigate = useNavigate()
   const { data, isLoading, isError, error, reload } = useInstructorDashboard()
 
@@ -150,7 +151,7 @@ export function InstructorDashboardPage() {
               {t('common.welcomeBack')} <span className="text-navy-700">{firstName}</span>
             </h1>
             <p className="text-[13px] text-secondary-text mt-1">
-              Manage your courses, grade submissions, and track student performance across {data.department} · {data.term}.
+              {tx(`Manage your courses, grade submissions, and track student performance across ${data.department}${data.term ? ` · ${data.term}` : ''}.`)}
             </p>
             <p className="text-[12px] text-lemon-700 font-semibold mt-1.5">{data.specialization}</p>
             <div className="flex flex-wrap items-center gap-2 mt-4">
@@ -172,7 +173,7 @@ export function InstructorDashboardPage() {
               </Button>
               <Button variant="secondary" onClick={() => navigate('/instructor/students')}>
                 <Users size={15} />
-                Student roster
+                {tx('Student roster')}
               </Button>
               <Button variant="primary" onClick={() => navigate('/instructor/grades')}>
                 <GraduationCap size={15} />
@@ -364,7 +365,7 @@ export function InstructorDashboardPage() {
 
         <TrendLineChart
           title="Forum Engagement"
-          subtitle="Student discussion activity over the last 6 weeks"
+          subtitle={tx('Student discussion activity over the last 6 weeks')}
           data={data.engagementTrend}
           color="#7C3AED"
           unit=""
@@ -379,7 +380,7 @@ export function InstructorDashboardPage() {
                 <thead>
                   <tr className="table-header-label border-b border-divider table-header-bar">
                     <th className="py-2 pr-2 font-semibold">Course</th>
-                    <th className="py-2 px-2 font-semibold">Students</th>
+                    <th className="py-2 px-2 font-semibold">{tx('Students')}</th>
                     <th className="py-2 px-2 font-semibold">Next Session</th>
                     <th className="py-2 px-2 font-semibold">Progress</th>
                     <th className="py-2 pl-2 font-semibold">Pending</th>

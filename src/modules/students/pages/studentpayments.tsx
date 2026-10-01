@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { CheckCircle2, CreditCard, Receipt, Wallet } from 'lucide-react'
@@ -12,6 +12,7 @@ import { apiErrorMessage } from '../../../shared/api/client'
 import { checkoutInvoice, verifyCheckout } from '../../../shared/api/paymentsApi'
 import { refreshCollection } from '../../../shared/hooks/useApiCollection'
 import { STORAGE_KEYS } from '../../../shared/storage/keys'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
 import type { PaymentItem } from '../types'
@@ -41,6 +42,17 @@ export function StudentPaymentsPage() {
   const [payingId, setPayingId] = useState<string | null>(null)
   const [searchParams, setSearchParams] = useSearchParams()
   const verifiedRef = useRef<string | null>(null)
+  const { edition } = useOrganizationConfig()
+
+  // A paid registration fee confirms a cohort seat and enrolls the learner, so
+  // re-read those too.
+  const refreshPaid = useCallback(async () => {
+    await Promise.all(
+      [STORAGE_KEYS.payments, STORAGE_KEYS.cohortRegistrations, STORAGE_KEYS.enrollments].map((key) =>
+        refreshCollection(queryClient, key).catch(() => undefined),
+      ),
+    )
+  }, [queryClient])
 
   // Returning from the payment provider: confirm the payment on the server.
   const txRef = searchParams.get('tx_ref')
@@ -50,7 +62,7 @@ export function StudentPaymentsPage() {
     void (async () => {
       try {
         const result = await verifyCheckout(txRef)
-        await refreshCollection(queryClient, STORAGE_KEYS.payments)
+        await refreshPaid()
         void reload()
         notify(
           result.status === 'paid'
@@ -64,7 +76,7 @@ export function StudentPaymentsPage() {
         setSearchParams({}, { replace: true })
       }
     })()
-  }, [txRef, notify, queryClient, reload, setSearchParams])
+  }, [txRef, notify, refreshPaid, reload, setSearchParams])
 
   const stats = useMemo(() => {
     if (!data) return { pending: 0, paid: 0, overdue: 0 }
@@ -90,8 +102,10 @@ export function StudentPaymentsPage() {
         window.location.assign(result.checkout_url)
         return
       }
-      await refreshCollection(queryClient, STORAGE_KEYS.payments)
-      notify(`Payment for "${label}" completed.`)
+      await refreshPaid()
+      notify(
+        edition === 'training_organization' ? `Payment for "${label}" received — your place is confirmed.` : `Payment for "${label}" completed.`,
+      )
       void reload()
     } catch (err) {
       notify(apiErrorMessage(err) ?? 'Payment could not be started. Please try again.', 'error')
@@ -104,7 +118,11 @@ export function StudentPaymentsPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Payments & Fees"
-        subtitle="Tuition, lab fees, and registration — view balances and pay online."
+        subtitle={
+          edition === 'training_organization'
+            ? 'Program registration fees — pay online to confirm your place.'
+            : 'Tuition, lab fees, and registration — view balances and pay online.'
+        }
         actions={
           outstanding.length > 0 ? (
             <Button

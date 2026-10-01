@@ -156,6 +156,8 @@ export interface CertificateItem {
   /** Date the course work was completed */
   completionDate?: string
   credentialId: string
+  /** When the certification must be renewed (Corporate Edition), YYYY-MM-DD. */
+  expiresAt?: string
   status: 'issued' | 'in-progress'
   /** Only present when status === 'in-progress' */
   pendingReason?: CertificatePendingReason

@@ -27,6 +27,8 @@ from app.modules.integrations.router import router as integrations_router
 from app.modules.admin.router import router as admin_router
 from app.modules.onboarding.router import router as onboarding_router
 from app.modules.lms_store.router import router as lms_store_router
+from app.modules.training.router import public_router as training_public_router
+from app.modules.training.router import router as training_router
 
 api_router = APIRouter()
 
@@ -36,6 +38,11 @@ api_router.include_router(onboarding_router)
 # Public certificate verification (QR codes and share links point here)
 api_router.include_router(
     certificates_public_router, prefix="/public/certificates", tags=["Certificates & Credentials"]
+)
+
+# Public training registration (Training Edition catalog and sign-up page)
+api_router.include_router(
+    training_public_router, prefix="/public/training", tags=["Training Registration"]
 )
 
 # LMS Data Store (generic per-tenant collections consumed by the portal frontends)
@@ -58,6 +65,11 @@ api_router.include_router(
 )
 api_router.include_router(
     enrollment_router, prefix="/enrollments", tags=["Enrollment"],
+    dependencies=[Depends(require_module(ModuleKey.ENROLLMENT_COHORTS))],
+)
+
+api_router.include_router(
+    training_router, prefix="/training", tags=["Training Registration"],
     dependencies=[Depends(require_module(ModuleKey.ENROLLMENT_COHORTS))],
 )
 

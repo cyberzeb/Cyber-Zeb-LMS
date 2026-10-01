@@ -38,6 +38,8 @@ export interface InstitutionSettingsState {
     liveClasses: boolean
     certificates: boolean
     invoices: boolean
+    training: boolean
+    reminders: boolean
   }
 }
 
@@ -87,6 +89,8 @@ export const defaultInstitutionSettings: InstitutionSettingsState = {
     liveClasses: true,
     certificates: true,
     invoices: true,
+    training: true,
+    reminders: true,
   },
 }
 
@@ -115,14 +119,24 @@ export function mergePortalSettings<T>(
 /** Merge partial localStorage settings with defaults (seed data may only store general.name). */
 export function normalizeInstitutionSettings(
   raw: Partial<InstitutionSettingsState> | null | undefined,
+  edition?: string,
 ): InstitutionSettingsState {
+  // Corporate training counts as done when it is finished, with no approval step
+  // (the server applies the same default until the admin saves their own).
+  // A training program is complete when its courses are finished and passed.
+  const certificateDefaults =
+    edition === 'corporate'
+      ? { ...defaultInstitutionSettings.certificates, rule: 'lessons' as const, requireApproval: false }
+      : edition === 'training_organization'
+        ? { ...defaultInstitutionSettings.certificates, rule: 'both' as const, requireApproval: false }
+        : defaultInstitutionSettings.certificates
   return {
     general: { ...defaultInstitutionSettings.general, ...raw?.general },
     branding: { ...defaultInstitutionSettings.branding, ...raw?.branding },
     academic: { ...defaultInstitutionSettings.academic, ...raw?.academic },
     modules: { ...defaultInstitutionSettings.modules, ...raw?.modules },
     integrations: { ...defaultInstitutionSettings.integrations, ...raw?.integrations },
-    certificates: { ...defaultInstitutionSettings.certificates, ...raw?.certificates },
+    certificates: { ...certificateDefaults, ...raw?.certificates },
     notifications: { ...defaultInstitutionSettings.notifications, ...raw?.notifications },
   }
 }

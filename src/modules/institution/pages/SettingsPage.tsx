@@ -36,12 +36,16 @@ export function SettingsPage() {
   // A company configures training rules, not academic ones, and has no tuition.
   const { edition } = useOrganizationConfig()
   const isCorporate = edition === 'corporate'
+  // A training institute certifies programs and bills registration fees; no GPA or guardians.
+  const isTraining = edition === 'training_organization'
+  const isOrganization = isCorporate || isTraining
   const { isDark, setTheme } = useTheme()
   const [storedRaw, setStoredRaw] = useApiCollection<SettingsState>(
     STORAGE_KEYS.settings,
     defaultInstitutionSettings,
   )
-  const stored = useMemo(() => normalizeInstitutionSettings(storedRaw), [storedRaw])
+  const stored = useMemo(() => normalizeInstitutionSettings(storedRaw, edition), [storedRaw, edition])
+  const learners = isCorporate ? 'employees' : isTraining ? 'learners' : 'students'
   const [draft, setDraft] = useState<SettingsState>(stored)
 
   useEffect(() => {
@@ -86,8 +90,12 @@ export function SettingsPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title="Institution Settings"
-        subtitle="Configure your institution profile, branding, identity, academic defaults and modules."
+        title={isOrganization ? 'Organization Settings' : 'Institution Settings'}
+        subtitle={
+          isOrganization
+            ? 'Configure your organization profile, branding, training defaults, certificates and notifications.'
+            : 'Configure your institution profile, branding, identity, academic defaults and modules.'
+        }
         actions={
           <>
             <Button variant="secondary" onClick={handleDiscard} disabled={!isDirty}>
@@ -105,13 +113,13 @@ export function SettingsPage() {
           icon={<Building2 size={SEC} />}
           title="General"
           description={
-            isCorporate
+            isOrganization
               ? 'Core identity and localization for your organization.'
               : 'Core identity and localization for your institution.'
           }
         >
           <SettingField
-            label={isCorporate ? 'Organization Name' : 'Institution Name'}
+            label={isOrganization ? 'Organization Name' : 'Institution Name'}
             value={general.name}
             onChange={(v) => setGeneral({ name: v })}
           />
@@ -190,19 +198,19 @@ export function SettingsPage() {
 
         <SettingsSection
           icon={<GraduationCap size={SEC} />}
-          title={isCorporate ? 'Training Defaults' : 'Academic Defaults'}
+          title={isOrganization ? 'Training Defaults' : 'Academic Defaults'}
           description={
-            isCorporate
+            isOrganization
               ? 'Scoring, attendance and completion rules applied to new training.'
               : 'Grading, attendance and completion rules applied to new courses.'
           }
         >
           <SettingField
-            label={isCorporate ? 'Scoring Scheme' : 'Grading Scheme'}
+            label={isOrganization ? 'Scoring Scheme' : 'Grading Scheme'}
             type="select"
             value={academic.grading}
             options={
-              isCorporate
+              isOrganization
                 ? ['Pass / Fail', 'Percentage (0–100)', 'Competency levels']
                 : ['Letter Grade (A–F)', 'Percentage (0–100)', 'Pass / Fail', 'GPA (4.0)']
             }
@@ -274,7 +282,7 @@ export function SettingsPage() {
             enabled={modules.certificates}
             onToggle={() => toggleModule('certificates')}
           />
-          {isCorporate ? (
+          {isTraining ? null : isCorporate ? (
             <ToggleRow
               label="Manager Visibility"
               description="Let team managers see their team's training compliance."
@@ -294,18 +302,26 @@ export function SettingsPage() {
         <SettingsSection
           icon={<Award size={SEC} />}
           title="Certificates"
-          description="Issue certificates automatically when students complete a course."
+          description={
+            isCorporate
+              ? 'Issue certifications automatically when employees complete training.'
+              : isTraining
+                ? 'Issue one certificate per program when a learner completes it.'
+                : 'Issue certificates automatically when students complete a course.'
+          }
         >
           <ToggleRow
             label="Issue automatically"
-            description="Checked when students finish lessons, when work is graded, and when you open Certificates."
+            description={`Checked when ${learners} finish lessons, when work is graded, when attendance is taken, and when you open Certificates.${isCorporate ? ' Certifications expire after the job role’s recertification interval.' : ''}${isTraining ? ' Learners must also reach the program’s minimum attendance.' : ''}`}
             enabled={certificates.autoIssue}
             onToggle={() => setCertificates({ autoIssue: !certificates.autoIssue })}
           />
           {certificates.autoIssue ? (
             <>
               <label className="flex flex-col gap-1.5">
-                <span className="text-[12px] font-semibold text-navy-900">A student has completed a course when</span>
+                <span className="text-[12px] font-semibold text-navy-900">
+                  {isCorporate ? 'An employee has completed training when' : isTraining ? 'A learner has completed a program when, in every course,' : 'A student has completed a course when'}
+                </span>
                 <select
                   value={certificates.rule}
                   onChange={(e) => setCertificates({ rule: e.target.value as SettingsState['certificates']['rule'] })}
@@ -356,11 +372,33 @@ export function SettingsPage() {
           {notifications.email ? (
             <>
               <ToggleRow label="Announcements" description="To the roles or course an announcement targets." enabled={notifications.announcements} onToggle={() => toggleNotification('announcements')} />
-              <ToggleRow label="New assignments and quizzes" description="To enrolled students when work is published." enabled={notifications.assessments} onToggle={() => toggleNotification('assessments')} />
-              <ToggleRow label="Grades" description="To the student and their guardians when work is graded." enabled={notifications.grades} onToggle={() => toggleNotification('grades')} />
-              <ToggleRow label="Live classes" description="To enrolled students when a class is scheduled." enabled={notifications.liveClasses} onToggle={() => toggleNotification('liveClasses')} />
-              <ToggleRow label="Certificates" description="To the student and their guardians when one is issued." enabled={notifications.certificates} onToggle={() => toggleNotification('certificates')} />
-              <ToggleRow label="Invoices" description="To the student and their guardians when an invoice is created." enabled={notifications.invoices} onToggle={() => toggleNotification('invoices')} />
+              <ToggleRow
+                label={isCorporate ? 'Training assigned' : isTraining ? 'Registration & enrollment' : 'Course enrolment'}
+                description={
+                  isCorporate
+                    ? 'To the employee, with the due date, when training is assigned.'
+                    : isTraining
+                      ? 'To the learner when they register, when payment confirms their seat, and if it is cancelled.'
+                      : 'To the student when they are enrolled in a course.'
+                }
+                enabled={notifications.training}
+                onToggle={() => toggleNotification('training')}
+              />
+              {isCorporate ? (
+                <ToggleRow
+                  label="Reminders"
+                  description="Due in 3 days, overdue (weekly), certification renewal — and a weekly overdue summary to each team manager."
+                  enabled={notifications.reminders}
+                  onToggle={() => toggleNotification('reminders')}
+                />
+              ) : null}
+              <ToggleRow label="New assignments and quizzes" description={`To enrolled ${learners} when work is published.`} enabled={notifications.assessments} onToggle={() => toggleNotification('assessments')} />
+              <ToggleRow label={isOrganization ? 'Results' : 'Grades'} description={isCorporate ? 'To the employee when their work is marked.' : isTraining ? 'To the learner when their work is marked.' : 'To the student and their guardians when work is graded.'} enabled={notifications.grades} onToggle={() => toggleNotification('grades')} />
+              <ToggleRow label="Live classes" description={`To enrolled ${learners} when a session is scheduled.`} enabled={notifications.liveClasses} onToggle={() => toggleNotification('liveClasses')} />
+              <ToggleRow label={isCorporate ? 'Certifications' : 'Certificates'} description={isCorporate ? 'To the employee when one is issued.' : isTraining ? 'To the learner when one is issued.' : 'To the student and their guardians when one is issued.'} enabled={notifications.certificates} onToggle={() => toggleNotification('certificates')} />
+              {isCorporate ? null : (
+                <ToggleRow label="Invoices" description={isTraining ? 'To the learner when an invoice is created by hand (registration fees are covered above).' : 'To the student and their guardians when an invoice is created.'} enabled={notifications.invoices} onToggle={() => toggleNotification('invoices')} />
+              )}
             </>
           ) : null}
         </SettingsSection>

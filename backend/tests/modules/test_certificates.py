@@ -199,3 +199,42 @@ async def test_revoked_certificates_are_not_reissued(env):
         "/api/v1/certificates/auto-issue", json={}, headers=_auth(tenants["tenant-a"], "admin-1", "Admin")
     )
     assert res.json()["records"] == []
+
+
+async def test_corporate_certification_expires_and_renews(env):
+    from datetime import date
+
+    from app.modules.certificates.auto_issue import add_months
+    from tests.modules.test_corporate_assignments import _make_corporate
+
+    client, tenants = env
+    sf, t = tenants["_session_factory"], tenants["tenant-a"]
+    await _make_corporate(sf, t)
+    people = [
+        {"id": "admin-1", "name": "Ada", "role": "Admin"},
+        {"id": "stu-1", "name": "Sam", "email": "sam@example.com", "role": "Student", "jobRoleId": "jr-1"},
+    ]
+    await _replace(sf, t, "people", people)
+    await _replace(sf, t, "courses", [COURSE])
+    await _replace(sf, t, "job-roles", [{"id": "jr-1", "requiredCourseIds": ["c1"], "recertificationMonths": 12}])
+    await _replace(sf, t, "enrollments", [{"id": "e1", "studentId": "stu-1", "courseId": "c1", "status": "active", "progress": 100}])
+    await _replace(sf, t, "settings", {})
+    await _replace(sf, t, "certificates", [])
+    admin = _auth(t, "admin-1", "Admin")
+
+    res = (await client.post("/api/v1/certificates/auto-issue", json={}, headers=admin)).json()
+    # Corporate defaults: issued on finishing the training, no approval step.
+    assert len(res["issued"]) == 1
+    cert = res["records"][0]
+    assert cert["expirationDate"] == add_months(date.today(), 12).isoformat()
+
+    # Still valid: nothing new.
+    assert (await client.post("/api/v1/certificates/auto-issue", json={}, headers=admin)).json()["records"] == []
+
+    # Expired + a completed new round → renewed.
+    await _replace(sf, t, "certificates", [{**cert, "expirationDate": "2020-01-01"}])
+    assert len((await client.post("/api/v1/certificates/auto-issue", json={}, headers=admin)).json()["issued"]) == 1
+
+    # Revoked is never renewed automatically.
+    await _replace(sf, t, "certificates", [{**cert, "status": "revoked", "expirationDate": "2020-01-01"}])
+    assert (await client.post("/api/v1/certificates/auto-issue", json={}, headers=admin)).json()["records"] == []

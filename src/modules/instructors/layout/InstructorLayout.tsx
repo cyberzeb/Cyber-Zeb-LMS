@@ -13,6 +13,7 @@ import {
   SquarePen,
   UserRoundCheck,
   Users,
+  UsersRound,
 } from 'lucide-react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from '../../../shared/layout/Sidebar'
@@ -42,12 +43,15 @@ const breadcrumbLabels: Record<string, string> = {
   '/instructor/certificates': 'Certificates',
   '/instructor/help-desk': 'Help Desk',
   '/instructor/settings': 'Settings',
+  '/instructor/cohorts': 'My Cohorts',
 }
 
 export function InstructorLayout() {
   const location = useLocation()
   const path = location.pathname
-  const { terminology: t } = useOrganizationConfig()
+  const { terminology: t, edition } = useOrganizationConfig()
+  // Training trainers lead cohorts: their roster and attendance live there.
+  const isTraining = edition === 'training_organization'
   const session = readPortalSession()
   const person = getSessionPerson()
 
@@ -69,6 +73,13 @@ export function InstructorLayout() {
           to: '/instructor',
           active: isActive('/instructor'),
           icon: <LayoutDashboard size={ICON_SIZE} />,
+        },
+        {
+          label: 'My Cohorts',
+          to: '/instructor/cohorts',
+          active: isActive('/instructor/cohorts'),
+          icon: <UsersRound size={ICON_SIZE} />,
+          show: isTraining,
         },
         {
           label: 'Courses',

@@ -1,0 +1,3317 @@
+{
+  "collections": {
+    "campuses": [
+      {
+        "id": "c1",
+        "name": "Bole Training Center",
+        "code": "BOLE",
+        "address": "Bole Road, Addis Ababa",
+        "subtitle": "Classrooms and computer lab",
+        "status": "active"
+      },
+      {
+        "id": "c2",
+        "name": "Online Campus",
+        "code": "ONLINE",
+        "address": "Live online sessions",
+        "subtitle": "Virtual classroom",
+        "status": "active"
+      }
+    ],
+    "colleges": [
+      {
+        "id": "col1",
+        "name": "Apex Training Institute",
+        "deanName": "Hana Wolde",
+        "campusId": "c1",
+        "description": "Training divisions"
+      }
+    ],
+    "departments": [
+      {
+        "id": "d1",
+        "name": "Project & Business",
+        "headName": "Yonas Alemu",
+        "studentsCount": 0,
+        "facultyCount": 1,
+        "icon": "📐",
+        "campusId": "c1",
+        "collegeId": "col1",
+        "description": "Project management, agile delivery and business skills.",
+        "status": "active"
+      },
+      {
+        "id": "d2",
+        "name": "Data & Technology",
+        "headName": "Meron Tesfaye",
+        "studentsCount": 0,
+        "facultyCount": 1,
+        "icon": "📊",
+        "campusId": "c1",
+        "collegeId": "col1",
+        "description": "Spreadsheets, analytics and dashboards.",
+        "status": "active"
+      },
+      {
+        "id": "d3",
+        "name": "Leadership & People",
+        "headName": "Samuel Girma",
+        "studentsCount": 0,
+        "facultyCount": 1,
+        "icon": "🧭",
+        "campusId": "c1",
+        "collegeId": "col1",
+        "description": "Supervision, coaching and team leadership.",
+        "status": "active"
+      }
+    ],
+    "people": [
+      {
+        "id": "apx-admin",
+        "name": "Hana Wolde",
+        "email": "h.wolde@apexacademy.et",
+        "role": "Admin",
+        "department": "Administration",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "1 hour ago",
+        "initials": "HW"
+      },
+      {
+        "id": "apx-tr1",
+        "name": "Yonas Alemu",
+        "email": "y.alemu@apexacademy.et",
+        "role": "Instructor",
+        "department": "Project & Business",
+        "departmentId": "d1",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "1 hour ago",
+        "initials": "YA"
+      },
+      {
+        "id": "apx-tr2",
+        "name": "Meron Tesfaye",
+        "email": "m.tesfaye@apexacademy.et",
+        "role": "Instructor",
+        "department": "Data & Technology",
+        "departmentId": "d2",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "1 hour ago",
+        "initials": "MT"
+      },
+      {
+        "id": "apx-tr3",
+        "name": "Samuel Girma",
+        "email": "s.girma@apexacademy.et",
+        "role": "Instructor",
+        "department": "Leadership & People",
+        "departmentId": "d3",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "1 hour ago",
+        "initials": "SG"
+      },
+      {
+        "id": "apx-help",
+        "name": "Lidya Bekele",
+        "email": "support@apexacademy.et",
+        "role": "HelpDesk",
+        "department": "Learner Support",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "1 hour ago",
+        "initials": "LB"
+      },
+      {
+        "id": "apx-l1",
+        "name": "Selam Hailu",
+        "email": "selam.hailu@learner.apex.et",
+        "role": "Student",
+        "department": "Self-sponsored",
+        "organization": "Self-sponsored",
+        "phone": "0911734521",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "SH",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l2",
+        "name": "Abel Tesfaye",
+        "email": "abel.tesfaye@learner.apex.et",
+        "role": "Student",
+        "department": "Ethio Engineering Group",
+        "organization": "Ethio Engineering Group",
+        "phone": "0912469042",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "AT",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l3",
+        "name": "Ruth Mengistu",
+        "email": "ruth.mengistu@learner.apex.et",
+        "role": "Student",
+        "department": "Dashen Microfinance",
+        "organization": "Dashen Microfinance",
+        "phone": "0913203563",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "RM",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l4",
+        "name": "Nahom Bekele",
+        "email": "nahom.bekele@learner.apex.et",
+        "role": "Student",
+        "department": "Self-sponsored",
+        "organization": "Self-sponsored",
+        "phone": "0913938084",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "NB",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l5",
+        "name": "Eden Assefa",
+        "email": "eden.assefa@learner.apex.et",
+        "role": "Student",
+        "department": "Addis Logistics",
+        "organization": "Addis Logistics",
+        "phone": "0914672605",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "EA",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l6",
+        "name": "Kaleb Worku",
+        "email": "kaleb.worku@learner.apex.et",
+        "role": "Student",
+        "department": "Self-sponsored",
+        "organization": "Self-sponsored",
+        "phone": "0915407126",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "KW",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l7",
+        "name": "Mahlet Getachew",
+        "email": "mahlet.getachew@learner.apex.et",
+        "role": "Student",
+        "department": "Sheba Hotels",
+        "organization": "Sheba Hotels",
+        "phone": "0916141647",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "MG",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l8",
+        "name": "Biruk Tadesse",
+        "email": "biruk.tadesse@learner.apex.et",
+        "role": "Student",
+        "department": "Self-sponsored",
+        "organization": "Self-sponsored",
+        "phone": "0916876168",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "BT",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l9",
+        "name": "Hiwot Alemayehu",
+        "email": "hiwot.alemayehu@learner.apex.et",
+        "role": "Student",
+        "department": "City Health Office",
+        "organization": "City Health Office",
+        "phone": "0917610689",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "HA",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l10",
+        "name": "Dawit Mulugeta",
+        "email": "dawit.mulugeta@learner.apex.et",
+        "role": "Student",
+        "department": "Self-sponsored",
+        "organization": "Self-sponsored",
+        "phone": "0918345210",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "DM",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l11",
+        "name": "Tsion Kebede",
+        "email": "tsion.kebede@learner.apex.et",
+        "role": "Student",
+        "department": "Blue Nile Insurance",
+        "organization": "Blue Nile Insurance",
+        "phone": "0919079731",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "TK",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l12",
+        "name": "Yared Solomon",
+        "email": "yared.solomon@learner.apex.et",
+        "role": "Student",
+        "department": "Self-sponsored",
+        "organization": "Self-sponsored",
+        "phone": "0919814252",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "YS",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l13",
+        "name": "Blen Fikre",
+        "email": "blen.fikre@learner.apex.et",
+        "role": "Student",
+        "department": "Ethio Engineering Group",
+        "organization": "Ethio Engineering Group",
+        "phone": "0920548773",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "BF",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      },
+      {
+        "id": "apx-l14",
+        "name": "Robel Hailemariam",
+        "email": "robel.hailemariam@learner.apex.et",
+        "role": "Student",
+        "department": "Self-sponsored",
+        "organization": "Self-sponsored",
+        "phone": "0921283294",
+        "campusId": "c1",
+        "status": "active",
+        "verificationStatus": "verified",
+        "lastActive": "2 days ago",
+        "initials": "RH",
+        "joinedAt": "2026-06-28",
+        "source": "registration"
+      }
+    ],
+    "courses": [
+      {
+        "id": "t1",
+        "code": "PM-101",
+        "title": "Project Management Foundations",
+        "instructor": "Yonas Alemu",
+        "instructorId": "apx-tr1",
+        "department": "Project & Business",
+        "departmentId": "d1",
+        "level": "Professional",
+        "enrolledCount": 0,
+        "moduleCount": 2,
+        "status": "published",
+        "progressPercent": 0,
+        "icon": "📐",
+        "approvalStatus": "approved",
+        "description": "Project Management Foundations — part of Apex Training Institute's Project & Business programs.",
+        "shortDescription": "Project management, agile delivery and business skills.",
+        "credits": 0,
+        "modules": [
+          {
+            "id": "t1-m1",
+            "title": "What a project is",
+            "lessons": [
+              {
+                "id": "t1-m1-l1",
+                "title": "Projects, programs and operations",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "A **project** is a temporary effort to create a unique result. It has a start, an end and a defined goal — unlike **operations**, which keep the business running day to day.\n\n- A **program** groups related projects so their benefits are managed together.\n- A **portfolio** is everything an organization invests in, prioritised against its strategy.\n\nKnowing which one you are running tells you how to plan it and who decides."
+              },
+              {
+                "id": "t1-m1-l2",
+                "title": "The triple constraint",
+                "type": "reading",
+                "durationMinutes": 7,
+                "description": "Every project balances **scope**, **time** and **cost** — and quality depends on all three.\n\n1. Add scope and you need more time or money.\n2. Cut the budget and something else has to give.\n3. Shorten the schedule and cost or risk goes up.\n\nA good project manager makes these trade-offs visible early, so sponsors decide with open eyes."
+              },
+              {
+                "id": "t1-m1-check",
+                "title": "Knowledge check: project basics",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "Which of these is a project?",
+                    "options": [
+                      "Processing monthly payroll",
+                      "Opening a new branch office",
+                      "Answering customer calls"
+                    ],
+                    "correctIndex": 1,
+                    "explanation": "Opening a branch is temporary and unique.",
+                    "id": "t1-m1-q1",
+                    "type": "multiple-choice"
+                  },
+                  {
+                    "prompt": "The sponsor adds features but keeps the deadline. What usually has to change?",
+                    "options": [
+                      "Nothing",
+                      "Cost or resources",
+                      "The project charter title"
+                    ],
+                    "correctIndex": 1,
+                    "explanation": "More scope in the same time needs more resources.",
+                    "id": "t1-m1-q2",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "t1-m2",
+            "title": "Planning the work",
+            "lessons": [
+              {
+                "id": "t1-m2-l1",
+                "title": "Work breakdown structure",
+                "type": "reading",
+                "durationMinutes": 10,
+                "description": "A **work breakdown structure (WBS)** splits the project into deliverables, then into smaller work packages you can estimate and assign.\n\n- Break work down until a package takes roughly one to two weeks.\n- Name deliverables as nouns (\"Training manual\"), not tasks.\n- Every package has one owner.\n\nIf it is not in the WBS, it is not in the project."
+              },
+              {
+                "id": "t1-m2-l2",
+                "title": "Schedules and the critical path",
+                "type": "reading",
+                "durationMinutes": 10,
+                "description": "Link work packages by their dependencies and you get a network. The **critical path** is the longest chain through it — any delay on it delays the whole project.\n\n- Tasks off the critical path have **float**: they can slip a little.\n- Watch the critical path weekly; that is where your attention pays off."
+              },
+              {
+                "id": "t1-m2-check",
+                "title": "Knowledge check: planning",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "What does a delay on the critical path do?",
+                    "options": [
+                      "Nothing",
+                      "Delays the project end date",
+                      "Reduces cost"
+                    ],
+                    "correctIndex": 1,
+                    "id": "t1-m2-q1",
+                    "type": "multiple-choice"
+                  },
+                  {
+                    "prompt": "A good WBS work package should…",
+                    "options": [
+                      "Have one owner",
+                      "Last six months",
+                      "Be named as a verb"
+                    ],
+                    "correctIndex": 0,
+                    "id": "t1-m2-q2",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "deliveryMode": "Blended",
+        "certificateEnabled": true,
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "id": "t2",
+        "code": "PM-201",
+        "title": "Agile and Scrum in Practice",
+        "instructor": "Yonas Alemu",
+        "instructorId": "apx-tr1",
+        "department": "Project & Business",
+        "departmentId": "d1",
+        "level": "Professional",
+        "enrolledCount": 0,
+        "moduleCount": 2,
+        "status": "published",
+        "progressPercent": 0,
+        "icon": "📐",
+        "approvalStatus": "approved",
+        "description": "Agile and Scrum in Practice — part of Apex Training Institute's Project & Business programs.",
+        "shortDescription": "Project management, agile delivery and business skills.",
+        "credits": 0,
+        "modules": [
+          {
+            "id": "t2-m1",
+            "title": "Agile values",
+            "lessons": [
+              {
+                "id": "t2-m1-l1",
+                "title": "Why agile",
+                "type": "reading",
+                "durationMinutes": 7,
+                "description": "Agile teams deliver in **short iterations** and learn from real feedback instead of predicting everything up front.\n\nIt suits work where requirements change or are hard to know in advance — software, new services, process improvement."
+              },
+              {
+                "id": "t2-m1-l2",
+                "title": "The Scrum framework",
+                "type": "reading",
+                "durationMinutes": 9,
+                "description": "Scrum organises work into **sprints** of one to four weeks.\n\n- **Product owner** — orders the backlog by value.\n- **Scrum master** — removes obstacles and protects the process.\n- **Developers** — build the increment.\n\nEach sprint has planning, a daily stand-up, a review with stakeholders and a retrospective."
+              },
+              {
+                "id": "t2-m1-check",
+                "title": "Knowledge check: Scrum",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "Who orders the product backlog?",
+                    "options": [
+                      "Scrum master",
+                      "Product owner",
+                      "The sponsor"
+                    ],
+                    "correctIndex": 1,
+                    "id": "t2-m1-q1",
+                    "type": "multiple-choice"
+                  },
+                  {
+                    "prompt": "The retrospective is for…",
+                    "options": [
+                      "Demonstrating the product",
+                      "Improving how the team works",
+                      "Estimating the budget"
+                    ],
+                    "correctIndex": 1,
+                    "id": "t2-m1-q2",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "t2-m2",
+            "title": "Running sprints",
+            "lessons": [
+              {
+                "id": "t2-m2-l1",
+                "title": "User stories and estimation",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "A **user story** describes value from the user's point of view: *\"As a customer, I want to reset my PIN so I can use my card again.\"*\n\nTeams estimate stories in relative **story points** and use their **velocity** — points finished per sprint — to forecast."
+              },
+              {
+                "id": "t2-m2-l2",
+                "title": "Kanban boards",
+                "type": "reading",
+                "durationMinutes": 6,
+                "description": "A Kanban board shows work moving through columns such as **To do → Doing → Review → Done**.\n\nLimit **work in progress** in each column: finishing beats starting."
+              },
+              {
+                "id": "t2-m2-check",
+                "title": "Knowledge check: sprints",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "Velocity is…",
+                    "options": [
+                      "Hours worked per day",
+                      "Story points completed per sprint",
+                      "The number of team members"
+                    ],
+                    "correctIndex": 1,
+                    "id": "t2-m2-q1",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "deliveryMode": "Blended",
+        "certificateEnabled": true,
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "id": "t3",
+        "code": "DA-101",
+        "title": "Excel for Data Analysis",
+        "instructor": "Meron Tesfaye",
+        "instructorId": "apx-tr2",
+        "department": "Data & Technology",
+        "departmentId": "d2",
+        "level": "Professional",
+        "enrolledCount": 0,
+        "moduleCount": 2,
+        "status": "published",
+        "progressPercent": 0,
+        "icon": "📊",
+        "approvalStatus": "approved",
+        "description": "Excel for Data Analysis — part of Apex Training Institute's Data & Technology programs.",
+        "shortDescription": "Spreadsheets, analytics and dashboards.",
+        "credits": 0,
+        "modules": [
+          {
+            "id": "t3-m1",
+            "title": "Clean data",
+            "lessons": [
+              {
+                "id": "t3-m1-l1",
+                "title": "Tables, not ranges",
+                "type": "reading",
+                "durationMinutes": 7,
+                "description": "Turn raw data into an Excel **Table** (Ctrl + T) before you analyse it.\n\n- Headers stay visible and formulas fill down automatically.\n- New rows are picked up by charts and pivot tables.\n- Structured references like `[@Amount]` read like sentences."
+              },
+              {
+                "id": "t3-m1-l2",
+                "title": "Fixing messy data",
+                "type": "reading",
+                "durationMinutes": 9,
+                "description": "Most analysis time goes on cleaning. Useful tools:\n\n- **TRIM** and **CLEAN** remove stray spaces and characters.\n- **Text to Columns** splits \"Addis Ababa, Bole\" into two fields.\n- **Remove Duplicates** — but check which columns define a duplicate first.\n- Keep the raw data untouched on its own sheet."
+              },
+              {
+                "id": "t3-m1-check",
+                "title": "Knowledge check: clean data",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "Which function removes extra spaces?",
+                    "options": [
+                      "TRIM",
+                      "SUM",
+                      "VLOOKUP"
+                    ],
+                    "correctIndex": 0,
+                    "id": "t3-m1-q1",
+                    "type": "multiple-choice"
+                  },
+                  {
+                    "prompt": "Why convert data to a Table?",
+                    "options": [
+                      "It prints better",
+                      "Formulas and charts grow with new rows",
+                      "It encrypts the file"
+                    ],
+                    "correctIndex": 1,
+                    "id": "t3-m1-q2",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "t3-m2",
+            "title": "Summarising",
+            "lessons": [
+              {
+                "id": "t3-m2-l1",
+                "title": "Lookups",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "**XLOOKUP** finds a value in one column and returns the matching value from another:\n\n`=XLOOKUP(A2, Products[Code], Products[Price])`\n\nIt replaces VLOOKUP, works left or right, and lets you say what to show when nothing is found."
+              },
+              {
+                "id": "t3-m2-l2",
+                "title": "Pivot tables",
+                "type": "reading",
+                "durationMinutes": 10,
+                "description": "A **pivot table** summarises thousands of rows in seconds: drag *Region* to rows, *Month* to columns and *Sales* to values.\n\nAdd a **slicer** so others can filter without touching the layout."
+              },
+              {
+                "id": "t3-m2-check",
+                "title": "Knowledge check: summarising",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "Which tool summarises many rows by category fastest?",
+                    "options": [
+                      "Pivot table",
+                      "Conditional formatting",
+                      "Freeze panes"
+                    ],
+                    "correctIndex": 0,
+                    "id": "t3-m2-q1",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "deliveryMode": "Blended",
+        "certificateEnabled": true,
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "id": "t4",
+        "code": "DA-201",
+        "title": "Dashboards with Power BI",
+        "instructor": "Meron Tesfaye",
+        "instructorId": "apx-tr2",
+        "department": "Data & Technology",
+        "departmentId": "d2",
+        "level": "Professional",
+        "enrolledCount": 0,
+        "moduleCount": 2,
+        "status": "published",
+        "progressPercent": 0,
+        "icon": "📊",
+        "approvalStatus": "approved",
+        "description": "Dashboards with Power BI — part of Apex Training Institute's Data & Technology programs.",
+        "shortDescription": "Spreadsheets, analytics and dashboards.",
+        "credits": 0,
+        "modules": [
+          {
+            "id": "t4-m1",
+            "title": "Power BI basics",
+            "lessons": [
+              {
+                "id": "t4-m1-l1",
+                "title": "Getting data in",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "Power BI loads data from Excel, databases and web sources through **Power Query**, where you clean it once and refresh it forever.\n\nEvery step you apply is recorded, so next month's file goes through the same cleaning automatically."
+              },
+              {
+                "id": "t4-m1-l2",
+                "title": "Data models",
+                "type": "reading",
+                "durationMinutes": 9,
+                "description": "Split data into **fact tables** (sales, transactions) and **dimension tables** (products, dates, branches) and relate them.\n\nThis *star schema* keeps reports fast and measures correct."
+              },
+              {
+                "id": "t4-m1-check",
+                "title": "Knowledge check: modelling",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "In a star schema, \"Sales\" is usually a…",
+                    "options": [
+                      "Dimension table",
+                      "Fact table",
+                      "Slicer"
+                    ],
+                    "correctIndex": 1,
+                    "id": "t4-m1-q1",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "t4-m2",
+            "title": "Dashboards that get used",
+            "lessons": [
+              {
+                "id": "t4-m2-l1",
+                "title": "Choosing visuals",
+                "type": "reading",
+                "durationMinutes": 7,
+                "description": "Pick the chart for the question:\n\n- **Trend over time** — line chart.\n- **Compare categories** — bar chart.\n- **Part of a whole** — only with few parts; otherwise a bar chart.\n- **One key number** — a card, with its target."
+              },
+              {
+                "id": "t4-m2-l2",
+                "title": "Designing for decisions",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "Put the most important number top-left. Keep one page to one question. Label with what the number means (\"Overdue loans, % of book\"), and show the target so people know if it is good or bad."
+              },
+              {
+                "id": "t4-m2-check",
+                "title": "Knowledge check: visuals",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "Best visual for monthly revenue over two years?",
+                    "options": [
+                      "Pie chart",
+                      "Line chart",
+                      "Table"
+                    ],
+                    "correctIndex": 1,
+                    "id": "t4-m2-q1",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "deliveryMode": "Blended",
+        "certificateEnabled": true,
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "id": "t5",
+        "code": "LD-101",
+        "title": "Leading Teams",
+        "instructor": "Samuel Girma",
+        "instructorId": "apx-tr3",
+        "department": "Leadership & People",
+        "departmentId": "d3",
+        "level": "Professional",
+        "enrolledCount": 0,
+        "moduleCount": 2,
+        "status": "published",
+        "progressPercent": 0,
+        "icon": "🧭",
+        "approvalStatus": "approved",
+        "description": "Leading Teams — part of Apex Training Institute's Leadership & People programs.",
+        "shortDescription": "Supervision, coaching and team leadership.",
+        "credits": 0,
+        "modules": [
+          {
+            "id": "t5-m1",
+            "title": "From colleague to leader",
+            "lessons": [
+              {
+                "id": "t5-m1-l1",
+                "title": "Your first 90 days",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "New supervisors succeed by **listening first**: meet each team member one-to-one, learn what they need, and agree how you will work together.\n\nSet a few clear priorities rather than changing everything at once."
+              },
+              {
+                "id": "t5-m1-l2",
+                "title": "Setting expectations",
+                "type": "reading",
+                "durationMinutes": 7,
+                "description": "People perform best when they know what good looks like. Agree goals that are **specific, measurable and time-bound**, and write them down."
+              },
+              {
+                "id": "t5-m1-check",
+                "title": "Knowledge check: new leaders",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "A good first step for a new supervisor is…",
+                    "options": [
+                      "Reorganising the team",
+                      "One-to-one conversations with each member",
+                      "Changing all processes"
+                    ],
+                    "correctIndex": 1,
+                    "id": "t5-m1-q1",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "t5-m2",
+            "title": "Leading the team",
+            "lessons": [
+              {
+                "id": "t5-m2-l1",
+                "title": "Delegation",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "Delegate the **outcome**, not just the task: explain why it matters, what success looks like and when you will check in.\n\nMatch the level of support to the person's experience with that task."
+              },
+              {
+                "id": "t5-m2-l2",
+                "title": "Running good meetings",
+                "type": "reading",
+                "durationMinutes": 6,
+                "description": "Every meeting needs a purpose, an agenda and an owner. End with **decisions and actions**: who does what by when."
+              },
+              {
+                "id": "t5-m2-check",
+                "title": "Knowledge check: delegation",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "When delegating, you should explain…",
+                    "options": [
+                      "Only the deadline",
+                      "The outcome and why it matters",
+                      "Nothing — trust them"
+                    ],
+                    "correctIndex": 1,
+                    "id": "t5-m2-q1",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "deliveryMode": "Blended",
+        "certificateEnabled": true,
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "id": "t6",
+        "code": "LD-102",
+        "title": "Coaching and Feedback",
+        "instructor": "Samuel Girma",
+        "instructorId": "apx-tr3",
+        "department": "Leadership & People",
+        "departmentId": "d3",
+        "level": "Professional",
+        "enrolledCount": 0,
+        "moduleCount": 2,
+        "status": "published",
+        "progressPercent": 0,
+        "icon": "🧭",
+        "approvalStatus": "approved",
+        "description": "Coaching and Feedback — part of Apex Training Institute's Leadership & People programs.",
+        "shortDescription": "Supervision, coaching and team leadership.",
+        "credits": 0,
+        "modules": [
+          {
+            "id": "t6-m1",
+            "title": "Coaching conversations",
+            "lessons": [
+              {
+                "id": "t6-m1-l1",
+                "title": "The GROW model",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "**GROW** structures a coaching conversation:\n\n1. **Goal** — what do you want to achieve?\n2. **Reality** — what is happening now?\n3. **Options** — what could you do?\n4. **Way forward** — what will you do, and when?"
+              },
+              {
+                "id": "t6-m1-l2",
+                "title": "Asking better questions",
+                "type": "reading",
+                "durationMinutes": 6,
+                "description": "Open questions (\"What would make this easier?\") help people think for themselves. Resist giving the answer first."
+              },
+              {
+                "id": "t6-m1-check",
+                "title": "Knowledge check: coaching",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "In GROW, \"R\" stands for…",
+                    "options": [
+                      "Results",
+                      "Reality",
+                      "Review"
+                    ],
+                    "correctIndex": 1,
+                    "id": "t6-m1-q1",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "t6-m2",
+            "title": "Feedback that helps",
+            "lessons": [
+              {
+                "id": "t6-m2-l1",
+                "title": "The SBI method",
+                "type": "reading",
+                "durationMinutes": 7,
+                "description": "Describe the **Situation**, the **Behaviour** you saw and its **Impact**:\n\n*\"In yesterday's client meeting (S), you summarised the next steps clearly (B), so the client signed the same day (I).\"*\n\nIt keeps feedback factual and easy to act on."
+              },
+              {
+                "id": "t6-m2-l2",
+                "title": "Difficult conversations",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "Prepare, stay curious and focus on the future. Agree one or two concrete changes and a date to follow up."
+              },
+              {
+                "id": "t6-m2-check",
+                "title": "Knowledge check: feedback",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "SBI stands for…",
+                    "options": [
+                      "Situation, Behaviour, Impact",
+                      "Skill, Budget, Idea",
+                      "Start, Build, Improve"
+                    ],
+                    "correctIndex": 0,
+                    "id": "t6-m2-q1",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "deliveryMode": "Blended",
+        "certificateEnabled": true,
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      }
+    ],
+    "training-programs": [
+      {
+        "id": "prg-pm",
+        "code": "PMP-PREP",
+        "name": "Project Management Professional",
+        "description": "Plan, schedule and deliver projects with confidence — from the work breakdown structure to agile sprints. Prepares you for PMP-style exams.",
+        "divisionId": "d1",
+        "divisionName": "Project & Business",
+        "level": "Intermediate",
+        "deliveryMode": "hybrid",
+        "durationWeeks": 6,
+        "totalHours": 36,
+        "courseIds": [
+          "t1",
+          "t2"
+        ],
+        "price": 12500,
+        "minAttendance": 80,
+        "credentialType": "Professional Certificate",
+        "certificateTemplateId": "tpl-professional",
+        "skills": [
+          "Planning",
+          "Scheduling",
+          "Risk",
+          "Agile"
+        ],
+        "currency": "ETB",
+        "certificateEnabled": true,
+        "status": "active",
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "id": "prg-da",
+        "code": "DATA-ANL",
+        "name": "Data Analytics with Excel & Power BI",
+        "description": "Turn messy spreadsheets into clear dashboards. Hands-on lab sessions with real datasets.",
+        "divisionId": "d2",
+        "divisionName": "Data & Technology",
+        "level": "Foundational",
+        "deliveryMode": "in-person",
+        "durationWeeks": 8,
+        "totalHours": 48,
+        "courseIds": [
+          "t3",
+          "t4"
+        ],
+        "price": 15000,
+        "minAttendance": 75,
+        "credentialType": "Certificate of Completion",
+        "certificateTemplateId": "tpl-tech",
+        "skills": [
+          "Excel",
+          "Pivot tables",
+          "Power BI",
+          "Data cleaning"
+        ],
+        "currency": "ETB",
+        "certificateEnabled": true,
+        "status": "active",
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "id": "prg-ld",
+        "code": "LEAD-SUP",
+        "name": "Leadership & Supervisory Skills",
+        "description": "For new and aspiring supervisors: set expectations, delegate, coach and give feedback that helps.",
+        "divisionId": "d3",
+        "divisionName": "Leadership & People",
+        "level": "Intermediate",
+        "deliveryMode": "in-person",
+        "durationWeeks": 4,
+        "totalHours": 24,
+        "courseIds": [
+          "t5",
+          "t6"
+        ],
+        "price": 9500,
+        "minAttendance": 80,
+        "credentialType": "Certificate of Completion",
+        "certificateTemplateId": "tpl-emerald",
+        "skills": [
+          "Delegation",
+          "Coaching",
+          "Feedback"
+        ],
+        "currency": "ETB",
+        "certificateEnabled": true,
+        "status": "active",
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "id": "prg-open",
+        "code": "OPEN-XL",
+        "name": "Excel Essentials Open Day",
+        "description": "A free half-day online taster: clean data, lookups and pivot tables.",
+        "divisionId": "d2",
+        "divisionName": "Data & Technology",
+        "level": "Foundational",
+        "deliveryMode": "online",
+        "durationWeeks": 1,
+        "totalHours": 4,
+        "courseIds": [
+          "t3"
+        ],
+        "price": 0,
+        "minAttendance": 0,
+        "credentialType": "Certificate of Attendance",
+        "certificateTemplateId": "tpl-minimal",
+        "skills": [
+          "Excel"
+        ],
+        "currency": "ETB",
+        "certificateEnabled": true,
+        "status": "active",
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      }
+    ],
+    "cohorts": [
+      {
+        "status": "upcoming",
+        "id": "coh-pm-summer",
+        "programId": "prg-pm",
+        "name": "PMP — Summer evening cohort",
+        "code": "PMP-SUM",
+        "startDate": "2026-07-18",
+        "endDate": "2026-08-29",
+        "seatCapacity": 20,
+        "trainerId": "apx-tr1",
+        "deliveryMode": "hybrid",
+        "location": "Bole Training Center, Room 2",
+        "schedule": "Mon & Wed, 18:00–21:00",
+        "enrollmentOpen": false,
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "status": "upcoming",
+        "id": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "name": "PMP — Autumn evening cohort",
+        "code": "PMP-AUT",
+        "startDate": "2026-09-12",
+        "endDate": "2026-10-24",
+        "seatCapacity": 20,
+        "trainerId": "apx-tr1",
+        "deliveryMode": "hybrid",
+        "location": "Bole Training Center, Room 2",
+        "schedule": "Mon & Wed, 18:00–21:00",
+        "enrollmentOpen": false,
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "status": "upcoming",
+        "id": "coh-pm-winter",
+        "programId": "prg-pm",
+        "name": "PMP — Winter weekend cohort",
+        "code": "PMP-WIN",
+        "startDate": "2026-11-10",
+        "endDate": "2026-12-22",
+        "seatCapacity": 20,
+        "trainerId": "apx-tr1",
+        "deliveryMode": "hybrid",
+        "location": "Bole Training Center, Room 2",
+        "schedule": "Saturdays, 09:00–15:00",
+        "enrollmentOpen": true,
+        "registrationDeadline": "2026-11-05",
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "status": "upcoming",
+        "id": "coh-da-7",
+        "programId": "prg-da",
+        "name": "Data Analytics — Cohort 7",
+        "code": "DA-C7",
+        "startDate": "2026-09-19",
+        "endDate": "2026-11-14",
+        "seatCapacity": 15,
+        "trainerId": "apx-tr2",
+        "deliveryMode": "in-person",
+        "location": "Bole Training Center, Lab 1",
+        "schedule": "Tue & Thu, 17:30–20:30",
+        "enrollmentOpen": true,
+        "registrationDeadline": "2026-10-03",
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "status": "upcoming",
+        "id": "coh-da-8",
+        "programId": "prg-da",
+        "name": "Data Analytics — Cohort 8",
+        "code": "DA-C8",
+        "startDate": "2026-10-17",
+        "endDate": "2026-12-12",
+        "seatCapacity": 15,
+        "trainerId": "apx-tr2",
+        "deliveryMode": "in-person",
+        "location": "Bole Training Center, Lab 1",
+        "schedule": "Mon & Wed, 17:30–20:30",
+        "enrollmentOpen": true,
+        "price": 13500,
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "status": "upcoming",
+        "id": "coh-ld-oct",
+        "programId": "prg-ld",
+        "name": "Leadership — New supervisors",
+        "code": "LEAD-NS",
+        "startDate": "2026-10-06",
+        "endDate": "2026-11-03",
+        "seatCapacity": 12,
+        "trainerId": null,
+        "deliveryMode": "in-person",
+        "location": "Bole Training Center, Room 1",
+        "schedule": "Fridays, 09:00–16:00",
+        "enrollmentOpen": true,
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "status": "upcoming",
+        "id": "coh-open-xl",
+        "programId": "prg-open",
+        "name": "Excel Essentials — Open Day",
+        "code": "OPEN-XL",
+        "startDate": "2026-10-01",
+        "endDate": "2026-10-01",
+        "seatCapacity": 100,
+        "trainerId": "apx-tr2",
+        "deliveryMode": "online",
+        "schedule": "09:00–13:00",
+        "meetingUrl": "https://zoom.us/j/5550000000",
+        "enrollmentOpen": true,
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "updatedAt": "2026-09-26T08:00:00.000Z"
+      }
+    ],
+    "cohort-registrations": [
+      {
+        "id": "reg-coh-pm-summer-l2",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "studentId": "apx-l2",
+        "studentName": "Abel Tesfaye",
+        "studentEmail": "abel.tesfaye@learner.apex.et",
+        "phone": "0912469042",
+        "organization": "Ethio Engineering Group",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 12500,
+        "currency": "ETB",
+        "createdAt": "2026-07-03",
+        "registeredAt": "2026-07-03T09:10:00.000Z",
+        "invoiceId": "inv-reg-coh-pm-summer-l2",
+        "confirmedAt": "2026-07-04T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-pm-summer-l3",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "studentId": "apx-l3",
+        "studentName": "Ruth Mengistu",
+        "studentEmail": "ruth.mengistu@learner.apex.et",
+        "phone": "0913203563",
+        "organization": "Dashen Microfinance",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 12500,
+        "currency": "ETB",
+        "createdAt": "2026-07-04",
+        "registeredAt": "2026-07-04T09:11:00.000Z",
+        "invoiceId": "inv-reg-coh-pm-summer-l3",
+        "confirmedAt": "2026-07-05T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-pm-summer-l4",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "studentId": "apx-l4",
+        "studentName": "Nahom Bekele",
+        "studentEmail": "nahom.bekele@learner.apex.et",
+        "phone": "0913938084",
+        "organization": "Self-sponsored",
+        "status": "enrolled",
+        "source": "admin",
+        "amount": 12500,
+        "currency": "ETB",
+        "createdAt": "2026-07-08",
+        "registeredAt": "2026-07-08T09:12:00.000Z",
+        "invoiceId": "inv-reg-coh-pm-summer-l4",
+        "confirmedAt": "2026-07-09T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-pm-summer-l5",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "studentId": "apx-l5",
+        "studentName": "Eden Assefa",
+        "studentEmail": "eden.assefa@learner.apex.et",
+        "phone": "0914672605",
+        "organization": "Addis Logistics",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 12500,
+        "currency": "ETB",
+        "createdAt": "2026-07-10",
+        "registeredAt": "2026-07-10T09:13:00.000Z",
+        "invoiceId": "inv-reg-coh-pm-summer-l5",
+        "confirmedAt": "2026-07-11T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-pm-autumn-l1",
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "studentId": "apx-l1",
+        "studentName": "Selam Hailu",
+        "studentEmail": "selam.hailu@learner.apex.et",
+        "phone": "0911734521",
+        "organization": "Self-sponsored",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 12500,
+        "currency": "ETB",
+        "createdAt": "2026-08-27",
+        "registeredAt": "2026-08-27T09:14:00.000Z",
+        "invoiceId": "inv-reg-coh-pm-autumn-l1",
+        "confirmedAt": "2026-08-28T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-pm-autumn-l6",
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "studentId": "apx-l6",
+        "studentName": "Kaleb Worku",
+        "studentEmail": "kaleb.worku@learner.apex.et",
+        "phone": "0915407126",
+        "organization": "Self-sponsored",
+        "status": "enrolled",
+        "source": "admin",
+        "amount": 12500,
+        "currency": "ETB",
+        "createdAt": "2026-08-29",
+        "registeredAt": "2026-08-29T09:15:00.000Z",
+        "invoiceId": "inv-reg-coh-pm-autumn-l6",
+        "confirmedAt": "2026-08-30T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-pm-autumn-l7",
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "studentId": "apx-l7",
+        "studentName": "Mahlet Getachew",
+        "studentEmail": "mahlet.getachew@learner.apex.et",
+        "phone": "0916141647",
+        "organization": "Sheba Hotels",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 12500,
+        "currency": "ETB",
+        "createdAt": "2026-08-31",
+        "registeredAt": "2026-08-31T09:16:00.000Z",
+        "invoiceId": "inv-reg-coh-pm-autumn-l7",
+        "confirmedAt": "2026-09-01T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-pm-autumn-l8",
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "studentId": "apx-l8",
+        "studentName": "Biruk Tadesse",
+        "studentEmail": "biruk.tadesse@learner.apex.et",
+        "phone": "0916876168",
+        "organization": "Self-sponsored",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 12500,
+        "currency": "ETB",
+        "createdAt": "2026-09-01",
+        "registeredAt": "2026-09-01T09:17:00.000Z",
+        "invoiceId": "inv-reg-coh-pm-autumn-l8",
+        "confirmedAt": "2026-09-02T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-pm-autumn-l9",
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "studentId": "apx-l9",
+        "studentName": "Hiwot Alemayehu",
+        "studentEmail": "hiwot.alemayehu@learner.apex.et",
+        "phone": "0917610689",
+        "organization": "City Health Office",
+        "status": "enrolled",
+        "source": "admin",
+        "amount": 0,
+        "currency": "ETB",
+        "createdAt": "2026-09-06",
+        "registeredAt": "2026-09-06T09:18:00.000Z",
+        "confirmedAt": "2026-09-07T11:00:00.000Z",
+        "confirmedBy": "waived"
+      },
+      {
+        "id": "reg-coh-pm-autumn-l10",
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "studentId": "apx-l10",
+        "studentName": "Dawit Mulugeta",
+        "studentEmail": "dawit.mulugeta@learner.apex.et",
+        "phone": "0918345210",
+        "organization": "Self-sponsored",
+        "status": "pending_payment",
+        "source": "public",
+        "amount": 12500,
+        "currency": "ETB",
+        "createdAt": "2026-09-24",
+        "registeredAt": "2026-09-24T09:19:00.000Z",
+        "invoiceId": "inv-reg-coh-pm-autumn-l10"
+      },
+      {
+        "id": "reg-coh-da-7-l11",
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "studentId": "apx-l11",
+        "studentName": "Tsion Kebede",
+        "studentEmail": "tsion.kebede@learner.apex.et",
+        "phone": "0919079731",
+        "organization": "Blue Nile Insurance",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 15000,
+        "currency": "ETB",
+        "createdAt": "2026-09-05",
+        "registeredAt": "2026-09-05T09:20:00.000Z",
+        "invoiceId": "inv-reg-coh-da-7-l11",
+        "confirmedAt": "2026-09-06T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-da-7-l12",
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "studentId": "apx-l12",
+        "studentName": "Yared Solomon",
+        "studentEmail": "yared.solomon@learner.apex.et",
+        "phone": "0919814252",
+        "organization": "Self-sponsored",
+        "status": "enrolled",
+        "source": "admin",
+        "amount": 15000,
+        "currency": "ETB",
+        "createdAt": "2026-09-06",
+        "registeredAt": "2026-09-06T09:21:00.000Z",
+        "invoiceId": "inv-reg-coh-da-7-l12",
+        "confirmedAt": "2026-09-07T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-da-7-l13",
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "studentId": "apx-l13",
+        "studentName": "Blen Fikre",
+        "studentEmail": "blen.fikre@learner.apex.et",
+        "phone": "0920548773",
+        "organization": "Ethio Engineering Group",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 15000,
+        "currency": "ETB",
+        "createdAt": "2026-09-08",
+        "registeredAt": "2026-09-08T09:22:00.000Z",
+        "invoiceId": "inv-reg-coh-da-7-l13",
+        "confirmedAt": "2026-09-09T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-da-7-l3",
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "studentId": "apx-l3",
+        "studentName": "Ruth Mengistu",
+        "studentEmail": "ruth.mengistu@learner.apex.et",
+        "phone": "0913203563",
+        "organization": "Dashen Microfinance",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 15000,
+        "currency": "ETB",
+        "createdAt": "2026-09-11",
+        "registeredAt": "2026-09-11T09:23:00.000Z",
+        "invoiceId": "inv-reg-coh-da-7-l3",
+        "confirmedAt": "2026-09-12T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-da-8-l1",
+        "cohortId": "coh-da-8",
+        "programId": "prg-da",
+        "studentId": "apx-l1",
+        "studentName": "Selam Hailu",
+        "studentEmail": "selam.hailu@learner.apex.et",
+        "phone": "0911734521",
+        "organization": "Self-sponsored",
+        "status": "pending_payment",
+        "source": "admin",
+        "amount": 13500,
+        "currency": "ETB",
+        "createdAt": "2026-09-25",
+        "registeredAt": "2026-09-25T09:24:00.000Z",
+        "invoiceId": "inv-reg-coh-da-8-l1"
+      },
+      {
+        "id": "reg-coh-da-8-l14",
+        "cohortId": "coh-da-8",
+        "programId": "prg-da",
+        "studentId": "apx-l14",
+        "studentName": "Robel Hailemariam",
+        "studentEmail": "robel.hailemariam@learner.apex.et",
+        "phone": "0921283294",
+        "organization": "Self-sponsored",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 13500,
+        "currency": "ETB",
+        "createdAt": "2026-09-20",
+        "registeredAt": "2026-09-20T09:25:00.000Z",
+        "invoiceId": "inv-reg-coh-da-8-l14",
+        "confirmedAt": "2026-09-21T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-da-8-l2",
+        "cohortId": "coh-da-8",
+        "programId": "prg-da",
+        "studentId": "apx-l2",
+        "studentName": "Abel Tesfaye",
+        "studentEmail": "abel.tesfaye@learner.apex.et",
+        "phone": "0912469042",
+        "organization": "Ethio Engineering Group",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 13500,
+        "currency": "ETB",
+        "createdAt": "2026-09-22",
+        "registeredAt": "2026-09-22T09:26:00.000Z",
+        "invoiceId": "inv-reg-coh-da-8-l2",
+        "confirmedAt": "2026-09-23T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-ld-oct-l4",
+        "cohortId": "coh-ld-oct",
+        "programId": "prg-ld",
+        "studentId": "apx-l4",
+        "studentName": "Nahom Bekele",
+        "studentEmail": "nahom.bekele@learner.apex.et",
+        "phone": "0913938084",
+        "organization": "Self-sponsored",
+        "status": "enrolled",
+        "source": "admin",
+        "amount": 9500,
+        "currency": "ETB",
+        "createdAt": "2026-09-17",
+        "registeredAt": "2026-09-17T09:27:00.000Z",
+        "invoiceId": "inv-reg-coh-ld-oct-l4",
+        "confirmedAt": "2026-09-18T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-ld-oct-l6",
+        "cohortId": "coh-ld-oct",
+        "programId": "prg-ld",
+        "studentId": "apx-l6",
+        "studentName": "Kaleb Worku",
+        "studentEmail": "kaleb.worku@learner.apex.et",
+        "phone": "0915407126",
+        "organization": "Self-sponsored",
+        "status": "pending_payment",
+        "source": "public",
+        "amount": 9500,
+        "currency": "ETB",
+        "createdAt": "2026-09-23",
+        "registeredAt": "2026-09-23T09:28:00.000Z",
+        "invoiceId": "inv-reg-coh-ld-oct-l6"
+      },
+      {
+        "id": "reg-coh-pm-winter-l12",
+        "cohortId": "coh-pm-winter",
+        "programId": "prg-pm",
+        "studentId": "apx-l12",
+        "studentName": "Yared Solomon",
+        "studentEmail": "yared.solomon@learner.apex.et",
+        "phone": "0919814252",
+        "organization": "Self-sponsored",
+        "status": "pending_payment",
+        "source": "public",
+        "amount": 12500,
+        "currency": "ETB",
+        "createdAt": "2026-09-16",
+        "registeredAt": "2026-09-16T09:29:00.000Z",
+        "invoiceId": "inv-reg-coh-pm-winter-l12"
+      },
+      {
+        "id": "reg-coh-pm-winter-l13",
+        "cohortId": "coh-pm-winter",
+        "programId": "prg-pm",
+        "studentId": "apx-l13",
+        "studentName": "Blen Fikre",
+        "studentEmail": "blen.fikre@learner.apex.et",
+        "phone": "0920548773",
+        "organization": "Ethio Engineering Group",
+        "status": "enrolled",
+        "source": "admin",
+        "amount": 12500,
+        "currency": "ETB",
+        "createdAt": "2026-09-18",
+        "registeredAt": "2026-09-18T09:30:00.000Z",
+        "invoiceId": "inv-reg-coh-pm-winter-l13",
+        "confirmedAt": "2026-09-19T11:00:00.000Z",
+        "confirmedBy": "chapa"
+      },
+      {
+        "id": "reg-coh-open-xl-l5",
+        "cohortId": "coh-open-xl",
+        "programId": "prg-open",
+        "studentId": "apx-l5",
+        "studentName": "Eden Assefa",
+        "studentEmail": "eden.assefa@learner.apex.et",
+        "phone": "0914672605",
+        "organization": "Addis Logistics",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 0,
+        "currency": "ETB",
+        "createdAt": "2026-09-23",
+        "registeredAt": "2026-09-23T09:31:00.000Z",
+        "confirmedAt": "2026-09-24T11:00:00.000Z",
+        "confirmedBy": "free"
+      },
+      {
+        "id": "reg-coh-open-xl-l9",
+        "cohortId": "coh-open-xl",
+        "programId": "prg-open",
+        "studentId": "apx-l9",
+        "studentName": "Hiwot Alemayehu",
+        "studentEmail": "hiwot.alemayehu@learner.apex.et",
+        "phone": "0917610689",
+        "organization": "City Health Office",
+        "status": "enrolled",
+        "source": "public",
+        "amount": 0,
+        "currency": "ETB",
+        "createdAt": "2026-09-24",
+        "registeredAt": "2026-09-24T09:32:00.000Z",
+        "confirmedAt": "2026-09-25T11:00:00.000Z",
+        "confirmedBy": "free"
+      },
+      {
+        "id": "reg-coh-open-xl-l10",
+        "cohortId": "coh-open-xl",
+        "programId": "prg-open",
+        "studentId": "apx-l10",
+        "studentName": "Dawit Mulugeta",
+        "studentEmail": "dawit.mulugeta@learner.apex.et",
+        "phone": "0918345210",
+        "organization": "Self-sponsored",
+        "status": "enrolled",
+        "source": "admin",
+        "amount": 0,
+        "currency": "ETB",
+        "createdAt": "2026-09-25",
+        "registeredAt": "2026-09-25T09:33:00.000Z",
+        "confirmedAt": "2026-09-26T11:00:00.000Z",
+        "confirmedBy": "free"
+      }
+    ],
+    "cohort-attendance": [
+      {
+        "id": "att-coh-pm-summer-1",
+        "cohortId": "coh-pm-summer",
+        "date": "2026-07-18",
+        "topic": "Kick-off and project charter",
+        "marks": {
+          "apx-l2": "present",
+          "apx-l3": "present",
+          "apx-l4": "present",
+          "apx-l5": "present"
+        },
+        "takenById": "apx-tr1",
+        "takenByName": "Yonas Alemu",
+        "takenAt": "2026-07-18T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-pm-summer-2",
+        "cohortId": "coh-pm-summer",
+        "date": "2026-07-20",
+        "topic": "Scope and WBS",
+        "marks": {
+          "apx-l2": "present",
+          "apx-l3": "excused",
+          "apx-l4": "present",
+          "apx-l5": "present"
+        },
+        "takenById": "apx-tr1",
+        "takenByName": "Yonas Alemu",
+        "takenAt": "2026-07-20T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-pm-summer-3",
+        "cohortId": "coh-pm-summer",
+        "date": "2026-07-25",
+        "topic": "Scheduling and critical path",
+        "marks": {
+          "apx-l2": "present",
+          "apx-l3": "present",
+          "apx-l4": "present",
+          "apx-l5": "absent"
+        },
+        "takenById": "apx-tr1",
+        "takenByName": "Yonas Alemu",
+        "takenAt": "2026-07-25T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-pm-summer-4",
+        "cohortId": "coh-pm-summer",
+        "date": "2026-07-27",
+        "topic": "Cost and risk",
+        "marks": {
+          "apx-l2": "present",
+          "apx-l3": "present",
+          "apx-l4": "present",
+          "apx-l5": "absent"
+        },
+        "takenById": "apx-tr1",
+        "takenByName": "Yonas Alemu",
+        "takenAt": "2026-07-27T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-pm-summer-5",
+        "cohortId": "coh-pm-summer",
+        "date": "2026-08-01",
+        "topic": "Agile and Scrum",
+        "marks": {
+          "apx-l2": "present",
+          "apx-l3": "present",
+          "apx-l4": "late",
+          "apx-l5": "present"
+        },
+        "takenById": "apx-tr1",
+        "takenByName": "Yonas Alemu",
+        "takenAt": "2026-08-01T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-pm-summer-6",
+        "cohortId": "coh-pm-summer",
+        "date": "2026-08-03",
+        "topic": "Sprint simulation",
+        "marks": {
+          "apx-l2": "present",
+          "apx-l3": "present",
+          "apx-l4": "present",
+          "apx-l5": "absent"
+        },
+        "takenById": "apx-tr1",
+        "takenByName": "Yonas Alemu",
+        "takenAt": "2026-08-03T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-pm-summer-7",
+        "cohortId": "coh-pm-summer",
+        "date": "2026-08-08",
+        "topic": "Stakeholders and communication",
+        "marks": {
+          "apx-l2": "present",
+          "apx-l3": "present",
+          "apx-l4": "present",
+          "apx-l5": "absent"
+        },
+        "takenById": "apx-tr1",
+        "takenByName": "Yonas Alemu",
+        "takenAt": "2026-08-08T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-pm-summer-8",
+        "cohortId": "coh-pm-summer",
+        "date": "2026-08-10",
+        "topic": "Exam preparation",
+        "marks": {
+          "apx-l2": "present",
+          "apx-l3": "present",
+          "apx-l4": "present",
+          "apx-l5": "present"
+        },
+        "takenById": "apx-tr1",
+        "takenByName": "Yonas Alemu",
+        "takenAt": "2026-08-10T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-pm-autumn-1",
+        "cohortId": "coh-pm-autumn",
+        "date": "2026-09-12",
+        "topic": "Kick-off and project charter",
+        "marks": {
+          "apx-l1": "present",
+          "apx-l6": "present",
+          "apx-l7": "present",
+          "apx-l8": "present",
+          "apx-l9": "absent"
+        },
+        "takenById": "apx-tr1",
+        "takenByName": "Yonas Alemu",
+        "takenAt": "2026-09-12T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-pm-autumn-2",
+        "cohortId": "coh-pm-autumn",
+        "date": "2026-09-14",
+        "topic": "Scope and WBS",
+        "marks": {
+          "apx-l1": "present",
+          "apx-l6": "present",
+          "apx-l7": "absent",
+          "apx-l8": "present",
+          "apx-l9": "present"
+        },
+        "takenById": "apx-tr1",
+        "takenByName": "Yonas Alemu",
+        "takenAt": "2026-09-14T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-pm-autumn-3",
+        "cohortId": "coh-pm-autumn",
+        "date": "2026-09-19",
+        "topic": "Scheduling and critical path",
+        "marks": {
+          "apx-l1": "late",
+          "apx-l6": "present",
+          "apx-l7": "present",
+          "apx-l8": "present",
+          "apx-l9": "absent"
+        },
+        "takenById": "apx-tr1",
+        "takenByName": "Yonas Alemu",
+        "takenAt": "2026-09-19T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-pm-autumn-4",
+        "cohortId": "coh-pm-autumn",
+        "date": "2026-09-21",
+        "topic": "Cost and risk",
+        "marks": {
+          "apx-l1": "present",
+          "apx-l6": "present",
+          "apx-l7": "present",
+          "apx-l8": "present",
+          "apx-l9": "present"
+        },
+        "takenById": "apx-tr1",
+        "takenByName": "Yonas Alemu",
+        "takenAt": "2026-09-21T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-da-7-1",
+        "cohortId": "coh-da-7",
+        "date": "2026-09-19",
+        "topic": "Clean data and tables",
+        "marks": {
+          "apx-l11": "present",
+          "apx-l12": "present",
+          "apx-l13": "present",
+          "apx-l3": "present"
+        },
+        "takenById": "apx-tr2",
+        "takenByName": "Meron Tesfaye",
+        "takenAt": "2026-09-19T21:05:00.000Z"
+      },
+      {
+        "id": "att-coh-da-7-2",
+        "cohortId": "coh-da-7",
+        "date": "2026-09-21",
+        "topic": "Fixing messy data",
+        "marks": {
+          "apx-l11": "present",
+          "apx-l12": "absent",
+          "apx-l13": "present",
+          "apx-l3": "present"
+        },
+        "takenById": "apx-tr2",
+        "takenByName": "Meron Tesfaye",
+        "takenAt": "2026-09-21T21:05:00.000Z"
+      }
+    ],
+    "enrollments": [
+      {
+        "id": "enr-reg-coh-pm-summer-l2-t1",
+        "studentId": "apx-l2",
+        "studentName": "Abel Tesfaye",
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "courseTitle": "Project Management Foundations",
+        "enrolledOn": "2026-07-04",
+        "status": "active",
+        "progress": 100,
+        "completedOn": "2026-08-28",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-summer-l2"
+      },
+      {
+        "id": "enr-reg-coh-pm-summer-l2-t2",
+        "studentId": "apx-l2",
+        "studentName": "Abel Tesfaye",
+        "courseId": "t2",
+        "courseCode": "PM-201",
+        "courseTitle": "Agile and Scrum in Practice",
+        "enrolledOn": "2026-07-04",
+        "status": "active",
+        "progress": 100,
+        "completedOn": "2026-08-28",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-summer-l2"
+      },
+      {
+        "id": "enr-reg-coh-pm-summer-l3-t1",
+        "studentId": "apx-l3",
+        "studentName": "Ruth Mengistu",
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "courseTitle": "Project Management Foundations",
+        "enrolledOn": "2026-07-05",
+        "status": "active",
+        "progress": 100,
+        "completedOn": "2026-08-28",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-summer-l3"
+      },
+      {
+        "id": "enr-reg-coh-pm-summer-l3-t2",
+        "studentId": "apx-l3",
+        "studentName": "Ruth Mengistu",
+        "courseId": "t2",
+        "courseCode": "PM-201",
+        "courseTitle": "Agile and Scrum in Practice",
+        "enrolledOn": "2026-07-05",
+        "status": "active",
+        "progress": 100,
+        "completedOn": "2026-08-28",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-summer-l3"
+      },
+      {
+        "id": "enr-reg-coh-pm-summer-l4-t1",
+        "studentId": "apx-l4",
+        "studentName": "Nahom Bekele",
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "courseTitle": "Project Management Foundations",
+        "enrolledOn": "2026-07-09",
+        "status": "active",
+        "progress": 100,
+        "completedOn": "2026-08-28",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-summer-l4"
+      },
+      {
+        "id": "enr-reg-coh-pm-summer-l4-t2",
+        "studentId": "apx-l4",
+        "studentName": "Nahom Bekele",
+        "courseId": "t2",
+        "courseCode": "PM-201",
+        "courseTitle": "Agile and Scrum in Practice",
+        "enrolledOn": "2026-07-09",
+        "status": "active",
+        "progress": 100,
+        "completedOn": "2026-08-28",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-summer-l4"
+      },
+      {
+        "id": "enr-reg-coh-pm-summer-l5-t1",
+        "studentId": "apx-l5",
+        "studentName": "Eden Assefa",
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "courseTitle": "Project Management Foundations",
+        "enrolledOn": "2026-07-11",
+        "status": "active",
+        "progress": 100,
+        "completedOn": "2026-08-28",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-summer-l5"
+      },
+      {
+        "id": "enr-reg-coh-pm-summer-l5-t2",
+        "studentId": "apx-l5",
+        "studentName": "Eden Assefa",
+        "courseId": "t2",
+        "courseCode": "PM-201",
+        "courseTitle": "Agile and Scrum in Practice",
+        "enrolledOn": "2026-07-11",
+        "status": "active",
+        "progress": 100,
+        "completedOn": "2026-08-28",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-summer-l5"
+      },
+      {
+        "id": "enr-reg-coh-pm-autumn-l1-t1",
+        "studentId": "apx-l1",
+        "studentName": "Selam Hailu",
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "courseTitle": "Project Management Foundations",
+        "enrolledOn": "2026-08-28",
+        "status": "active",
+        "progress": 60,
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-autumn-l1"
+      },
+      {
+        "id": "enr-reg-coh-pm-autumn-l1-t2",
+        "studentId": "apx-l1",
+        "studentName": "Selam Hailu",
+        "courseId": "t2",
+        "courseCode": "PM-201",
+        "courseTitle": "Agile and Scrum in Practice",
+        "enrolledOn": "2026-08-28",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-autumn-l1"
+      },
+      {
+        "id": "enr-reg-coh-pm-autumn-l6-t1",
+        "studentId": "apx-l6",
+        "studentName": "Kaleb Worku",
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "courseTitle": "Project Management Foundations",
+        "enrolledOn": "2026-08-30",
+        "status": "active",
+        "progress": 100,
+        "completedOn": "2026-09-23",
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-autumn-l6"
+      },
+      {
+        "id": "enr-reg-coh-pm-autumn-l6-t2",
+        "studentId": "apx-l6",
+        "studentName": "Kaleb Worku",
+        "courseId": "t2",
+        "courseCode": "PM-201",
+        "courseTitle": "Agile and Scrum in Practice",
+        "enrolledOn": "2026-08-30",
+        "status": "active",
+        "progress": 40,
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-autumn-l6"
+      },
+      {
+        "id": "enr-reg-coh-pm-autumn-l7-t1",
+        "studentId": "apx-l7",
+        "studentName": "Mahlet Getachew",
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "courseTitle": "Project Management Foundations",
+        "enrolledOn": "2026-09-01",
+        "status": "active",
+        "progress": 30,
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-autumn-l7"
+      },
+      {
+        "id": "enr-reg-coh-pm-autumn-l7-t2",
+        "studentId": "apx-l7",
+        "studentName": "Mahlet Getachew",
+        "courseId": "t2",
+        "courseCode": "PM-201",
+        "courseTitle": "Agile and Scrum in Practice",
+        "enrolledOn": "2026-09-01",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-autumn-l7"
+      },
+      {
+        "id": "enr-reg-coh-pm-autumn-l8-t1",
+        "studentId": "apx-l8",
+        "studentName": "Biruk Tadesse",
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "courseTitle": "Project Management Foundations",
+        "enrolledOn": "2026-09-02",
+        "status": "active",
+        "progress": 80,
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-autumn-l8"
+      },
+      {
+        "id": "enr-reg-coh-pm-autumn-l8-t2",
+        "studentId": "apx-l8",
+        "studentName": "Biruk Tadesse",
+        "courseId": "t2",
+        "courseCode": "PM-201",
+        "courseTitle": "Agile and Scrum in Practice",
+        "enrolledOn": "2026-09-02",
+        "status": "active",
+        "progress": 10,
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-autumn-l8"
+      },
+      {
+        "id": "enr-reg-coh-pm-autumn-l9-t1",
+        "studentId": "apx-l9",
+        "studentName": "Hiwot Alemayehu",
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "courseTitle": "Project Management Foundations",
+        "enrolledOn": "2026-09-07",
+        "status": "active",
+        "progress": 10,
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-autumn-l9"
+      },
+      {
+        "id": "enr-reg-coh-pm-autumn-l9-t2",
+        "studentId": "apx-l9",
+        "studentName": "Hiwot Alemayehu",
+        "courseId": "t2",
+        "courseCode": "PM-201",
+        "courseTitle": "Agile and Scrum in Practice",
+        "enrolledOn": "2026-09-07",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-autumn-l9"
+      },
+      {
+        "id": "enr-reg-coh-da-7-l11-t3",
+        "studentId": "apx-l11",
+        "studentName": "Tsion Kebede",
+        "courseId": "t3",
+        "courseCode": "DA-101",
+        "courseTitle": "Excel for Data Analysis",
+        "enrolledOn": "2026-09-06",
+        "status": "active",
+        "progress": 40,
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "registrationId": "reg-coh-da-7-l11"
+      },
+      {
+        "id": "enr-reg-coh-da-7-l11-t4",
+        "studentId": "apx-l11",
+        "studentName": "Tsion Kebede",
+        "courseId": "t4",
+        "courseCode": "DA-201",
+        "courseTitle": "Dashboards with Power BI",
+        "enrolledOn": "2026-09-06",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "registrationId": "reg-coh-da-7-l11"
+      },
+      {
+        "id": "enr-reg-coh-da-7-l12-t3",
+        "studentId": "apx-l12",
+        "studentName": "Yared Solomon",
+        "courseId": "t3",
+        "courseCode": "DA-101",
+        "courseTitle": "Excel for Data Analysis",
+        "enrolledOn": "2026-09-07",
+        "status": "active",
+        "progress": 25,
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "registrationId": "reg-coh-da-7-l12"
+      },
+      {
+        "id": "enr-reg-coh-da-7-l12-t4",
+        "studentId": "apx-l12",
+        "studentName": "Yared Solomon",
+        "courseId": "t4",
+        "courseCode": "DA-201",
+        "courseTitle": "Dashboards with Power BI",
+        "enrolledOn": "2026-09-07",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "registrationId": "reg-coh-da-7-l12"
+      },
+      {
+        "id": "enr-reg-coh-da-7-l13-t3",
+        "studentId": "apx-l13",
+        "studentName": "Blen Fikre",
+        "courseId": "t3",
+        "courseCode": "DA-101",
+        "courseTitle": "Excel for Data Analysis",
+        "enrolledOn": "2026-09-09",
+        "status": "active",
+        "progress": 50,
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "registrationId": "reg-coh-da-7-l13"
+      },
+      {
+        "id": "enr-reg-coh-da-7-l13-t4",
+        "studentId": "apx-l13",
+        "studentName": "Blen Fikre",
+        "courseId": "t4",
+        "courseCode": "DA-201",
+        "courseTitle": "Dashboards with Power BI",
+        "enrolledOn": "2026-09-09",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "registrationId": "reg-coh-da-7-l13"
+      },
+      {
+        "id": "enr-reg-coh-da-7-l3-t3",
+        "studentId": "apx-l3",
+        "studentName": "Ruth Mengistu",
+        "courseId": "t3",
+        "courseCode": "DA-101",
+        "courseTitle": "Excel for Data Analysis",
+        "enrolledOn": "2026-09-12",
+        "status": "active",
+        "progress": 60,
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "registrationId": "reg-coh-da-7-l3"
+      },
+      {
+        "id": "enr-reg-coh-da-7-l3-t4",
+        "studentId": "apx-l3",
+        "studentName": "Ruth Mengistu",
+        "courseId": "t4",
+        "courseCode": "DA-201",
+        "courseTitle": "Dashboards with Power BI",
+        "enrolledOn": "2026-09-12",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "registrationId": "reg-coh-da-7-l3"
+      },
+      {
+        "id": "enr-reg-coh-da-8-l14-t3",
+        "studentId": "apx-l14",
+        "studentName": "Robel Hailemariam",
+        "courseId": "t3",
+        "courseCode": "DA-101",
+        "courseTitle": "Excel for Data Analysis",
+        "enrolledOn": "2026-09-21",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-da-8",
+        "programId": "prg-da",
+        "registrationId": "reg-coh-da-8-l14"
+      },
+      {
+        "id": "enr-reg-coh-da-8-l14-t4",
+        "studentId": "apx-l14",
+        "studentName": "Robel Hailemariam",
+        "courseId": "t4",
+        "courseCode": "DA-201",
+        "courseTitle": "Dashboards with Power BI",
+        "enrolledOn": "2026-09-21",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-da-8",
+        "programId": "prg-da",
+        "registrationId": "reg-coh-da-8-l14"
+      },
+      {
+        "id": "enr-reg-coh-da-8-l2-t3",
+        "studentId": "apx-l2",
+        "studentName": "Abel Tesfaye",
+        "courseId": "t3",
+        "courseCode": "DA-101",
+        "courseTitle": "Excel for Data Analysis",
+        "enrolledOn": "2026-09-23",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-da-8",
+        "programId": "prg-da",
+        "registrationId": "reg-coh-da-8-l2"
+      },
+      {
+        "id": "enr-reg-coh-da-8-l2-t4",
+        "studentId": "apx-l2",
+        "studentName": "Abel Tesfaye",
+        "courseId": "t4",
+        "courseCode": "DA-201",
+        "courseTitle": "Dashboards with Power BI",
+        "enrolledOn": "2026-09-23",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-da-8",
+        "programId": "prg-da",
+        "registrationId": "reg-coh-da-8-l2"
+      },
+      {
+        "id": "enr-reg-coh-ld-oct-l4-t5",
+        "studentId": "apx-l4",
+        "studentName": "Nahom Bekele",
+        "courseId": "t5",
+        "courseCode": "LD-101",
+        "courseTitle": "Leading Teams",
+        "enrolledOn": "2026-09-18",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-ld-oct",
+        "programId": "prg-ld",
+        "registrationId": "reg-coh-ld-oct-l4"
+      },
+      {
+        "id": "enr-reg-coh-ld-oct-l4-t6",
+        "studentId": "apx-l4",
+        "studentName": "Nahom Bekele",
+        "courseId": "t6",
+        "courseCode": "LD-102",
+        "courseTitle": "Coaching and Feedback",
+        "enrolledOn": "2026-09-18",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-ld-oct",
+        "programId": "prg-ld",
+        "registrationId": "reg-coh-ld-oct-l4"
+      },
+      {
+        "id": "enr-reg-coh-pm-winter-l13-t1",
+        "studentId": "apx-l13",
+        "studentName": "Blen Fikre",
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "courseTitle": "Project Management Foundations",
+        "enrolledOn": "2026-09-19",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-pm-winter",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-winter-l13"
+      },
+      {
+        "id": "enr-reg-coh-pm-winter-l13-t2",
+        "studentId": "apx-l13",
+        "studentName": "Blen Fikre",
+        "courseId": "t2",
+        "courseCode": "PM-201",
+        "courseTitle": "Agile and Scrum in Practice",
+        "enrolledOn": "2026-09-19",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-pm-winter",
+        "programId": "prg-pm",
+        "registrationId": "reg-coh-pm-winter-l13"
+      },
+      {
+        "id": "enr-reg-coh-open-xl-l5-t3",
+        "studentId": "apx-l5",
+        "studentName": "Eden Assefa",
+        "courseId": "t3",
+        "courseCode": "DA-101",
+        "courseTitle": "Excel for Data Analysis",
+        "enrolledOn": "2026-09-24",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-open-xl",
+        "programId": "prg-open",
+        "registrationId": "reg-coh-open-xl-l5"
+      },
+      {
+        "id": "enr-reg-coh-open-xl-l9-t3",
+        "studentId": "apx-l9",
+        "studentName": "Hiwot Alemayehu",
+        "courseId": "t3",
+        "courseCode": "DA-101",
+        "courseTitle": "Excel for Data Analysis",
+        "enrolledOn": "2026-09-25",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-open-xl",
+        "programId": "prg-open",
+        "registrationId": "reg-coh-open-xl-l9"
+      },
+      {
+        "id": "enr-reg-coh-open-xl-l10-t3",
+        "studentId": "apx-l10",
+        "studentName": "Dawit Mulugeta",
+        "courseId": "t3",
+        "courseCode": "DA-101",
+        "courseTitle": "Excel for Data Analysis",
+        "enrolledOn": "2026-09-26",
+        "status": "active",
+        "progress": 0,
+        "cohortId": "coh-open-xl",
+        "programId": "prg-open",
+        "registrationId": "reg-coh-open-xl-l10"
+      }
+    ],
+    "payments": [
+      {
+        "id": "inv-reg-coh-pm-summer-l2",
+        "studentId": "apx-l2",
+        "studentName": "Abel Tesfaye",
+        "label": "Project Management Professional — PMP — Summer evening cohort",
+        "amount": 12500,
+        "currency": "ETB",
+        "dueAt": "2026-07-10",
+        "paidAt": "2026-07-04T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "PMP — Summer evening cohort",
+        "campusId": "c1",
+        "reference": "CHAPA-482910",
+        "registrationId": "reg-coh-pm-summer-l2",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-pm-summer-l3",
+        "studentId": "apx-l3",
+        "studentName": "Ruth Mengistu",
+        "label": "Project Management Professional — PMP — Summer evening cohort",
+        "amount": 12500,
+        "currency": "ETB",
+        "dueAt": "2026-07-11",
+        "paidAt": "2026-07-05T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "PMP — Summer evening cohort",
+        "campusId": "c1",
+        "reference": "CHAPA-482947",
+        "registrationId": "reg-coh-pm-summer-l3",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-pm-summer-l4",
+        "studentId": "apx-l4",
+        "studentName": "Nahom Bekele",
+        "label": "Project Management Professional — PMP — Summer evening cohort",
+        "amount": 12500,
+        "currency": "ETB",
+        "dueAt": "2026-07-15",
+        "paidAt": "2026-07-09T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "PMP — Summer evening cohort",
+        "campusId": "c1",
+        "reference": "CHAPA-482984",
+        "registrationId": "reg-coh-pm-summer-l4",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-pm-summer-l5",
+        "studentId": "apx-l5",
+        "studentName": "Eden Assefa",
+        "label": "Project Management Professional — PMP — Summer evening cohort",
+        "amount": 12500,
+        "currency": "ETB",
+        "dueAt": "2026-07-17",
+        "paidAt": "2026-07-11T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "PMP — Summer evening cohort",
+        "campusId": "c1",
+        "reference": "CHAPA-483021",
+        "registrationId": "reg-coh-pm-summer-l5",
+        "cohortId": "coh-pm-summer",
+        "programId": "prg-pm",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-pm-autumn-l1",
+        "studentId": "apx-l1",
+        "studentName": "Selam Hailu",
+        "label": "Project Management Professional — PMP — Autumn evening cohort",
+        "amount": 12500,
+        "currency": "ETB",
+        "dueAt": "2026-09-03",
+        "paidAt": "2026-08-28T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "PMP — Autumn evening cohort",
+        "campusId": "c1",
+        "reference": "CHAPA-483058",
+        "registrationId": "reg-coh-pm-autumn-l1",
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-pm-autumn-l6",
+        "studentId": "apx-l6",
+        "studentName": "Kaleb Worku",
+        "label": "Project Management Professional — PMP — Autumn evening cohort",
+        "amount": 12500,
+        "currency": "ETB",
+        "dueAt": "2026-09-05",
+        "paidAt": "2026-08-30T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "PMP — Autumn evening cohort",
+        "campusId": "c1",
+        "reference": "CHAPA-483095",
+        "registrationId": "reg-coh-pm-autumn-l6",
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-pm-autumn-l7",
+        "studentId": "apx-l7",
+        "studentName": "Mahlet Getachew",
+        "label": "Project Management Professional — PMP — Autumn evening cohort",
+        "amount": 12500,
+        "currency": "ETB",
+        "dueAt": "2026-09-07",
+        "paidAt": "2026-09-01T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "PMP — Autumn evening cohort",
+        "campusId": "c1",
+        "reference": "CHAPA-483132",
+        "registrationId": "reg-coh-pm-autumn-l7",
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-pm-autumn-l8",
+        "studentId": "apx-l8",
+        "studentName": "Biruk Tadesse",
+        "label": "Project Management Professional — PMP — Autumn evening cohort",
+        "amount": 12500,
+        "currency": "ETB",
+        "dueAt": "2026-09-08",
+        "paidAt": "2026-09-02T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "PMP — Autumn evening cohort",
+        "campusId": "c1",
+        "reference": "CHAPA-483169",
+        "registrationId": "reg-coh-pm-autumn-l8",
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-pm-autumn-l10",
+        "studentId": "apx-l10",
+        "studentName": "Dawit Mulugeta",
+        "label": "Project Management Professional — PMP — Autumn evening cohort",
+        "amount": 12500,
+        "currency": "ETB",
+        "dueAt": "2026-10-01",
+        "status": "pending",
+        "category": "registration",
+        "term": "PMP — Autumn evening cohort",
+        "campusId": "c1",
+        "registrationId": "reg-coh-pm-autumn-l10",
+        "cohortId": "coh-pm-autumn",
+        "programId": "prg-pm"
+      },
+      {
+        "id": "inv-reg-coh-da-7-l11",
+        "studentId": "apx-l11",
+        "studentName": "Tsion Kebede",
+        "label": "Data Analytics with Excel & Power BI — Data Analytics — Cohort 7",
+        "amount": 15000,
+        "currency": "ETB",
+        "dueAt": "2026-09-12",
+        "paidAt": "2026-09-06T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "Data Analytics — Cohort 7",
+        "campusId": "c1",
+        "reference": "CHAPA-483280",
+        "registrationId": "reg-coh-da-7-l11",
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-da-7-l12",
+        "studentId": "apx-l12",
+        "studentName": "Yared Solomon",
+        "label": "Data Analytics with Excel & Power BI — Data Analytics — Cohort 7",
+        "amount": 15000,
+        "currency": "ETB",
+        "dueAt": "2026-09-13",
+        "paidAt": "2026-09-07T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "Data Analytics — Cohort 7",
+        "campusId": "c1",
+        "reference": "CHAPA-483317",
+        "registrationId": "reg-coh-da-7-l12",
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-da-7-l13",
+        "studentId": "apx-l13",
+        "studentName": "Blen Fikre",
+        "label": "Data Analytics with Excel & Power BI — Data Analytics — Cohort 7",
+        "amount": 15000,
+        "currency": "ETB",
+        "dueAt": "2026-09-15",
+        "paidAt": "2026-09-09T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "Data Analytics — Cohort 7",
+        "campusId": "c1",
+        "reference": "CHAPA-483354",
+        "registrationId": "reg-coh-da-7-l13",
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-da-7-l3",
+        "studentId": "apx-l3",
+        "studentName": "Ruth Mengistu",
+        "label": "Data Analytics with Excel & Power BI — Data Analytics — Cohort 7",
+        "amount": 15000,
+        "currency": "ETB",
+        "dueAt": "2026-09-18",
+        "paidAt": "2026-09-12T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "Data Analytics — Cohort 7",
+        "campusId": "c1",
+        "reference": "CHAPA-483391",
+        "registrationId": "reg-coh-da-7-l3",
+        "cohortId": "coh-da-7",
+        "programId": "prg-da",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-da-8-l1",
+        "studentId": "apx-l1",
+        "studentName": "Selam Hailu",
+        "label": "Data Analytics with Excel & Power BI — Data Analytics — Cohort 8",
+        "amount": 13500,
+        "currency": "ETB",
+        "dueAt": "2026-10-02",
+        "status": "pending",
+        "category": "registration",
+        "term": "Data Analytics — Cohort 8",
+        "campusId": "c1",
+        "registrationId": "reg-coh-da-8-l1",
+        "cohortId": "coh-da-8",
+        "programId": "prg-da"
+      },
+      {
+        "id": "inv-reg-coh-da-8-l14",
+        "studentId": "apx-l14",
+        "studentName": "Robel Hailemariam",
+        "label": "Data Analytics with Excel & Power BI — Data Analytics — Cohort 8",
+        "amount": 13500,
+        "currency": "ETB",
+        "dueAt": "2026-09-27",
+        "paidAt": "2026-09-21T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "Data Analytics — Cohort 8",
+        "campusId": "c1",
+        "reference": "CHAPA-483465",
+        "registrationId": "reg-coh-da-8-l14",
+        "cohortId": "coh-da-8",
+        "programId": "prg-da",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-da-8-l2",
+        "studentId": "apx-l2",
+        "studentName": "Abel Tesfaye",
+        "label": "Data Analytics with Excel & Power BI — Data Analytics — Cohort 8",
+        "amount": 13500,
+        "currency": "ETB",
+        "dueAt": "2026-09-29",
+        "paidAt": "2026-09-23T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "Data Analytics — Cohort 8",
+        "campusId": "c1",
+        "reference": "CHAPA-483502",
+        "registrationId": "reg-coh-da-8-l2",
+        "cohortId": "coh-da-8",
+        "programId": "prg-da",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-ld-oct-l4",
+        "studentId": "apx-l4",
+        "studentName": "Nahom Bekele",
+        "label": "Leadership & Supervisory Skills — Leadership — New supervisors",
+        "amount": 9500,
+        "currency": "ETB",
+        "dueAt": "2026-09-24",
+        "paidAt": "2026-09-18T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "Leadership — New supervisors",
+        "campusId": "c1",
+        "reference": "CHAPA-483539",
+        "registrationId": "reg-coh-ld-oct-l4",
+        "cohortId": "coh-ld-oct",
+        "programId": "prg-ld",
+        "method": "chapa"
+      },
+      {
+        "id": "inv-reg-coh-ld-oct-l6",
+        "studentId": "apx-l6",
+        "studentName": "Kaleb Worku",
+        "label": "Leadership & Supervisory Skills — Leadership — New supervisors",
+        "amount": 9500,
+        "currency": "ETB",
+        "dueAt": "2026-09-30",
+        "status": "pending",
+        "category": "registration",
+        "term": "Leadership — New supervisors",
+        "campusId": "c1",
+        "registrationId": "reg-coh-ld-oct-l6",
+        "cohortId": "coh-ld-oct",
+        "programId": "prg-ld"
+      },
+      {
+        "id": "inv-reg-coh-pm-winter-l12",
+        "studentId": "apx-l12",
+        "studentName": "Yared Solomon",
+        "label": "Project Management Professional — PMP — Winter weekend cohort",
+        "amount": 12500,
+        "currency": "ETB",
+        "dueAt": "2026-09-23",
+        "status": "overdue",
+        "category": "registration",
+        "term": "PMP — Winter weekend cohort",
+        "campusId": "c1",
+        "registrationId": "reg-coh-pm-winter-l12",
+        "cohortId": "coh-pm-winter",
+        "programId": "prg-pm"
+      },
+      {
+        "id": "inv-reg-coh-pm-winter-l13",
+        "studentId": "apx-l13",
+        "studentName": "Blen Fikre",
+        "label": "Project Management Professional — PMP — Winter weekend cohort",
+        "amount": 12500,
+        "currency": "ETB",
+        "dueAt": "2026-09-25",
+        "paidAt": "2026-09-19T11:00:00.000Z",
+        "status": "paid",
+        "category": "registration",
+        "term": "PMP — Winter weekend cohort",
+        "campusId": "c1",
+        "reference": "CHAPA-483650",
+        "registrationId": "reg-coh-pm-winter-l13",
+        "cohortId": "coh-pm-winter",
+        "programId": "prg-pm",
+        "method": "chapa"
+      }
+    ],
+    "certificates": [
+      {
+        "id": "cert-apx-l2",
+        "certificateId": "BER-CERT-2026-HXN5-Y60H",
+        "studentId": "apx-l2",
+        "studentName": "Abel Tesfaye",
+        "courseId": "prg-pm",
+        "courseCode": "PMP-PREP",
+        "courseTitle": "Project Management Professional",
+        "programId": "prg-pm",
+        "cohortId": "coh-pm-summer",
+        "cohortName": "PMP — Summer evening cohort",
+        "totalHours": 36,
+        "instructorId": "apx-tr1",
+        "instructorName": "Yonas Alemu",
+        "department": "Project & Business",
+        "campusId": "c1",
+        "completionDate": "2026-08-28",
+        "issueDate": "2026-08-30",
+        "templateId": "tpl-professional",
+        "templateName": "Professional Certificate",
+        "status": "issued"
+      },
+      {
+        "id": "cert-apx-l3",
+        "certificateId": "BER-CERT-2026-8H8X-W92H",
+        "studentId": "apx-l3",
+        "studentName": "Ruth Mengistu",
+        "courseId": "prg-pm",
+        "courseCode": "PMP-PREP",
+        "courseTitle": "Project Management Professional",
+        "programId": "prg-pm",
+        "cohortId": "coh-pm-summer",
+        "cohortName": "PMP — Summer evening cohort",
+        "totalHours": 36,
+        "instructorId": "apx-tr1",
+        "instructorName": "Yonas Alemu",
+        "department": "Project & Business",
+        "campusId": "c1",
+        "completionDate": "2026-08-28",
+        "issueDate": "2026-08-30",
+        "templateId": "tpl-professional",
+        "templateName": "Professional Certificate",
+        "status": "issued"
+      },
+      {
+        "id": "cert-apx-l4",
+        "certificateId": "BER-CERT-2026-Z4VM-VC4H",
+        "studentId": "apx-l4",
+        "studentName": "Nahom Bekele",
+        "courseId": "prg-pm",
+        "courseCode": "PMP-PREP",
+        "courseTitle": "Project Management Professional",
+        "programId": "prg-pm",
+        "cohortId": "coh-pm-summer",
+        "cohortName": "PMP — Summer evening cohort",
+        "totalHours": 36,
+        "instructorId": "apx-tr1",
+        "instructorName": "Yonas Alemu",
+        "department": "Project & Business",
+        "campusId": "c1",
+        "completionDate": "2026-08-28",
+        "issueDate": "2026-08-30",
+        "templateId": "tpl-professional",
+        "templateName": "Professional Certificate",
+        "status": "issued"
+      }
+    ],
+    "lesson-progress": {
+      "apx-l2": {
+        "t1": [
+          "t1-m1-l1",
+          "t1-m1-l2",
+          "t1-m1-check",
+          "t1-m2-l1",
+          "t1-m2-l2",
+          "t1-m2-check"
+        ],
+        "t2": [
+          "t2-m1-l1",
+          "t2-m1-l2",
+          "t2-m1-check",
+          "t2-m2-l1",
+          "t2-m2-l2",
+          "t2-m2-check"
+        ]
+      },
+      "apx-l3": {
+        "t1": [
+          "t1-m1-l1",
+          "t1-m1-l2",
+          "t1-m1-check",
+          "t1-m2-l1",
+          "t1-m2-l2",
+          "t1-m2-check"
+        ],
+        "t2": [
+          "t2-m1-l1",
+          "t2-m1-l2",
+          "t2-m1-check",
+          "t2-m2-l1",
+          "t2-m2-l2",
+          "t2-m2-check"
+        ],
+        "t3": [
+          "t3-m1-l1",
+          "t3-m1-l2",
+          "t3-m1-check",
+          "t3-m2-l1"
+        ]
+      },
+      "apx-l4": {
+        "t1": [
+          "t1-m1-l1",
+          "t1-m1-l2",
+          "t1-m1-check",
+          "t1-m2-l1",
+          "t1-m2-l2",
+          "t1-m2-check"
+        ],
+        "t2": [
+          "t2-m1-l1",
+          "t2-m1-l2",
+          "t2-m1-check",
+          "t2-m2-l1",
+          "t2-m2-l2",
+          "t2-m2-check"
+        ]
+      },
+      "apx-l5": {
+        "t1": [
+          "t1-m1-l1",
+          "t1-m1-l2",
+          "t1-m1-check",
+          "t1-m2-l1",
+          "t1-m2-l2",
+          "t1-m2-check"
+        ],
+        "t2": [
+          "t2-m1-l1",
+          "t2-m1-l2",
+          "t2-m1-check",
+          "t2-m2-l1",
+          "t2-m2-l2",
+          "t2-m2-check"
+        ]
+      },
+      "apx-l1": {
+        "t1": [
+          "t1-m1-l1",
+          "t1-m1-l2",
+          "t1-m1-check",
+          "t1-m2-l1"
+        ]
+      },
+      "apx-l6": {
+        "t1": [
+          "t1-m1-l1",
+          "t1-m1-l2",
+          "t1-m1-check",
+          "t1-m2-l1",
+          "t1-m2-l2",
+          "t1-m2-check"
+        ],
+        "t2": [
+          "t2-m1-l1",
+          "t2-m1-l2"
+        ]
+      },
+      "apx-l7": {
+        "t1": [
+          "t1-m1-l1",
+          "t1-m1-l2"
+        ]
+      },
+      "apx-l8": {
+        "t1": [
+          "t1-m1-l1",
+          "t1-m1-l2",
+          "t1-m1-check",
+          "t1-m2-l1",
+          "t1-m2-l2"
+        ],
+        "t2": [
+          "t2-m1-l1"
+        ]
+      },
+      "apx-l9": {
+        "t1": [
+          "t1-m1-l1"
+        ]
+      },
+      "apx-l11": {
+        "t3": [
+          "t3-m1-l1",
+          "t3-m1-l2"
+        ]
+      },
+      "apx-l12": {
+        "t3": [
+          "t3-m1-l1",
+          "t3-m1-l2"
+        ]
+      },
+      "apx-l13": {
+        "t3": [
+          "t3-m1-l1",
+          "t3-m1-l2",
+          "t3-m1-check"
+        ]
+      }
+    },
+    "academic-years": [],
+    "academic-terms": [],
+    "course-offerings": [],
+    "programs": [],
+    "settings": {
+      "general": {
+        "name": "Apex Training Institute",
+        "timezone": "(GMT+3) East Africa Time",
+        "language": "English",
+        "currency": "ETB — Ethiopian Birr"
+      },
+      "branding": {
+        "domain": "learn.berana.edu",
+        "sender": "no-reply@berana.edu",
+        "primary": "Lemon / Navy"
+      },
+      "academic": {
+        "grading": "Letter Grade (A–F)",
+        "attendance": "75% minimum",
+        "completion": "All modules + passing grade"
+      },
+      "modules": {
+        "virtualClassroom": true,
+        "attendance": true,
+        "assessments": true,
+        "payments": false,
+        "certificates": true,
+        "parentPortal": false
+      },
+      "integrations": {
+        "zoom": true,
+        "googleSso": true,
+        "microsoftSso": false,
+        "stripe": false,
+        "emailSms": true
+      },
+      "certificates": {
+        "autoIssue": true,
+        "rule": "both",
+        "minPercent": 60,
+        "requireApproval": false
+      },
+      "notifications": {
+        "email": true,
+        "announcements": true,
+        "assessments": true,
+        "grades": true,
+        "liveClasses": true,
+        "certificates": true,
+        "invoices": true,
+        "training": true,
+        "reminders": true
+      }
+    },
+    "selectedCampus": "all",
+    "attendances": [],
+    "reports": [],
+    "announcements": [
+      {
+        "id": "ann-apx-1",
+        "title": "Data Analytics Cohort 8 is open for registration",
+        "body": "Seats are limited to 15 and the early price of 13,500 ETB applies to this intake. Share the registration page with colleagues who want to build dashboards.",
+        "authorId": "apx-admin",
+        "authorName": "Hana Wolde",
+        "authorRole": "admin",
+        "targetRoles": [
+          "Student",
+          "Instructor"
+        ],
+        "priority": "important",
+        "postedAt": "2026-09-26T08:00:00.000Z",
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "views": 0,
+        "viewedBy": []
+      },
+      {
+        "id": "ann-apx-2",
+        "title": "Attendance counts towards your certificate",
+        "body": "Each program has a minimum attendance. Your trainer records it after every session — check your Attendance page, and tell your trainer in advance if you cannot come.",
+        "authorId": "apx-admin",
+        "authorName": "Hana Wolde",
+        "authorRole": "admin",
+        "targetRoles": [
+          "Student"
+        ],
+        "priority": "normal",
+        "postedAt": "2026-09-26T08:00:00.000Z",
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "views": 0,
+        "viewedBy": []
+      }
+    ],
+    "forum-chats": [],
+    "forum-messages": [],
+    "forum-read-state": {},
+    "live-sessions": [
+      {
+        "id": "live-da-lab",
+        "title": "Lab clinic — pivot tables Q&A",
+        "courseId": "t3",
+        "courseCode": "DA-101",
+        "courseTitle": "Excel for Data Analysis",
+        "instructorId": "apx-tr2",
+        "instructorName": "Meron Tesfaye",
+        "campusId": "c1",
+        "department": "Data & Technology",
+        "startAt": "2026-09-28T14:00:00.000Z",
+        "durationMinutes": 60,
+        "platform": "Zoom",
+        "meetingUrl": "https://zoom.us/j/5550000001",
+        "status": "upcoming"
+      },
+      {
+        "id": "live-pm-review",
+        "title": "Scheduling workshop — critical path",
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "courseTitle": "Project Management Foundations",
+        "instructorId": "apx-tr1",
+        "instructorName": "Yonas Alemu",
+        "campusId": "c1",
+        "department": "Project & Business",
+        "startAt": "2026-09-29T15:00:00.000Z",
+        "durationMinutes": 90,
+        "platform": "Zoom",
+        "meetingUrl": "https://zoom.us/j/5550000002",
+        "status": "upcoming"
+      }
+    ],
+    "assignments": [
+      {
+        "id": "asg-da-dashboard",
+        "title": "Build a sales dashboard",
+        "courseId": "t4",
+        "courseCode": "DA-201",
+        "courseTitle": "Dashboards with Power BI",
+        "instructorId": "apx-tr2",
+        "instructorName": "Meron Tesfaye",
+        "campusId": "c1",
+        "department": "Data & Technology",
+        "dueAt": "2026-11-05T20:00",
+        "brief": "Use the practice sales file from the lab to build a one-page Power BI dashboard: revenue trend, sales by branch, and the top five products. Submit the .pbix file and a screenshot.",
+        "acceptedFormats": [
+          "pbix",
+          "pdf",
+          "png"
+        ],
+        "status": "published",
+        "maxPoints": 20
+      }
+    ],
+    "quizzes": [
+      {
+        "id": "quiz-pm-foundations",
+        "title": "Project Management Foundations — check",
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "courseTitle": "Project Management Foundations",
+        "instructorId": "apx-tr1",
+        "instructorName": "Yonas Alemu",
+        "campusId": "c1",
+        "department": "Project & Business",
+        "dueAt": "2026-10-06T20:00",
+        "durationMinutes": 15,
+        "questionIds": [
+          "q-pm-1",
+          "q-pm-2",
+          "q-pm-3",
+          "q-pm-4"
+        ],
+        "status": "published",
+        "maxPoints": 20
+      }
+    ],
+    "question-bank": [
+      {
+        "id": "q-pm-1",
+        "stem": "The longest chain of dependent tasks in a schedule is the…",
+        "type": "mcq",
+        "options": [
+          "Critical path",
+          "Float",
+          "Baseline"
+        ],
+        "correctAnswer": "Critical path",
+        "tags": [
+          "project-management"
+        ],
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "department": "Project & Business",
+        "difficulty": "medium",
+        "points": 5,
+        "createdAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "id": "q-pm-2",
+        "stem": "A work breakdown structure lists deliverables, not tasks.",
+        "type": "true-false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": "True",
+        "tags": [
+          "project-management"
+        ],
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "department": "Project & Business",
+        "difficulty": "medium",
+        "points": 5,
+        "createdAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "id": "q-pm-3",
+        "stem": "Adding scope without more time usually needs more…",
+        "type": "mcq",
+        "options": [
+          "Resources or budget",
+          "Stakeholders",
+          "Meetings"
+        ],
+        "correctAnswer": "Resources or budget",
+        "tags": [
+          "project-management"
+        ],
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "department": "Project & Business",
+        "difficulty": "medium",
+        "points": 5,
+        "createdAt": "2026-09-26T08:00:00.000Z"
+      },
+      {
+        "id": "q-pm-4",
+        "stem": "A project is temporary and creates a unique result.",
+        "type": "true-false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": "True",
+        "tags": [
+          "project-management"
+        ],
+        "courseId": "t1",
+        "courseCode": "PM-101",
+        "department": "Project & Business",
+        "difficulty": "medium",
+        "points": 5,
+        "createdAt": "2026-09-26T08:00:00.000Z"
+      }
+    ],
+    "student-submissions": [],
+    "help-desk-tickets": [],
+    "integrations": [],
+    "lesson-responses": {},
+    "student-settings": {},
+    "instructor-settings": {},
+    "staff-settings": {},
+    "guardian-settings": {},
+    "help-desk-settings": {}
+  }
+}

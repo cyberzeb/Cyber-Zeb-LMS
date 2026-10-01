@@ -1,3 +1,4 @@
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import { useMemo, useState } from 'react'
 import {
   AlertTriangle,
@@ -143,6 +144,7 @@ function TakeAttendanceModal({
   onDateChange,
   onSave,
 }: TakeAttendanceModalProps) {
+  const { tx } = useLanguage()
   // Build initial state from each student's history for the selected date
   const initialOverrides = useMemo(() => {
     const map: Record<string, { status: AttendanceStatus; note: string }> = {}
@@ -292,7 +294,7 @@ function TakeAttendanceModal({
 
         {records.length === 0 && (
           <p className="py-6 text-center text-[13px] text-secondary-text">
-            No students enrolled in this course yet.
+            {tx('No students enrolled in this course yet.')}
           </p>
         )}
       </div>
@@ -387,6 +389,7 @@ function StudentHistoryModal({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export function InstructorAttendancePage() {
+  const { tx } = useLanguage()
   const { data, isLoading, isError } = useInstructorDashboard()
   const { records, overrideSession } = useAttendance()
   const { notify } = useToast()
@@ -532,7 +535,7 @@ export function InstructorAttendancePage() {
                 {courseStats.rate}%
               </h2>
               <p className="mt-2 text-[13px] text-[#c5cade]">
-                {courseRecords.length} student{courseRecords.length === 1 ? '' : 's'} · {data.term}
+                {tx(`${courseRecords.length} student${courseRecords.length === 1 ? '' : 's'}`)}{data.term ? ` · ${data.term}` : ''}
               </p>
             </div>
             {/* Course picker */}
@@ -618,7 +621,7 @@ export function InstructorAttendancePage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <FilterTabs tabs={STATUS_TABS} active={activeTab} onChange={setActiveTab} />
           <span className="text-[12px] text-secondary-text shrink-0">
-            {filtered.length} student{filtered.length === 1 ? '' : 's'}
+            {tx(`${filtered.length} student${filtered.length === 1 ? '' : 's'}`)}
           </span>
         </div>
 
@@ -632,7 +635,7 @@ export function InstructorAttendancePage() {
                   : 'Select a course'}
               </h3>
               <p className="text-[12px] text-secondary-text mt-0.5">
-                Per-student attendance overview
+                {tx('Per-student attendance overview')}
               </p>
             </div>
           </div>
@@ -640,7 +643,7 @@ export function InstructorAttendancePage() {
             <table className="w-full min-w-[640px] text-left">
               <thead>
                 <tr className="table-header-label border-b border-divider table-header-bar">
-                  <th className="py-3 pl-5 pr-3 font-semibold">Student</th>
+                  <th className="py-3 pl-5 pr-3 font-semibold">{tx('Student')}</th>
                   <th className="py-3 px-3 font-semibold">Attendance %</th>
                   <th className="py-3 px-3 font-semibold">Present</th>
                   <th className="py-3 px-3 font-semibold">Absent</th>
@@ -660,13 +663,13 @@ export function InstructorAttendancePage() {
                           {myCourses.length === 0
                             ? 'No courses assigned yet'
                             : activeTab !== 'All'
-                              ? 'No students match this filter'
-                              : 'No students enrolled in this course yet'}
+                              ? tx('No students match this filter')
+                              : tx('No students enrolled in this course yet')}
                         </p>
                         <p className="text-[12px] text-secondary-text max-w-xs leading-relaxed">
                           {myCourses.length === 0
                             ? 'Ask an admin to assign courses to your account.'
-                            : 'Students appear here once enrolled in your courses.'}
+                            : tx('Students appear here once enrolled in your courses.')}
                         </p>
                       </div>
                     </td>
@@ -826,9 +829,8 @@ export function InstructorAttendancePage() {
         <GlassCard className="p-4 flex items-start gap-3 border-info/20 bg-info-bg/40">
           <ClipboardCheck size={16} className="text-info shrink-0 mt-0.5" />
           <p className="text-[12px] text-info leading-relaxed">
-            <span className="font-semibold">Instructor scope: </span>
-            Attendance data shown is scoped to your courses and students only. Institution-wide
-            attendance reports are available to admins.
+            <span className="font-semibold">{tx('Instructor scope: ')}</span>
+            {tx('Attendance data shown is scoped to your courses and students only. Institution-wide attendance reports are available to admins.')}
           </p>
         </GlassCard>
       </div>

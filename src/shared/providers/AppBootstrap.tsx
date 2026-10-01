@@ -11,6 +11,7 @@ import {
 import { hydrateCache } from '../storage/dataCache'
 import { saveCollectionChange } from '../storage/collectionSync'
 import { readPortalSession } from '../storage/session'
+import { isUniversityEdition } from '../config/tenant'
 import { collectionQueryKey } from '../hooks/useApiCollection'
 import {
   academicCalendarWasPatched,
@@ -22,7 +23,8 @@ interface AppBootstrapProps {
 }
 
 function hydrateFromRecord(collections: Record<string, unknown>, queryClient: ReturnType<typeof useQueryClient>) {
-  const patched = ensureAcademicCalendarCollections(collections)
+  // Academic years and semesters exist only in the University Edition.
+  const patched = isUniversityEdition() ? ensureAcademicCalendarCollections(collections) : collections
   hydrateCache(patched)
   for (const [key, data] of Object.entries(patched)) {
     queryClient.setQueryData(collectionQueryKey(key), data)

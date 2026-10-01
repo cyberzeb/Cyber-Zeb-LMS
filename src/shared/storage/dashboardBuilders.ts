@@ -1,3 +1,8 @@
+import { vocab } from '../../shared/i18n/editionGlossary'
+import { isUniversityEdition } from '../config/tenant'
+
+/** Terms and semesters are University ideas; the other editions run continuous training. */
+const currentPeriod = () => (isUniversityEdition() ? 'Current term' : 'current training')
 import type { PersonRow } from '../../modules/institution/types'
 import type { CourseRecord } from '../../modules/institution/types'
 import type { CourseEnrollment } from '../../modules/institution/types'
@@ -65,7 +70,7 @@ function emptyStudentDashboard(student: PersonRow): StudentDashboardData {
     email: student.email,
     department: student.department,
     program: student.department,
-    term: 'Current term',
+    term: currentPeriod(),
     standing: 'Not enrolled yet',
     stats: [
       { label: 'Active Courses', value: '0', detail: 'Enroll via admin' },
@@ -320,8 +325,8 @@ export function buildStudentDashboard(student: PersonRow): StudentDashboardData 
       })),
       ...courses.slice(0, 2).map((c, i) => ({
         id: `act-${i}`,
-        text: `Enrolled in ${c.code} — ${c.title}`,
-        timestamp: 'From admin enrollments',
+        text: vocab(`Enrolled in ${c.code} — ${c.title}`),
+        timestamp: vocab('From admin enrollments'),
       })),
     ],
   }
@@ -332,9 +337,9 @@ function emptyInstructorDashboard(instructor: PersonRow): InstructorDashboardDat
     instructorId: instructor.id,
     instructorName: instructor.name,
     email: instructor.email,
-    title: 'Instructor',
-    department: 'Course faculty',
-    term: 'Current term',
+    title: vocab('Instructor'),
+    department: vocab('Course faculty'),
+    term: currentPeriod(),
     officeHours: 'Not set',
     specialization: 'Assign courses to set teaching load',
     resources: [],
@@ -562,11 +567,11 @@ export function buildInstructorDashboard(instructor: PersonRow): InstructorDashb
         text:
           c.approvalStatus === 'pending'
             ? `Course proposal “${c.title}” pending admin approval.`
-            : `Teaching ${c.code} — ${
-                enrollments.filter(
-                  (e) => e.courseId === c.id && e.status === 'active',
-                ).length
-              } students enrolled.`,
+            : vocab(
+                `Teaching ${c.code} — ${
+                  enrollments.filter((e) => e.courseId === c.id && e.status === 'active').length
+                } students enrolled.`,
+              ),
         timestamp: c.submittedAt ?? 'Active',
       })),
     ],

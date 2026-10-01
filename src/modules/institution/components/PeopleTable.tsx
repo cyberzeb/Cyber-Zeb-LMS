@@ -26,6 +26,7 @@ const roleColors: Record<PersonRow['role'], string> = {
   Guardian: 'bg-warning-bg text-[#8A6D00]',
   Staff: 'bg-navy-50 text-navy-500',
   HelpDesk: 'bg-info-bg text-info',
+  Manager: 'bg-lemon-50 text-lemon-900',
 }
 
 const avatarColors = [

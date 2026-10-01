@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { Children, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { useLanguage } from '../i18n/LanguageProvider'
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline-green' | 'outline-blue' | 'outline-purple'
@@ -40,7 +40,11 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const { tx } = useLanguage()
-  const content = typeof children === 'string' ? tx(children) : children
+  // Text next to an icon is translated too, so edition wording reaches every button.
+  const content =
+    typeof children === 'string'
+      ? tx(children)
+      : Children.map(children, (child) => (typeof child === 'string' ? tx(child) : child))
   return (
     <button
       className={`inline-flex items-center gap-1.5 rounded-lg cursor-pointer transition-colors duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}

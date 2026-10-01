@@ -1,3 +1,4 @@
+import { vocab } from '../../shared/i18n/editionGlossary'
 import type { AnnouncementRecord, AnnouncementTargetRole, InstructorAnnouncementAudience } from '../types/announcements'
 import {
   ALL_ANNOUNCEMENT_TARGET_ROLES,
@@ -70,15 +71,15 @@ export function formatAnnouncementAudience(record: AnnouncementRecord): string {
     if (normalized.instructorAudience === 'selected_students') {
       const count = normalized.targetPersonIds?.length ?? 0
       if (count === 1 && normalized.targetPersonNames?.[0]) return normalized.targetPersonNames[0]
-      return count > 0 ? `${count} selected students` : 'Selected students'
+      return vocab(count > 0 ? `${count} selected students` : 'Selected students')
     }
     if (normalized.instructorAudience === 'course' && normalized.courseCode) {
-      return `${normalized.courseCode} students`
+      return vocab(`${normalized.courseCode} students`)
     }
     if (normalized.courseCode) return `${normalized.courseCode} (course)`
   }
 
-  const parts: string[] = normalized.targetRoles.map((role) => ANNOUNCEMENT_TARGET_ROLE_LABELS[role])
+  const parts: string[] = normalized.targetRoles.map((role) => vocab(ANNOUNCEMENT_TARGET_ROLE_LABELS[role]))
 
   if (normalized.courseId && normalized.courseCode) {
     parts.push(`${normalized.courseCode} (course)`)

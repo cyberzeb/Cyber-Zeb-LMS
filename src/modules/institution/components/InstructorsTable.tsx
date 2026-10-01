@@ -1,3 +1,4 @@
+import { vocab } from '../../../shared/i18n/editionGlossary'
 import { Pencil, Trash2 } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill, type StatusTone } from '../../../shared/components/StatusPill'
@@ -41,7 +42,7 @@ export function InstructorsTable({
   return (
     <GlassCard className="p-0 overflow-hidden">
       <div className="hidden md:grid md:grid-cols-[2.2fr_0.9fr_1.4fr_1fr_0.9fr_0.7fr] gap-4 px-6 py-3.5 table-header-bar">
-        {['Name', 'Campus', 'Teaching', 'Last Active', 'Status', ''].map((h) => (
+        {['Name', vocab('Campus'), 'Teaching', 'Last Active', 'Status', ''].map((h) => (
           <span key={h || 'actions'} className="table-header-label">
             {h}
           </span>

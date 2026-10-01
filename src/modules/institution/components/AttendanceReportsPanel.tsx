@@ -1,3 +1,4 @@
+import { vocab } from '../../../shared/i18n/editionGlossary'
 import { BarChart2, BookOpen, Building2, Download, FileText, User } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { Button } from '../../../shared/components/Button'
@@ -246,7 +247,7 @@ export function AttendanceReportsPanel({ records }: AttendanceReportsPanelProps)
         ].map(({ label, value }) => (
           <GlassCard key={label} className="p-3 text-center">
             <p className="text-[22px] font-bold text-navy-900 leading-none">{value}</p>
-            <p className="text-[11px] text-secondary-text mt-1">{label}</p>
+            <p className="text-[11px] text-secondary-text mt-1">{vocab(label)}</p>
           </GlassCard>
         ))}
       </div>
@@ -266,9 +267,9 @@ export function AttendanceReportsPanel({ records }: AttendanceReportsPanelProps)
                 <Icon size={18} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13.5px] font-bold text-navy-900">{report.title}</p>
+                <p className="text-[13.5px] font-bold text-navy-900">{vocab(report.title)}</p>
                 <p className="text-[11.5px] text-secondary-text mt-0.5 leading-snug">
-                  {report.description}
+                  {vocab(report.description)}
                 </p>
               </div>
               <Button

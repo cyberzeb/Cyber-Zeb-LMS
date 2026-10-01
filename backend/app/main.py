@@ -5,7 +5,8 @@ This wires together: CORS, correlation-id middleware, global exception
 handlers, and the versioned API router. Individual business logic lives
 in app/modules/*, never here.
 """
-from contextlib import asynccontextmanager
+import asyncio
+from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,7 +27,14 @@ async def lifespan(_app: FastAPI):
         await seed_if_empty()
     except Exception as exc:
         print(f"WARN: demo seed skipped: {exc}")
+    # Daily training reminders (due soon, overdue, renewals, manager digests).
+    from app.modules.communication.training_reminders import reminder_loop
+
+    reminders = asyncio.create_task(reminder_loop())
     yield
+    reminders.cancel()
+    with suppress(asyncio.CancelledError):
+        await reminders
 
 
 app = FastAPI(

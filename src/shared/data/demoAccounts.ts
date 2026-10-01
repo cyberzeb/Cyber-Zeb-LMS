@@ -41,6 +41,11 @@ export const DEMO_ACCOUNTS: Record<
     name: 'Mekdes Haile',
     email: 'm.haile@berana.edu',
   },
+  Manager: {
+    id: 'u-mgr-1',
+    name: 'Dawit Kebede',
+    email: 'd.kebede@horizonbank.et',
+  },
   Admin: {
     id: 'u3',
     name: 'Martha Bekele',
