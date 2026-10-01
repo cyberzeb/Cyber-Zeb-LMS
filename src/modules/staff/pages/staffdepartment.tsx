@@ -1,3 +1,5 @@
+import { StaffCorporateDepartment } from '../components/StaffCorporateDepartment'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { useMemo } from 'react'
 import { BookOpen, GraduationCap, Layers, Users } from 'lucide-react'
 
@@ -25,6 +27,11 @@ const STAT = 17
  * instructors and students that belong to their own department.
  */
 export function StaffDepartmentPage() {
+  const { edition } = useOrganizationConfig()
+  return edition === 'corporate' ? <StaffCorporateDepartment /> : <UniversityDepartmentView />
+}
+
+function UniversityDepartmentView() {
   const person = getSessionPerson()
   // Staff in an administrative office (e.g. the registrar) have no academic department.
   const academicDepartment = useMemo(() => {

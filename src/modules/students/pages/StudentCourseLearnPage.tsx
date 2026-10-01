@@ -14,6 +14,7 @@ import {
   Video,
 } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
+import { LessonText } from '../../../shared/components/LessonText'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
@@ -93,9 +94,7 @@ function renderLessonBody(
     return (
       <div className="flex flex-col gap-4">
         {lesson.description ? (
-          <div className="whitespace-pre-wrap text-[14px] leading-relaxed text-navy-800">
-            {lesson.description}
-          </div>
+          <LessonText text={lesson.description} />
         ) : null}
         {lesson.questions && lesson.questions.length > 0 ? (
           <LessonQuestions
@@ -111,9 +110,7 @@ function renderLessonBody(
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="whitespace-pre-wrap text-[14px] leading-relaxed text-navy-800">
-        {lesson.description ?? 'No content provided for this lesson yet.'}
-      </div>
+      <LessonText text={lesson.description ?? 'No content provided for this lesson yet.'} />
       {lesson.questions && lesson.questions.length > 0 ? (
         <LessonQuestions
           studentId={studentId}

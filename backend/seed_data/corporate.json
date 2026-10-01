@@ -103,7 +103,7 @@
         "name": "AML & Regulatory",
         "description": "Anti-money laundering monitoring and regulatory reporting.",
         "departmentId": "d3",
-        "managerId": null,
+        "managerId": "u-mgr-1",
         "status": "active",
         "createdAt": "2026-01-15T09:00:00.000Z",
         "updatedAt": "2026-01-15T09:00:00.000Z"
@@ -113,7 +113,7 @@
         "name": "Branch Operations",
         "description": "Frontline branch staff and teller services.",
         "departmentId": "d1",
-        "managerId": null,
+        "managerId": "u-mgr-1",
         "status": "active",
         "createdAt": "2026-01-15T09:00:00.000Z",
         "updatedAt": "2026-01-15T09:00:00.000Z"
@@ -123,7 +123,7 @@
         "name": "Digital Product",
         "description": "Mobile and internet banking product delivery.",
         "departmentId": "d2",
-        "managerId": null,
+        "managerId": "u-mgr-2",
         "status": "active",
         "createdAt": "2026-01-15T09:00:00.000Z",
         "updatedAt": "2026-01-15T09:00:00.000Z"
@@ -133,7 +133,7 @@
         "name": "Cybersecurity",
         "description": "Security operations, access control, and incident response.",
         "departmentId": "d5",
-        "managerId": null,
+        "managerId": "u-mgr-2",
         "status": "active",
         "createdAt": "2026-01-15T09:00:00.000Z",
         "updatedAt": "2026-01-15T09:00:00.000Z"
@@ -278,7 +278,7 @@
       {
         "id": "u-demo-amina",
         "name": "Amina Lemma",
-        "email": "amina.lemma@student.berana.edu",
+        "email": "amina.lemma@horizonbank.et",
         "role": "Student",
         "department": "Computer Science",
         "departmentId": "d1",
@@ -424,6 +424,32 @@
         "lastActive": "1 week ago",
         "initials": "TB",
         "verificationStatus": "verified"
+      },
+      {
+        "id": "u-mgr-1",
+        "name": "Dawit Kebede",
+        "email": "d.kebede@horizonbank.et",
+        "role": "Manager",
+        "department": "Risk & Compliance",
+        "departmentId": "d3",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "1 hour ago",
+        "initials": "DK",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u-mgr-2",
+        "name": "Liya Mekonnen",
+        "email": "l.mekonnen@horizonbank.et",
+        "role": "Manager",
+        "department": "Digital Channels",
+        "departmentId": "d2",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "3 hours ago",
+        "initials": "LM",
+        "verificationStatus": "verified"
       }
     ],
     "courses": [
@@ -435,15 +461,138 @@
         "department": "Risk & Compliance",
         "level": "Mandatory",
         "enrolledCount": 1240,
-        "moduleCount": 8,
+        "moduleCount": 2,
         "status": "published",
         "progressPercent": 100,
         "icon": "🏛️",
         "description": "Anti-Money Laundering & KYC — mandatory training for Risk & Compliance.",
+        "shortDescription": "Required training for Risk & Compliance.",
         "credits": 0,
         "departmentId": "d1",
-        "createdAt": "2026-09-21T09:00:00.000Z",
-        "updatedAt": "2026-09-21T09:00:00.000Z"
+        "instructorId": "u2",
+        "modules": [
+          {
+            "id": "c1-m1",
+            "title": "Understanding money laundering",
+            "lessons": [
+              {
+                "id": "c1-m1-l1",
+                "title": "What money laundering is",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "Money laundering disguises the criminal origin of funds so they appear legitimate.\n\n**The three stages**\n- **Placement** — criminal cash enters the financial system, often in small deposits.\n- **Layering** — funds move through many transactions to hide their trail.\n- **Integration** — \"clean\" money re-enters the economy as apparently lawful wealth.\n\nBanks are a natural target at every stage, which is why every employee has a role in prevention."
+              },
+              {
+                "id": "c1-m1-l2",
+                "title": "Red flags at the counter",
+                "type": "reading",
+                "durationMinutes": 10,
+                "description": "Be alert to activity that does not fit what you know about the customer:\n\n- Cash deposits just under reporting thresholds (**structuring**).\n- Reluctance to provide identification or source of funds.\n- Rapid movement of funds in and out with no clear purpose.\n- Third parties depositing into an account they do not own.\n- Transactions inconsistent with the customer's stated occupation.\n\n**Never tip off** a customer that you are suspicious — escalate quietly."
+              },
+              {
+                "id": "c1-m1-check",
+                "title": "Knowledge check: AML basics",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "Which stage moves money through many transactions to hide its origin?",
+                    "options": [
+                      "Placement",
+                      "Layering",
+                      "Integration"
+                    ],
+                    "correctIndex": 1,
+                    "explanation": "Layering obscures the audit trail.",
+                    "id": "c1-m1-q1",
+                    "type": "multiple-choice"
+                  },
+                  {
+                    "prompt": "Several cash deposits just below the reporting threshold suggest:",
+                    "options": [
+                      "Structuring",
+                      "Normal saving",
+                      "A system error"
+                    ],
+                    "correctIndex": 0,
+                    "explanation": "Splitting deposits to avoid reporting is structuring.",
+                    "id": "c1-m1-q2",
+                    "type": "multiple-choice"
+                  },
+                  {
+                    "prompt": "If you suspect a customer, you should:",
+                    "options": [
+                      "Tell the customer",
+                      "Escalate quietly to compliance",
+                      "Ignore it"
+                    ],
+                    "correctIndex": 1,
+                    "explanation": "Tipping off is prohibited; report internally.",
+                    "id": "c1-m1-q3",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "c1-m2",
+            "title": "Know Your Customer (KYC)",
+            "lessons": [
+              {
+                "id": "c1-m2-l1",
+                "title": "Customer due diligence",
+                "type": "reading",
+                "durationMinutes": 10,
+                "description": "KYC means knowing who your customer really is and what activity to expect.\n\n**Standard due diligence**\n- Verify identity with valid, current documents.\n- Confirm address and occupation.\n- Understand the purpose of the account.\n\n**Enhanced due diligence** applies to higher-risk customers, such as politically exposed persons (PEPs), and requires senior approval and source-of-wealth checks."
+              },
+              {
+                "id": "c1-m2-l2",
+                "title": "Reporting suspicious activity",
+                "type": "reading",
+                "durationMinutes": 7,
+                "description": "When something does not add up:\n\n1. Record what you observed, factually.\n2. Submit an internal suspicious activity report to the compliance team.\n3. Continue to serve the customer normally.\n\nCompliance decides whether to file with the financial intelligence unit. Reporting in good faith protects you."
+              },
+              {
+                "id": "c1-m2-check",
+                "title": "Knowledge check: KYC",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "A politically exposed person requires:",
+                    "options": [
+                      "No extra checks",
+                      "Enhanced due diligence",
+                      "Account refusal"
+                    ],
+                    "correctIndex": 1,
+                    "id": "c1-m2-q1",
+                    "type": "multiple-choice"
+                  },
+                  {
+                    "prompt": "Who decides whether to file an external report?",
+                    "options": [
+                      "The teller",
+                      "The compliance team",
+                      "The customer"
+                    ],
+                    "correctIndex": 1,
+                    "id": "c1-m2-q2",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "deliveryMode": "Self-paced",
+        "certificateEnabled": true,
+        "certificateTemplateId": "tpl-professional",
+        "createdAt": "2026-09-26T09:00:00.000Z",
+        "updatedAt": "2026-09-26T09:00:00.000Z"
       },
       {
         "id": "c2",
@@ -453,15 +602,113 @@
         "department": "IT & Security",
         "level": "Mandatory",
         "enrolledCount": 3420,
-        "moduleCount": 6,
+        "moduleCount": 2,
         "status": "published",
         "progressPercent": 100,
         "icon": "🔐",
         "description": "Cybersecurity Awareness (All Staff) — mandatory training for IT & Security.",
+        "shortDescription": "Required training for IT & Security.",
         "credits": 0,
         "departmentId": "d2",
-        "createdAt": "2026-09-21T09:00:00.000Z",
-        "updatedAt": "2026-09-21T09:00:00.000Z"
+        "instructorId": "u6",
+        "modules": [
+          {
+            "id": "c2-m1",
+            "title": "Everyday threats",
+            "lessons": [
+              {
+                "id": "c2-m1-l1",
+                "title": "Phishing and social engineering",
+                "type": "reading",
+                "durationMinutes": 9,
+                "description": "Most attacks start with a person, not a machine.\n\n**Spot a phishing message**\n- Urgency: \"your account will be closed today\".\n- Mismatched sender addresses or links.\n- Requests for passwords, codes or payments.\n\nHover over links before clicking. When in doubt, contact the sender through a channel you already trust."
+              },
+              {
+                "id": "c2-m1-l2",
+                "title": "Passwords and multi-factor authentication",
+                "type": "reading",
+                "durationMinutes": 7,
+                "description": "- Use long, unique passphrases — never reuse a work password elsewhere.\n- Keep MFA on for every system that offers it.\n- Never share one-time codes. The bank will never ask for them."
+              },
+              {
+                "id": "c2-m1-check",
+                "title": "Knowledge check: cyber awareness",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "An email says your account closes today unless you log in now. This is most likely:",
+                    "options": [
+                      "Routine IT maintenance",
+                      "Phishing",
+                      "A payroll update"
+                    ],
+                    "correctIndex": 1,
+                    "id": "c2-m1-q1",
+                    "type": "multiple-choice"
+                  },
+                  {
+                    "prompt": "A caller from \"IT\" asks for your MFA code. You should:",
+                    "options": [
+                      "Read it out",
+                      "Refuse and report the call",
+                      "Email it instead"
+                    ],
+                    "correctIndex": 1,
+                    "id": "c2-m1-q2",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "c2-m2",
+            "title": "Protecting the bank",
+            "lessons": [
+              {
+                "id": "c2-m2-l1",
+                "title": "Clean desk and device security",
+                "type": "reading",
+                "durationMinutes": 6,
+                "description": "Lock your screen whenever you step away. Keep customer documents out of sight, use approved storage only, and report lost devices immediately — fast reporting lets IT wipe them."
+              },
+              {
+                "id": "c2-m2-l2",
+                "title": "Reporting an incident",
+                "type": "reading",
+                "durationMinutes": 5,
+                "description": "Clicked a suspicious link? Report it at once to the security desk. Early reports stop attacks spreading; nobody is penalised for honest mistakes reported quickly."
+              },
+              {
+                "id": "c2-m2-check",
+                "title": "Knowledge check: protecting the bank",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "You clicked a link you now think was malicious. First step?",
+                    "options": [
+                      "Wait and see",
+                      "Report it to security immediately",
+                      "Delete the email and forget it"
+                    ],
+                    "correctIndex": 1,
+                    "id": "c2-m2-q1",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "deliveryMode": "Self-paced",
+        "certificateEnabled": true,
+        "certificateTemplateId": "tpl-professional",
+        "createdAt": "2026-09-26T09:00:00.000Z",
+        "updatedAt": "2026-09-26T09:00:00.000Z"
       },
       {
         "id": "c3",
@@ -471,15 +718,73 @@
         "department": "Risk & Compliance",
         "level": "Mandatory",
         "enrolledCount": 2100,
-        "moduleCount": 5,
+        "moduleCount": 1,
         "status": "published",
         "progressPercent": 100,
         "icon": "🔒",
         "description": "Customer Data Privacy & Protection — mandatory training for Risk & Compliance.",
+        "shortDescription": "Required training for Risk & Compliance.",
         "credits": 0,
         "departmentId": "d3",
-        "createdAt": "2026-09-21T09:00:00.000Z",
-        "updatedAt": "2026-09-21T09:00:00.000Z"
+        "instructorId": "u2",
+        "modules": [
+          {
+            "id": "c3-m1",
+            "title": "Customer data and privacy",
+            "lessons": [
+              {
+                "id": "c3-m1-l1",
+                "title": "What counts as personal data",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "Personal data is anything that identifies a person: names, ID numbers, account details, phone numbers, photos and transaction history.\n\nCollect only what you need, use it only for the purpose it was collected for, and keep it no longer than required."
+              },
+              {
+                "id": "c3-m1-l2",
+                "title": "Handling requests and breaches",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "- Verify identity before discussing any account.\n- Share data only with authorised people, through approved channels.\n- A misdirected email or lost file is a **data breach** — report it to the privacy officer the same day."
+              },
+              {
+                "id": "c3-m1-check",
+                "title": "Knowledge check: data privacy",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "Before discussing an account on the phone you must:",
+                    "options": [
+                      "Verify the caller’s identity",
+                      "Ask for their password",
+                      "Nothing"
+                    ],
+                    "correctIndex": 0,
+                    "id": "c3-m1-q1",
+                    "type": "multiple-choice"
+                  },
+                  {
+                    "prompt": "You emailed a statement to the wrong customer. This is:",
+                    "options": [
+                      "Not important",
+                      "A data breach to report today",
+                      "Only a problem if they complain"
+                    ],
+                    "correctIndex": 1,
+                    "id": "c3-m1-q2",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "deliveryMode": "Self-paced",
+        "certificateEnabled": true,
+        "certificateTemplateId": "tpl-professional",
+        "createdAt": "2026-09-26T09:00:00.000Z",
+        "updatedAt": "2026-09-26T09:00:00.000Z"
       },
       {
         "id": "c4",
@@ -489,15 +794,72 @@
         "department": "Retail Banking",
         "level": "Role-based",
         "enrolledCount": 890,
-        "moduleCount": 7,
+        "moduleCount": 1,
         "status": "published",
         "progressPercent": 100,
         "icon": "🚨",
         "description": "Fraud Detection for Frontline Staff — mandatory training for Retail Banking.",
+        "shortDescription": "Required training for Retail Banking.",
         "credits": 0,
         "departmentId": "d4",
-        "createdAt": "2026-09-21T09:00:00.000Z",
-        "updatedAt": "2026-09-21T09:00:00.000Z"
+        "modules": [
+          {
+            "id": "c4-m1",
+            "title": "Fraud at the front line",
+            "lessons": [
+              {
+                "id": "c4-m1-l1",
+                "title": "Common fraud schemes",
+                "type": "reading",
+                "durationMinutes": 9,
+                "description": "- **Identity fraud**: forged or borrowed documents to open accounts.\n- **Account takeover**: criminals posing as the customer to change contact details.\n- **Cheque and card fraud**: altered cheques, skimmed cards.\n- **Authorised push-payment scams**: customers tricked into sending money themselves."
+              },
+              {
+                "id": "c4-m1-l2",
+                "title": "Protecting vulnerable customers",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "Watch for customers who seem pressured, are accompanied by someone answering for them, or want to move large sums urgently. Slow the transaction down, ask open questions, and involve a supervisor."
+              },
+              {
+                "id": "c4-m1-check",
+                "title": "Knowledge check: fraud detection",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "A customer wants to send their savings urgently to a new \"investment\". You should:",
+                    "options": [
+                      "Process it quickly",
+                      "Slow down, ask questions and involve a supervisor",
+                      "Refuse service"
+                    ],
+                    "correctIndex": 1,
+                    "id": "c4-m1-q1",
+                    "type": "multiple-choice"
+                  },
+                  {
+                    "prompt": "Changing a customer’s phone number on a call without checks risks:",
+                    "options": [
+                      "Account takeover",
+                      "Faster service",
+                      "Nothing"
+                    ],
+                    "correctIndex": 0,
+                    "id": "c4-m1-q2",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "deliveryMode": "Self-paced",
+        "certificateEnabled": true,
+        "certificateTemplateId": "tpl-professional",
+        "createdAt": "2026-09-26T09:00:00.000Z",
+        "updatedAt": "2026-09-26T09:00:00.000Z"
       },
       {
         "id": "c5",
@@ -507,15 +869,62 @@
         "department": "Retail Banking",
         "level": "Role-based",
         "enrolledCount": 760,
-        "moduleCount": 6,
+        "moduleCount": 1,
         "status": "published",
         "progressPercent": 100,
         "icon": "⭐",
         "description": "Customer Service Excellence — mandatory training for Retail Banking.",
+        "shortDescription": "Required training for Retail Banking.",
         "credits": 0,
         "departmentId": "d1",
-        "createdAt": "2026-09-21T09:00:00.000Z",
-        "updatedAt": "2026-09-21T09:00:00.000Z"
+        "instructorId": "u9",
+        "modules": [
+          {
+            "id": "c5-m1",
+            "title": "Service that customers remember",
+            "lessons": [
+              {
+                "id": "c5-m1-l1",
+                "title": "Listening first",
+                "type": "reading",
+                "durationMinutes": 7,
+                "description": "Great service starts with understanding the need. Let the customer finish, repeat back what you heard, and agree the next step before acting."
+              },
+              {
+                "id": "c5-m1-l2",
+                "title": "Handling complaints",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "1. Acknowledge the problem and apologise for the experience.\n2. Take ownership — do not pass the customer around.\n3. Explain what will happen and by when.\n4. Follow up and record the complaint so it can be fixed for everyone."
+              },
+              {
+                "id": "c5-m1-check",
+                "title": "Knowledge check: service",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "The first step with an unhappy customer is to:",
+                    "options": [
+                      "Explain the policy",
+                      "Acknowledge the problem",
+                      "Transfer them"
+                    ],
+                    "correctIndex": 1,
+                    "id": "c5-m1-q1",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "deliveryMode": "Self-paced",
+        "certificateEnabled": true,
+        "certificateTemplateId": "tpl-professional",
+        "createdAt": "2026-09-26T09:00:00.000Z",
+        "updatedAt": "2026-09-26T09:00:00.000Z"
       },
       {
         "id": "c6",
@@ -525,15 +934,79 @@
         "department": "HR & Learning",
         "level": "Leadership",
         "enrolledCount": 0,
-        "moduleCount": 9,
+        "moduleCount": 1,
         "status": "draft",
         "progressPercent": 40,
         "icon": "📋",
         "description": "People Leadership for Managers — mandatory training for HR & Learning.",
+        "shortDescription": "Required training for HR & Learning.",
         "credits": 0,
         "departmentId": "d2",
-        "createdAt": "2026-09-21T09:00:00.000Z",
-        "updatedAt": "2026-09-21T09:00:00.000Z"
+        "modules": [
+          {
+            "id": "c6-m1",
+            "title": "Leading a team",
+            "lessons": [
+              {
+                "id": "c6-m1-l1",
+                "title": "Setting clear expectations",
+                "type": "reading",
+                "durationMinutes": 8,
+                "description": "People perform best when they know what good looks like. Agree goals, explain why they matter, and check in regularly rather than only at review time."
+              },
+              {
+                "id": "c6-m1-l2",
+                "title": "Coaching and feedback",
+                "type": "reading",
+                "durationMinutes": 9,
+                "description": "Give feedback soon and specifically: describe the situation, the behaviour you saw, and its impact. Ask how they see it and agree one improvement together."
+              },
+              {
+                "id": "c6-m1-l3",
+                "title": "Keeping your team compliant",
+                "type": "reading",
+                "durationMinutes": 6,
+                "description": "As a manager you are accountable for your team's mandatory training. Use the manager portal to see who is overdue, send reminders, and assign what their job role requires."
+              },
+              {
+                "id": "c6-m1-check",
+                "title": "Knowledge check: leadership",
+                "type": "quiz",
+                "durationMinutes": 5,
+                "description": "Check your understanding before moving on.",
+                "questions": [
+                  {
+                    "prompt": "Effective feedback is:",
+                    "options": [
+                      "Saved for the annual review",
+                      "Timely and specific",
+                      "General praise only"
+                    ],
+                    "correctIndex": 1,
+                    "id": "c6-m1-q1",
+                    "type": "multiple-choice"
+                  },
+                  {
+                    "prompt": "Who is accountable for a team’s mandatory training being up to date?",
+                    "options": [
+                      "Only HR",
+                      "The team’s manager",
+                      "Nobody"
+                    ],
+                    "correctIndex": 1,
+                    "id": "c6-m1-q2",
+                    "type": "multiple-choice"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "deliveryMode": "Self-paced",
+        "certificateEnabled": true,
+        "certificateTemplateId": "tpl-professional",
+        "createdAt": "2026-09-26T09:00:00.000Z",
+        "updatedAt": "2026-09-26T09:00:00.000Z"
       }
     ],
     "enrollments": [
@@ -544,13 +1017,13 @@
         "courseId": "c1",
         "courseCode": "AML-101",
         "courseTitle": "Anti-Money Laundering & KYC",
-        "enrolledOn": "2026-07-23",
+        "enrolledOn": "2026-07-28",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 100,
-        "completedOn": "2026-09-01",
-        "dueDate": "2026-09-16"
+        "completedOn": "2026-09-06",
+        "dueDate": "2026-09-21"
       },
       {
         "id": "enr-u-demo-amina-c4",
@@ -559,13 +1032,13 @@
         "courseId": "c4",
         "courseCode": "FRAUD-201",
         "courseTitle": "Fraud Detection for Frontline Staff",
-        "enrolledOn": "2026-07-23",
+        "enrolledOn": "2026-07-28",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 100,
-        "completedOn": "2026-09-01",
-        "dueDate": "2026-09-16"
+        "completedOn": "2026-09-06",
+        "dueDate": "2026-09-21"
       },
       {
         "id": "enr-u-demo-amina-c5",
@@ -574,13 +1047,13 @@
         "courseId": "c5",
         "courseCode": "SVC-EXC",
         "courseTitle": "Customer Service Excellence",
-        "enrolledOn": "2026-07-23",
+        "enrolledOn": "2026-07-28",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 100,
-        "completedOn": "2026-09-01",
-        "dueDate": "2026-09-16"
+        "completedOn": "2026-09-06",
+        "dueDate": "2026-09-21"
       },
       {
         "id": "enr-u1-c1",
@@ -589,13 +1062,13 @@
         "courseId": "c1",
         "courseCode": "AML-101",
         "courseTitle": "Anti-Money Laundering & KYC",
-        "enrolledOn": "2026-07-23",
+        "enrolledOn": "2026-07-28",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 100,
-        "completedOn": "2026-09-01",
-        "dueDate": "2026-09-16"
+        "completedOn": "2026-09-06",
+        "dueDate": "2026-09-21"
       },
       {
         "id": "enr-u1-c4",
@@ -604,12 +1077,12 @@
         "courseId": "c4",
         "courseCode": "FRAUD-201",
         "courseTitle": "Fraud Detection for Frontline Staff",
-        "enrolledOn": "2026-07-23",
+        "enrolledOn": "2026-07-28",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 45,
-        "dueDate": "2026-09-26"
+        "dueDate": "2026-10-01"
       },
       {
         "id": "enr-u1-c5",
@@ -618,12 +1091,12 @@
         "courseId": "c5",
         "courseCode": "SVC-EXC",
         "courseTitle": "Customer Service Excellence",
-        "enrolledOn": "2026-07-23",
+        "enrolledOn": "2026-07-28",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 60,
-        "dueDate": "2026-10-16"
+        "dueDate": "2026-10-21"
       },
       {
         "id": "enr-u10-c2",
@@ -632,13 +1105,13 @@
         "courseId": "c2",
         "courseCode": "CYB-AWR",
         "courseTitle": "Cybersecurity Awareness (All Staff)",
-        "enrolledOn": "2026-07-23",
+        "enrolledOn": "2026-07-28",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 100,
-        "completedOn": "2026-09-01",
-        "dueDate": "2026-09-16"
+        "completedOn": "2026-09-06",
+        "dueDate": "2026-09-21"
       },
       {
         "id": "enr-u10-c3",
@@ -647,12 +1120,12 @@
         "courseId": "c3",
         "courseCode": "PRIV-001",
         "courseTitle": "Customer Data Privacy & Protection",
-        "enrolledOn": "2026-07-23",
+        "enrolledOn": "2026-07-28",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 20,
-        "dueDate": "2026-09-09"
+        "dueDate": "2026-09-14"
       },
       {
         "id": "enr-u17-c1",
@@ -661,13 +1134,13 @@
         "courseId": "c1",
         "courseCode": "AML-101",
         "courseTitle": "Anti-Money Laundering & KYC",
-        "enrolledOn": "2025-07-18",
+        "enrolledOn": "2025-07-23",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 100,
-        "completedOn": "2025-08-17",
-        "dueDate": "2025-09-06"
+        "completedOn": "2025-08-22",
+        "dueDate": "2025-09-11"
       },
       {
         "id": "enr-u17-c3",
@@ -676,13 +1149,13 @@
         "courseId": "c3",
         "courseCode": "PRIV-001",
         "courseTitle": "Customer Data Privacy & Protection",
-        "enrolledOn": "2026-07-23",
+        "enrolledOn": "2026-07-28",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 100,
-        "completedOn": "2026-09-01",
-        "dueDate": "2026-09-16"
+        "completedOn": "2026-09-06",
+        "dueDate": "2026-09-21"
       },
       {
         "id": "enr-u18-c1",
@@ -691,12 +1164,12 @@
         "courseId": "c1",
         "courseCode": "AML-101",
         "courseTitle": "Anti-Money Laundering & KYC",
-        "enrolledOn": "2026-07-23",
+        "enrolledOn": "2026-07-28",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 60,
-        "dueDate": "2026-10-16"
+        "dueDate": "2026-10-21"
       },
       {
         "id": "enr-u18-c4",
@@ -705,12 +1178,12 @@
         "courseId": "c4",
         "courseCode": "FRAUD-201",
         "courseTitle": "Fraud Detection for Frontline Staff",
-        "enrolledOn": "2026-07-23",
+        "enrolledOn": "2026-07-28",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 20,
-        "dueDate": "2026-09-09"
+        "dueDate": "2026-09-14"
       },
       {
         "id": "enr-u18-c5",
@@ -719,12 +1192,12 @@
         "courseId": "c5",
         "courseCode": "SVC-EXC",
         "courseTitle": "Customer Service Excellence",
-        "enrolledOn": "2026-07-23",
+        "enrolledOn": "2026-07-28",
         "status": "active",
         "isMandatory": true,
         "assignedBy": "Job role",
         "progress": 45,
-        "dueDate": "2026-09-26"
+        "dueDate": "2026-10-01"
       }
     ],
     "academic-years": [],
@@ -762,25 +1235,430 @@
         "microsoftSso": false,
         "stripe": false,
         "emailSms": true
+      },
+      "certificates": {
+        "autoIssue": true,
+        "rule": "lessons",
+        "minPercent": 50,
+        "requireApproval": false
+      },
+      "notifications": {
+        "email": true,
+        "announcements": true,
+        "assessments": true,
+        "grades": true,
+        "liveClasses": true,
+        "certificates": true,
+        "invoices": true,
+        "training": true,
+        "reminders": true
       }
     },
     "selectedCampus": "all",
-    "certificates": [],
+    "certificates": [
+      {
+        "id": "cert-enr-u-demo-amina-c1",
+        "certificateId": "BER-CERT-2026-QZSH-5V6T",
+        "studentId": "u-demo-amina",
+        "studentName": "Amina Lemma",
+        "courseId": "c1",
+        "courseCode": "AML-101",
+        "courseTitle": "Anti-Money Laundering & KYC",
+        "instructorId": "u2",
+        "instructorName": "Sara Tadesse",
+        "department": "Computer Science",
+        "campusId": "c1",
+        "completionDate": "2026-09-06",
+        "issueDate": "2026-09-06",
+        "expirationDate": "2027-09-06",
+        "templateId": "tpl-professional",
+        "templateName": "Professional Certificate",
+        "status": "issued"
+      },
+      {
+        "id": "cert-enr-u-demo-amina-c4",
+        "certificateId": "BER-CERT-2026-8DR0-9A9T",
+        "studentId": "u-demo-amina",
+        "studentName": "Amina Lemma",
+        "courseId": "c4",
+        "courseCode": "FRAUD-201",
+        "courseTitle": "Fraud Detection for Frontline Staff",
+        "instructorName": "Tewodros Alemu",
+        "department": "Computer Science",
+        "campusId": "c1",
+        "completionDate": "2026-09-06",
+        "issueDate": "2026-09-06",
+        "expirationDate": "2027-09-06",
+        "templateId": "tpl-professional",
+        "templateName": "Professional Certificate",
+        "status": "issued"
+      },
+      {
+        "id": "cert-enr-u-demo-amina-c5",
+        "certificateId": "BER-CERT-2026-STPF-CSBT",
+        "studentId": "u-demo-amina",
+        "studentName": "Amina Lemma",
+        "courseId": "c5",
+        "courseCode": "SVC-EXC",
+        "courseTitle": "Customer Service Excellence",
+        "instructorId": "u9",
+        "instructorName": "Hanna Mekonnen",
+        "department": "Computer Science",
+        "campusId": "c1",
+        "completionDate": "2026-09-06",
+        "issueDate": "2026-09-06",
+        "expirationDate": "2027-09-06",
+        "templateId": "tpl-professional",
+        "templateName": "Professional Certificate",
+        "status": "issued"
+      },
+      {
+        "id": "cert-enr-u1-c1",
+        "certificateId": "BER-CERT-2026-A8NY-F8ET",
+        "studentId": "u1",
+        "studentName": "Selam Girma",
+        "courseId": "c1",
+        "courseCode": "AML-101",
+        "courseTitle": "Anti-Money Laundering & KYC",
+        "instructorId": "u2",
+        "instructorName": "Sara Tadesse",
+        "department": "Retail Banking",
+        "campusId": "c2",
+        "completionDate": "2026-09-06",
+        "issueDate": "2026-09-06",
+        "expirationDate": "2027-09-06",
+        "templateId": "tpl-professional",
+        "templateName": "Professional Certificate",
+        "status": "issued"
+      },
+      {
+        "id": "cert-enr-u10-c2",
+        "certificateId": "BER-CERT-2026-VNKD-KQGT",
+        "studentId": "u10",
+        "studentName": "Bruk Alemu",
+        "courseId": "c2",
+        "courseCode": "CYB-AWR",
+        "courseTitle": "Cybersecurity Awareness (All Staff)",
+        "instructorId": "u6",
+        "instructorName": "Mekonnen Alemu",
+        "department": "Digital Channels",
+        "campusId": "c1",
+        "completionDate": "2026-09-06",
+        "issueDate": "2026-09-06",
+        "expirationDate": "2028-09-06",
+        "templateId": "tpl-professional",
+        "templateName": "Professional Certificate",
+        "status": "issued"
+      },
+      {
+        "id": "cert-enr-u17-c1",
+        "certificateId": "BER-CERT-2026-C3JW-P6KT",
+        "studentId": "u17",
+        "studentName": "Sara Negash",
+        "courseId": "c1",
+        "courseCode": "AML-101",
+        "courseTitle": "Anti-Money Laundering & KYC",
+        "instructorId": "u2",
+        "instructorName": "Sara Tadesse",
+        "department": "Risk & Compliance",
+        "campusId": "c1",
+        "completionDate": "2025-08-22",
+        "issueDate": "2025-08-22",
+        "expirationDate": "2026-08-22",
+        "templateId": "tpl-professional",
+        "templateName": "Professional Certificate",
+        "status": "issued"
+      },
+      {
+        "id": "cert-enr-u17-c3",
+        "certificateId": "BER-CERT-2026-XGGB-TNNT",
+        "studentId": "u17",
+        "studentName": "Sara Negash",
+        "courseId": "c3",
+        "courseCode": "PRIV-001",
+        "courseTitle": "Customer Data Privacy & Protection",
+        "instructorId": "u2",
+        "instructorName": "Sara Tadesse",
+        "department": "Risk & Compliance",
+        "campusId": "c1",
+        "completionDate": "2026-09-06",
+        "issueDate": "2026-09-06",
+        "expirationDate": "2027-09-06",
+        "templateId": "tpl-professional",
+        "templateName": "Professional Certificate",
+        "status": "issued"
+      }
+    ],
+    "lesson-progress": {
+      "u-demo-amina": {
+        "c1": [
+          "c1-m1-l1",
+          "c1-m1-l2",
+          "c1-m1-check",
+          "c1-m2-l1",
+          "c1-m2-l2",
+          "c1-m2-check"
+        ],
+        "c4": [
+          "c4-m1-l1",
+          "c4-m1-l2",
+          "c4-m1-check"
+        ],
+        "c5": [
+          "c5-m1-l1",
+          "c5-m1-l2",
+          "c5-m1-check"
+        ]
+      },
+      "u1": {
+        "c1": [
+          "c1-m1-l1",
+          "c1-m1-l2",
+          "c1-m1-check",
+          "c1-m2-l1",
+          "c1-m2-l2",
+          "c1-m2-check"
+        ],
+        "c4": [
+          "c4-m1-l1"
+        ],
+        "c5": [
+          "c5-m1-l1",
+          "c5-m1-l2"
+        ]
+      },
+      "u10": {
+        "c2": [
+          "c2-m1-l1",
+          "c2-m1-l2",
+          "c2-m1-check",
+          "c2-m2-l1",
+          "c2-m2-l2",
+          "c2-m2-check"
+        ],
+        "c3": [
+          "c3-m1-l1"
+        ]
+      },
+      "u17": {
+        "c1": [
+          "c1-m1-l1",
+          "c1-m1-l2",
+          "c1-m1-check",
+          "c1-m2-l1",
+          "c1-m2-l2",
+          "c1-m2-check"
+        ],
+        "c3": [
+          "c3-m1-l1",
+          "c3-m1-l2",
+          "c3-m1-check"
+        ]
+      },
+      "u18": {
+        "c1": [
+          "c1-m1-l1",
+          "c1-m1-l2",
+          "c1-m1-check",
+          "c1-m2-l1"
+        ],
+        "c4": [
+          "c4-m1-l1"
+        ],
+        "c5": [
+          "c5-m1-l1"
+        ]
+      }
+    },
     "attendances": [],
     "reports": [],
-    "announcements": [],
+    "announcements": [
+      {
+        "id": "ann-corp-1",
+        "title": "Annual AML refresher is now open",
+        "body": "Everyone in customer-facing roles must complete AML & KYC by the due date shown in your training. Managers can see their team’s progress in the manager portal.",
+        "authorId": "u3",
+        "authorName": "Martha Bekele",
+        "authorRole": "admin",
+        "targetRoles": [
+          "Student",
+          "Manager"
+        ],
+        "priority": "important",
+        "postedAt": "2026-09-26T08:00:00.000Z",
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "views": 0,
+        "viewedBy": []
+      },
+      {
+        "id": "ann-corp-2",
+        "title": "New phishing simulation next month",
+        "body": "IT & Security will run a phishing simulation. Report anything suspicious using the “Report phishing” button — that is exactly what we want to see.",
+        "authorId": "u3",
+        "authorName": "Martha Bekele",
+        "authorRole": "admin",
+        "targetRoles": [
+          "Student",
+          "Instructor",
+          "Manager",
+          "Staff"
+        ],
+        "priority": "normal",
+        "postedAt": "2026-09-26T08:00:00.000Z",
+        "createdAt": "2026-09-26T08:00:00.000Z",
+        "views": 0,
+        "viewedBy": []
+      }
+    ],
     "forum-chats": [],
     "forum-messages": [],
     "forum-read-state": {},
-    "live-sessions": [],
-    "assignments": [],
-    "quizzes": [],
-    "question-bank": [],
+    "live-sessions": [
+      {
+        "id": "live-cyber-qa",
+        "title": "Cybersecurity awareness — live Q&A",
+        "courseId": "c2",
+        "courseCode": "CYB-AWR",
+        "courseTitle": "Cybersecurity Awareness (All Staff)",
+        "instructorId": "u6",
+        "instructorName": "Mekonnen Alemu",
+        "campusId": "c1",
+        "department": "IT & Security",
+        "startAt": "2026-09-29T10:00:00.000Z",
+        "durationMinutes": 45,
+        "platform": "Microsoft Teams",
+        "meetingUrl": "https://teams.microsoft.com/l/meetup-join/horizon-demo",
+        "status": "upcoming"
+      }
+    ],
+    "assignments": [
+      {
+        "id": "asg-fraud-case",
+        "title": "Fraud case review",
+        "courseId": "c4",
+        "courseCode": "FRAUD-201",
+        "courseTitle": "Fraud Detection for Frontline Staff",
+        "instructorId": "u2",
+        "instructorName": "Tewodros Alemu",
+        "campusId": "c1",
+        "department": "Retail Banking",
+        "dueAt": "2026-10-10T17:00",
+        "brief": "Read the attached scenario of a suspected authorised push-payment scam. In one page, list the red flags you see and the steps you would take at the counter.",
+        "acceptedFormats": [
+          "pdf",
+          "docx"
+        ],
+        "status": "published",
+        "maxPoints": 20
+      }
+    ],
+    "quizzes": [
+      {
+        "id": "quiz-aml-final",
+        "title": "AML & KYC — final assessment",
+        "courseId": "c1",
+        "courseCode": "AML-101",
+        "courseTitle": "Anti-Money Laundering & KYC",
+        "instructorId": "u2",
+        "instructorName": "Sara Tadesse",
+        "campusId": "c1",
+        "department": "Risk & Compliance",
+        "dueAt": "2026-10-17T17:00",
+        "durationMinutes": 15,
+        "questionIds": [
+          "q-aml-1",
+          "q-aml-2",
+          "q-aml-3",
+          "q-aml-4"
+        ],
+        "status": "published",
+        "maxPoints": 20
+      }
+    ],
+    "question-bank": [
+      {
+        "id": "q-aml-1",
+        "stem": "Which stage of money laundering hides the audit trail?",
+        "type": "mcq",
+        "options": [
+          "Placement",
+          "Layering",
+          "Integration"
+        ],
+        "correctAnswer": "Layering",
+        "tags": [
+          "aml"
+        ],
+        "courseId": "c1",
+        "courseCode": "AML-101",
+        "department": "Risk & Compliance",
+        "difficulty": "medium",
+        "points": 5,
+        "createdAt": "2026-09-26T09:00:00.000Z"
+      },
+      {
+        "id": "q-aml-2",
+        "stem": "Splitting cash into deposits just under the reporting limit is called:",
+        "type": "mcq",
+        "options": [
+          "Structuring",
+          "Smurfing prevention",
+          "Netting"
+        ],
+        "correctAnswer": "Structuring",
+        "tags": [
+          "aml"
+        ],
+        "courseId": "c1",
+        "courseCode": "AML-101",
+        "department": "Risk & Compliance",
+        "difficulty": "medium",
+        "points": 5,
+        "createdAt": "2026-09-26T09:00:00.000Z"
+      },
+      {
+        "id": "q-aml-3",
+        "stem": "You may tell a customer that you have filed a suspicious activity report.",
+        "type": "true-false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": "False",
+        "tags": [
+          "aml"
+        ],
+        "courseId": "c1",
+        "courseCode": "AML-101",
+        "department": "Risk & Compliance",
+        "difficulty": "medium",
+        "points": 5,
+        "createdAt": "2026-09-26T09:00:00.000Z"
+      },
+      {
+        "id": "q-aml-4",
+        "stem": "A politically exposed person requires enhanced due diligence.",
+        "type": "true-false",
+        "options": [
+          "True",
+          "False"
+        ],
+        "correctAnswer": "True",
+        "tags": [
+          "aml"
+        ],
+        "courseId": "c1",
+        "courseCode": "AML-101",
+        "department": "Risk & Compliance",
+        "difficulty": "medium",
+        "points": 5,
+        "createdAt": "2026-09-26T09:00:00.000Z"
+      }
+    ],
     "student-submissions": [],
     "payments": [],
     "help-desk-tickets": [],
     "integrations": [],
-    "lesson-progress": {},
     "lesson-responses": {},
     "student-settings": {},
     "instructor-settings": {},

@@ -45,6 +45,8 @@ export const STORAGE_KEYS = {
   trainingDivisions: 'berana:training-divisions',
   trainingPrograms: 'berana:training-programs',
   cohorts: 'berana:cohorts',
+  cohortRegistrations: 'berana:cohort-registrations',
+  cohortAttendance: 'berana:cohort-attendance',
   learners: 'berana:learners',
   trainers: 'berana:trainers',
   trainingCertificates: 'berana:training-certificates',

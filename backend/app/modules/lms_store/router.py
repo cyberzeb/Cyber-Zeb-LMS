@@ -138,6 +138,14 @@ async def patch_collection(
         after = await service.get_collection(principal.tenant_id, collection_key)
         ids = [u.record.get("id") for u in payload.upserts]
         background.add_task(dispatch, principal.tenant_id, collection_key, changes_between(before, after, ids))
+    if collection_key == "payments" and principal.is_tenant_admin and payload.upserts:
+        # An invoice marked paid by the finance team confirms a cohort registration.
+        from app.modules.training.emails import send_registration_emails
+        from app.modules.training.service import TrainingService
+
+        enrolled = await TrainingService(db).sync_paid(principal.tenant_id)
+        if enrolled:
+            background.add_task(send_registration_emails, principal.tenant_id, [r["id"] for r in enrolled])
     return CollectionOut(key=collection_key, data=data)
 
 

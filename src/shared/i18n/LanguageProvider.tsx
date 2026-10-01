@@ -8,6 +8,8 @@ import {
   writeStoredLanguage,
 } from './languages'
 import { interpolate, translations, ENGLISH_TO_KEY, type TranslationKey } from './translations'
+import { applyEditionVocabulary } from './editionGlossary'
+import { useOrganizationConfig } from '../config/useOrganizationConfig'
 
 interface LanguageContextValue {
   language: AppLanguage
@@ -40,13 +42,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     [language],
   )
 
+  // Shared screens speak the active edition's language ("Employees", not "Students").
+  const { edition } = useOrganizationConfig()
   const tx = useCallback(
     (text: string, vars?: Record<string, string | number>) => {
-      const key = ENGLISH_TO_KEY[text]
-      if (key) return t(key, vars)
-      return interpolate(text, vars)
+      const worded = applyEditionVocabulary(text, edition)
+      const key = ENGLISH_TO_KEY[worded] ?? ENGLISH_TO_KEY[text]
+      if (key && (worded === text || ENGLISH_TO_KEY[worded])) return t(key, vars)
+      return interpolate(worded, vars)
     },
-    [t],
+    [t, edition],
   )
 
   const value = useMemo(

@@ -1,3 +1,4 @@
+import { vocab } from '../../../shared/i18n/editionGlossary'
 import { useMemo, useState } from 'react'
 import { Clock, Headset, MessageCircle, Plus, Shield } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
@@ -118,7 +119,7 @@ export function InstructorHelpDeskPage() {
             <Headset size={26} />
           </div>
           <div className="flex-1 text-white">
-            <h2 className="text-[18px] font-bold">Instructor support</h2>
+            <h2 className="text-[18px] font-bold">{vocab('Instructor support')}</h2>
             <p className="mt-1 text-[13px] text-[#c5cade]">
               Priority response for teaching staff · {stats.open + stats.inReview} active ticket
               {stats.open + stats.inReview === 1 ? '' : 's'}

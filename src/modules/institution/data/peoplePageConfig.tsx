@@ -231,6 +231,27 @@ export const peoplePageConfigs: Record<PeoplePageFocus, PeoplePageConfig> = {
       ]
     },
   },
+  Manager: {
+    title: 'Managers',
+    subtitle: 'Line managers follow and assign training for the teams they lead in the manager portal.',
+    inviteLabel: 'Add Manager',
+    inviteTitle: 'Invite Manager',
+    inviteDescription: 'Grant manager portal access. Make them the manager of a team on the Teams page.',
+    defaultRole: 'Manager',
+    lockRole: true,
+    searchPlaceholder: 'Search managers by name or email...',
+    emptyMessage: 'No managers match your search.',
+    showRoleTabs: false,
+    hideRoleColumn: true,
+    getStats: (people) => {
+      const managers = filterRole(people, 'Manager')
+      return [
+        { label: 'Managers', value: managers.length, icon: <UserCog size={STAT} /> },
+        { label: 'Active', value: countByStatus(managers, 'active'), icon: <Users size={STAT} /> },
+        { label: 'Pending Invites', value: countByStatus(managers, 'invited'), icon: <MailPlus size={STAT} /> },
+      ]
+    },
+  },
   HelpDesk: {
     title: 'Help Desk Agents',
     subtitle:

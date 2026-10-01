@@ -11,6 +11,7 @@ import {
   Shield,
   ShieldCheck,
   UserRound,
+  UsersRound,
 } from 'lucide-react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -43,6 +44,7 @@ function roleIcon(role: LoginRole) {
   if (role === 'Student') return GraduationCap
   if (role === 'Guardian') return HeartHandshake
   if (role === 'HelpDesk') return Headset
+  if (role === 'Manager') return UsersRound
   if (role === 'SuperAdmin') return ShieldCheck
   if (role === 'Admin') return Shield
   return UserRound
@@ -61,7 +63,10 @@ export function LoginPage() {
   const [role, setRole] = useState<LoginRole>(
     isLoginRole(initialRole) ? initialRole : 'Student',
   )
-  const [email, setEmail] = useState(DEMO_ACCOUNTS[isLoginRole(initialRole) ? initialRole : 'Student'].email)
+  // A learner arriving from the registration page has their email prefilled.
+  const [email, setEmail] = useState(
+    searchParams.get('email') ?? DEMO_ACCOUNTS[isLoginRole(initialRole) ? initialRole : 'Student'].email,
+  )
   const [code, setCode] = useState(['', '', '', '', '', ''])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

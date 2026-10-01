@@ -43,9 +43,13 @@ export function getEnrollmentProgressPercent(
 
 function syncEnrollmentProgress(studentId: string, courseId: string, progress: number) {
   const enrollments = readEnrollments()
-  const next = enrollments.map((e) =>
-    e.studentId === studentId && e.courseId === courseId ? { ...e, progress } : e,
-  )
+  const today = new Date().toISOString().slice(0, 10)
+  const next = enrollments.map((e) => {
+    if (e.studentId !== studentId || e.courseId !== courseId) return e
+    // Record when a course is finished: recertification counts from this date.
+    const completedOn = progress >= 100 ? (e.completedOn ?? today) : e.completedOn
+    return { ...e, progress, completedOn }
+  })
   persistCollection(STORAGE_KEYS.enrollments, next)
   window.dispatchEvent(new CustomEvent(STORAGE_EVENTS.enrollmentsUpdated))
 }

@@ -1,3 +1,4 @@
+import { vocab } from '../../../shared/i18n/editionGlossary'
 import { CalendarClock, Clock, MonitorPlay, Plus, Radio, UserRound, Video } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '../../../shared/components/Button'
@@ -363,7 +364,7 @@ export function InstructorLiveClassesPage() {
           <MonitorPlay size={32} className="mx-auto text-navy-300 mb-3" />
           <p className="text-[14px] font-semibold text-navy-900">No live sessions scheduled</p>
           <p className="text-[12.5px] text-secondary-text mt-1">
-            Create a Zoom meeting and schedule a session for your students.
+            {vocab('Create a Zoom meeting and schedule a session for your students.')}
           </p>
           <Button variant="primary" className="mt-4" onClick={() => setModalOpen(true)}>
             <Plus size={15} />

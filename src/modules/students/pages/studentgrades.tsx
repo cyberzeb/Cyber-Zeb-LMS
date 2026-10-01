@@ -11,7 +11,8 @@ import { useStudentDashboard } from '../hooks/useStudentDashboard'
 
 export function StudentGradesPage() {
   const { edition } = useOrganizationConfig()
-  const isCorporate = edition === 'corporate'
+  // Only the University Edition keeps GPA, terms and transcripts.
+  const noGpa = edition !== 'university'
 
   const { data, isLoading, isError } = useStudentDashboard()
 
@@ -64,15 +65,15 @@ export function StudentGradesPage() {
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
-        title={isCorporate ? 'My Results' : 'Grades & Feedback'}
+        title={noGpa ? 'My Results' : 'Grades & Feedback'}
         subtitle={
-          isCorporate
-            ? 'Your scores and trainer feedback across assigned training.'
+          noGpa
+            ? 'Your scores and trainer feedback across your training.'
             : 'View current scores, instructor feedback, and past semester transcripts.'
         }
         actions={
           // A transcript is an academic record — corporate employees have none.
-          isCorporate ? null : (
+          noGpa ? null : (
             <Button variant="primary">
               <GraduationCap size={15} />
               Download transcript
@@ -83,37 +84,47 @@ export function StudentGradesPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <StatBlock
-          label={isCorporate ? 'Assessment average' : 'Current term GPA'}
+          label={noGpa ? 'Assessment average' : 'Current term GPA'}
           value={
-            isCorporate
+            noGpa
               ? `${data.kpis.avgQuizScore}%`
               : (currentSemester?.gpa.toFixed(2) ?? data.kpis.gpa.toFixed(2))
           }
-          sub={isCorporate ? 'Across your training' : data.term}
+          sub={noGpa ? 'Across your training' : data.term}
           icon={<Award size={17} />}
           iconBg="bg-lemon-100 text-lemon-800"
         />
         <StatBlock
-          label={isCorporate ? 'Training completed' : 'Cumulative GPA'}
-          value={isCorporate ? String(stats.courses) : cumulativeGpa}
-          sub={isCorporate ? 'Assigned to you' : data.standing}
+          label={noGpa ? 'Training completed' : 'Cumulative GPA'}
+          value={noGpa ? String(stats.courses) : cumulativeGpa}
+          sub={noGpa ? 'Assigned to you' : data.standing}
           icon={<Sparkles size={17} />}
           iconBg="bg-success-bg text-success"
         />
         <StatBlock
-          label={isCorporate ? 'Recent average' : 'Term average'}
+          label={noGpa ? 'Recent average' : 'Term average'}
           value={stats.average}
-          sub={isCorporate ? 'Latest results' : 'Current semester'}
+          sub={noGpa ? 'Latest results' : 'Current semester'}
           icon={<TrendingUp size={17} />}
           iconBg="bg-info-bg text-info"
         />
-        <StatBlock
-          label="Past semesters"
-          value={data.gradeHistory.filter((s) => s.status === 'completed').length}
-          sub="Archived transcripts"
-          icon={<GraduationCap size={17} />}
-          iconBg="bg-navy-50 text-navy-600"
-        />
+        {noGpa ? (
+          <StatBlock
+            label="Certifications"
+            value={data.certificates.filter((c) => c.status === 'issued').length}
+            sub="Earned so far"
+            icon={<GraduationCap size={17} />}
+            iconBg="bg-navy-50 text-navy-600"
+          />
+        ) : (
+          <StatBlock
+            label="Past semesters"
+            value={data.gradeHistory.filter((s) => s.status === 'completed').length}
+            sub="Archived transcripts"
+            icon={<GraduationCap size={17} />}
+            iconBg="bg-navy-50 text-navy-600"
+          />
+        )}
       </div>
 
       {data.gradeTrend.length > 0 ? (
@@ -151,13 +162,13 @@ export function StudentGradesPage() {
             <StatBlock
               label="A-range grades"
               value={trendInsights.aGrades}
-              sub="Current semester courses"
+              sub={noGpa ? 'Across your training' : 'Current semester courses'}
               icon={<Award size={17} />}
               iconBg="bg-info-bg text-info"
             />
             <StatBlock
-              label="Credits this term"
-              value={trendInsights.credits}
+              label={noGpa ? 'Quiz average' : 'Credits this term'}
+              value={noGpa ? `${data.kpis.avgQuizScore}%` : trendInsights.credits}
               sub={`Quiz avg · ${data.kpis.avgQuizScore}%`}
               icon={<Target size={17} />}
               iconBg="bg-navy-50 text-navy-600"

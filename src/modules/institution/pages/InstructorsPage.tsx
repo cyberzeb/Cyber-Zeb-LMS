@@ -1,3 +1,4 @@
+import { vocab } from '../../../shared/i18n/editionGlossary'
 import { useEffect, useMemo, useState } from 'react'
 import { MailPlus, Plus } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
@@ -167,8 +168,8 @@ export function InstructorsPage() {
     setInviteOpen(false)
     notify(
       inviteForm.courseIds.length > 0
-        ? `Instructor ${newInstructor.name} added with ${inviteForm.courseIds.length} course assignment${inviteForm.courseIds.length === 1 ? '' : 's'}.`
-        : `Instructor ${newInstructor.name} added. Assign courses from their profile or the Course Catalog.`,
+        ? vocab(`Instructor ${newInstructor.name} added with ${inviteForm.courseIds.length} course assignment${inviteForm.courseIds.length === 1 ? '' : 's'}.`)
+        : vocab(`Instructor ${newInstructor.name} added. Assign courses from their profile or the Course Catalog.`),
     )
   }
 
@@ -231,7 +232,7 @@ export function InstructorsPage() {
             className="w-full sm:w-auto min-w-[200px]"
           />
           <span className="text-[13px] font-semibold text-navy-700 whitespace-nowrap">
-            {filtered.length} instructor{filtered.length === 1 ? '' : 's'}
+            {vocab(`${filtered.length} instructor${filtered.length === 1 ? '' : 's'}`)}
           </span>
         </div>
         <SearchInput
@@ -286,7 +287,7 @@ export function InstructorsPage() {
           placeholder="e.g. a.selassie@berana.edu"
         />
         <label className="flex flex-col gap-1.5">
-          <span className="text-[12px] font-semibold text-navy-900">Campus</span>
+          <span className="text-[12px] font-semibold text-navy-900">{vocab('Campus')}</span>
           <select
             value={inviteForm.campusId}
             onChange={(e) => setInviteForm({ ...inviteForm, campusId: e.target.value })}

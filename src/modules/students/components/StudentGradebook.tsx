@@ -1,3 +1,4 @@
+import { vocab } from '../../../shared/i18n/editionGlossary'
 import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { useMemo, useState } from 'react'
 import { BookOpen, ChevronDown, ChevronUp, GraduationCap, Layers } from 'lucide-react'
@@ -113,7 +114,7 @@ function CourseGradeCard({ grade, defaultExpanded }: { grade: GradeItem; default
           </div>
 
           <div className="mt-4 rounded-xl bg-navy-50/80 border border-divider px-4 py-3 text-[12px] leading-relaxed text-navy-800">
-            <span className="font-semibold text-navy-900">Instructor feedback: </span>
+            <span className="font-semibold text-navy-900">{vocab('Instructor feedback: ')}</span>
             {grade.feedback}
           </div>
         </div>
@@ -126,7 +127,8 @@ const TERM_SORT_ORDER = ['Fall 2026', 'Spring 2026', 'Fall 2025', 'Spring 2025']
 
 export function StudentGradebook({ gradeHistory }: StudentGradebookProps) {
   const { edition } = useOrganizationConfig()
-  const isCorporate = edition === 'corporate'
+  // Only the University Edition keeps GPA, terms and transcripts.
+  const noGpa = edition !== 'university'
 
   const sorted = useMemo(
     () =>
@@ -155,7 +157,11 @@ export function StudentGradebook({ gradeHistory }: StudentGradebookProps) {
       <div className="flex flex-col gap-3">
         <FilterTabs tabs={tabLabels} active={activeTerm} onChange={setActiveTerm} />
         <p className="text-[12px] text-secondary-text">
-          {semester.status === 'current' ? 'Current semester — grades update as assessments are graded.' : 'Completed semester transcript.'}
+          {noGpa
+            ? 'Results update as your work is marked.'
+            : semester.status === 'current'
+              ? 'Current semester — grades update as assessments are graded.'
+              : 'Completed semester transcript.'}
         </p>
       </div>
 
@@ -195,7 +201,7 @@ export function StudentGradebook({ gradeHistory }: StudentGradebookProps) {
           <div className="flex gap-6">
             <div>
               <div className="text-[10px] font-bold uppercase tracking-wider text-secondary-text">
-                {isCorporate ? 'Average score' : 'Term GPA'}
+                {noGpa ? 'Average score' : 'Term GPA'}
               </div>
               <div className="text-[28px] font-extrabold text-navy-900 leading-none mt-1">{semester.gpa.toFixed(2)}</div>
             </div>

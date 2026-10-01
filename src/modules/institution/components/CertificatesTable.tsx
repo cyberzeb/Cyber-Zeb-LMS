@@ -59,7 +59,12 @@ export function CertificatesTable({
           </thead>
           <tbody>
             {certificates.map((cert) => {
-              const status = statusConfig[cert.status]
+              // An issued certification past its expiry date needs renewing.
+              const expired =
+                cert.status === 'issued' &&
+                Boolean(cert.expirationDate) &&
+                (cert.expirationDate as string) < new Date().toISOString().slice(0, 10)
+              const status = expired ? { label: 'Expired', tone: 'danger' as const } : statusConfig[cert.status]
               const canDownload = cert.status === 'issued'
               const canRevoke = cert.status === 'issued'
 
@@ -74,7 +79,14 @@ export function CertificatesTable({
                     <div className="text-xs text-slate-500">{cert.courseTitle}</div>
                   </td>
                   <td className="px-5 py-3 text-slate-600">{cert.instructorName}</td>
-                  <td className="px-5 py-3 text-slate-600">{formatDate(cert.issueDate)}</td>
+                  <td className="px-5 py-3 text-slate-600">
+                    {formatDate(cert.issueDate)}
+                    {cert.expirationDate ? (
+                      <div className={`text-xs ${expired ? 'text-danger' : 'text-slate-500'}`}>
+                        {expired ? 'Expired' : 'Expires'} {formatDate(cert.expirationDate)}
+                      </div>
+                    ) : null}
+                  </td>
                   <td className="px-5 py-3">
                     <StatusPill label={status.label} tone={status.tone} />
                   </td>

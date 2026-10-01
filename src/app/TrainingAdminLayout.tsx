@@ -14,6 +14,8 @@ import {
   PEOPLE_UPDATED_EVENT,
 } from '../modules/institution/utils/peopleVerification'
 import { useOrganizationConfig } from '../shared/config/useOrganizationConfig'
+import { useCohortRegistrations } from '../modules/training/hooks/useTrainingData'
+import { registrationState } from '../modules/training/utils/trainingUtils'
 import {
   buildTrainingNavSections,
   TRAINING_BREADCRUMB_LABELS,
@@ -37,6 +39,9 @@ function TrainingAdminShell() {
   const organizationName = orgConfig.organizationName
   const adminRoleLabel = orgConfig.terminology.adminRole
   const [pendingVerifications, setPendingVerifications] = useState(0)
+  const { registrations } = useCohortRegistrations()
+  // Unpaid and expired holds wait on the training team.
+  const awaiting = registrations.filter((r) => registrationState(r) !== 'enrolled' && r.status !== 'cancelled').length
 
   useEffect(() => {
     const refresh = () => {
@@ -53,9 +58,11 @@ function TrainingAdminShell() {
 
   const navSections = buildTrainingNavSections(path, {
     'verify-people': pendingVerifications,
+    registrations: awaiting,
   })
 
-  const breadcrumb = TRAINING_BREADCRUMB_LABELS[path] ?? ''
+  const breadcrumb =
+    TRAINING_BREADCRUMB_LABELS[path] ?? (path.startsWith('/admin/training/cohorts/') ? 'Cohort' : '')
   const isForumPage = path === '/admin/discussion-forum'
 
   return (

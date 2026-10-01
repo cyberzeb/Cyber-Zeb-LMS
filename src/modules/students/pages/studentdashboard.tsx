@@ -1,3 +1,4 @@
+import { vocab } from '../../../shared/i18n/editionGlossary'
 import {
   AlertTriangle,
   BookOpen,
@@ -14,6 +15,7 @@ import {
   TrendingUp,
   UserRoundCheck,
 } from 'lucide-react'
+import { LearnerCohortsCard } from '../../training/learner/LearnerTrainingWidgets'
 import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../../shared/components/Button'
@@ -59,7 +61,8 @@ function assignmentStatusTone(status: AssignmentItem['status']) {
 
 export function StudentDashboardPage() {
   const { edition } = useOrganizationConfig()
-  const isCorporate = edition === 'corporate'
+  // Only the University Edition keeps GPA, terms and transcripts.
+  const noGpa = edition !== 'university'
 
   const { t } = useLanguage()
   const navigate = useNavigate()
@@ -211,6 +214,8 @@ export function StudentDashboardPage() {
         </div>
       </div>
 
+      {edition === 'training_organization' ? <LearnerCohortsCard /> : null}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatBlock
           label="Active Courses"
@@ -224,9 +229,9 @@ export function StudentDashboardPage() {
           iconBg="bg-navy-50 text-navy-700"
         />
         <StatBlock
-          label={isCorporate ? 'Assessment average' : 'Current GPA'}
-          value={isCorporate ? `${data.kpis.avgQuizScore}%` : data.kpis.gpa.toFixed(2)}
-          sub={isCorporate ? 'Across completed training' : 'Based on graded credits'}
+          label={noGpa ? 'Assessment average' : 'Current GPA'}
+          value={noGpa ? `${data.kpis.avgQuizScore}%` : data.kpis.gpa.toFixed(2)}
+          sub={noGpa ? 'Across completed training' : 'Based on graded credits'}
           trend={gpaTrend.trend}
           trendValue={gpaTrend.trendValue}
           sparkline={data.kpiTrends.gpa.map((v) => Math.round(v * 100))}
@@ -400,7 +405,7 @@ export function StudentDashboardPage() {
                 <thead>
                   <tr className="table-header-label border-b border-divider table-header-bar">
                     <th className="py-2 pr-2 font-semibold">Course</th>
-                    <th className="py-2 px-2 font-semibold">Instructor</th>
+                    <th className="py-2 px-2 font-semibold">{vocab('Instructor')}</th>
                     <th className="py-2 px-2 font-semibold">Next Session</th>
                     <th className="py-2 px-2 font-semibold">Progress</th>
                     <th className="py-2 pl-2 font-semibold">Status</th>
@@ -547,7 +552,7 @@ export function StudentDashboardPage() {
       <GlassCard className="p-3 nested-panel border-lemon-500/20">
         <div className="flex items-center gap-2 text-[12px] text-navy-700">
           <CheckCircle2 size={14} className="text-lemon-700" />
-          Your dashboard reflects your personal learning data for {data.term}. Grades and attendance update as instructors post results.
+          Your dashboard reflects your personal learning data for {data.term}. {vocab('Grades and attendance update as instructors post results.')}
         </div>
       </GlassCard>
     </div>

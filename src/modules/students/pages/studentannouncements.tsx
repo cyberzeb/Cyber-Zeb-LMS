@@ -1,3 +1,4 @@
+import { vocab } from '../../../shared/i18n/editionGlossary'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Bell, Building2, Sparkles } from 'lucide-react'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
@@ -77,7 +78,7 @@ export function StudentAnnouncementsPage() {
           meta={
             <>
               {latestImportant.author}
-              {latestImportant.course ? ` · ${latestImportant.course}` : ' · Campus-wide'}
+              {latestImportant.course ? ` · ${latestImportant.course}` : ` · ${vocab('Campus-wide')}`}
             </>
           }
         />

@@ -29,6 +29,7 @@ import {
   UserRoundCheck,
   Users,
   UsersRound,
+  Wallet,
 } from 'lucide-react'
 
 const ICON_SIZE = 17
@@ -170,6 +171,12 @@ export function buildCorporateNavSections(
           icon: <UserCog size={ICON_SIZE} />,
         },
         {
+          label: 'Managers',
+          to: '/admin/managers',
+          active: isActive(['/admin/managers'], path),
+          icon: <UsersRound size={ICON_SIZE} />,
+        },
+        {
           label: 'Administrators',
           to: '/admin/admins',
           active: isActive(['/admin/admins'], path),
@@ -281,7 +288,7 @@ export function buildTrainingNavSections(
         {
           label: 'Training Programs',
           to: '/admin/training/programs',
-          module: 'academic_structure',
+          module: 'enrollment_cohorts',
           active: isActive(['/admin/training/programs'], path),
           icon: <GraduationCap size={ICON_SIZE} />,
         },
@@ -289,7 +296,7 @@ export function buildTrainingNavSections(
           label: 'Cohorts',
           to: '/admin/training/cohorts',
           module: 'enrollment_cohorts',
-          active: isActive(['/admin/training/cohorts'], path),
+          active: isActive(['/admin/training/cohorts'], path) || path.startsWith('/admin/training/cohorts/'),
           icon: <UsersRound size={ICON_SIZE} />,
         },
         {
@@ -300,11 +307,19 @@ export function buildTrainingNavSections(
           icon: <BookOpen size={ICON_SIZE} />,
         },
         {
-          label: 'Course Offerings',
-          to: '/admin/course-offerings',
-          module: 'course_catalog_authoring',
-          active: isActive(['/admin/course-offerings'], path),
+          label: 'Registrations',
+          to: '/admin/enrollments',
+          module: 'enrollment_cohorts',
+          active: isActive(['/admin/enrollments'], path),
           icon: <ClipboardCheck size={ICON_SIZE} />,
+          badge: badges.registrations,
+        },
+        {
+          label: 'Training Divisions',
+          to: '/admin/training/divisions',
+          module: 'academic_structure',
+          active: isActive(['/admin/training/divisions', '/admin/institution/departments'], path),
+          icon: <Network size={ICON_SIZE} />,
         },
       ],
     },
@@ -415,6 +430,13 @@ export function buildTrainingNavSections(
       title: 'Administration',
       items: [
         {
+          label: 'Payments',
+          to: '/admin/payments',
+          module: 'payments_billing',
+          active: isActive(['/admin/payments'], path),
+          icon: <Wallet size={ICON_SIZE} />,
+        },
+        {
           label: 'Reports & Analytics',
           to: '/admin/reports',
           module: 'reports_analytics',
@@ -476,10 +498,10 @@ export const TRAINING_BREADCRUMB_LABELS: Record<string, string> = {
   '/admin/institution/overview': 'Dashboard',
   '/admin/training/programs': 'Training Programs',
   '/admin/training/cohorts': 'Cohorts',
-  '/admin/training/learners': 'Learners',
-  '/admin/training/trainers': 'Trainers',
   '/admin/courses': 'Course Catalog',
-  '/admin/course-offerings': 'Course Offerings',
+  '/admin/enrollments': 'Registrations',
+  '/admin/training/divisions': 'Training Divisions',
+  '/admin/payments': 'Payments',
   '/admin/live-classes': 'Live Sessions',
   '/admin/assignments': 'Assignments',
   '/admin/quizzes-exams': 'Assessments',

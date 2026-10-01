@@ -58,8 +58,12 @@ export function CorporateTeamFormModal({
   const managerOptions = useMemo(
     () => [
       { value: '', label: 'No manager assigned' },
+      // Managers first: only the Manager role can use the manager portal.
       ...people
-        .filter((person) => person.status === 'active')
+        .filter((person) => person.status === 'active' && person.role === 'Manager')
+        .map((person) => ({ value: person.id, label: person.name, hint: 'Manager' })),
+      ...people
+        .filter((person) => person.status === 'active' && person.role !== 'Manager' && person.role !== 'Student')
         .map((person) => ({ value: person.id, label: person.name, hint: person.role })),
     ],
     [people],

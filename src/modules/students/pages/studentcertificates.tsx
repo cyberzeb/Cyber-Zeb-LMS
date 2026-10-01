@@ -184,7 +184,7 @@ function CertDetailsModal({ cert, open, onClose, onDownload, downloading, previe
         <div className="shrink-0 rounded-xl bg-canvas p-3">{preview}</div>
       ) : (
       <div className="relative rounded-xl overflow-hidden p-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0f1a2e] via-[#16233d] to-[#0f1a2e]" />
         <div className="absolute right-0 top-0 w-40 h-40 rounded-full bg-lemon-500/15 blur-3xl" />
         <div className="relative p-5 flex items-center gap-4">
           <div
@@ -199,7 +199,7 @@ function CertDetailsModal({ cert, open, onClose, onDownload, downloading, previe
               {isIssued ? 'Certificate of Completion' : 'Certificate in Progress'}
             </p>
             <h3 className="mt-1 text-[17px] font-bold text-white leading-tight">{cert.title}</h3>
-            <p className="mt-1 text-[12px] text-navy-200">{cert.course}</p>
+            <p className="mt-1 text-[12px] text-white/70">{cert.course}</p>
           </div>
         </div>
       </div>
@@ -283,8 +283,8 @@ function CertCard({ cert, onView, onDownload, downloading }: CertCardProps) {
     <GlassCard
       className={`p-0 overflow-hidden hover:shadow-md transition-shadow border-l-4 ${
         isIssued
-          ? 'border-l-success bg-gradient-to-r from-success-bg/40 to-white'
-          : 'border-l-info bg-gradient-to-r from-info-bg/40 to-white'
+          ? 'border-l-success bg-gradient-to-r from-success-bg/40 to-white dark:to-transparent'
+          : 'border-l-info bg-gradient-to-r from-info-bg/40 to-white dark:to-transparent'
       }`}
     >
       <div className="p-5">
@@ -299,10 +299,23 @@ function CertCard({ cert, onView, onDownload, downloading }: CertCardProps) {
           </div>
 
           <div className="min-w-0 flex-1">
-            <StatusPill
-              label={isIssued ? 'Issued' : 'In progress'}
-              tone={isIssued ? 'success' : 'info'}
-            />
+            {(() => {
+              const today = new Date().toISOString().slice(0, 10)
+              const expired = isIssued && Boolean(cert.expiresAt) && (cert.expiresAt as string) < today
+              return (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <StatusPill
+                    label={expired ? 'Expired' : isIssued ? 'Issued' : 'In progress'}
+                    tone={expired ? 'danger' : isIssued ? 'success' : 'info'}
+                  />
+                  {isIssued && cert.expiresAt ? (
+                    <span className={`text-[11px] font-semibold ${expired ? 'text-danger' : 'text-secondary-text'}`}>
+                      {expired ? 'Renewal needed' : `Valid until ${cert.expiresAt}`}
+                    </span>
+                  ) : null}
+                </div>
+              )
+            })()}
             <h3 className="mt-1.5 text-[15px] font-bold text-navy-900 leading-snug">
               {cert.title}
             </h3>
@@ -405,7 +418,7 @@ function PendingSection({
       {certs.map((cert) => (
         <GlassCard
           key={cert.id}
-          className="p-0 overflow-hidden border-l-4 border-l-info bg-gradient-to-r from-info-bg/40 to-white"
+          className="p-0 overflow-hidden border-l-4 border-l-info bg-gradient-to-r from-info-bg/40 to-white dark:to-transparent"
         >
           <div className="p-4 flex items-start gap-3">
             <div className="w-10 h-10 rounded-lg bg-info/10 text-info flex items-center justify-center shrink-0">
@@ -548,7 +561,7 @@ export function StudentCertificatesPage() {
         {/* ── Featured banner — latest issued cert ── */}
         {latestIssued ? (
           <GlassCard className="relative overflow-hidden p-0">
-            <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-900" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0f1a2e] via-[#16233d] to-[#0f1a2e]" />
             <div className="absolute right-0 top-0 w-56 h-56 rounded-full bg-lemon-500/15 blur-3xl" />
             <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6">
               <div className="w-16 h-16 rounded-2xl bg-lemon-500 text-navy-900 flex items-center justify-center shrink-0 shadow-lg">
@@ -561,10 +574,10 @@ export function StudentCertificatesPage() {
                 <h2 className="mt-2 text-[20px] md:text-[22px] font-bold text-white leading-tight">
                   {latestIssued.title}
                 </h2>
-                <p className="mt-1.5 text-[13px] text-navy-200">
+                <p className="mt-1.5 text-[13px] text-white/70">
                   {latestIssued.course}
                 </p>
-                <p className="mt-1 text-[11px] font-mono text-navy-300">
+                <p className="mt-1 text-[11px] font-mono text-white/55">
                   {latestIssued.credentialId} · Issued {latestIssued.issuedAt}
                 </p>
               </div>

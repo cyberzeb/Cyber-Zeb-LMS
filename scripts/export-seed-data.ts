@@ -1,14 +1,15 @@
 /**
  * Writes the demo seed payloads the backend seeds tenants from.
  *
- * One file per edition: the university demo (`berana`) and the corporate demo
- * (`horizon`). Run with `npm run export-seed` after changing any seed module.
+ * One file per edition: the university demo (`berana`), the corporate demo
+ * (`horizon`) and the training demo (`apex`). Run with `npm run export-seed` after changing any seed module.
  */
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildSeedPayload } from '../src/shared/storage/buildSeedPayload'
 import { buildCorporateSeedPayload } from '../src/shared/storage/buildCorporateSeedPayload'
+import { buildTrainingSeedPayload } from '../src/shared/storage/buildTrainingSeedPayload'
 
 const root = dirname(fileURLToPath(import.meta.url))
 const repoRoot = join(root, '..')
@@ -18,6 +19,7 @@ mkdirSync(outDir, { recursive: true })
 const targets = [
   { file: 'demo.json', collections: buildSeedPayload() },
   { file: 'corporate.json', collections: buildCorporateSeedPayload() },
+  { file: 'training.json', collections: buildTrainingSeedPayload() },
 ]
 
 for (const target of targets) {

@@ -113,6 +113,7 @@ export function certificateToStudentItem(cert: CertificateRecord) {
     issuedAtRaw: cert.issueDate,
     completionDate: completionDateDisplay,
     credentialId: cert.certificateId,
+    expiresAt: cert.expirationDate,
     status: isIssued ? ('issued' as const) : ('in-progress' as const),
     pendingReason: isIssued ? undefined : derivePendingReason(cert),
     institution: readInstitutionName(),

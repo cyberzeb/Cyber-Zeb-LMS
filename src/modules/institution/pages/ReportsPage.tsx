@@ -1,3 +1,4 @@
+import { vocab } from '../../../shared/i18n/editionGlossary'
 import { useMemo, useState } from 'react'
 import {
   AlertTriangle,
@@ -29,6 +30,7 @@ import { ReportCategoryCard } from '../components/ReportCategoryCard'
 import { GeneratedReportsList } from '../components/GeneratedReportsList'
 import { MiniBarChart } from '../components/MiniBarChart'
 import { CorporateReportsPanel } from '../../corporate/components/CorporateReportsPanel'
+import { TrainingReportsPanel } from '../../training/components/TrainingReportsPanel'
 import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { TrendLineChart } from '../components/TrendLineChart'
 import { downloadInstitutionReport } from '../utils/exportInstitutionReport'
@@ -56,6 +58,17 @@ const corporateCategories: ReportCategory[] = [
 
 const corporateAnalyticsTabs = ['Overview', 'Compliance', 'Engagement']
 
+const trainingCategories: ReportCategory[] = [
+  { id: 'tr1', title: 'Programs & Cohorts', description: 'Enrollment, seat fill and completion by program and cohort.', icon: '🎓', reportCount: 8 },
+  { id: 'tr2', title: 'Attendance', description: 'Session attendance by cohort and learners below the minimum.', icon: '📅', reportCount: 5 },
+  { id: 'tr3', title: 'Fee Income', description: 'Registration fees collected, outstanding and refunded.', icon: '💳', reportCount: 6 },
+  { id: 'tr4', title: 'Certification', description: 'Certificates issued per program and completion rates.', icon: '🏅', reportCount: 4 },
+  { id: 'tr5', title: 'Registrations', description: 'Sign-ups by source, conversion to paid and cancellations.', icon: '📝', reportCount: 5 },
+  { id: 'tr6', title: 'Trainer Activity', description: 'Cohorts led, attendance taken and learner outcomes.', icon: '🧑‍🏫', reportCount: 4 },
+]
+
+const trainingAnalyticsTabs = ['Overview', 'Programs & Cohorts', 'Financial', 'Engagement']
+
 const categoryOptions = categories.map((c) => c.title)
 const formatOptions: GeneratedReport['format'][] = ['PDF', 'Excel', 'CSV']
 const analyticsTabs = ['Overview', 'Academic', 'Financial', 'Engagement']
@@ -76,8 +89,10 @@ export function ReportsPage() {
   // edition gets its own tabs, categories and summary panel.
   const { edition, modules } = useOrganizationConfig()
   const isCorporate = edition === 'corporate'
-  const visibleCategories = isCorporate ? corporateCategories : categories
-  const visibleTabs = isCorporate ? corporateAnalyticsTabs : analyticsTabs
+  // A training institute reports on programs, cohorts and fees, not GPA.
+  const isTraining = edition === 'training_organization'
+  const visibleCategories = isCorporate ? corporateCategories : isTraining ? trainingCategories : categories
+  const visibleTabs = isCorporate ? corporateAnalyticsTabs : isTraining ? trainingAnalyticsTabs : analyticsTabs
   const visibleCategoryOptions = visibleCategories.map((c) => c.title)
   const analytics = useMemo(() => buildReportsAnalytics(), [])
   const [reports, setReports] = useApiCollection<GeneratedReport[]>(STORAGE_KEYS.reports, [])
@@ -158,7 +173,9 @@ export function ReportsPage() {
         <CorporateReportsPanel />
       ) : null}
 
-      {!isCorporate && (activeTab === 'Overview' || activeTab === 'Academic') ? (
+      {isTraining && (activeTab === 'Overview' || activeTab === 'Programs & Cohorts') ? <TrainingReportsPanel /> : null}
+
+      {!isCorporate && !isTraining && (activeTab === 'Overview' || activeTab === 'Academic') ? (
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             <StatBlock label="Active learners" value={summary.activeStudents} sub={`${summary.totalStudents} total`} icon={<Users size={STAT} />} />
@@ -219,7 +236,7 @@ export function ReportsPage() {
       {(activeTab === 'Overview' || activeTab === 'Academic') ? (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           <GlassCard className="p-5">
-            <h3 className="text-[15px] font-extrabold text-navy-900 mb-4">Top courses by enrollment</h3>
+            <h3 className="text-[15px] font-extrabold text-navy-900 mb-4">{vocab('Top courses by enrollment')}</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-[13px] text-left">
                 <thead>
@@ -254,7 +271,7 @@ export function ReportsPage() {
                 <div key={dept.name} className="rounded-xl border border-divider p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div>
                     <div className="font-semibold text-navy-900 text-[13px]">{dept.name}</div>
-                    <div className="text-[11px] text-secondary-text mt-0.5">{dept.students} students · {dept.enrollments} enrollments</div>
+                    <div className="text-[11px] text-secondary-text mt-0.5">{vocab(`${dept.students} students · ${dept.enrollments} enrollments`)}</div>
                   </div>
                   <div className="flex gap-3 text-[12px]">
                     <span><strong>{dept.avgCompletion}%</strong> completion</span>

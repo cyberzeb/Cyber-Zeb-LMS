@@ -57,8 +57,15 @@ async def check_structure(
     old: Optional[Record],
     new: Record,
     load: Loader,
+    *,
+    university: bool = True,
 ) -> None:
-    """Validate one created/updated record. `old is None` means it is new."""
+    """
+    Validate one created/updated record. `old is None` means it is new.
+
+    Only the University Edition runs courses as term offerings. Corporate and
+    Training assignments point straight at a catalog course instead.
+    """
     is_new = old is None
 
     if collection == "colleges":
@@ -83,6 +90,9 @@ async def check_structure(
 
     elif collection == "enrollments":
         await _require(load, new, "studentId", "people", "Student", required=True)
+        if not university:
+            await _require(load, new, "courseId", "courses", "Course", required=is_new)
+            return
         await _require(
             load, new, "courseOfferingId", "course-offerings", "Course offering", required=is_new
         )

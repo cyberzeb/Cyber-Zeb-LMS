@@ -39,7 +39,8 @@ function ProfileField({
 
 export function StudentProfileCard({ data }: StudentProfileCardProps) {
   const { edition } = useOrganizationConfig()
-  const isCorporate = edition === 'corporate'
+  // Only the University Edition keeps GPA, terms and transcripts.
+  const noGpa = edition !== 'university'
 
   const navigate = useNavigate()
 
@@ -66,13 +67,13 @@ export function StudentProfileCard({ data }: StudentProfileCardProps) {
 
       <div className="mt-5 profile-stat-panel p-4 text-white">
         <div className="text-[10.5px] font-semibold uppercase tracking-wide text-navy-200">
-          {isCorporate ? 'Assessment average' : 'Current GPA'}
+          {noGpa ? 'Assessment average' : 'Current GPA'}
         </div>
         <div className="mt-1 flex items-end gap-2">
           <span className="text-[28px] font-extrabold leading-none text-lemon-500">
-            {isCorporate ? data.kpis.avgQuizScore : data.kpis.gpa.toFixed(2)}
+            {noGpa ? data.kpis.avgQuizScore : data.kpis.gpa.toFixed(2)}
           </span>
-          <span className="text-[12px] text-navy-200 mb-1">{isCorporate ? '%' : '/ 4.00'}</span>
+          <span className="text-[12px] text-navy-200 mb-1">{noGpa ? '%' : '/ 4.00'}</span>
         </div>
         <p className="mt-2 text-[11px] text-navy-200">
           {data.kpis.attendanceRate}% attendance · {data.kpis.activeCourses} active courses

@@ -11,8 +11,9 @@ import { CorporateSkillsPage } from '../modules/corporate/pages/CorporateSkillsP
 import { TrainingOverviewPage } from '../modules/training/dashboard/TrainingOverviewPage'
 import { TrainingProgramsPage } from '../modules/training/pages/TrainingProgramsPage'
 import { CohortsPage } from '../modules/training/pages/CohortsPage'
-import { LearnersPage } from '../modules/training/pages/LearnersPage'
-import { TrainersPage } from '../modules/training/pages/TrainersPage'
+import { CohortDetailPage } from '../modules/training/pages/CohortDetailPage'
+import { TrainingDivisionsPage } from '../modules/training/pages/TrainingDivisionsPage'
+import { JoinTrainingPage } from '../modules/training/public/JoinTrainingPage'
 import { EditionDashboardPage } from './EditionDashboardPage'
 import { CampusProfilePage } from '../modules/institution/pages/CampusProfilePage'
 import { OrgStructurePage } from '../modules/institution/pages/OrgStructurePage'
@@ -25,15 +26,12 @@ import { TranscriptsPage } from '../modules/institution/pages/TranscriptsPage'
 import { AcademicReportsPage } from '../modules/institution/pages/AcademicReportsPage'
 import { ResourcesAdminPage } from '../modules/institution/pages/ResourcesAdminPage'
 import { PeoplePage } from '../modules/institution/pages/PeoplePage'
-import { StudentsPage } from '../modules/institution/pages/StudentsPage'
 import { InstructorsPage } from '../modules/institution/pages/InstructorsPage'
 import { StaffPage } from '../modules/institution/pages/StaffPage'
 import { GuardiansPage } from '../modules/institution/pages/GuardiansPage'
 import { AdministratorsPage } from '../modules/institution/pages/AdministratorsPage'
 import { VerifyPeoplePage } from '../modules/institution/pages/VerifyPeoplePage'
-import { EnrollmentsPage } from '../modules/institution/pages/EnrollmentsPage'
 import { CertificatesPage } from '../modules/institution/pages/CertificatesPage'
-import { AttendanceAdminPage } from '../modules/institution/pages/AttendanceAdminPage'
 import { PaymentsAdminPage } from '../modules/institution/pages/PaymentsAdminPage'
 import { HelpDeskAdminPage } from '../modules/institution/pages/HelpDeskAdminPage'
 import { ApiIntegrationsAdminPage } from '../modules/institution/pages/ApiIntegrationsAdminPage'
@@ -60,7 +58,6 @@ import { StudentGradesPage } from '../modules/students/pages/studentgrades'
 import { StudentTranscriptPage } from '../modules/students/pages/studenttranscript'
 import { StudentCoursesShell } from '../modules/students/pages/StudentCoursesShell'
 import { StudentLiveClassesPage } from '../modules/students/pages/studentliveclasses'
-import { StudentAttendancePage } from '../modules/students/pages/studentattendance'
 import { StudentAnnouncementsPage } from '../modules/students/pages/studentannouncements'
 import { StudentForumPage } from '../modules/students/pages/studentforum'
 import { StudentCertificatesPage } from '../modules/students/pages/studentcertificates'
@@ -77,7 +74,6 @@ import { InstructorQuizzesPage } from '../modules/instructors/pages/instructorqu
 import { InstructorAssignmentsPage } from '../modules/instructors/pages/instructorassignments'
 import { InstructorCalendarPage } from '../modules/instructors/pages/instructorcalendar'
 import { InstructorGradesPage } from '../modules/instructors/pages/instructorgrades'
-import { InstructorAttendancePage } from '../modules/instructors/pages/instructorattendance'
 import { InstructorAnnouncementsPage } from '../modules/instructors/pages/instructorannouncements'
 import { InstructorForumPage } from '../modules/instructors/pages/instructorforum'
 import { InstructorCertificatesPage } from '../modules/instructors/pages/instructorcertificates'
@@ -91,6 +87,16 @@ import { StaffSubmissionsPage } from '../modules/staff/pages/staffsubmissions'
 import { StaffAnnouncementsPage } from '../modules/staff/pages/staffannouncements'
 import { StaffSettingsPage } from '../modules/staff/pages/staffsettings'
 import { GuardianLayout } from '../modules/guardian/layout/GuardianLayout'
+import { EditionInstructorAttendancePage, EditionStudentAttendancePage } from './EditionPortalPages'
+import { LearnerProgramsPage } from '../modules/training/learner/LearnerProgramsPage'
+import { TrainerCohortsPage } from '../modules/training/trainer/TrainerCohortsPage'
+import { EditionAttendancePage, EditionEnrollmentsPage, EditionLearnersPage } from './EditionPages'
+import { ManagerLayout } from '../modules/manager/layout/ManagerLayout'
+import { ManagerDashboardPage } from '../modules/manager/pages/managerdashboard'
+import { ManagerTeamPage } from '../modules/manager/pages/managerteam'
+import { ManagerCertificationsPage } from '../modules/manager/pages/managercertifications'
+import { ManagerReportsPage } from '../modules/manager/pages/managerreports'
+import { ManagerAnnouncementsPage } from '../modules/manager/pages/managerannouncements'
 import { GuardianDashboardPage } from '../modules/guardian/pages/guardiandashboard'
 import { GuardianProgressPage } from '../modules/guardian/pages/guardianprogress'
 import { GuardianGradesPage } from '../modules/guardian/pages/guardiangrades'
@@ -135,6 +141,11 @@ export const router = createBrowserRouter([
     // Institution registration: master data + module selection.
     path: '/request',
     element: <RequestPage />,
+  },
+  {
+    // Training Edition: public program catalog and cohort registration.
+    path: '/join/:tenantCode',
+    element: <JoinTrainingPage />,
   },
   {
     // Public certificate verification (QR codes and share links).
@@ -238,7 +249,12 @@ export const router = createBrowserRouter([
       },
       {
         path: 'attendance',
-        element: <StudentAttendancePage />,
+        element: <EditionStudentAttendancePage />,
+      },
+      {
+        // Training Edition: the learner's cohorts and open intakes.
+        path: 'programs',
+        element: <LearnerProgramsPage />,
       },
       {
         path: 'announcements',
@@ -308,7 +324,12 @@ export const router = createBrowserRouter([
       },
       {
         path: 'attendance',
-        element: <InstructorAttendancePage />,
+        element: <EditionInstructorAttendancePage />,
+      },
+      {
+        // Training Edition: the cohorts this trainer leads.
+        path: 'cohorts',
+        element: <TrainerCohortsPage />,
       },
       {
         path: 'announcements',
@@ -341,6 +362,19 @@ export const router = createBrowserRouter([
       { path: 'submit-people', element: <StaffSubmitPeoplePage /> },
       { path: 'submissions', element: <StaffSubmissionsPage /> },
       { path: 'announcements', element: <StaffAnnouncementsPage /> },
+      { path: 'settings', element: <StaffSettingsPage /> },
+    ],
+  },
+  {
+    // Corporate Edition: line managers follow their own teams.
+    path: '/manager',
+    element: <ManagerLayout />,
+    children: [
+      { index: true, element: <ManagerDashboardPage /> },
+      { path: 'team', element: <ManagerTeamPage /> },
+      { path: 'certifications', element: <ManagerCertificationsPage /> },
+      { path: 'reports', element: <ManagerReportsPage /> },
+      { path: 'announcements', element: <ManagerAnnouncementsPage /> },
       { path: 'settings', element: <StaffSettingsPage /> },
     ],
   },
@@ -387,8 +421,11 @@ export const router = createBrowserRouter([
       { path: 'training/overview', element: <TrainingOverviewPage /> },
       { path: 'training/programs', element: <TrainingProgramsPage /> },
       { path: 'training/cohorts', element: <CohortsPage /> },
-      { path: 'training/learners', element: <LearnersPage /> },
-      { path: 'training/trainers', element: <TrainersPage /> },
+      { path: 'training/cohorts/:cohortId', element: <CohortDetailPage /> },
+      { path: 'training/divisions', element: <TrainingDivisionsPage /> },
+      // Learners and trainers are people records, managed on the shared pages.
+      { path: 'training/learners', element: <Navigate to="/admin/students" replace /> },
+      { path: 'training/trainers', element: <Navigate to="/admin/instructors" replace /> },
       {
         path: 'institution/overview',
         element: <EditionDashboardPage />,
@@ -467,11 +504,16 @@ export const router = createBrowserRouter([
       },
       {
         path: 'students',
-        element: <StudentsPage />,
+        element: <EditionLearnersPage />,
       },
       {
         path: 'instructors',
         element: <InstructorsPage />,
+      },
+      {
+        // Corporate Edition: line managers who use the manager portal.
+        path: 'managers',
+        element: <PeoplePage focus="Manager" />,
       },
       {
         path: 'staff',
@@ -491,11 +533,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'enrollments',
-        element: <EnrollmentsPage />,
+        element: <EditionEnrollmentsPage />,
       },
       {
         path: 'attendance',
-        element: <AttendanceAdminPage />,
+        element: <EditionAttendancePage />,
       },
       {
         path: 'announcements',

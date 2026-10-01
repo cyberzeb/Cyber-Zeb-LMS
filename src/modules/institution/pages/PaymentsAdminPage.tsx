@@ -10,6 +10,8 @@ import { SelectMenu } from '../../../shared/components/SelectMenu'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { formatCurrency, formatPlatformDateTime, computePaymentSummary } from '../../../shared/storage/platformUtils'
 import { readPeople } from '../../../shared/storage/readers'
@@ -31,6 +33,9 @@ export function PaymentsAdminPage() {
   const { notify } = useToast()
   const { activeCampuses, selectedCampusId } = useCampusContext()
   const { records, createPayment, markPaid, deletePayment } = usePayments()
+  const { tx } = useLanguage()
+  // A training institute bills registration fees per cohort, not tuition per term.
+  const isTraining = useOrganizationConfig().edition === 'training_organization'
   const [activeTab, setActiveTab] = useState('All')
   const [query, setQuery] = useState('')
   const [campusFilter, setCampusFilter] = useState('all')
@@ -106,7 +111,11 @@ export function PaymentsAdminPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Payments"
-        subtitle="Manage tuition, fees, invoices, and payment reconciliation."
+        subtitle={
+          isTraining
+            ? 'Cohort registration fees and other invoices. Paying a registration invoice confirms the learner’s seat.'
+            : 'Manage tuition, fees, invoices, and payment reconciliation.'
+        }
         actions={
           <Button variant="primary" onClick={() => setModalOpen(true)}>
             <Plus size={15} />
@@ -119,7 +128,7 @@ export function PaymentsAdminPage() {
         <StatBlock
           label="Collected"
           value={formatCurrency(summary.collected)}
-          sub="Paid this term"
+          sub={isTraining ? 'Paid invoices' : 'Paid this term'}
           icon={<CheckCircle2 size={17} />}
           iconBg="bg-success-bg text-success"
         />
@@ -160,7 +169,7 @@ export function PaymentsAdminPage() {
             <thead>
               <tr className="border-b border-divider text-[11px] uppercase tracking-wider text-secondary-text">
                 <th className="py-2.5 pr-4 font-semibold">Invoice</th>
-                <th className="py-2.5 pr-4 font-semibold">Student</th>
+                <th className="py-2.5 pr-4 font-semibold">{tx('Student')}</th>
                 <th className="py-2.5 pr-4 font-semibold">Amount</th>
                 <th className="py-2.5 pr-4 font-semibold">Due</th>
                 <th className="py-2.5 pr-4 font-semibold">Category</th>
@@ -177,7 +186,12 @@ export function PaymentsAdminPage() {
                   </td>
                   <td className="py-3 pr-4">{payment.studentName}</td>
                   <td className="py-3 pr-4 font-semibold">{formatCurrency(payment.amount, payment.currency)}</td>
-                  <td className="py-3 pr-4 text-secondary-text">{formatPlatformDateTime(payment.dueAt)}</td>
+                  <td className="py-3 pr-4 text-secondary-text">
+                    {/* Date-only due dates (registration fees) have no meaningful time. */}
+                    {payment.dueAt.length === 10
+                      ? new Date(`${payment.dueAt}T00:00:00`).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+                      : formatPlatformDateTime(payment.dueAt)}
+                  </td>
                   <td className="py-3 pr-4 capitalize">{payment.category.replace('-', ' ')}</td>
                   <td className="py-3 pr-4">
                     <StatusPill label={payment.status} tone={statusTone[payment.status]} />
@@ -189,9 +203,12 @@ export function PaymentsAdminPage() {
                           Mark paid
                         </Button>
                       ) : null}
-                      <Button variant="ghost" size="sm" onClick={() => { deletePayment(payment.id); notify('Invoice removed.') }}>
-                        <Trash2 size={13} />
-                      </Button>
+                      {/* A registration invoice belongs to a cohort seat: cancel the registration instead. */}
+                      {(payment as PaymentRecord & { registrationId?: string }).registrationId ? null : (
+                        <Button variant="ghost" size="sm" onClick={() => { deletePayment(payment.id); notify('Invoice removed.') }}>
+                          <Trash2 size={13} />
+                        </Button>
+                      )}
                     </div>
                   </td>
                 </tr>

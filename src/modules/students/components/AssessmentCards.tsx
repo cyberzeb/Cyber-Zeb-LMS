@@ -1,3 +1,4 @@
+import { vocab } from '../../../shared/i18n/editionGlossary'
 import {
   BadgeCheck,
   CalendarDays,
@@ -393,7 +394,7 @@ export function GradesFeedbackCard({ grades }: Pick<AssessmentCardsProps, 'grade
       <GlassCard className="p-10 text-center">
         <BadgeCheck size={32} className="mx-auto text-navy-300 mb-3" />
         <p className="text-[14px] font-semibold text-navy-900">No grades yet</p>
-        <p className="text-[12.5px] text-secondary-text mt-1">Grades will appear here once instructors post them.</p>
+        <p className="text-[12.5px] text-secondary-text mt-1">{vocab('Grades will appear here once instructors post them.')}</p>
       </GlassCard>
     )
   }

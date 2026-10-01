@@ -39,6 +39,9 @@ export function StudentLayout() {
   // Corporate employees have no transcript, GPA or tuition: those belong to a
   // university's academic record, not to workplace training.
   const isCorporate = edition === 'corporate'
+  // Training learners follow cohorts of a program; they have no transcript either.
+  const isTraining = edition === 'training_organization'
+  const noTranscript = edition !== 'university'
   const session = readPortalSession()
   const person = getSessionPerson()
 
@@ -52,9 +55,14 @@ export function StudentLayout() {
     '/student/live-classes': 'Live Training',
     '/student/certificates': 'Certifications',
   }
+  const trainingBreadcrumbs: Record<string, string> = {
+    '/student/programs': 'My Programs',
+    '/student/grades': 'My Results',
+    '/student/live-classes': 'Live Sessions',
+  }
   const breadcrumb = path.includes('/courses/') && path.includes('/learn')
     ? 'Learning'
-    : (isCorporate ? corporateBreadcrumbs[path] : undefined) ??
+    : (isCorporate ? corporateBreadcrumbs[path] : isTraining ? trainingBreadcrumbs[path] : undefined) ??
       breadcrumbLabels[path] ??
       'Dashboard'
 
@@ -81,6 +89,13 @@ export function StudentLayout() {
           to: '/student',
           active: isActive('/student'),
           icon: <LayoutDashboard size={ICON_SIZE} />,
+        },
+        {
+          label: 'My Programs',
+          to: '/student/programs',
+          active: isActive('/student/programs'),
+          icon: <GraduationCap size={ICON_SIZE} />,
+          show: isTraining,
         },
         {
           label: 'Courses',
@@ -124,7 +139,7 @@ export function StudentLayout() {
           icon: <CalendarDays size={ICON_SIZE} />,
         },
         {
-          label: isCorporate ? 'My Results' : 'Grades',
+          label: noTranscript ? 'My Results' : 'Grades',
           to: '/student/grades',
           active: isActive('/student/grades'),
           icon: <GraduationCap size={ICON_SIZE} />,
@@ -134,7 +149,7 @@ export function StudentLayout() {
           to: '/student/transcript',
           active: isActive('/student/transcript'),
           icon: <ScrollText size={ICON_SIZE} />,
-          show: !isCorporate,
+          show: !noTranscript,
         },
         {
           label: 'Attendance',

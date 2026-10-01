@@ -5,6 +5,7 @@ backend/seed_data/*.json.
 One demo tenant per edition, so each can be signed into and shown:
   berana  — Berana University (college_university)
   horizon — Horizon Bank      (corporate)
+  apex    — Apex Training Institute (training)
 
 Usage (from backend/):
     python scripts/seed_db.py             # every edition
@@ -50,6 +51,7 @@ class DemoTenant:
 DEMO_TENANTS = [
     DemoTenant("university", "berana", "Berana University", "demo.json", TenantType.COLLEGE_UNIVERSITY),
     DemoTenant("corporate", "horizon", "Horizon Bank", "corporate.json", TenantType.CORPORATE),
+    DemoTenant("training", "apex", "Apex Training Institute", "training.json", TenantType.TRAINING),
 ]
 
 # Kept for callers that still import these.

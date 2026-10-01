@@ -1,4 +1,4 @@
-export type AnnouncementTargetRole = 'Student' | 'Instructor' | 'Staff' | 'Admin' | 'Guardian'
+export type AnnouncementTargetRole = 'Student' | 'Instructor' | 'Staff' | 'Admin' | 'Guardian' | 'Manager'
 
 export type AnnouncementPriority = 'normal' | 'important'
 
@@ -74,4 +74,27 @@ export const ANNOUNCEMENT_TARGET_ROLE_LABELS: Record<AnnouncementTargetRole, str
   Staff: 'Staff',
   Admin: 'Administrators',
   Guardian: 'Guardians',
+  Manager: 'Managers',
+}
+
+/** Who an announcement can target in each edition, with the edition's own words. */
+export function announcementRolesFor(edition: string): { role: AnnouncementTargetRole; label: string }[] {
+  if (edition === 'corporate') {
+    return [
+      { role: 'Student', label: 'Employees' },
+      { role: 'Instructor', label: 'Trainers' },
+      { role: 'Manager', label: 'Managers' },
+      { role: 'Staff', label: 'HR & staff' },
+      { role: 'Admin', label: 'Administrators' },
+    ]
+  }
+  if (edition === 'training_organization') {
+    return [
+      { role: 'Student', label: 'Learners' },
+      { role: 'Instructor', label: 'Trainers' },
+      { role: 'Staff', label: 'Staff' },
+      { role: 'Admin', label: 'Administrators' },
+    ]
+  }
+  return ALL_ANNOUNCEMENT_TARGET_ROLES.map((role) => ({ role, label: ANNOUNCEMENT_TARGET_ROLE_LABELS[role] }))
 }

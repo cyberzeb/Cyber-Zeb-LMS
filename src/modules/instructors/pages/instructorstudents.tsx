@@ -1,3 +1,4 @@
+import { useLanguage } from '../../../shared/i18n/LanguageProvider'
 import { useMemo, useState } from 'react'
 import { AlertTriangle, Mail, Search, UserRound, Users } from 'lucide-react'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
@@ -25,6 +26,7 @@ const statusLabel: Record<StudentRosterItem['status'], string> = {
 }
 
 export function InstructorStudentsPage() {
+  const { tx } = useLanguage()
   const { data, isLoading, isError } = useInstructorDashboard()
   const [activeTab, setActiveTab] = useState('All')
 
@@ -94,7 +96,7 @@ export function InstructorStudentsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <FilterTabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
         <span className="text-[12px] text-secondary-text">
-          {filtered.length} student{filtered.length === 1 ? '' : 's'}
+          {tx(`${filtered.length} student${filtered.length === 1 ? '' : 's'}`)}
         </span>
       </div>
 

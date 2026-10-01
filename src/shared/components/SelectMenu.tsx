@@ -1,3 +1,4 @@
+import { useLanguage } from '../i18n/LanguageProvider'
 import { useEffect, useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 
@@ -24,6 +25,7 @@ export function SelectMenu({
   className = '',
   'aria-label': ariaLabel,
 }: SelectMenuProps) {
+  const { tx } = useLanguage()
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -49,7 +51,7 @@ export function SelectMenu({
         onClick={() => setOpen((prev) => !prev)}
         className="inline-flex items-center justify-between gap-2 h-9 w-full min-w-[220px] rounded-lg border border-divider bg-white dark:bg-navy-50 px-3 text-[12.5px] text-navy-900 hover:border-navy-200 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25 transition-colors"
       >
-        <span className="truncate text-left">{selected?.label ?? placeholder}</span>
+        <span className="truncate text-left">{tx(selected?.label ?? placeholder)}</span>
         <ChevronDown
           size={14}
           className={`shrink-0 text-secondary-text transition-transform ${open ? 'rotate-180' : ''}`}
@@ -77,7 +79,7 @@ export function SelectMenu({
                       : 'text-navy-900 hover:bg-navy-50 dark:hover:bg-[#111b2e]'
                   }`}
                 >
-                  <span className="block truncate">{opt.label}</span>
+                  <span className="block truncate">{tx(opt.label)}</span>
                   {opt.hint ? (
                     <span className="block text-[10px] text-secondary-text mt-0.5">{opt.hint}</span>
                   ) : null}

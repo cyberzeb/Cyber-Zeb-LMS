@@ -108,10 +108,40 @@ class ScopeContext:
         }
         return {i for i in ids if i}
 
+    async def managed_team_ids(self) -> set[str]:
+        """Corporate: teams whose manager is this person."""
+        return {t.get("id") for t in await self._list("teams") if t.get("managerId") == self.person_id}
+
+    async def managed_employee_ids(self) -> set[str]:
+        """Corporate: everyone on the teams this person manages (not themselves)."""
+        teams = await self.managed_team_ids()
+        if not teams:
+            return set()
+        return {
+            p["id"]
+            for p in await self._list("people")
+            if p.get("teamId") in teams and p.get("id") and p.get("id") != self.person_id
+        }
+
+    async def led_cohort_ids(self) -> set[str]:
+        """Training: cohorts this person is the trainer of."""
+        return {c.get("id") for c in await self._list("cohorts") if c.get("trainerId") == self.person_id}
+
+    async def learner_cohort_ids(self) -> set[str]:
+        """Training: cohorts the learners this person follows have a seat in."""
+        learners = await self.learner_ids()
+        return {
+            r.get("cohortId")
+            for r in await self._list("cohort-registrations")
+            if r.get("studentId") in learners and r.get("status") in ("pending_payment", "enrolled")
+        }
+
     async def learner_ids(self) -> set[str]:
         """The student ids whose records this person may see as "their own"."""
         if self.role == Role.PARENT_GUARDIAN:
             return await self.children_ids()
+        if self.role == Role.MANAGER:
+            return await self.managed_employee_ids()
         return {self.person_id}
 
     async def student_course_ids(self) -> set[str]:
@@ -133,6 +163,13 @@ class ScopeContext:
             for o in await self._list("course-offerings")
             if o.get("primaryInstructorId") == self.person_id
         }
+        # Training: a cohort's trainer teaches every course of its program.
+        led = await self.led_cohort_ids()
+        if led:
+            programs = {c.get("programId") for c in await self._list("cohorts") if c.get("id") in led}
+            for program in await self._list("training-programs"):
+                if program.get("id") in programs:
+                    ids |= {str(c) for c in program.get("courseIds") or []}
         return {i for i in ids if i}
 
     async def my_course_ids(self) -> set[str]:
@@ -142,7 +179,11 @@ class ScopeContext:
 
     async def taught_student_ids(self) -> set[str]:
         courses = await self.taught_course_ids()
-        return {e.get("studentId") for e in await self._list("enrollments") if e.get("courseId") in courses}
+        ids = {e.get("studentId") for e in await self._list("enrollments") if e.get("courseId") in courses}
+        led = await self.led_cohort_ids()
+        if led:
+            ids |= {r.get("studentId") for r in await self._list("cohort-registrations") if r.get("cohortId") in led}
+        return ids
 
     async def assessment_ids(self, course_ids: set[str]) -> set[str]:
         ids: set[str] = set()
@@ -191,6 +232,8 @@ async def _people_view(data: list[Record], ctx: ScopeContext) -> list[Record]:
     full_ids = {ctx.person_id}
     if role == Role.PARENT_GUARDIAN:
         full_ids |= await ctx.children_ids()
+    elif role == Role.MANAGER:
+        full_ids |= await ctx.managed_employee_ids()
     elif role in TEACHING_ROLES:
         full_ids |= await ctx.taught_student_ids()
     return [p if p.get("id") in full_ids else _directory(p) for p in data]
@@ -252,6 +295,30 @@ async def filter_collection(key: str, data: Any, ctx: ScopeContext) -> Any:
     if key == "announcements":
         return records
 
+    if key == "cohort-registrations":
+        if role in (Role.STUDENT, Role.PARENT_GUARDIAN):
+            learners = await ctx.learner_ids()
+            return [r for r in records if r.get("studentId") in learners]
+        if role in TEACHING_ROLES:
+            led = await ctx.led_cohort_ids()
+            return [r for r in records if r.get("cohortId") in led]
+        return []
+
+    if key == "cohort-attendance":
+        if role in (Role.STUDENT, Role.PARENT_GUARDIAN):
+            # Their own mark only; classmates' marks stay private.
+            learners = await ctx.learner_ids()
+            cohorts = await ctx.learner_cohort_ids()
+            return [
+                {**r, "marks": {k: v for k, v in (r.get("marks") or {}).items() if k in learners}}
+                for r in records
+                if r.get("cohortId") in cohorts
+            ]
+        if role in TEACHING_ROLES:
+            led = await ctx.led_cohort_ids()
+            return [r for r in records if r.get("cohortId") in led]
+        return []
+
     if key == "forum-messages":
         chats = await ctx.visible_chat_ids()
         return [r for r in records if r.get("chatId") in chats]
@@ -275,6 +342,15 @@ async def filter_collection(key: str, data: Any, ctx: ScopeContext) -> Any:
                 for r in records
                 if r.get("id") in quiz_questions
             ]
+        return []
+
+    if role == Role.MANAGER:
+        # A line manager follows the training of their own team members.
+        team = await ctx.managed_employee_ids()
+        if key in ("enrollments", "student-submissions", "attendances", "certificates"):
+            return [r for r in records if r.get("studentId") in team]
+        if key in ("live-sessions", "assignments", "quizzes"):
+            return records
         return []
 
     if role in TEACHING_ROLES:

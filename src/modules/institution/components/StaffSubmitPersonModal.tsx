@@ -1,3 +1,4 @@
+import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
 import { guardianLinkFields } from '../../../shared/people/guardianLinks'
 import { useEffect, useMemo, useState } from 'react'
 import { UserPlus } from 'lucide-react'
@@ -20,7 +21,9 @@ interface StaffSubmitPersonModalProps {
   onSubmit: (person: PersonRow) => void
 }
 
-const roleOptions: PersonRole[] = ['Student', 'Instructor', 'Guardian']
+// Guardians exist only in the University Edition; companies submit managers instead.
+const roleOptionsFor = (edition: string): PersonRole[] =>
+  edition === 'corporate' ? ['Student', 'Instructor', 'Manager'] : ['Student', 'Instructor', 'Guardian']
 
 function initialsFromName(name: string): string {
   return name
@@ -42,6 +45,7 @@ export function StaffSubmitPersonModal({
   onClose,
   onSubmit,
 }: StaffSubmitPersonModalProps) {
+  const { edition } = useOrganizationConfig()
   const [form, setForm] = useState({
     role: 'Student' as PersonRole,
     name: '',
@@ -142,7 +146,7 @@ export function StaffSubmitPersonModal({
         label="Person Type"
         type="select"
         value={form.role}
-        options={roleOptions}
+        options={roleOptionsFor(edition)}
         onChange={(v) => setForm({ ...form, role: v as PersonRole })}
       />
       <FormField
