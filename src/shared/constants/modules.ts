@@ -57,7 +57,7 @@ export const MODULE_CATALOG: ModuleInfo[] = [
   {
     key: 'academic_structure',
     label: 'Academic / Training Structure',
-    description: 'Colleges, departments, programs and the academic calendar.',
+    description: 'Campuses, departments, programs and the academic calendar.',
   },
   {
     key: 'course_catalog_authoring',

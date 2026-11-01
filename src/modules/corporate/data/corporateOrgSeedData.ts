@@ -1,8 +1,7 @@
-import type { CampusRecord, College, Department } from '../../institution/types'
+import type { CampusRecord, Department } from '../../institution/types'
 
 /** Shared default location id for corporate org (head office). */
 export const CORPORATE_DEFAULT_CAMPUS_ID = 'c1'
-export const CORPORATE_DEFAULT_COLLEGE_ID = 'col1'
 
 export const seedCorporateCampuses: CampusRecord[] = [
   {
@@ -31,17 +30,6 @@ export const seedCorporateCampuses: CampusRecord[] = [
   },
 ]
 
-/** Minimal org grouping shim — not surfaced in corporate UI. */
-export const seedCorporateColleges: College[] = [
-  {
-    id: CORPORATE_DEFAULT_COLLEGE_ID,
-    name: 'Horizon Bank',
-    deanName: 'Executive Leadership',
-    campusId: CORPORATE_DEFAULT_CAMPUS_ID,
-    description: 'Enterprise operating structure',
-  },
-]
-
 export const seedCorporateDepartments: Department[] = [
   {
     id: 'd1',
@@ -51,7 +39,6 @@ export const seedCorporateDepartments: Department[] = [
     facultyCount: 0,
     icon: '🏦',
     campusId: CORPORATE_DEFAULT_CAMPUS_ID,
-    collegeId: CORPORATE_DEFAULT_COLLEGE_ID,
     description: 'Branches, contact center, and customer-facing operations.',
     status: 'active',
   },
@@ -63,7 +50,6 @@ export const seedCorporateDepartments: Department[] = [
     facultyCount: 0,
     icon: '📱',
     campusId: CORPORATE_DEFAULT_CAMPUS_ID,
-    collegeId: CORPORATE_DEFAULT_COLLEGE_ID,
     description: 'Mobile banking, internet banking, and digital product teams.',
     status: 'active',
   },
@@ -75,7 +61,6 @@ export const seedCorporateDepartments: Department[] = [
     facultyCount: 0,
     icon: '🛡️',
     campusId: CORPORATE_DEFAULT_CAMPUS_ID,
-    collegeId: CORPORATE_DEFAULT_COLLEGE_ID,
     description: 'AML, KYC, regulatory reporting, and internal audit support.',
     status: 'active',
   },
@@ -87,7 +72,6 @@ export const seedCorporateDepartments: Department[] = [
     facultyCount: 0,
     icon: '👥',
     campusId: CORPORATE_DEFAULT_CAMPUS_ID,
-    collegeId: CORPORATE_DEFAULT_COLLEGE_ID,
     description: 'Workforce planning, onboarding, and enterprise learning.',
     status: 'active',
   },
@@ -99,7 +83,6 @@ export const seedCorporateDepartments: Department[] = [
     facultyCount: 0,
     icon: '💻',
     campusId: CORPORATE_DEFAULT_CAMPUS_ID,
-    collegeId: CORPORATE_DEFAULT_COLLEGE_ID,
     description: 'Core banking systems, infrastructure, and cybersecurity.',
     status: 'active',
   },

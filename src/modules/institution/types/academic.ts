@@ -65,6 +65,9 @@ export interface CourseOfferingRecord {
   courseTitle: string
   departmentId: string
   departmentName: string
+  /** Program whose curriculum this section serves (owned by the department). */
+  programId?: string
+  programName?: string
   /** Target study year (Year 1, Year 2, …) within the department program */
   studyYear: number
   /** Semester within that study year (1 = first semester, 2 = second, …) */
@@ -94,7 +97,7 @@ export interface CourseOfferingRecord {
 /** Ordered University Edition setup steps (configuration phase). */
 export const UNIVERSITY_SETUP_STEPS = [
   { id: 'profile', title: 'University Setup', subtitle: 'Name, timezone and regional settings' },
-  { id: 'structure', title: 'Academic Structure', subtitle: 'Campuses, colleges and departments with program duration' },
+  { id: 'structure', title: 'Academic Structure', subtitle: 'Campuses and departments with program duration' },
   { id: 'calendar', title: 'Academic Year / Term', subtitle: 'Define calendar and current term' },
   { id: 'catalog', title: 'Course Catalog', subtitle: 'Reusable courses without term binding' },
   { id: 'offerings', title: 'Course Offerings', subtitle: 'Sections by department, study year, and program semester' },

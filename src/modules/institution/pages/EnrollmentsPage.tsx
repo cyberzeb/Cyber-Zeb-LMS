@@ -19,9 +19,9 @@ import {
   syncOfferingEnrollmentCounts,
 } from '../utils/offeringUtils'
 import { useCampusContext } from '../context/CampusContext'
+import { usePrograms } from '../hooks/usePrograms'
+import { programSemesters, programYears } from '../utils/programUtils'
 import {
-  departmentMaxYears,
-  departmentSemestersPerYear,
   formatProgramSemester,
   formatProgramSlot,
   formatStudyYear,
@@ -46,7 +46,9 @@ export function EnrollmentsPage() {
   const { courses, setCourses } = useCourses()
   const { offerings, setOfferings } = useCourseOfferings()
 
-  const [departmentId, setDepartmentId] = useState('')
+  const { programs } = usePrograms()
+  // A cohort is one program's year/semester slot.
+  const [programId, setProgramId] = useState('')
   const [studyYear, setStudyYear] = useState('1')
   const [programSemester, setProgramSemester] = useState('1')
   const [tableFilter, setTableFilter] = useState('')
@@ -58,21 +60,21 @@ export function EnrollmentsPage() {
     [people],
   )
 
-  const selectedDepartment = departments.find((d) => d.id === departmentId)
+  const selectedProgram = programs.find((p) => p.id === programId)
   const yearNum = Number(studyYear) || 1
   const semesterNum = Number(programSemester) || 1
-  const maxYears = departmentMaxYears(selectedDepartment)
-  const semestersPerYear = departmentSemestersPerYear(selectedDepartment)
+  const maxYears = programYears(selectedProgram)
+  const semestersPerYear = programSemesters(selectedProgram)
 
   const cohortStudents = useMemo(() => {
-    if (!departmentId) return []
-    return getStudentsForProgramSlot(students, departmentId, yearNum, semesterNum, departments)
-  }, [students, departmentId, yearNum, semesterNum, departments])
+    if (!programId) return []
+    return getStudentsForProgramSlot(students, programId, yearNum, semesterNum, programs, departments)
+  }, [students, programId, yearNum, semesterNum, programs, departments])
 
   const catalogOfferings = useMemo(() => {
-    if (!departmentId) return []
-    return getOfferingsForProgramSlot(normalizedOfferings, departmentId, yearNum, semesterNum)
-  }, [normalizedOfferings, departmentId, yearNum, semesterNum])
+    if (!programId) return []
+    return getOfferingsForProgramSlot(normalizedOfferings, programId, yearNum, semesterNum, programs)
+  }, [normalizedOfferings, programId, yearNum, semesterNum, programs])
 
   useEffect(() => {
     setCourses((prev) => syncCourseEnrollmentCounts(prev, enrollments))
@@ -80,8 +82,8 @@ export function EnrollmentsPage() {
   }, [enrollments, setCourses, setOfferings])
 
   const handleCohortEnroll = () => {
-    if (!departmentId) {
-      notify('Select a department.', 'error')
+    if (!programId) {
+      notify('Select a program.', 'error')
       return
     }
     if (catalogOfferings.length === 0) {
@@ -94,7 +96,7 @@ export function EnrollmentsPage() {
     }
 
     const result = bulkEnrollCohort(
-      { departmentId, studyYear: yearNum, programSemester: semesterNum },
+      { programId, studyYear: yearNum, programSemester: semesterNum },
       cohortStudents,
       catalogOfferings,
     )
@@ -161,15 +163,15 @@ export function EnrollmentsPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">Department</label>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Program</label>
             <SelectMenu
-              value={departmentId}
-              onChange={setDepartmentId}
-              placeholder="Select department"
-              options={departments.map((d) => ({
-                value: d.id,
-                label: d.name,
-                hint: d.programCode,
+              value={programId}
+              onChange={setProgramId}
+              placeholder="Select program"
+              options={programs.map((p) => ({
+                value: p.id,
+                label: p.name,
+                hint: p.department,
               }))}
             />
           </div>
@@ -197,7 +199,7 @@ export function EnrollmentsPage() {
           </div>
         </div>
 
-        {departmentId ? (
+        {programId ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="rounded-xl border border-divider/70 bg-navy-50/30 p-4 space-y-3">
               <div className="flex items-center gap-2 text-[13px] font-extrabold text-navy-900">
@@ -248,7 +250,7 @@ export function EnrollmentsPage() {
         <div className="flex justify-end pt-2 border-t border-slate-200/60">
           <Button
             onClick={handleCohortEnroll}
-            disabled={!departmentId || cohortStudents.length === 0 || catalogOfferings.length === 0}
+            disabled={!programId || cohortStudents.length === 0 || catalogOfferings.length === 0}
           >
             Enroll cohort
           </Button>

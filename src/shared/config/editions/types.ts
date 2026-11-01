@@ -52,7 +52,6 @@ export interface TerminologyMap {
  */
 export interface EditionModules {
   campuses: boolean
-  colleges: boolean
   programs: boolean
   students: boolean
   instructors: boolean

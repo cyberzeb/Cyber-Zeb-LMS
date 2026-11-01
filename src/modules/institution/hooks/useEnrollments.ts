@@ -129,7 +129,7 @@ export function useEnrollments() {
 
   const bulkEnrollCohort = useCallback(
     (
-      _params: { departmentId: string; studyYear: number; programSemester: number },
+      _params: { programId: string; studyYear: number; programSemester: number },
       students: PersonRow[],
       offerings: CourseOfferingRecord[],
     ): BulkEnrollCohortResult => {

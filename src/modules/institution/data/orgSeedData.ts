@@ -1,7 +1,6 @@
-import type { CampusRecord, College, Department } from '../types'
+import type { CampusRecord, Department } from '../types'
 
 export const DEFAULT_CAMPUS_ID = 'c1'
-export const DEFAULT_COLLEGE_ID = 'col1'
 
 export const seedCampuses: CampusRecord[] = [
   {
@@ -22,23 +21,6 @@ export const seedCampuses: CampusRecord[] = [
   },
 ]
 
-export const seedColleges: College[] = [
-  {
-    id: 'col1',
-    name: 'College of Computing & IT',
-    deanName: 'Dr. Aaron Selassie',
-    campusId: 'c1',
-    description: 'Computer science, software engineering, and information technology',
-  },
-  {
-    id: 'col2',
-    name: 'College of Business',
-    deanName: 'Dr. Martha Bekele',
-    campusId: 'c1',
-    description: 'Business administration, management, and finance',
-  },
-]
-
 export const seedDepartments: Department[] = [
   {
     id: 'd1',
@@ -49,11 +31,6 @@ export const seedDepartments: Department[] = [
     facultyCount: 18,
     icon: '',
     campusId: 'c1',
-    collegeId: 'col1',
-    programCode: 'BSC-CS',
-    programLevel: 'Undergraduate',
-    maxYears: 4,
-    semestersPerYear: 2,
   },
   {
     id: 'd2',
@@ -64,11 +41,6 @@ export const seedDepartments: Department[] = [
     facultyCount: 12,
     icon: '',
     campusId: 'c1',
-    collegeId: 'col1',
-    programCode: 'BSC-SE',
-    programLevel: 'Undergraduate',
-    maxYears: 4,
-    semestersPerYear: 2,
   },
   {
     id: 'd3',
@@ -79,11 +51,6 @@ export const seedDepartments: Department[] = [
     facultyCount: 8,
     icon: '',
     campusId: 'c1',
-    collegeId: 'col1',
-    programCode: 'BSC-IT',
-    programLevel: 'Undergraduate',
-    maxYears: 4,
-    semestersPerYear: 2,
   },
   {
     id: 'd4',
@@ -94,10 +61,5 @@ export const seedDepartments: Department[] = [
     facultyCount: 16,
     icon: '',
     campusId: 'c1',
-    collegeId: 'col2',
-    programCode: 'BBA',
-    programLevel: 'Undergraduate',
-    maxYears: 4,
-    semestersPerYear: 2,
   },
 ]

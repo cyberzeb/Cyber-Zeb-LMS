@@ -3,6 +3,7 @@ import { Clock, FileText, MessageSquareText, Plus, UploadCloud } from 'lucide-re
 import { Button } from '../../../shared/components/Button'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { useTeachingPermissions } from '../../../shared/auth/rolePermissions'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { Monogram } from '../../../shared/components/Monogram'
@@ -25,6 +26,8 @@ const statusTone: Record<AssignmentSubmission['status'], 'warning' | 'success' |
 
 export function InstructorAssignmentsPage() {
   const { data, isLoading, isError, reload } = useInstructorDashboard()
+  // Assistants grade submissions; only instructors create assignments.
+  const { canAuthor } = useTeachingPermissions()
   const [activeTab, setActiveTab] = useState('All')
   const [createOpen, setCreateOpen] = useState(false)
   const [gradeTarget, setGradeTarget] = useState<{ id: string; title: string; maxPoints: number } | null>(null)
@@ -60,10 +63,12 @@ export function InstructorAssignmentsPage() {
         title="Assignment Submissions"
         subtitle="Review student uploads, provide feedback, and publish grades."
         actions={
-          <Button variant="primary" onClick={() => setCreateOpen(true)}>
-            <Plus size={15} />
-            Create assignment
-          </Button>
+          canAuthor ? (
+            <Button variant="primary" onClick={() => setCreateOpen(true)}>
+              <Plus size={15} />
+              Create assignment
+            </Button>
+          ) : undefined
         }
       />
 
@@ -121,10 +126,12 @@ export function InstructorAssignmentsPage() {
         <GlassCard className="p-10 text-center">
           <FileText size={32} className="mx-auto text-navy-300 mb-3" />
           <p className="text-[14px] font-semibold text-navy-900">No assignments in this view</p>
-          <Button variant="primary" className="mt-4" onClick={() => setCreateOpen(true)}>
-            <Plus size={15} />
-            Create assignment
-          </Button>
+          {canAuthor ? (
+            <Button variant="primary" className="mt-4" onClick={() => setCreateOpen(true)}>
+              <Plus size={15} />
+              Create assignment
+            </Button>
+          ) : null}
         </GlassCard>
       ) : null}
 

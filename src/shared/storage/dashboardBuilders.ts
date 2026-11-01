@@ -69,7 +69,7 @@ function emptyStudentDashboard(student: PersonRow): StudentDashboardData {
     studentName: student.name,
     email: student.email,
     department: student.department,
-    program: student.department,
+    program: studentProgramName(student),
     term: currentPeriod(),
     standing: 'Not enrolled yet',
     stats: [
@@ -142,6 +142,7 @@ function enrollmentToCourse(
     instructor: course?.instructor ?? 'Unassigned',
     progress,
     nextSession: course?.startDate ?? 'Schedule TBA',
+    thumbnailUrl: course?.thumbnailUrl,
     credits: course?.credits ?? 3,
     status: allComplete
       ? ('completed' as const)
@@ -632,7 +633,7 @@ export function buildInstitutionOverview(): InstitutionOverviewData {
     {
       id: 'structure',
       title: 'Academic Structure',
-      subtitle: 'Campuses, colleges and departments',
+      subtitle: 'Campuses and departments',
       done: campusRecords.length > 0 && departments.length > 0,
       href: '/admin/institution/structure',
     },
@@ -998,6 +999,7 @@ import {
   computeOrganizationComplianceRate,
   countOverdueEnrollments,
 } from '../../modules/corporate/utils/complianceUtils'
+import { studentProgramName } from '../../modules/institution/utils/programUtils'
 
 export function buildCorporateOverviewData(): CorporateOverviewData {
 

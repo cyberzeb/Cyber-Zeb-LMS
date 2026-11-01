@@ -1,3 +1,4 @@
+import { ROLE_LABELS } from '../../../shared/auth/portalRoutes'
 import { useMemo, useState } from 'react'
 import { MailPlus, Plus, Upload } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
@@ -210,6 +211,7 @@ export function PeoplePage({ focus = 'all' }: PeoplePageProps) {
               type="select"
               value={form.role}
               options={roleOptions}
+              optionLabels={ROLE_LABELS}
               onChange={(v) => setForm({ ...form, role: v as PersonRole })}
             />
           )}

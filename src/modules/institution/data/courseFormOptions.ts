@@ -8,6 +8,7 @@ import type {
   CourseVisibility,
 } from '../types'
 import { UNASSIGNED_DEPARTMENT, courseLevelOptions } from './courseSeedData'
+import { isPersistentImageUrl } from '../../../shared/utils/imageUtils'
 
 export const courseDeliveryModeOptions: CourseDeliveryMode[] = [
   'Self-paced',
@@ -91,7 +92,7 @@ export function computeCourseProgress(input: Pick<
   if (input.code.trim()) score += 10
   if (input.description?.trim()) score += 10
   if (input.learningOutcomes?.trim()) score += 10
-  if (input.thumbnailUrl?.trim()) score += 5
+  if (isPersistentImageUrl(input.thumbnailUrl)) score += 5
   if (input.syllabusUrl?.trim()) score += 5
   if ((input.modules?.length ?? 0) > 0) score += 20
   if ((input.videos?.length ?? 0) > 0) score += 15
@@ -197,7 +198,8 @@ export function courseInputToRecordFields(
     modules,
     videos: input.videos ?? [],
     resources: input.resources ?? [],
-    thumbnailUrl: input.thumbnailUrl?.trim() || undefined,
+    // Temporary blob: links never survive a reload, so they are not saved.
+    thumbnailUrl: isPersistentImageUrl(input.thumbnailUrl) ? input.thumbnailUrl.trim() : undefined,
     syllabusUrl: input.syllabusUrl?.trim() || undefined,
     maxEnrollment: input.maxEnrollment,
     allowSelfEnrollment: input.allowSelfEnrollment,

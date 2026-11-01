@@ -5,14 +5,16 @@ import { FilterTabs } from '../../../shared/components/FilterTabs'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
-import { Monogram } from '../../../shared/components/Monogram'
+import { CourseCover } from '../../../shared/components/CourseCover'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { CourseCreateModal } from '../../institution/components/CourseCreateModal'
 import { useCourses } from '../../institution/hooks/useCourses'
+import { courseTeachesInstructor } from '../../institution/utils/courseAssignmentUtils'
 import type { CourseCreateInput, CourseRecord } from '../../institution/types'
 import { getSessionPerson } from '../../../shared/storage/session'
 import { useLanguage } from '../../../shared/i18n/LanguageProvider'
+import { useTeachingPermissions } from '../../../shared/auth/rolePermissions'
 
 const tabs = ['All', 'Approved', 'Pending approval', 'Rejected']
 
@@ -34,6 +36,7 @@ function resolveApprovalStatus(course: CourseRecord) {
 
 export function InstructorCoursesPage() {
   const { t } = useLanguage()
+  const { canAuthor } = useTeachingPermissions()
   const { notify } = useToast()
   const instructor = getSessionPerson()
   const { courses, submitInstructorCourse, updateCourseFromInput, updateCourse } = useCourses()
@@ -43,11 +46,8 @@ export function InstructorCoursesPage() {
 
   const myCourses = useMemo(() => {
     if (!instructor) return []
-    return courses.filter(
-      (c) =>
-        c.submittedByInstructorId === instructor.id ||
-        c.instructor === instructor.name,
-    )
+    // Instructors see the courses they teach or proposed; assistants their assigned ones.
+    return courses.filter((c) => courseTeachesInstructor(c, instructor.id, instructor.name))
   }, [courses, instructor])
 
   const filtered = useMemo(() => {
@@ -128,10 +128,12 @@ export function InstructorCoursesPage() {
         title="My Courses"
         subtitle={t('page.coursesInstructor.sub', { count: myCourses.length })}
         actions={
-          <Button variant="primary" onClick={openCreate}>
-            <Plus size={15} />
-            Propose course
-          </Button>
+          canAuthor ? (
+            <Button variant="primary" onClick={openCreate}>
+              <Plus size={15} />
+              Propose course
+            </Button>
+          ) : undefined
         }
       />
 
@@ -160,10 +162,16 @@ export function InstructorCoursesPage() {
         <GlassCard className="p-10 text-center">
           <BookOpen size={32} className="mx-auto text-navy-300 mb-3" />
           <p className="text-[14px] font-semibold text-navy-900">No courses in this view</p>
-          <Button variant="primary" className="mt-4" onClick={openCreate}>
-            <Plus size={15} />
-            Propose course
-          </Button>
+          {canAuthor ? (
+            <Button variant="primary" className="mt-4" onClick={openCreate}>
+              <Plus size={15} />
+              Propose course
+            </Button>
+          ) : (
+            <p className="text-[12.5px] text-secondary-text mt-2">
+              Ask the registrar to assign you to a course.
+            </p>
+          )}
         </GlassCard>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
@@ -176,9 +184,10 @@ export function InstructorCoursesPage() {
                   approval === 'pending' ? 'border-l-warning' : approval === 'rejected' ? 'border-l-danger' : 'border-l-lemon-500'
                 }`}
               >
+                <CourseCover title={course.title} code={course.code} thumbnailUrl={course.thumbnailUrl} />
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-3">
-                    <Monogram label={course.code} size="md" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-secondary-text">{course.code}</span>
                     <div className="flex flex-col items-end gap-1.5">
                       <StatusPill label={approvalLabel[approval]} tone={approvalTone[approval]} />
                       <StatusPill label={course.status === 'published' ? 'Published' : 'Draft'} tone={course.status === 'published' ? 'success' : 'neutral'} />
@@ -198,7 +207,11 @@ export function InstructorCoursesPage() {
                       <div className="h-full rounded-full bg-lemon-500" style={{ width: `${course.progressPercent}%` }} />
                     </div>
                   </div>
-                  {approval !== 'pending' ? (
+                  {!canAuthor ? (
+                    <p className="mt-4 text-[11.5px] text-secondary-text text-center">
+                      Teaching assistant · instructor {course.instructor}
+                    </p>
+                  ) : approval !== 'pending' ? (
                     <Button variant="secondary" size="sm" className="w-full mt-4" onClick={() => openEdit(course)}>
                       {approval === 'rejected' ? 'Revise & resubmit' : 'Manage course'}
                     </Button>

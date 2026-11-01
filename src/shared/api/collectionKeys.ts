@@ -2,7 +2,6 @@
 export const STORAGE_TO_API_KEY: Record<string, string> = {
   'berana:people': 'people',
   'berana:campuses': 'campuses',
-  'berana:colleges': 'colleges',
   'berana:departments': 'departments',
   'berana:programs': 'programs',
   'berana:academic-years': 'academic-years',

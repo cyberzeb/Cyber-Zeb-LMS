@@ -9,6 +9,7 @@ email-validator==2.2.0
 
 # --- Database ---
 sqlalchemy==2.0.35
+greenlet==3.1.1  # SQLAlchemy async needs it; not auto-installed on Python 3.13+
 asyncpg==0.30.0
 aiosqlite==0.20.0
 alembic==1.13.3

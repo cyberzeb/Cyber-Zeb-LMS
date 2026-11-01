@@ -2,21 +2,16 @@ import type { NavSection } from '../shared/layout/Sidebar'
 import { Sidebar } from '../shared/layout/Sidebar'
 import { AdminTopHeader } from '../shared/layout/AdminTopHeader'
 import { AdminFooter } from '../shared/layout/AdminFooter'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { LockedModuleGate } from '../shared/components/LockedModuleGate'
-import { useEffect, useState } from 'react'
 import brandLogo from '../assets/Logo.jpg'
 import { canUsePortal } from '../shared/auth/portalRoutes'
+import { ADMIN_ROLE_TITLES, canOpenAdminPage, isAdminPortalRole } from '../shared/auth/rolePermissions'
 import { PortalAuthRedirect } from '../shared/components/PortalAuthRedirect'
 import { getSessionPerson, readPortalSession } from '../shared/storage/session'
 import { CampusProvider, useCampusContext } from '../modules/institution/context/CampusContext'
 import { useOrganizationConfig } from '../shared/config/useOrganizationConfig'
 import { getEditionConfig } from '../shared/config/edition'
-import { readPeopleFromStorage } from '../modules/institution/hooks/usePeople'
-import {
-  countPendingVerifications,
-  PEOPLE_UPDATED_EVENT,
-} from '../modules/institution/utils/peopleVerification'
 import {
   BookCheck,
   LayoutDashboard,
@@ -24,7 +19,6 @@ import {
   BookOpen,
   CalendarRange,
   CalendarDays,
-  ClipboardList,
   FileText,
   GraduationCap,
   ScrollText,
@@ -41,11 +35,10 @@ import {
   UserRoundCog,
   Users,
   Wallet,
-  Briefcase,
   HeartHandshake,
   Shield,
-  ShieldCheck,
   UserCog,
+  UserRoundPen,
 } from 'lucide-react'
 
 // Each destination declares the module it needs; the sidebar locks the row
@@ -57,7 +50,7 @@ const breadcrumbLabels: Record<string, string> = {
   '/admin/institution/overview': 'Dashboard',
   '/admin/institution/dashboard': 'Dashboard',
   '/admin/courses': 'Course Catalog',
-  '/admin/institution/departments': 'Departments & Programs',
+  '/admin/institution/departments': 'Departments',
   '/admin/institution/academic-calendar': 'Academic Calendar',
   '/admin/institution/programs': 'Academic Programs',
   '/admin/transcripts': 'Transcripts & Academic Records',
@@ -67,15 +60,13 @@ const breadcrumbLabels: Record<string, string> = {
   '/admin/institution/profile': 'Campus Profile',
   '/admin/students': 'Students',
   '/admin/instructors': 'Instructors',
-  '/admin/staff': 'Staff',
-  '/admin/guardians': 'Guardians',
+  '/admin/teaching-assistants': 'Teaching Assistants',
+  '/admin/guardians': 'Parents & Guardians',
   '/admin/admins': 'Administrators',
-  '/admin/verify-people': 'Verify People',
   '/admin/people': 'People & Users',
   '/admin/enrollments': 'Enrollments',
   '/admin/live-classes': 'Live Classes',
   '/admin/assignments': 'Assignments',
-  '/admin/quizzes-exams': 'Quizzes & Exams',
   '/admin/question-bank': 'Question Bank',
   '/admin/certificates': 'Certificates',
   '/admin/attendance': 'Attendance',
@@ -112,19 +103,15 @@ function InstitutionAdminShell() {
     setSelectedCampusId,
     institutionName,
   } = useCampusContext()
-  const [pendingVerifications, setPendingVerifications] = useState(0)
 
-  useEffect(() => {
-    const refresh = () => {
-      setPendingVerifications(countPendingVerifications(readPeopleFromStorage()))
-    }
-    refresh()
-    window.addEventListener(PEOPLE_UPDATED_EVENT, refresh)
-    return () => window.removeEventListener(PEOPLE_UPDATED_EVENT, refresh)
-  }, [path])
-
-  if (!session || !canUsePortal('/admin', session.role) || !person) {
+  if (!session || !canUsePortal('/admin', session.role) || !person || !isAdminPortalRole(session.role)) {
     return <PortalAuthRedirect role="Admin" />
+  }
+  const role = session.role
+
+  // Registrars and finance officers only reach the pages of their own office.
+  if (!canOpenAdminPage(role, path)) {
+    return <Navigate to="/admin" replace />
   }
 
   const isActive = (routes: string[]) => routes.some((route) => path === route)
@@ -132,9 +119,8 @@ function InstitutionAdminShell() {
   // Edition-aware labels. Terminology drives the wording so the same build reads
   // "Students / Courses / Enrollments" for a university and
   // "Employees / Training Modules / Training Assignments" for a corporate tenant.
-  const departmentsLabel = mods.programs
-    ? `${t.departments} & ${t.trainingPrograms}`
-    : t.departments
+  // Departments and the programs they offer are separate pages.
+  const departmentsLabel = t.departments
 
   const rawSections: NavSection[] = [
     {
@@ -176,7 +162,7 @@ function InstitutionAdminShell() {
           label: t.trainingPrograms,
           to: '/admin/institution/programs',
           module: 'academic_structure',
-          active: isActive(['/admin/institution/programs']),
+          active: path.startsWith('/admin/institution/programs'),
           icon: <GraduationCap size={ICON_SIZE} />,
           show: mods.programs,
         },
@@ -208,12 +194,6 @@ function InstitutionAdminShell() {
           module: 'assignments_assessments',
           active: isActive(['/admin/assignments']),
           icon: <SquarePen size={ICON_SIZE} />,
-        },
-        {
-          label: org.edition === 'university' ? 'Quizzes & Exams' : 'Assessments',
-          to: '/admin/quizzes-exams',
-          active: isActive(['/admin/quizzes-exams']),
-          icon: <ClipboardList size={ICON_SIZE} />,
         },
         {
           label: 'Question Bank',
@@ -258,7 +238,14 @@ function InstitutionAdminShell() {
           show: mods.instructors,
         },
         {
-          label: 'Guardians',
+          label: 'Teaching Assistants',
+          to: '/admin/teaching-assistants',
+          active: isActive(['/admin/teaching-assistants']),
+          icon: <UserRoundPen size={ICON_SIZE} />,
+          show: org.edition === 'university',
+        },
+        {
+          label: 'Parents & Guardians',
           to: '/admin/guardians',
           module: 'parent_manager_portal',
           active: isActive(['/admin/guardians']),
@@ -266,24 +253,11 @@ function InstitutionAdminShell() {
           show: mods.guardians,
         },
         {
-          label: mods.employees ? t.employees : 'Staff',
-          to: '/admin/staff',
-          active: isActive(['/admin/staff']),
-          icon: <Briefcase size={ICON_SIZE} />,
-          show: mods.staff || mods.employees,
-        },
-        {
+          // Institution admins, registrars and finance officers.
           label: 'Administrators',
           to: '/admin/admins',
           active: isActive(['/admin/admins']),
           icon: <Shield size={ICON_SIZE} />,
-        },
-        {
-          label: 'Verify People',
-          to: '/admin/verify-people',
-          active: isActive(['/admin/verify-people']),
-          icon: <ShieldCheck size={ICON_SIZE} />,
-          badge: pendingVerifications,
         },
         {
           label: 'All People',
@@ -391,9 +365,16 @@ function InstitutionAdminShell() {
     },
   ]
 
-  // Items with `show: false` (module disabled for this edition) and modules the
-  // institution did not buy are both filtered by the sidebar itself.
-  const navSections = rawSections
+  // Items with `show: false` (module disabled for this edition, or a page outside
+  // this role's office) and modules the institution did not buy are both
+  // filtered by the sidebar itself.
+  const navSections: NavSection[] = rawSections.map((section) => ({
+    ...section,
+    items: section.items.map((item) => ({
+      ...item,
+      show: item.show !== false && (!item.to || canOpenAdminPage(role, item.to)),
+    })),
+  }))
 
   const breadcrumb =
     getEditionConfig(org.edition).breadcrumbLabels[path] ??
@@ -414,7 +395,7 @@ function InstitutionAdminShell() {
       <div className="flex flex-col flex-1 min-w-0">
         <AdminTopHeader
           userName={person.name}
-          userRole={t.adminRole}
+          userRole={role === 'Admin' ? t.adminRole : ADMIN_ROLE_TITLES[role]}
           institutionName={institutionName || org.organizationName}
           breadcrumb={breadcrumb}
           campuses={mods.campuses ? campuses : []}

@@ -9,7 +9,6 @@ interface InstitutionHeroProps {
 
 export function InstitutionHero({ entity, onEdit, onAddDepartment }: InstitutionHeroProps) {
   const stats = [
-    { label: 'Colleges', value: entity.collegesCount },
     { label: 'Departments', value: entity.departmentsCount },
     { label: 'Students', value: entity.studentsCount.toLocaleString() },
     { label: 'Faculty & Staff', value: entity.facultyCount },

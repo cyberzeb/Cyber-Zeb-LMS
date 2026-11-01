@@ -598,19 +598,6 @@ export function RequestPage() {
                     placeholder="Main Campus, City Campus"
                   />
                 </Field>
-                <Field label="Colleges / schools" hint="Comma separated">
-                  <Input
-                    value={master.academic_structure.colleges}
-                    onChange={(v) => setSection('academic_structure', { colleges: v })}
-                    placeholder="School of Computing, School of Business"
-                  />
-                </Field>
-                <Field label="Faculties" hint="Comma separated">
-                  <Input
-                    value={master.academic_structure.faculties}
-                    onChange={(v) => setSection('academic_structure', { faculties: v })}
-                  />
-                </Field>
                 <Field label="Departments" hint="Comma separated">
                   <Input
                     value={master.academic_structure.departments}

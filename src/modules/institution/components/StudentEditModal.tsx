@@ -4,9 +4,9 @@ import { Modal } from '../../../shared/components/Modal'
 import { Button } from '../../../shared/components/Button'
 import { FormField } from '../../../shared/components/FormField'
 import { updateStudent, type UpdateStudentInput } from '../api/peopleApi'
+import { usePrograms } from '../hooks/usePrograms'
+import { programSemesters, programYears, resolveStudentProgram } from '../utils/programUtils'
 import {
-  departmentMaxYears,
-  departmentSemestersPerYear,
   formatProgramSemester,
   formatStudyYear,
   programSemesterOptions,
@@ -33,13 +33,14 @@ export function StudentEditModal({
   onClose,
   onSaved,
 }: StudentEditModalProps) {
+  const { programs } = usePrograms()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState<UpdateStudentInput>({
     name: '',
     email: '',
     campusId: campuses[0]?.id ?? '',
-    departmentId: '',
+    programId: '',
     studyYear: 1,
     programSemester: 1,
     status: 'active',
@@ -47,39 +48,34 @@ export function StudentEditModal({
 
   useEffect(() => {
     if (!student || !open) return
-    const dept =
-      departments.find((d) => d.id === student.departmentId) ??
-      departments.find((d) => d.name === student.department && d.campusId === student.campusId)
+    const program = resolveStudentProgram(student, programs, departments)
     setForm({
       name: student.name,
       email: student.email,
       campusId: student.campusId ?? campuses[0]?.id ?? '',
-      departmentId: dept?.id ?? '',
+      programId: program?.id ?? '',
       studyYear: student.studyYear ?? 1,
       programSemester: student.programSemester ?? 1,
       status: student.status,
     })
     setError('')
-  }, [student, open, campuses, departments])
+  }, [student, open, campuses, departments, programs])
 
-  const departmentOptions = useMemo(
-    () => departments.filter((d) => d.campusId === form.campusId),
-    [departments, form.campusId],
+  // Programs taught on the chosen campus, grouped by department in the select.
+  const programOptions = useMemo(
+    () => programs.filter((p) => p.campusId === form.campusId && p.status !== 'archived'),
+    [programs, form.campusId],
   )
 
-  const selectedDept = departmentOptions.find((d) => d.id === form.departmentId)
-  const maxYears = departmentMaxYears(selectedDept)
-  const semestersPerYear = departmentSemestersPerYear(selectedDept)
+  const selectedProgram = programOptions.find((p) => p.id === form.programId)
+  const maxYears = programYears(selectedProgram)
+  const semestersPerYear = programSemesters(selectedProgram)
 
   useEffect(() => {
-    if (!departmentOptions.some((d) => d.id === form.departmentId)) {
-      setForm((prev) => ({
-        ...prev,
-        departmentId: departmentOptions[0]?.id ?? '',
-        studyYear: 1,
-      }))
+    if (!programOptions.some((p) => p.id === form.programId)) {
+      setForm((prev) => ({ ...prev, programId: programOptions[0]?.id ?? '', studyYear: 1 }))
     }
-  }, [departmentOptions, form.departmentId])
+  }, [programOptions, form.programId])
 
   useEffect(() => {
     if (form.programSemester > semestersPerYear) {
@@ -98,7 +94,7 @@ export function StudentEditModal({
     setSaving(true)
     setError('')
     try {
-      const updated = await updateStudent(student.id, form, campuses, departments)
+      const updated = await updateStudent(student.id, form, campuses, departments, programs)
       onSaved(updated)
       onClose()
     } catch (err) {
@@ -114,13 +110,13 @@ export function StudentEditModal({
       onClose={onClose}
       icon={<UserRoundPen size={18} />}
       title="Edit Student"
-      description="Profile, department program, study year, and current program semester."
+      description="Profile, program, study year and current semester."
       footer={
         <>
           <Button variant="secondary" onClick={onClose} disabled={saving}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSave} disabled={saving || !form.departmentId}>
+          <Button variant="primary" onClick={handleSave} disabled={saving || !form.programId}>
             {saving ? 'Saving…' : 'Save Changes'}
           </Button>
         </>
@@ -143,7 +139,7 @@ export function StudentEditModal({
           <span className="text-[12px] font-semibold text-navy-900">Campus</span>
           <select
             value={form.campusId}
-            onChange={(e) => setForm({ ...form, campusId: e.target.value, departmentId: '', studyYear: 1 })}
+            onChange={(e) => setForm({ ...form, campusId: e.target.value, programId: '', studyYear: 1 })}
             className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
           >
             {campuses.map((c) => (
@@ -154,17 +150,25 @@ export function StudentEditModal({
           </select>
         </label>
         <label className="flex flex-col gap-1.5">
-          <span className="text-[12px] font-semibold text-navy-900">Department / Program</span>
+          <span className="text-[12px] font-semibold text-navy-900">Program</span>
           <select
-            value={form.departmentId}
-            onChange={(e) => setForm({ ...form, departmentId: e.target.value, studyYear: 1 })}
+            value={form.programId}
+            onChange={(e) => setForm({ ...form, programId: e.target.value, studyYear: 1 })}
             className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
           >
-            {departmentOptions.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name} ({d.maxYears ?? 4} yrs)
-              </option>
-            ))}
+            {departments
+              .filter((d) => programOptions.some((p) => p.departmentId === d.id))
+              .map((d) => (
+                <optgroup key={d.id} label={d.name}>
+                  {programOptions
+                    .filter((p) => p.departmentId === d.id)
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} ({p.durationYears} yrs)
+                      </option>
+                    ))}
+                </optgroup>
+              ))}
           </select>
         </label>
       </div>
@@ -177,7 +181,7 @@ export function StudentEditModal({
           const year = studyYearOptions(maxYears).find((y) => formatStudyYear(y) === label)
           if (year) setForm({ ...form, studyYear: year })
         }}
-        hint={selectedDept ? `${selectedDept.programCode ?? 'Program'} · max ${maxYears} years` : undefined}
+        hint={selectedProgram ? `${selectedProgram.code} · ${selectedProgram.department} · ${maxYears} years` : undefined}
       />
       <FormField
         label="Program Semester"

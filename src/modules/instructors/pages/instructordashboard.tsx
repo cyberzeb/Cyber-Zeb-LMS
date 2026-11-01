@@ -27,6 +27,7 @@ import { InstructorPageLoading } from '../components/InstructorPageStates'
 import { InstructorProfileCard } from '../components/InstructorProfileCard'
 import { useInstructorDashboard } from '../hooks/useInstructorDashboard'
 import { useLanguage } from '../../../shared/i18n/LanguageProvider'
+import { useTeachingPermissions } from '../../../shared/auth/rolePermissions'
 import type { AssignmentSubmission, UpcomingTask } from '../types'
 
 const STAT = 17
@@ -60,6 +61,7 @@ export function InstructorDashboardPage() {
   const { t } = useLanguage()
   const { tx } = useLanguage()
   const navigate = useNavigate()
+  const { canAuthor } = useTeachingPermissions()
   const { data, isLoading, isError, error, reload } = useInstructorDashboard()
 
   if (isLoading) return <InstructorPageLoading />
@@ -151,22 +153,31 @@ export function InstructorDashboardPage() {
               {t('common.welcomeBack')} <span className="text-navy-700">{firstName}</span>
             </h1>
             <p className="text-[13px] text-secondary-text mt-1">
-              {tx(`Manage your courses, grade submissions, and track student performance across ${data.department}${data.term ? ` · ${data.term}` : ''}.`)}
+              {canAuthor
+                ? tx(`Manage your courses, grade submissions, and track student performance across ${data.department}${data.term ? ` · ${data.term}` : ''}.`)
+                : tx(`Teaching assistant: grade submissions and take attendance for the courses you support${data.term ? ` · ${data.term}` : ''}.`)}
             </p>
             <p className="text-[12px] text-lemon-700 font-semibold mt-1.5">{data.specialization}</p>
             <div className="flex flex-wrap items-center gap-2 mt-4">
               <Button variant="outline-green" onClick={() => navigate('/instructor/live-classes')}>
                 <MonitorPlay size={15} />
-                Start live class
+                {canAuthor ? 'Start live class' : 'Join live class'}
               </Button>
               <Button variant="outline-blue" onClick={() => navigate('/instructor/assignments')}>
                 <SquarePen size={15} />
                 Grade submissions
               </Button>
-              <Button variant="outline-purple" onClick={() => navigate('/instructor/quizzes')}>
-                <ClipboardList size={15} />
-                Manage quizzes
-              </Button>
+              {canAuthor ? (
+                <Button variant="outline-purple" onClick={() => navigate('/instructor/quizzes')}>
+                  <ClipboardList size={15} />
+                  Manage quizzes
+                </Button>
+              ) : (
+                <Button variant="outline-purple" onClick={() => navigate('/instructor/attendance')}>
+                  <ClipboardList size={15} />
+                  Take attendance
+                </Button>
+              )}
               <Button variant="secondary" onClick={() => navigate('/instructor/calendar')}>
                 <CalendarClock size={15} />
                 View calendar

@@ -16,7 +16,7 @@ University Edition only.
 
 | Edition | Primary org model | Term model | Learner label |
 |---------|-------------------|------------|---------------|
-| **University** | Campus → College → Department → Program | Academic Year → Semester/Term → Course Offering | Student |
+| **University** | Campus → Department → Program | Academic Year → Semester/Term → Course Offering | Student |
 | Corporate | Business unit → Team | Cohort / Learning path | Employee |
 | Training | Provider → Cohort | Session / Intake | Trainee |
 
@@ -30,13 +30,14 @@ that gap.
 
 ```
 Tenant (University)
- └── Campus (optional, multi-campus institutions)
-      └── College / Faculty / School
-           └── Department
-                └── Program (degree / diploma track)
-                     └── Course (catalog — reusable template)
-                          └── Course Offering (section in a specific term)
-                               └── Enrollment (student registered in offering)
+ └── Campus
+      └── Department
+           └── Program (BSc, MSc, PhD, Diploma … — a department can offer several)
+                ├── Curriculum (which catalog courses run in each year + semester)
+                └── Students (each studies one program, in a year + semester)
+Course (catalog — reusable template, owned by a department)
+ └── Course Offering (section: one curriculum course of a program, in a term)
+      └── Enrollment (student registered in the section)
 ```
 
 ### Rules
@@ -51,7 +52,14 @@ Tenant (University)
    catalog `course_id`.
 4. **Grades, attendance, certificates, and progress** are scoped to
    `course_offering_id` (and optionally aggregated to program/transcript level).
-5. **College** exists in both backend (`colleges` table) and frontend collections.
+5. **Programs, not departments, are degrees.** A program has its own duration
+   (years), semesters per year, credits and curriculum. Students and sections
+   point at a program (`programId`). Sections for a term are generated from
+   each program's curriculum on the Course Offerings page. Existing data is moved
+   with `python -m scripts.migrate_programs --apply`.
+6. **No colleges, faculties or schools.** A department belongs directly to a
+   campus; the server refuses a new department without an existing campus.
+   Existing data is moved with `python -m scripts.remove_colleges --apply`.
 
 ---
 
@@ -72,47 +80,75 @@ Terms are **first-class entities**, not display strings like `"Fall 2026"`.
 
 ## 4. Roles (University Edition)
 
-Single backend source of truth: `backend/app/core/permissions.py`.
+University Edition has **exactly seven roles**. Each has its own permissions,
+enforced by the API (`backend/app/modules/lms_store/policy.py` for writes,
+`scope.py` for reads) and mirrored in the UI (`src/shared/auth/rolePermissions.ts`)
+so nobody is shown an action the server would refuse.
 
-### University administration
+| # | Role | Person `role` | Backend enum | Portal | Scope |
+|---|------|---------------|--------------|--------|-------|
+| 1 | Institution Admin | `Admin` | `institution_admin` | `/admin` (every page) | Whole institution |
+| 2 | Registrar | `Registrar` | `registrar` | `/admin` (academic pages) | Whole institution, academic data only |
+| 3 | Finance Officer | `FinanceOfficer` | `finance_officer` | `/admin` (finance pages) | Invoices and payments |
+| 4 | Instructor | `Instructor` | `instructor` | `/instructor` | Courses they teach |
+| 5 | Teaching Assistant | `TeachingAssistant` | `teaching_assistant` | `/instructor` (reduced) | Courses they are assigned to |
+| 6 | Student | `Student` | `student` | `/student` | Own records |
+| 7 | Parent / Guardian | `Guardian` | `parent_guardian` | `/guardian` | Linked students, read-only |
 
-| Role | Backend enum | Scope | Primary responsibilities |
-|------|--------------|-------|--------------------------|
-| Institution Admin | `institution_admin` | Tenant | Tenant setup, policies, all modules |
-| Registrar | `registrar` | Tenant | Enrollment, transcripts, student records |
-| Academic Admin | `academic_admin` | Tenant | Programs, academic calendar, curriculum |
-| Department Admin | `department_admin` | Department | Department users, local offerings |
-| Finance Admin | `finance_officer` | Tenant | Tuition, invoices, payment holds |
+There is no Head of Department, Dean, department Staff or Help Desk role in the
+University Edition. A department's head is recorded on the department itself
+(informational, no extra permissions). Help desk tickets are answered by the
+Institution Admin.
 
-### Academic users
+### What each role can do
 
-| Role | Backend enum | Scope | Primary responsibilities |
-|------|--------------|-------|--------------------------|
-| Head of Department | `head_of_department` | Department | Approve offerings, assign instructors, dept reports |
-| Instructor | `instructor` | Course offering | Teach, grade, attendance, content delivery |
-| Teaching Assistant | `teaching_assistant` | Course offering | Grading support, forum moderation |
+| Area | Admin | Registrar | Finance | Instructor | TA | Student | Guardian |
+|------|:-----:|:---------:|:-------:|:----------:|:--:|:-------:|:--------:|
+| Institution settings, branding, integrations | ✅ | — | — | — | — | — | — |
+| Campuses, organization structure | ✅ | — | — | — | — | — | — |
+| Administrator / Registrar / Finance accounts | ✅ | — | — | — | — | — | — |
+| Academic calendar, departments, programs | ✅ | ✅ | — | — | — | — | — |
+| Course catalog, course offerings | ✅ | ✅ | — | propose own | view assigned | — | — |
+| Students, instructors, TAs, guardians (accounts) | ✅ | ✅ | — | view own students | view own students | — | — |
+| Enrollments | ✅ | ✅ | view | view own | view assigned | own | child's |
+| Transcripts, academic reports | ✅ | ✅ | — | — | — | own | child's |
+| Certificates | ✅ | ✅ | — | own courses | — | own | child's |
+| Course content, assignments, quizzes, question bank | ✅ | — | — | own courses | — | take | — |
+| Live classes | ✅ | — | — | host | join | join | — |
+| Grading, attendance | ✅ | view | — | own courses | assigned courses | own | child's |
+| Invoices and payments | ✅ | view | ✅ | — | — | pay own | pay child's |
+| Announcements | ✅ | publish | publish | publish to own courses | read | read | read |
+| Help desk tickets | answer all | — | — | raise | raise | raise | — |
 
-### Learners
+### Where each role works
 
-| Role | Backend enum | Scope |
-|------|--------------|-------|
-| Student | `student` | Own enrollments |
+- **Institution Admin, Registrar and Finance Officer** share the admin portal.
+  The sidebar shows only the pages of each person's office, and opening any
+  other admin URL sends them back to their dashboard. Finance Officers get a
+  Finance Dashboard (collected, outstanding, overdue, collection rate).
+- **Instructors and Teaching Assistants** share the instructor portal.
+  Assistants have no Quizzes or Certificates pages and no buttons to create
+  courses, assignments, live classes, library items or announcements.
+- Admins manage office accounts under **People → Administrators** and teaching
+  assistants under **People → Teaching Assistants**, where each assistant is
+  assigned to one or more courses (`course.teachingAssistantIds`).
 
-### Cross-edition (inactive in University demo)
+### Cross-edition roles (not used by University)
 
-`training_admin`, `manager`, `parent_guardian`, `support_agent`, `auditor` —
-available for other editions or optional modules (e.g. parent portal).
+`department_admin` (Staff), `support_agent` (Help Desk), `manager`,
+`training_admin`, `academic_admin` and `auditor` serve the Corporate and
+Training editions.
 
-### Demo portal mapping
+### Moving an existing university to these roles
 
-The React demo collapses admin roles into portals for UX simplicity:
+```bash
+cd backend
+python -m scripts.migrate_university_roles          # dry run: lists what changes
+python -m scripts.migrate_university_roles --apply
+```
 
-| Demo portal | Backend roles routed there |
-|-------------|----------------------------|
-| Admin (`/admin`) | `institution_admin`, `academic_admin`, `registrar`, `finance_officer` |
-| Staff (`/staff`) | `department_admin`, `head_of_department` |
-| Instructor | `instructor`, `teaching_assistant` |
-| Student | `student` |
+Head of Department accounts become Instructors. Staff and Help Desk accounts
+are listed for an admin to re-assign (Registrar or Finance Officer) or remove.
 
 ---
 
@@ -122,7 +158,7 @@ Ordered checklist shown in Institution Setup:
 
 ```
 1. University Setup          → Tenant profile, timezone, branding
-2. Academic Structure        → Campuses, colleges, departments
+2. Academic Structure        → Campuses and their departments
 3. Academic Year / Term      → Define calendar, set current term
 4. Programs                  → Degree tracks under departments
 5. Course Catalog            → Reusable courses (no instructor/dates)
@@ -139,7 +175,7 @@ Ordered checklist shown in Institution Setup:
 16. Reports / Analytics      → Term, department, program views
 ```
 
-Steps 1–8 are **configuration** (Registrar + Academic Admin). Steps 9–15 are
+Steps 1–8 are **configuration** (Institution Admin + Registrar). Steps 9–15 are
 **term operations** (Instructor + automated pipelines). Step 16 is
 **institutional reporting**.
 
@@ -155,7 +191,6 @@ Steps 1–8 are **configuration** (Registrar + Academic Admin). Steps 9–15 are
 | Grades | UI grouping by term label | FK to `course_offering_id` |
 | Attendance | Per student + course | Per offering session (`AttendanceEvent`) |
 | Certificates | Per course | Per offering completion |
-| College | Frontend JSON only | Backend `colleges` table |
 | Roles | 6 demo roles; `academic_admin` = registrar only | Full HE role pack incl. registrar, HoD |
 | Setup steps | Profile → Structure → Catalog | Full 8-step config pipeline |
 | Editions | `TenantType` only, unused | `BeranaEdition` + edition-specific defaults |
@@ -198,7 +233,7 @@ weights yet), and there is no retake/grade-replacement policy.
 Do **not** fork the codebase. Use `BeranaEdition` on the tenant plus edition
 feature flags in `tenant.settings`:
 
-- **Corporate**: hide programs/colleges; use `manager` role; cohort = team intake.
+- **Corporate**: hide programs; use `manager` role; cohort = team intake.
 - **Training**: emphasize `cohort` entity; shorter terms; `training_admin` role pack.
 
 University Edition remains the default demo tenant (`berana`).

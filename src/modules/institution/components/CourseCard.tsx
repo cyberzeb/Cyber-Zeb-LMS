@@ -1,7 +1,7 @@
 import { CheckCircle2, Clock, GraduationCap, Trash2, User, XCircle } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill, type StatusTone } from '../../../shared/components/StatusPill'
-import { Monogram } from '../../../shared/components/Monogram'
+import { CourseCover } from '../../../shared/components/CourseCover'
 import { Button } from '../../../shared/components/Button'
 import type { CourseApprovalStatus, CourseRecord } from '../types'
 
@@ -32,11 +32,12 @@ export function CourseCard({ course, onOpen, onDelete, onApprove, onReject }: Co
 
   return (
     <GlassCard
-      className="group p-5 flex flex-col gap-4 hover:shadow-[0_12px_32px_rgba(27,35,64,0.12)] hover:-translate-y-0.5 transition-all cursor-pointer"
+      className="group p-0 overflow-hidden flex flex-col hover:shadow-[0_12px_32px_rgba(27,35,64,0.12)] hover:-translate-y-0.5 transition-all cursor-pointer"
     >
+      <CourseCover title={course.title} code={course.code} thumbnailUrl={course.thumbnailUrl} />
+      <div className="p-5 flex flex-col gap-4 flex-1">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <Monogram label={course.title} size="md" />
           <div className="min-w-0">
             <div className="text-[10.5px] font-bold uppercase tracking-wider text-secondary-text">
               {course.code}
@@ -168,6 +169,7 @@ export function CourseCard({ course, onOpen, onDelete, onApprove, onReject }: Co
           </Button>
         </div>
       ) : null}
+      </div>
     </GlassCard>
   )
 }

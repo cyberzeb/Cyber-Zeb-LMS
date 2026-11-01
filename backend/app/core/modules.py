@@ -97,7 +97,6 @@ def require_module(module: ModuleKey):
 # available — an unmapped key must never be silently hidden.
 COLLECTION_MODULES: dict[str, ModuleKey] = {
     # Academic / training structure
-    "colleges": ModuleKey.ACADEMIC_STRUCTURE,
     "departments": ModuleKey.ACADEMIC_STRUCTURE,
     "programs": ModuleKey.ACADEMIC_STRUCTURE,
     "academic-years": ModuleKey.ACADEMIC_STRUCTURE,

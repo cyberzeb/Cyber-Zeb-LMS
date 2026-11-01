@@ -48,7 +48,7 @@ def _hash_code(code: str) -> str:
 
 def _demo_code_allowed(audience: str) -> bool:
     """Whether this audience may use the fixed demo code instead of a real email."""
-    if not settings.DEMO_LOGIN_ENABLED:
+    if not settings.DEMO_LOGIN_ENABLED or settings.OTP_ALWAYS_EMAIL:
         return False
     if audience == "SuperAdmin" and settings.SUPER_ADMIN_OTP_REQUIRE_EMAIL:
         return False

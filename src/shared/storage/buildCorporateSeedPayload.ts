@@ -1,9 +1,9 @@
 /**
  * Demo seed for the Corporate Edition tenant (Horizon Bank).
  *
- * The university demo (`buildSeedPayload`) is academic: colleges, programs,
+ * The university demo (`buildSeedPayload`) is academic: campuses, departments, programs,
  * terms, GPAs. A corporate tenant needs a different shape — departments and
- * teams instead of colleges, job roles and skills, and mandatory training with
+ * teams instead of programs, job roles and skills, and mandatory training with
  * due dates so the compliance engine has something real to report on.
  *
  * Deliberately built from the corporate job roles: every employee's assignments
@@ -12,7 +12,6 @@
  */
 import {
   seedCorporateCampuses,
-  seedCorporateColleges,
   seedCorporateDepartments,
 } from '../../modules/corporate/data/corporateOrgSeedData'
 import { buildCorporatePeopleSeed } from '../../modules/corporate/data/corporatePeopleSeedData'
@@ -401,7 +400,6 @@ export function buildCorporateSeedPayload(): Record<string, unknown> {
   return {
     // Organization: branches and departments, no academic hierarchy.
     campuses: seedCorporateCampuses,
-    colleges: seedCorporateColleges,
     departments: seedCorporateDepartments,
     teams: withManagers(seedCorporateTeams),
     'job-roles': seedJobRoles,

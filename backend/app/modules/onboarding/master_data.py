@@ -106,10 +106,13 @@ class Leadership(_Section):
 
 # 6. Academic Structure
 class AcademicStructure(_Section):
+    """Campus → Department. Colleges / faculties were removed; old forms that
+    still send them are accepted and the values ignored."""
+
+    model_config = ConfigDict(extra="ignore", str_strip_whitespace=True)
+
     campus_count: int | None = Field(default=None, ge=0, le=1000)
     campuses: list[str] = Field(default_factory=list, max_length=200)
-    colleges: list[str] = Field(default_factory=list, max_length=200)
-    faculties: list[str] = Field(default_factory=list, max_length=200)
     departments: list[str] = Field(default_factory=list, max_length=500)
     academic_units: list[str] = Field(default_factory=list, max_length=500)
 

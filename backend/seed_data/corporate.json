@@ -26,15 +26,6 @@
         "status": "active"
       }
     ],
-    "colleges": [
-      {
-        "id": "col1",
-        "name": "Horizon Bank",
-        "deanName": "Executive Leadership",
-        "campusId": "c1",
-        "description": "Enterprise operating structure"
-      }
-    ],
     "departments": [
       {
         "id": "d1",
@@ -44,7 +35,6 @@
         "facultyCount": 0,
         "icon": "🏦",
         "campusId": "c1",
-        "collegeId": "col1",
         "description": "Branches, contact center, and customer-facing operations.",
         "status": "active"
       },
@@ -56,7 +46,6 @@
         "facultyCount": 0,
         "icon": "📱",
         "campusId": "c1",
-        "collegeId": "col1",
         "description": "Mobile banking, internet banking, and digital product teams.",
         "status": "active"
       },
@@ -68,7 +57,6 @@
         "facultyCount": 0,
         "icon": "🛡️",
         "campusId": "c1",
-        "collegeId": "col1",
         "description": "AML, KYC, regulatory reporting, and internal audit support.",
         "status": "active"
       },
@@ -80,7 +68,6 @@
         "facultyCount": 0,
         "icon": "👥",
         "campusId": "c1",
-        "collegeId": "col1",
         "description": "Workforce planning, onboarding, and enterprise learning.",
         "status": "active"
       },
@@ -92,7 +79,6 @@
         "facultyCount": 0,
         "icon": "💻",
         "campusId": "c1",
-        "collegeId": "col1",
         "description": "Core banking systems, infrastructure, and cybersecurity.",
         "status": "active"
       }

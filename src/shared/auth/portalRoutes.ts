@@ -1,31 +1,58 @@
 import type { PersonRole } from '../../modules/institution/types'
 
-export type LoginRole = PersonRole | 'Admin' | 'SuperAdmin'
+export type LoginRole = PersonRole | 'SuperAdmin'
 
-export const LOGIN_ROLES: { value: LoginRole; label: string }[] = [
-  { value: 'Student', label: 'Student' },
-  { value: 'Instructor', label: 'Instructor' },
-  { value: 'Registrar', label: 'Registrar' },
-  { value: 'HeadOfDepartment', label: 'Head of Department' },
-  { value: 'Staff', label: 'Staff' },
-  { value: 'Guardian', label: 'Guardian' },
-  { value: 'HelpDesk', label: 'Help Desk' },
-  { value: 'Manager', label: 'Manager' },
-  { value: 'Admin', label: 'Institution Admin' },
-  { value: 'SuperAdmin', label: 'Super Admin' },
+/** Every role that can sign in, with its display label. */
+export const ROLE_LABELS: Record<LoginRole, string> = {
+  Admin: 'Institution Admin',
+  Registrar: 'Registrar',
+  FinanceOfficer: 'Finance Officer',
+  Instructor: 'Instructor',
+  TeachingAssistant: 'Teaching Assistant',
+  Student: 'Student',
+  Guardian: 'Parent / Guardian',
+  Staff: 'Staff',
+  HelpDesk: 'Help Desk',
+  Manager: 'Manager',
+  SuperAdmin: 'Super Admin',
+}
+
+/**
+ * University Edition: the seven institution roles, in the order the login
+ * screen lists them. Super Admin is the platform operator, not an institution role.
+ */
+export const UNIVERSITY_ROLES: PersonRole[] = [
+  'Admin',
+  'Registrar',
+  'FinanceOfficer',
+  'Instructor',
+  'TeachingAssistant',
+  'Student',
+  'Guardian',
 ]
 
+/** Roles offered on the login screen. Other editions' roles are detected from the email. */
+export const LOGIN_ROLES: { value: LoginRole; label: string }[] = [
+  ...UNIVERSITY_ROLES.map((value) => ({ value, label: ROLE_LABELS[value] })),
+  { value: 'SuperAdmin', label: ROLE_LABELS.SuperAdmin },
+]
+
+const ALL_LOGIN_ROLES = Object.keys(ROLE_LABELS) as LoginRole[]
+
 export const ROLE_HOME: Record<LoginRole, string> = {
-  Student: '/student',
-  Instructor: '/instructor',
-  // The registrar works in the admin portal; heads of department in the staff portal.
+  // University: the three office roles share the admin portal, each with its own menu.
+  Admin: '/admin',
   Registrar: '/admin',
-  HeadOfDepartment: '/staff',
-  Staff: '/staff',
+  FinanceOfficer: '/admin',
+  // Teaching assistants use the instructor portal with a reduced menu.
+  Instructor: '/instructor',
+  TeachingAssistant: '/instructor',
+  Student: '/student',
   Guardian: '/guardian',
+  // Corporate / Training editions.
+  Staff: '/staff',
   HelpDesk: '/help-desk',
   Manager: '/manager',
-  Admin: '/admin',
   SuperAdmin: '/super-admin',
 }
 
@@ -34,20 +61,16 @@ export function portalPathForRole(role: LoginRole): string {
 }
 
 export function isLoginRole(value: string | null): value is LoginRole {
-  return LOGIN_ROLES.some((r) => r.value === value)
+  return value !== null && (ALL_LOGIN_ROLES as string[]).includes(value)
 }
 
-/**
- * Roles that share a portal (University Edition, spec section 4).
- * The admin portal serves institution admins and registrars; the staff portal
- * serves department staff and heads of department.
- */
+/** Roles that may enter each portal. */
 export const PORTAL_ROLES: Record<string, PersonRole[]> = {
-  '/admin': ['Admin', 'Registrar'],
-  '/staff': ['Staff', 'HeadOfDepartment'],
-  '/instructor': ['Instructor'],
+  '/admin': ['Admin', 'Registrar', 'FinanceOfficer'],
+  '/instructor': ['Instructor', 'TeachingAssistant'],
   '/student': ['Student'],
   '/guardian': ['Guardian'],
+  '/staff': ['Staff'],
   '/help-desk': ['HelpDesk'],
   '/manager': ['Manager'],
 }

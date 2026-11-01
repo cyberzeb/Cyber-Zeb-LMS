@@ -18,15 +18,6 @@
         "status": "active"
       }
     ],
-    "colleges": [
-      {
-        "id": "col1",
-        "name": "Apex Training Institute",
-        "deanName": "Hana Wolde",
-        "campusId": "c1",
-        "description": "Training divisions"
-      }
-    ],
     "departments": [
       {
         "id": "d1",
@@ -36,7 +27,6 @@
         "facultyCount": 1,
         "icon": "📐",
         "campusId": "c1",
-        "collegeId": "col1",
         "description": "Project management, agile delivery and business skills.",
         "status": "active"
       },
@@ -48,7 +38,6 @@
         "facultyCount": 1,
         "icon": "📊",
         "campusId": "c1",
-        "collegeId": "col1",
         "description": "Spreadsheets, analytics and dashboards.",
         "status": "active"
       },
@@ -60,7 +49,6 @@
         "facultyCount": 1,
         "icon": "🧭",
         "campusId": "c1",
-        "collegeId": "col1",
         "description": "Supervision, coaching and team leadership.",
         "status": "active"
       }

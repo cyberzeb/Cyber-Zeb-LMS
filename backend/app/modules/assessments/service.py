@@ -10,33 +10,32 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.demo_auth import DemoPrincipal
 from app.core.exceptions import NotFoundError, PermissionDeniedError, ValidationAppError
 from app.core.permissions import Role
+from app.modules.assessments.questions import is_answered, score_question
 from app.modules.lms_store.service import LmsStoreService
 
 
-def score_quiz(questions: list[dict[str, Any]], answers: dict[str, str]) -> tuple[int, int]:
-    """Same rules the portal used: true/false is case-insensitive, other types exact."""
-    score = 0
-    max_score = 0
+def score_quiz(
+    questions: list[dict[str, Any]], answers: dict[str, Any]
+) -> tuple[float, float, dict[str, Optional[float]]]:
+    """Auto-graded score, maximum score, and points per question (None = instructor marks it)."""
+    per_question: dict[str, Optional[float]] = {}
+    score = 0.0
+    max_score = 0.0
     for question in questions:
-        points = int(question.get("points") or 0)
-        max_score += points
-        given = str(answers.get(question.get("id"), "")).strip()
-        expected = str(question.get("correctAnswer") or "").strip()
-        if not given or not expected:
-            continue
-        if question.get("type") == "true-false":
-            if given.lower() == expected.lower():
-                score += points
-        elif given == expected:
-            score += points
-    return score, max_score
+        qid = str(question.get("id"))
+        max_score += float(question.get("points") or 0)
+        earned = score_question(question, answers.get(qid))
+        per_question[qid] = earned
+        if earned is not None:
+            score += earned
+    return round(score, 2), round(max_score, 2), per_question
 
 
 class AssessmentsService:
@@ -45,7 +44,7 @@ class AssessmentsService:
         self.store = LmsStoreService(db)
 
     async def submit_quiz_attempt(
-        self, principal: DemoPrincipal, quiz_id: str, answers: dict[str, str]
+        self, principal: DemoPrincipal, quiz_id: str, answers: dict[str, Any]
     ) -> dict[str, Any]:
         if principal.role != Role.STUDENT:
             raise PermissionDeniedError("Only students can submit quiz attempts")
@@ -67,12 +66,14 @@ class AssessmentsService:
         questions = [by_id[qid] for qid in quiz.get("questionIds") or [] if qid in by_id]
         if not questions:
             raise ValidationAppError("This quiz has no questions")
-        unanswered = [q for q in questions if not str(answers.get(q.get("id"), "")).strip()]
+        unanswered = [q for q in questions if not is_answered(q, answers.get(q.get("id")))]
         if unanswered:
             raise ValidationAppError(f"Answer all {len(questions)} questions before submitting")
 
-        score, max_score = score_quiz(questions, answers)
-        max_score = max_score or int(quiz.get("maxPoints") or 0)
+        score, max_score, per_question = score_quiz(questions, answers)
+        max_score = max_score or float(quiz.get("maxPoints") or 0)
+        # Essays (and short answers without accepted answers) wait for the instructor.
+        pending = [qid for qid, earned in per_question.items() if earned is None]
         now = datetime.now(timezone.utc).isoformat()
 
         row = await self.store.repo.get(tenant_id, "student-submissions", for_update=True)
@@ -93,11 +94,14 @@ class AssessmentsService:
             "studentId": principal.person_id,
             "assessmentType": "quiz",
             "assessmentId": quiz_id,
-            "status": "graded",
+            "status": "submitted" if pending else "graded",
             "score": score,
             "maxScore": max_score,
             "submittedAt": now,
-            "gradedBy": "system",
+            "gradedBy": None if pending else "system",
+            "answers": {str(q.get("id")): answers.get(q.get("id")) for q in questions},
+            "questionScores": per_question,
+            "pendingReview": pending,
         }
         if existing:
             submissions = [record if s is existing else s for s in submissions]
@@ -105,4 +109,9 @@ class AssessmentsService:
             submissions.insert(0, record)
         await self.store.repo.upsert(tenant_id, "student-submissions", submissions)
         await self.db.commit()
-        return {"submission": record, "score": score, "max_score": max_score}
+        return {
+            "submission": record,
+            "score": score,
+            "max_score": max_score,
+            "pending_review": len(pending),
+        }

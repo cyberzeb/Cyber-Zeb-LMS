@@ -3,6 +3,7 @@ import { CalendarClock, Clock, MonitorPlay, Plus, Radio, UserRound, Video } from
 import { useState } from 'react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { useTeachingPermissions } from '../../../shared/auth/rolePermissions'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { ZoomIcon } from '../../../shared/components/ZoomIcon'
@@ -62,9 +63,11 @@ function LiveSessionCard({
   session: LiveClassSession
   featured?: boolean
   onJoin: (session: LiveClassSession) => void
-  onEnd: (session: LiveClassSession) => void
+  /** Omitted for teaching assistants, who join sessions but do not host them. */
+  onEnd?: (session: LiveClassSession) => void
   ending?: boolean
 }) {
+  const isHost = Boolean(onEnd)
   const isLive = session.status === 'live'
 
   if (featured && isLive) {
@@ -103,11 +106,13 @@ function LiveSessionCard({
           <div className="flex flex-col sm:flex-row gap-2 shrink-0">
             <Button variant="primary" className="shadow-lg shadow-lemon-500/25" onClick={() => onJoin(session)}>
               <MonitorPlay size={16} />
-              Start session
+              {isHost ? 'Start session' : 'Join session'}
             </Button>
-            <Button variant="secondary" onClick={() => onEnd(session)} disabled={ending}>
-              {ending ? 'Ending…' : 'End session'}
-            </Button>
+            {onEnd ? (
+              <Button variant="secondary" onClick={() => onEnd(session)} disabled={ending}>
+                {ending ? 'Ending…' : 'End session'}
+              </Button>
+            ) : null}
           </div>
         </div>
       </div>
@@ -161,9 +166,9 @@ function LiveSessionCard({
               onClick={() => onJoin(session)}
             >
               <Video size={13} />
-              {session.status === 'live' ? 'Start' : session.meetingUrl ? 'Open link' : 'Start'}
+              {!isHost ? 'Join' : session.status === 'live' ? 'Start' : session.meetingUrl ? 'Open link' : 'Start'}
             </Button>
-            {session.status === 'live' ? (
+            {session.status === 'live' && onEnd ? (
               <Button variant="secondary" size="sm" onClick={() => onEnd(session)} disabled={ending}>
                 {ending ? 'Ending…' : 'End session'}
               </Button>
@@ -191,7 +196,7 @@ function SessionSection({
   sessions: LiveClassSession[]
   featuredFirst?: boolean
   onJoin: (session: LiveClassSession) => void
-  onEnd: (session: LiveClassSession) => void
+  onEnd?: (session: LiveClassSession) => void
   endingId?: string | null
 }) {
   if (sessions.length === 0) return null
@@ -230,6 +235,7 @@ function SessionSection({
 
 export function InstructorLiveClassesPage() {
   const { notify } = useToast()
+  const { canAuthor } = useTeachingPermissions()
   const { data, isLoading, isError, reload } = useInstructorDashboard()
   const { records, updateSession } = useLiveSessions()
   const [modalOpen, setModalOpen] = useState(false)
@@ -239,6 +245,13 @@ export function InstructorLiveClassesPage() {
   useInterval(() => void reload(), 30_000)
 
   const handleJoin = async (session: LiveClassSession) => {
+    // Assistants join like a participant; only the instructor gets the host link.
+    if (!canAuthor) {
+      if (!openMeetingUrl(session.meetingUrl)) {
+        notify('This session has no join link yet.', 'error')
+      }
+      return
+    }
     if (!session.zoomMeetingId) {
       if (!openMeetingUrl(session.startUrl || session.meetingUrl)) {
         notify('No Zoom meeting has been created for this session yet.', 'error')
@@ -298,12 +311,18 @@ export function InstructorLiveClassesPage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Live Classes"
-        subtitle="Schedule, host, and manage virtual lectures and lab sessions."
+        subtitle={
+          canAuthor
+            ? 'Schedule, host, and manage virtual lectures and lab sessions.'
+            : 'Join the live classes of the courses you assist.'
+        }
         actions={
-          <Button variant="primary" onClick={() => setModalOpen(true)}>
-            <Plus size={15} />
-            Schedule session
-          </Button>
+          canAuthor ? (
+            <Button variant="primary" onClick={() => setModalOpen(true)}>
+              <Plus size={15} />
+              Schedule session
+            </Button>
+          ) : undefined
         }
       />
 
@@ -337,7 +356,7 @@ export function InstructorLiveClassesPage() {
         sessions={liveNow}
         featuredFirst
         onJoin={(session) => void handleJoin(session)}
-        onEnd={(session) => void handleEnd(session)}
+        onEnd={canAuthor ? (session) => void handleEnd(session) : undefined}
         endingId={endingId}
       />
 
@@ -346,7 +365,7 @@ export function InstructorLiveClassesPage() {
         subtitle="Prepare materials before class starts."
         sessions={upcoming}
         onJoin={(session) => void handleJoin(session)}
-        onEnd={(session) => void handleEnd(session)}
+        onEnd={canAuthor ? (session) => void handleEnd(session) : undefined}
         endingId={endingId}
       />
 
@@ -355,7 +374,7 @@ export function InstructorLiveClassesPage() {
         subtitle="Sessions that have already taken place."
         sessions={ended}
         onJoin={(session) => void handleJoin(session)}
-        onEnd={(session) => void handleEnd(session)}
+        onEnd={canAuthor ? (session) => void handleEnd(session) : undefined}
         endingId={endingId}
       />
 
@@ -366,10 +385,12 @@ export function InstructorLiveClassesPage() {
           <p className="text-[12.5px] text-secondary-text mt-1">
             {vocab('Create a Zoom meeting and schedule a session for your students.')}
           </p>
-          <Button variant="primary" className="mt-4" onClick={() => setModalOpen(true)}>
-            <Plus size={15} />
-            Schedule session
-          </Button>
+          {canAuthor ? (
+            <Button variant="primary" className="mt-4" onClick={() => setModalOpen(true)}>
+              <Plus size={15} />
+              Schedule session
+            </Button>
+          ) : null}
         </GlassCard>
       ) : null}
 

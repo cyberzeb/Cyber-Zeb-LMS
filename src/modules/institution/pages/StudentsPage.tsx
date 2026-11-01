@@ -19,9 +19,9 @@ import { useCampusContext } from '../context/CampusContext'
 import { peoplePageConfigs } from '../data/peoplePageConfig'
 import { DEFAULT_CAMPUS_ID } from '../data/orgSeedData'
 import { migrateStudentRecord } from '../api/peopleApi'
+import { usePrograms } from '../hooks/usePrograms'
+import { programSemesters, programYears } from '../utils/programUtils'
 import {
-  departmentMaxYears,
-  departmentSemestersPerYear,
   formatProgramSemester,
   formatStudyYear,
   programSemesterOptions,
@@ -59,10 +59,11 @@ export function StudentsPage() {
     name: '',
     email: '',
     campusId: DEFAULT_CAMPUS_ID,
-    departmentId: '',
+    programId: '',
     studyYear: 1,
     programSemester: 1,
   })
+  const { programs } = usePrograms()
 
   useEffect(() => {
     setPeople((prev) => prev.map((p) => migrateStudentRecord(p, departments)))
@@ -105,14 +106,15 @@ export function StudentsPage() {
     [activeCampuses],
   )
 
-  const inviteDepartments = useMemo(
-    () => departments.filter((d) => d.campusId === inviteForm.campusId),
-    [departments, inviteForm.campusId],
+  // New students join a program taught on their campus.
+  const invitePrograms = useMemo(
+    () => programs.filter((p) => p.campusId === inviteForm.campusId && p.status === 'active'),
+    [programs, inviteForm.campusId],
   )
 
-  const inviteDept = inviteDepartments.find((d) => d.id === inviteForm.departmentId)
-  const inviteMaxYears = departmentMaxYears(inviteDept)
-  const inviteSemestersPerYear = departmentSemestersPerYear(inviteDept)
+  const inviteProgram = invitePrograms.find((p) => p.id === inviteForm.programId)
+  const inviteMaxYears = programYears(inviteProgram)
+  const inviteSemestersPerYear = programSemesters(inviteProgram)
 
   useEffect(() => {
     if (inviteForm.studyYear > inviteMaxYears) {
@@ -127,17 +129,17 @@ export function StudentsPage() {
   }, [inviteSemestersPerYear, inviteForm.programSemester])
 
   useEffect(() => {
-    if (!inviteDepartments.some((d) => d.id === inviteForm.departmentId)) {
-      setInviteForm((prev) => ({ ...prev, departmentId: inviteDepartments[0]?.id ?? '' }))
+    if (!invitePrograms.some((p) => p.id === inviteForm.programId)) {
+      setInviteForm((prev) => ({ ...prev, programId: invitePrograms[0]?.id ?? '' }))
     }
-  }, [inviteDepartments, inviteForm.departmentId])
+  }, [invitePrograms, inviteForm.programId])
 
   const openInvite = () => {
     setInviteForm({
       name: '',
       email: '',
       campusId: campusFilter !== 'all' ? campusFilter : DEFAULT_CAMPUS_ID,
-      departmentId: '',
+      programId: '',
       studyYear: 1,
       programSemester: 1,
     })
@@ -145,12 +147,13 @@ export function StudentsPage() {
   }
 
   const handleInvite = () => {
-    if (!inviteForm.name.trim() || !inviteForm.email.trim() || !inviteForm.departmentId) {
+    if (!inviteForm.name.trim() || !inviteForm.email.trim() || !inviteForm.programId) {
       notify('Please complete all required fields.', 'error')
       return
     }
-    const dept = departments.find((d) => d.id === inviteForm.departmentId)
-    if (!dept) return
+    const program = programs.find((p) => p.id === inviteForm.programId)
+    const dept = departments.find((d) => d.id === program?.departmentId)
+    if (!program || !dept) return
 
     const newStudent = withAdminVerification({
       id: createId('user'),
@@ -159,6 +162,7 @@ export function StudentsPage() {
       role: 'Student',
       department: dept.name,
       departmentId: dept.id,
+      programId: program.id,
       studyYear: inviteForm.studyYear,
       programSemester: inviteForm.programSemester,
       campusId: inviteForm.campusId,
@@ -282,7 +286,7 @@ export function StudentsPage() {
             <Button variant="secondary" onClick={() => setInviteOpen(false)}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleInvite} disabled={!inviteForm.departmentId}>
+            <Button variant="primary" onClick={handleInvite} disabled={!inviteForm.programId}>
               Send Invite
             </Button>
           </>
@@ -306,7 +310,7 @@ export function StudentsPage() {
             <select
               value={inviteForm.campusId}
               onChange={(e) =>
-                setInviteForm({ ...inviteForm, campusId: e.target.value, departmentId: '' })
+                setInviteForm({ ...inviteForm, campusId: e.target.value, programId: '' })
               }
               className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
             >
@@ -318,22 +322,23 @@ export function StudentsPage() {
             </select>
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-[12px] font-semibold text-navy-900">Department</span>
+            <span className="text-[12px] font-semibold text-navy-900">Program</span>
             <select
-              value={inviteForm.departmentId}
+              value={inviteForm.programId}
               onChange={(e) =>
                 setInviteForm({
                   ...inviteForm,
-                  departmentId: e.target.value,
+                  programId: e.target.value,
                   studyYear: 1,
                   programSemester: 1,
                 })
               }
               className="w-full bg-white border border-divider rounded-lg px-3 py-2 text-[13px] text-navy-900 focus:outline-none focus:border-lemon-500/50 focus:ring-2 focus:ring-lemon-500/25"
             >
-              {inviteDepartments.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
+              {invitePrograms.length === 0 ? <option value="">No programs on this campus yet</option> : null}
+              {invitePrograms.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} · {p.department}
                 </option>
               ))}
             </select>

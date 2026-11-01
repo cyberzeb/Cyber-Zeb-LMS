@@ -18,6 +18,8 @@ import {
   Users,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { canOpenAdminPage } from '../../../shared/auth/rolePermissions'
+import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 import { useInstitutionOverview } from '../hooks/useInstitution'
 import { useCampusContext } from '../context/CampusContext'
 import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
@@ -143,6 +145,11 @@ export function InstitutionOverviewPage() {
   const navigate = useNavigate()
   const { setupPercent, setupSteps } = useCampusContext()
   const { data, isLoading, isError } = useInstitutionOverview()
+  // Registrars share this dashboard: only show shortcuts to pages their office can open.
+  const role = readPortalSession()?.role
+  const can = (to: string) => canOpenAdminPage(role, to)
+  const viewAll = (to: string) => (can(to) ? () => navigate(to) : undefined)
+  const firstName = getSessionPerson()?.name.split(' ')[0] ?? 'Admin'
 
   if (isLoading) {
     return (
@@ -207,7 +214,7 @@ export function InstitutionOverviewPage() {
 
   return (
     <div className="flex flex-col gap-5 md:gap-6">
-      {setupPercent < 100 ? (
+      {setupPercent < 100 && can('/admin/institution/structure') ? (
         <GlassCard className="p-4 border-lemon-500/30 bg-lemon-500/[0.06]">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
@@ -229,7 +236,7 @@ export function InstitutionOverviewPage() {
 
       <div>
         <h1 className="text-[22px] font-bold text-navy-900">
-          {t('common.welcomeBack')} <span className="text-navy-700">Admin</span>
+          {t('common.welcomeBack')} <span className="text-navy-700">{firstName}</span>
         </h1>
         <p className="text-[13px] text-secondary-text mt-1">
           Track {term.organization.toLowerCase()} performance, {term.learner.toLowerCase()} progress and operational priorities for {data.institutionName}.
@@ -239,15 +246,15 @@ export function InstitutionOverviewPage() {
             <Plus size={15} />
             Create {term.course}
           </Button>
-          <Button variant="outline-blue" onClick={() => navigate('/admin/people')}>
+          <Button variant="outline-blue" onClick={() => navigate('/admin/students')}>
             <UserPlus size={15} />
             Add {term.learner}
           </Button>
-          <Button variant="outline-purple" onClick={() => navigate('/admin/people')}>
+          <Button variant="outline-purple" onClick={() => navigate('/admin/instructors')}>
             <Presentation size={15} />
             Add {term.trainer}
           </Button>
-          <Button variant="secondary" onClick={() => navigate('/admin/reports')}>
+          <Button variant="secondary" onClick={() => navigate('/admin/course-offerings')}>
             <CalendarClock size={15} />
             Schedule {term.cohort}
           </Button>
@@ -255,7 +262,10 @@ export function InstitutionOverviewPage() {
             <Megaphone size={15} />
             Create Announcement
           </Button>
-          <Button variant="primary" onClick={() => navigate('/admin/reports')}>
+          <Button
+            variant="primary"
+            onClick={() => navigate(can('/admin/reports') ? '/admin/reports' : '/admin/academic-reports')}
+          >
             <FileText size={15} />
             Generate Report
           </Button>
@@ -422,7 +432,7 @@ export function InstitutionOverviewPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">
         <div className="xl:col-span-2 space-y-4">
-          <DashboardSummaryCard title={`Top ${term.courses}`} onViewAll={() => navigate('/admin/courses')}>
+          <DashboardSummaryCard title={`Top ${term.courses}`} onViewAll={viewAll('/admin/courses')}>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-left">
                 <thead>
@@ -461,7 +471,7 @@ export function InstitutionOverviewPage() {
             </div>
           </DashboardSummaryCard>
 
-          <DashboardSummaryCard title="Assignment Submissions" onViewAll={() => navigate('/admin/assignments')}>
+          <DashboardSummaryCard title="Assignment Submissions" onViewAll={viewAll('/admin/assignments')}>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] text-left">
                 <thead>
@@ -500,7 +510,7 @@ export function InstitutionOverviewPage() {
         </div>
 
         <div className="space-y-4">
-          <DashboardSummaryCard title="Calendar" onViewAll={() => navigate('/admin/calendar')}>
+          <DashboardSummaryCard title="Calendar" onViewAll={viewAll('/admin/calendar')}>
             <div className="space-y-2.5">
               {data.calendarEvents.map((event) => (
                 <div key={event.id} className="flex items-center gap-2.5">
@@ -517,7 +527,7 @@ export function InstitutionOverviewPage() {
             </div>
           </DashboardSummaryCard>
 
-          <DashboardSummaryCard title="Announcements" onViewAll={() => navigate('/admin/announcements')}>
+          <DashboardSummaryCard title="Announcements" onViewAll={viewAll('/admin/announcements')}>
             <AnnouncementDashboardList
               items={data.recentAnnouncements.map((announcement) => ({
                 id: announcement.id,
@@ -531,7 +541,7 @@ export function InstitutionOverviewPage() {
             />
           </DashboardSummaryCard>
 
-          <DashboardSummaryCard title="Upcoming Live Sessions" onViewAll={() => navigate('/admin/live-classes')}>
+          <DashboardSummaryCard title="Upcoming Live Sessions" onViewAll={viewAll('/admin/live-classes')}>
             <div className="space-y-2">
               {data.upcomingLiveClasses.map((item) => (
                 <div key={item.id} className="rounded-lg border border-divider p-2.5">
@@ -550,7 +560,10 @@ export function InstitutionOverviewPage() {
             </div>
           </DashboardSummaryCard>
 
-          <DashboardSummaryCard title="Help Desk Tickets" onViewAll={() => navigate('/admin/help-desk')}>
+{/* Support and integrations belong to the institution admin. */}
+          {can('/admin/help-desk') ? (
+            <>
+          <DashboardSummaryCard title="Help Desk Tickets" onViewAll={viewAll('/admin/help-desk')}>
             <div className="space-y-2">
               {data.helpDeskTickets.map((ticket) => (
                 <div key={ticket.id} className="rounded-lg border border-divider p-2.5">
@@ -572,7 +585,7 @@ export function InstitutionOverviewPage() {
             </div>
           </DashboardSummaryCard>
 
-          <DashboardSummaryCard title="System Integrations" onViewAll={() => navigate('/admin/api-integrations')}>
+          <DashboardSummaryCard title="System Integrations" onViewAll={viewAll('/admin/api-integrations')}>
             <div className="space-y-2">
               {data.integrationStatus.map((integration) => (
                 <div key={integration.id} className="flex items-center justify-between gap-2 rounded-lg border border-divider p-2.5">
@@ -590,8 +603,10 @@ export function InstitutionOverviewPage() {
               ))}
             </div>
           </DashboardSummaryCard>
+            </>
+          ) : null}
 
-          <DashboardSummaryCard title="Upcoming Deadlines" onViewAll={() => navigate('/admin/calendar')}>
+                    <DashboardSummaryCard title="Upcoming Deadlines" onViewAll={viewAll('/admin/calendar')}>
             <div className="space-y-2">
               {data.upcomingDeadlines.map((item) => (
                 <div key={item.id} className="rounded-lg border border-divider p-2.5">

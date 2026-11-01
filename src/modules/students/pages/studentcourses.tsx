@@ -4,7 +4,7 @@ import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
-import { Monogram } from '../../../shared/components/Monogram'
+import { CourseCover } from '../../../shared/components/CourseCover'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StudentPageError, StudentPageLoading } from '../components/StudentPageStates'
 import { useStudentDashboard } from '../hooks/useStudentDashboard'
@@ -86,10 +86,10 @@ export function StudentCoursesPage() {
             <GlassCard
               className="p-0 overflow-hidden hover:shadow-md transition-shadow border-l-4 border-l-lemon-500 cursor-pointer h-full"
             >
-              <div className="p-5 flex flex-col gap-4 h-full">
+              <CourseCover title={course.title} code={course.code} thumbnailUrl={course.thumbnailUrl} />
+              <div className="p-5 flex flex-col gap-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <Monogram label={course.title} size="md" />
                     <div className="min-w-0">
                       <div className="text-[10.5px] font-bold uppercase tracking-wider text-secondary-text">
                         {course.code}

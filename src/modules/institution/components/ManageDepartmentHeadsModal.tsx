@@ -10,14 +10,13 @@ import {
   getEligibleDepartmentHeads,
   resolveDepartmentHeadId,
 } from '../utils/departmentHeadUtils'
-import type { Campus, College, Department, PersonRow } from '../types'
+import type { Campus, Department, PersonRow } from '../types'
 
 interface ManageDepartmentHeadsModalProps {
   open: boolean
   departments: Department[]
   people: PersonRow[]
   campuses: Campus[]
-  colleges: College[]
   onClose: () => void
   onSave: (departments: Department[]) => void
 }
@@ -27,7 +26,6 @@ export function ManageDepartmentHeadsModal({
   departments,
   people,
   campuses,
-  colleges,
   onClose,
   onSave,
 }: ManageDepartmentHeadsModalProps) {
@@ -48,12 +46,9 @@ export function ManageDepartmentHeadsModal({
         const campusA = campuses.find((c) => c.id === a.campusId)?.name ?? ''
         const campusB = campuses.find((c) => c.id === b.campusId)?.name ?? ''
         if (campusA !== campusB) return campusA.localeCompare(campusB)
-        const collegeA = colleges.find((c) => c.id === a.collegeId)?.name ?? ''
-        const collegeB = colleges.find((c) => c.id === b.collegeId)?.name ?? ''
-        if (collegeA !== collegeB) return collegeA.localeCompare(collegeB)
         return a.name.localeCompare(b.name)
       }),
-    [departments, campuses, colleges],
+    [departments, campuses],
   )
 
   const assignedCount = useMemo(
@@ -106,7 +101,6 @@ export function ManageDepartmentHeadsModal({
           <div className="max-h-[420px] overflow-y-auto app-scroll pr-1 flex flex-col gap-2.5">
             {sortedDepartments.map((dept) => {
               const campus = campuses.find((c) => c.id === dept.campusId)
-              const college = colleges.find((c) => c.id === dept.collegeId)
               const eligible = getEligibleDepartmentHeads(people, dept)
               const selectedId = assignments[dept.id] ?? ''
               const selectedPerson = people.find((p) => p.id === selectedId)
@@ -131,7 +125,7 @@ export function ManageDepartmentHeadsModal({
                         )}
                       </div>
                       <p className="text-[11.5px] text-secondary-text mt-1">
-                        {college?.name ?? 'College'} · {campus?.name ?? 'Campus'}
+                        {campus?.name ?? 'Campus'}
                         {campus?.code ? ` (${campus.code})` : ''}
                       </p>
                     </div>

@@ -3,6 +3,7 @@ import { Bell, Eye, Megaphone, Plus, Sparkles } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { FilterTabs } from '../../../shared/components/FilterTabs'
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { useTeachingPermissions } from '../../../shared/auth/rolePermissions'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { AnnouncementFormModal } from '../../../shared/components/AnnouncementFormModal'
 import {
@@ -25,6 +26,8 @@ import type { AnnouncementFormInput, AnnouncementRecord } from '../../../shared/
 const tabs = ['All', 'Important', 'Updates', 'Mine']
 
 export function InstructorAnnouncementsPage() {
+  // Teaching assistants read announcements; instructors publish them.
+  const { canAnnounce } = useTeachingPermissions()
   const { notify } = useToast()
   const { data, isLoading, isError, reload } = useInstructorDashboard()
   const { createAnnouncement, updateAnnouncement } = useAnnouncements()
@@ -96,7 +99,7 @@ export function InstructorAnnouncementsPage() {
         title="Announcements"
         subtitle="Reach all your students, a specific course, or hand-picked individuals."
         actions={
-          <AnnouncementCreateButton
+          !canAnnounce ? undefined : <AnnouncementCreateButton
             onClick={() => {
               if (courses.length === 0) {
                 notify('Assign a course before publishing announcements.', 'error')
@@ -169,7 +172,7 @@ export function InstructorAnnouncementsPage() {
             variant="instructor"
             item={announcement}
             onEdit={
-              announcement.isOwn !== false
+              canAnnounce && announcement.isOwn !== false
                 ? () => {
                     setEditing(readAnnouncements().find((r) => r.id === announcement.id) ?? null)
                     setModalOpen(true)
@@ -188,7 +191,7 @@ export function InstructorAnnouncementsPage() {
                 : 'Try another tab — admin notices appear under All.'
             }
             action={
-              data.announcements.length === 0 && courses.length > 0 ? (
+              canAnnounce && data.announcements.length === 0 && courses.length > 0 ? (
                 <Button variant="primary" onClick={() => { setEditing(null); setModalOpen(true) }}>
                   <Plus size={15} />
                   Publish first announcement

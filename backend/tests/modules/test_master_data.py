@@ -55,7 +55,7 @@ def _master_data(**overrides) -> dict:
         "leadership": {"president": "Dr. Michael Example", "registrar": "M. Lee"},
         "academic_structure": {
             "campus_count": 2,
-            "colleges": ["School of Computing", "School of Business"],
+            "campuses": ["Main Campus", "City Campus"],
         },
         "academic_calendar": {
             "current_academic_year": "2026/27",
