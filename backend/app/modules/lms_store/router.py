@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.demo_auth import DemoPrincipal, get_demo_principal
+from app.core.permissions import Role
 from app.core.dependencies import PlatformPrincipal, require_platform_super_admin
 from app.core.modules import assert_collection_allowed, locked_collections_for
 from app.modules.lms_store.schemas import (
@@ -138,7 +139,8 @@ async def patch_collection(
         after = await service.get_collection(principal.tenant_id, collection_key)
         ids = [u.record.get("id") for u in payload.upserts]
         background.add_task(dispatch, principal.tenant_id, collection_key, changes_between(before, after, ids))
-    if collection_key == "payments" and principal.is_tenant_admin and payload.upserts:
+    finance = principal.is_tenant_admin or principal.role == Role.FINANCE_OFFICER
+    if collection_key == "payments" and finance and payload.upserts:
         # An invoice marked paid by the finance team confirms a cohort registration.
         from app.modules.training.emails import send_registration_emails
         from app.modules.training.service import TrainingService

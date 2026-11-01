@@ -17,7 +17,8 @@ from app.modules.live_sessions.service import LiveSessionsService
 router = APIRouter()
 
 # Creating or ending meetings uses the institution's Zoom account.
-require_session_host = require_portal_roles(Role.INSTRUCTOR, Role.TEACHING_ASSISTANT)
+# Instructors schedule live classes; teaching assistants only join them.
+require_session_host = require_portal_roles(Role.INSTRUCTOR)
 
 # Zoom meeting ids are numeric. Anything else must never reach the Zoom API URL,
 # where a value such as "../users" would address a different endpoint.

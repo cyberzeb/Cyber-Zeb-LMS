@@ -1,11 +1,11 @@
 import type { AcademicTermRecord, AcademicYearRecord } from '../../modules/institution/types/academic'
-import type { Department } from '../../modules/institution/types'
+import type { ProgramRow } from '../../modules/institution/types'
 import { seedAcademicTerms, seedAcademicYears } from '../../modules/institution/data/academicSeedData'
 import { DEFAULT_SEMESTERS_PER_YEAR, ensureProgramCalendar } from '../../modules/institution/utils/academicTermUtils'
 
-function readDepartments(collections: Record<string, unknown>): Department[] {
-  const raw = collections.departments
-  return Array.isArray(raw) ? (raw as Department[]) : []
+function readPrograms(collections: Record<string, unknown>): ProgramRow[] {
+  const raw = collections.programs
+  return Array.isArray(raw) ? (raw as ProgramRow[]) : []
 }
 
 function readCampusId(collections: Record<string, unknown>): string | undefined {
@@ -22,8 +22,9 @@ function readCampusId(collections: Record<string, unknown>): string | undefined 
 export function ensureAcademicCalendarCollections(
   collections: Record<string, unknown>,
 ): Record<string, unknown> {
-  const departments = readDepartments(collections)
-  const programYears = Math.max(...departments.map((d) => d.maxYears ?? 4), 4)
+  // The calendar must cover the longest program.
+  const programs = readPrograms(collections)
+  const programYears = Math.max(...programs.map((p) => p.durationYears ?? 4), 4)
   const semestersPerYear = DEFAULT_SEMESTERS_PER_YEAR
   const expectedTerms = programYears * semestersPerYear
 

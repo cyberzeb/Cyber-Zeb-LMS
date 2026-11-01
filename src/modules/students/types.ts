@@ -97,6 +97,8 @@ export interface EnrolledCourse {
   credits: number
   status: 'active' | 'completed' | 'upcoming'
   department: string
+  /** Course cover image (data URL or https link). */
+  thumbnailUrl?: string
 }
 
 export interface LiveClassSession {

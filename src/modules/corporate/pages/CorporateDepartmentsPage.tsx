@@ -12,7 +12,7 @@ import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { useCampusContext } from '../../institution/context/CampusContext'
 import { usePeople } from '../../institution/hooks/usePeople'
 import { useTeams } from '../hooks/useTeams'
-import { DEFAULT_CAMPUS_ID, DEFAULT_COLLEGE_ID } from '../../institution/data/orgSeedData'
+import { DEFAULT_CAMPUS_ID } from '../../institution/data/orgSeedData'
 import type { Department } from '../../institution/types'
 import { CorporateDepartmentFormModal } from '../components/CorporateDepartmentFormModal'
 import {
@@ -78,7 +78,6 @@ export function CorporateDepartmentsPage() {
           facultyCount: 0,
           icon: '',
           campusId: DEFAULT_CAMPUS_ID,
-          collegeId: DEFAULT_COLLEGE_ID,
           status: values.status,
         },
       ])

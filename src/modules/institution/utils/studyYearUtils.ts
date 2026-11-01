@@ -1,13 +1,8 @@
 import type { Department } from '../types'
 import type { PersonRow } from '../types'
 import type { AcademicTermStatus } from '../types/academic'
-import type { CourseOfferingRecord } from '../types/academic'
 
 export const DEFAULT_MAX_YEARS = 4
-
-export function departmentMaxYears(dept: Department | undefined): number {
-  return dept?.maxYears ?? DEFAULT_MAX_YEARS
-}
 
 export function formatStudyYear(year: number): string {
   const suffix =
@@ -75,20 +70,3 @@ export function resolveStudentProgramSemester(student: PersonRow): number {
   return student.programSemester ?? 1
 }
 
-export function departmentSemestersPerYear(dept: Department | undefined): number {
-  return dept?.semestersPerYear ?? 2
-}
-
-export function studentMatchesOffering(
-  student: PersonRow,
-  offering: CourseOfferingRecord,
-  departments: Department[],
-): boolean {
-  const deptId = resolveStudentDepartmentId(student, departments)
-  if (deptId !== offering.departmentId) return false
-  const year = student.studyYear ?? 1
-  if (year !== offering.studyYear) return false
-  const semester = resolveStudentProgramSemester(student)
-  const offeringSemester = offering.programSemester ?? 1
-  return semester === offeringSemester
-}

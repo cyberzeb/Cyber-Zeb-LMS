@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill, type StatusTone } from '../../../shared/components/StatusPill'
@@ -7,6 +8,8 @@ interface CampusRoleTableProps {
   people: PersonRow[]
   campuses: Campus[]
   detailColumnLabel: string
+  /** Detail column content; defaults to the person's department / office. */
+  detail?: (person: PersonRow) => ReactNode
   onEdit: (person: PersonRow) => void
   onDelete: (person: PersonRow) => void
 }
@@ -34,6 +37,7 @@ export function CampusRoleTable({
   people,
   campuses,
   detailColumnLabel,
+  detail,
   onEdit,
   onDelete,
 }: CampusRoleTableProps) {
@@ -78,7 +82,9 @@ export function CampusRoleTable({
                 </span>
               </div>
 
-              <div className="text-[12.5px] text-navy-700 truncate">{person.department}</div>
+              <div className="text-[12.5px] text-navy-700 truncate">
+                {detail ? detail(person) : person.department}
+              </div>
               <div className="text-[12px] text-secondary-text">{person.lastActive}</div>
 
               <div>

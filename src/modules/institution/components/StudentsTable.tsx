@@ -6,6 +6,7 @@ import {
   formatStudyYear,
   resolveStudentProgramSemester,
 } from '../utils/studyYearUtils'
+import { usePrograms } from '../hooks/usePrograms'
 import type { Campus, PersonRow } from '../types'
 
 interface StudentsTableProps {
@@ -35,6 +36,9 @@ function campusLabel(campusId: string | undefined, campuses: Campus[]): string {
 }
 
 export function StudentsTable({ students, campuses, onEdit, onDelete }: StudentsTableProps) {
+  const { programs } = usePrograms()
+  const programName = (student: PersonRow) =>
+    programs.find((p) => p.id === student.programId)?.name ?? student.department
   return (
     <GlassCard className="p-0 overflow-hidden">
       <div className="hidden md:grid md:grid-cols-[2fr_0.8fr_1.5fr_1fr_0.9fr_0.7fr] gap-4 px-6 py-3.5 table-header-bar">
@@ -75,7 +79,7 @@ export function StudentsTable({ students, campuses, onEdit, onDelete }: Students
 
               <div className="min-w-0">
                 <div className="text-[12.5px] font-semibold text-navy-800 truncate">
-                  {student.department}
+                  {programName(student)}
                 </div>
                 <div className="text-[11px] text-secondary-text mt-0.5">
                   {formatStudyYear(student.studyYear ?? 1)} ·{' '}

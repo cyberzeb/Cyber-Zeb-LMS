@@ -182,7 +182,7 @@ export const peoplePageConfigs: Record<PeoplePageFocus, PeoplePageConfig> = {
   Registrar: {
     title: 'Registrars',
     subtitle:
-      'Registrar staff manage student records, enrolment and transcripts from the admin portal.',
+      'Registrars run the academic calendar, course offerings, enrolment, student records and transcripts from the admin portal.',
     inviteLabel: 'Add Registrar',
     inviteTitle: 'Invite Registrar',
     inviteDescription: 'Grant admin portal access for student records, enrolment and transcripts.',
@@ -205,29 +205,46 @@ export const peoplePageConfigs: Record<PeoplePageFocus, PeoplePageConfig> = {
       ]
     },
   },
-  HeadOfDepartment: {
-    title: 'Heads of Department',
-    subtitle:
-      'Heads of department run one department: sections, instructor assignment and department reports.',
-    inviteLabel: 'Add Head of Department',
-    inviteTitle: 'Invite Head of Department',
-    inviteDescription: 'Grant staff portal access scoped to one academic department.',
-    defaultRole: 'HeadOfDepartment',
+  FinanceOfficer: {
+    title: 'Finance Officers',
+    subtitle: 'Finance officers manage tuition and fee invoices and payments from the admin portal.',
+    inviteLabel: 'Add Finance Officer',
+    inviteTitle: 'Invite Finance Officer',
+    inviteDescription: 'Grant admin portal access to the finance dashboard, invoices and payments.',
+    defaultRole: 'FinanceOfficer',
     lockRole: true,
-    searchPlaceholder: 'Search heads of department by name or email...',
-    emptyMessage: 'No heads of department match your search.',
+    searchPlaceholder: 'Search finance officers by name or email...',
+    emptyMessage: 'No finance officers match your search.',
     showRoleTabs: false,
     hideRoleColumn: true,
     getStats: (people) => {
-      const heads = filterRole(people, 'HeadOfDepartment')
+      const officers = filterRole(people, 'FinanceOfficer')
       return [
-        { label: 'Heads of Department', value: heads.length, icon: <UserCog size={STAT} /> },
-        { label: 'Active', value: countByStatus(heads, 'active'), icon: <Users size={STAT} /> },
-        {
-          label: 'Departments Covered',
-          value: new Set(heads.map((p) => p.department)).size,
-          icon: <Users size={STAT} />,
-        },
+        { label: 'Finance Officers', value: officers.length, icon: <UserCog size={STAT} /> },
+        { label: 'Active', value: countByStatus(officers, 'active'), icon: <Users size={STAT} /> },
+        { label: 'Pending Invites', value: countByStatus(officers, 'invited'), icon: <MailPlus size={STAT} /> },
+      ]
+    },
+  },
+  TeachingAssistant: {
+    title: 'Teaching Assistants',
+    subtitle:
+      'Teaching assistants grade submissions and take attendance on the courses they are assigned to.',
+    inviteLabel: 'Add Teaching Assistant',
+    inviteTitle: 'Invite Teaching Assistant',
+    inviteDescription: 'Grant instructor portal access limited to grading and attendance on assigned courses.',
+    defaultRole: 'TeachingAssistant',
+    lockRole: true,
+    searchPlaceholder: 'Search teaching assistants by name or email...',
+    emptyMessage: 'No teaching assistants match your search.',
+    showRoleTabs: false,
+    hideRoleColumn: true,
+    getStats: (people) => {
+      const assistants = filterRole(people, 'TeachingAssistant')
+      return [
+        { label: 'Teaching Assistants', value: assistants.length, icon: <Presentation size={STAT} /> },
+        { label: 'Active', value: countByStatus(assistants, 'active'), icon: <Users size={STAT} /> },
+        { label: 'Pending Invites', value: countByStatus(assistants, 'invited'), icon: <MailPlus size={STAT} /> },
       ]
     },
   },
@@ -353,28 +370,37 @@ export const peoplePageConfigs: Record<PeoplePageFocus, PeoplePageConfig> = {
   },
 }
 
-export const allPeopleTabs = ['All', 'Students', 'Instructors', 'Admins', 'Guardians', 'Staff', 'Help Desk']
+/** University Edition: one tab per institution role. */
+export const allPeopleTabs = [
+  'All',
+  'Students',
+  'Instructors',
+  'Teaching Assistants',
+  'Guardians',
+  'Admins',
+  'Registrars',
+  'Finance',
+]
 
 export const tabToRole: Record<string, PersonRole> = {
   Students: 'Student',
   Instructors: 'Instructor',
-  Admins: 'Admin',
+  'Teaching Assistants': 'TeachingAssistant',
   Guardians: 'Guardian',
-  Staff: 'Staff',
-  Registrar: 'Registrar',
-  'Head of Department': 'HeadOfDepartment',
-  'Help Desk': 'HelpDesk',
+  Admins: 'Admin',
+  Registrars: 'Registrar',
+  Finance: 'FinanceOfficer',
 }
 
+/** Roles an institution admin can give a new University account. */
 export const roleOptions: PersonRole[] = [
   'Student',
   'Instructor',
+  'TeachingAssistant',
+  'Guardian',
   'Admin',
   'Registrar',
-  'Guardian',
-  'Staff',
-  'HeadOfDepartment',
-  'HelpDesk',
+  'FinanceOfficer',
 ]
 
 export const departmentOptions = [

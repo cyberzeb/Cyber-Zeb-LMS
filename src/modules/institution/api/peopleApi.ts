@@ -2,7 +2,7 @@ import { guardianLinkFields } from '../../../shared/people/guardianLinks'
 import { createId } from '../../../shared/hooks/useLocalStorageState'
 import { DEFAULT_CAMPUS_ID } from '../data/orgSeedData'
 import { INSTRUCTOR_FACULTY_LABEL } from '../utils/courseAssignmentUtils'
-import type { Campus, Department, PersonRow } from '../types'
+import type { Campus, Department, PersonRow, ProgramRow } from '../types'
 
 export interface StudentImportInput {
   name: string
@@ -36,7 +36,8 @@ export interface UpdateStudentInput {
   name: string
   email: string
   campusId: string
-  departmentId: string
+  /** The program the student studies; its department is derived from it. */
+  programId: string
   studyYear: number
   programSemester: number
   status: PersonRow['status']
@@ -334,22 +335,23 @@ export async function updateStudent(
   input: UpdateStudentInput,
   campuses: Campus[],
   departments: Department[],
+  programs: ProgramRow[],
 ): Promise<PersonRow> {
   await new Promise((resolve) => setTimeout(resolve, 350))
 
   const campus = campuses.find((c) => c.id === input.campusId)
   if (!campus) throw new Error('Selected campus was not found.')
 
-  const department = departments.find(
-    (d) => d.id === input.departmentId && d.campusId === input.campusId,
-  )
-  if (!department) throw new Error('Selected department does not belong to this campus.')
+  const program = programs.find((p) => p.id === input.programId)
+  if (!program) throw new Error('Choose the program this student studies.')
+  const department = departments.find((d) => d.id === program.departmentId)
+  if (!department) throw new Error('This program has no department.')
 
   if (!input.name.trim()) throw new Error('Student name is required.')
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) throw new Error('Invalid email address.')
 
-  const maxYears = department.maxYears ?? 4
-  const semestersPerYear = department.semestersPerYear ?? 2
+  const maxYears = program.durationYears
+  const semestersPerYear = program.semestersPerYear
   const studyYear = Math.min(Math.max(1, input.studyYear), maxYears)
   const programSemester = Math.min(Math.max(1, input.programSemester), semestersPerYear)
 
@@ -360,6 +362,7 @@ export async function updateStudent(
     role: 'Student',
     department: department.name,
     departmentId: department.id,
+    programId: program.id,
     studyYear,
     programSemester,
     campusId: campus.id,

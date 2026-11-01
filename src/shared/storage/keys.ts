@@ -3,7 +3,6 @@ export const STORAGE_KEYS = {
   session: 'berana:session',
   people: 'berana:people',
   campuses: 'berana:campuses',
-  colleges: 'berana:colleges',
   departments: 'berana:departments',
   programs: 'berana:programs',
   academicYears: 'berana:academic-years',

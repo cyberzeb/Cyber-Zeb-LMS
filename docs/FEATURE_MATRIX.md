@@ -37,7 +37,7 @@ Status as of 2026-09-27 — University, Corporate and Training Editions complete
 | Payment gateway | 🟡 | Server checkout: Chapa (ETB) when `CHAPA_SECRET_KEY` is set, verified with Chapa before marking paid; demo provider on demo servers. Chapa not yet tested with real keys |
 | Email notifications | ✅ | LMS events email the right people: announcements, published assignments/quizzes, grades (student + guardians), live classes, certificates, invoices, training assigned (corporate), cohort registration / seat confirmed / cancelled (training). Per-event switches in Settings; personal switches respected (`communication/notifications.py`) |
 | Report PDF export | ✅ | `exportInstitutionReport.ts` |
-| Automated tests | ✅ | Backend: 115 tests (adds corporate assignments, manager scope, training reminders, certification expiry/renewal, training registration → payment → enrollment, cohort scoping, program certificates). Frontend: Vitest, `npm test` (certificates, grading, guardian links, API errors, edition vocabulary, training rules) |
+| Automated tests | ✅ | Backend: 124 tests (adds University role permissions, corporate assignments, manager scope, training reminders, certification expiry/renewal, training registration → payment → enrollment, cohort scoping, program certificates). Frontend: Vitest, `npm test` (certificates, grading, guardian links, API errors, edition vocabulary, training rules) |
 | Lint / type-check / build | ✅ | 0 lint errors (59 warnings tracked), `tsc` clean, build passes |
 | Read scoping per role | ✅ | Server builds each role's view (`lms_store/scope.py`): own records, own/taught courses, linked children; others as directory entries only. Answer keys never sent to students |
 | Per-person portal settings | ✅ | Fixed in Phase 1 (previously one shared object for all users) |
@@ -80,10 +80,10 @@ Status as of 2026-09-27 — University, Corporate and Training Editions complete
 
 | Feature | Status | Notes |
 |---|---|---|
-| Campus → College → Department → Program → Course → Offering | ✅ | Enforced on the server: a record cannot point at a parent that does not exist |
-| Colleges / faculties → departments → programs | ✅ | Programs are first-class records owned by a department |
+| Campus → Department → Program → Course → Offering | ✅ | Enforced on the server: a record cannot point at a parent that does not exist |
+| Departments → programs | ✅ | No colleges / faculties: departments sit directly under a campus; programs are owned by a department |
 | University report pack | ✅ | Enrolment by program, term summary, grade and standing distribution, students needing attention, Dean's List — all CSV exportable |
-| University roles (registrar, head of department) | ✅ | Registrar uses the admin portal; head of department uses the staff portal |
+| University roles (7: admin, registrar, finance officer, instructor, teaching assistant, student, guardian) | ✅ | Registrar and finance officer use the admin portal with their own menus; teaching assistants use the instructor portal with grading and attendance only |
 | Academic years → terms / semesters | ✅ | Offerings now run in a term; grades and reports are grouped by it |
 | Course offerings (course per term) | ✅ | |
 | Students, instructors, staff, guardians, admins | ✅ | |

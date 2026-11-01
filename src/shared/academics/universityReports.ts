@@ -5,6 +5,7 @@
  * transcripts, so reports and transcripts can never disagree.
  */
 import type { PersonRow } from '../../modules/institution/types'
+import { resolveOfferingProgramId, resolveStudentProgram } from '../../modules/institution/utils/programUtils'
 import {
   readAttendances,
   readCourseOfferings,
@@ -86,14 +87,17 @@ export function buildUniversityReportPack(): UniversityReportPack {
 
   const records = students.map((student) => ({
     student,
+    program: resolveStudentProgram(student, programs),
     transcript: buildTranscript(student, sources) as Transcript,
   }))
+  const programName = (student: PersonRow) =>
+    records.find((r) => r.student.id === student.id)?.program?.name ?? (student.department || '—')
   const graded = records.filter((r) => r.transcript.cumulativeGpa !== null)
 
   // ── Enrolment by program ────────────────────────────────────────────────
   const programEnrolment: ProgramEnrolmentRow[] = programs.map((program) => {
-    const inProgram = records.filter((r) => r.student.department === program.department)
-    const sections = offerings.filter((o) => o.departmentName === program.department)
+    const inProgram = records.filter((r) => r.program?.id === program.id)
+    const sections = offerings.filter((o) => resolveOfferingProgramId(o, programs) === program.id)
     return {
       programId: program.id,
       program: program.name,
@@ -191,7 +195,7 @@ export function buildUniversityReportPack(): UniversityReportPack {
       return {
         studentId: student.id,
         student: student.name,
-        program: student.department || '—',
+        program: programName(student),
         gpa: transcript.cumulativeGpa,
         attendance,
         reasons,
@@ -205,7 +209,7 @@ export function buildUniversityReportPack(): UniversityReportPack {
     .map(({ student, transcript }) => ({
       studentId: student.id,
       student: student.name,
-      program: student.department || '—',
+      program: programName(student),
       gpa: transcript.cumulativeGpa as number,
     }))
     .sort((a, b) => b.gpa - a.gpa)

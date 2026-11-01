@@ -29,6 +29,8 @@ export interface InstructorQuiz {
   submissions: number
   enrolled: number
   avgScore?: string
+  /** Attempts with essays still to mark. */
+  toReview?: number
 }
 
 export interface AssignmentSubmission {

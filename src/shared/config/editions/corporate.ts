@@ -39,7 +39,6 @@ export const corporateEditionConfig: EditionConfig = {
   terminology,
   modules: {
     campuses: false,
-    colleges: false,
     programs: false,
     students: true,
     instructors: true,

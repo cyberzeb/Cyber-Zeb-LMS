@@ -1,3 +1,4 @@
+import { ROLE_LABELS } from '../../../shared/auth/portalRoutes'
 import { Check, X } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatusPill, type StatusTone } from '../../../shared/components/StatusPill'
@@ -16,7 +17,8 @@ const roleColors: Record<PersonRow['role'], string> = {
   Instructor: 'bg-lemon-50 text-lemon-900',
   Admin: 'bg-navy-50 text-navy-700',
   Registrar: 'bg-navy-50 text-navy-700',
-  HeadOfDepartment: 'bg-lemon-50 text-lemon-900',
+  FinanceOfficer: 'bg-success-bg text-success',
+  TeachingAssistant: 'bg-lemon-50 text-lemon-900',
   Guardian: 'bg-warning-bg text-[#8A6D00]',
   Staff: 'bg-navy-50 text-navy-500',
   HelpDesk: 'bg-info-bg text-info',
@@ -61,7 +63,7 @@ export function VerifyQueueTable({
 
               <div>
                 <span className={`inline-block text-[10.5px] font-bold px-2.5 py-1 rounded-md ${roleColors[person.role]}`}>
-                  {person.role}
+                  {ROLE_LABELS[person.role] ?? person.role}
                 </span>
               </div>
 

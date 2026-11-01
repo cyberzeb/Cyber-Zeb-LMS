@@ -51,8 +51,6 @@ const campuses = [
   { id: 'c2', name: 'Online Campus', code: 'ONLINE', address: 'Live online sessions', subtitle: 'Virtual classroom', status: 'active' },
 ]
 
-const colleges = [{ id: 'col1', name: 'Apex Training Institute', deanName: 'Hana Wolde', campusId: 'c1', description: 'Training divisions' }]
-
 const DIVISIONS = [
   { id: 'd1', name: 'Project & Business', head: 'Yonas Alemu', icon: '📐', description: 'Project management, agile delivery and business skills.' },
   { id: 'd2', name: 'Data & Technology', head: 'Meron Tesfaye', icon: '📊', description: 'Spreadsheets, analytics and dashboards.' },
@@ -67,7 +65,6 @@ const departments = DIVISIONS.map((d) => ({
   facultyCount: 1,
   icon: d.icon,
   campusId: 'c1',
-  collegeId: 'col1',
   description: d.description,
   status: 'active',
 }))
@@ -598,7 +595,6 @@ export function buildTrainingSeedPayload(): Record<string, unknown> {
   const { questions, quizzes, assignments } = assessments()
   return {
     campuses,
-    colleges,
     departments,
     people: [ADMIN, ...TRAINERS, HELPDESK, ...LEARNERS],
     courses,

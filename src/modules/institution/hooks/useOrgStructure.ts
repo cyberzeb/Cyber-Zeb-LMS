@@ -8,21 +8,15 @@ import {
   readCourseOfferings as readCourseOfferingsFromCache,
   readEnrollments as readEnrollmentsFromCache,
   readSettings as readSettingsFromCache,
+  readPrograms as readProgramsFromCache,
 } from '../../../shared/storage/readers'
 
-import {
+import { DEFAULT_CAMPUS_ID } from '../data/orgSeedData'
 
-  DEFAULT_CAMPUS_ID,
-
-  DEFAULT_COLLEGE_ID,
-
-} from '../data/orgSeedData'
-
-import type { Campus, CampusRecord, College, Department, SetupStep, SsoProvider } from '../types'
+import type { Campus, CampusRecord, Department, SetupStep, SsoProvider } from '../types'
 
 export const ORG_STORAGE_KEYS = {
   campuses: 'berana:campuses',
-  colleges: 'berana:colleges',
   departments: 'berana:departments',
   programs: 'berana:programs',
   courses: 'berana:courses',
@@ -32,36 +26,20 @@ export const ORG_STORAGE_KEYS = {
 
 
 
-type LegacyDepartment = Omit<Department, 'campusId' | 'collegeId'> & {
-
+type LegacyDepartment = Omit<Department, 'campusId'> & {
   campusId?: string
-
+  /** Retired: colleges were removed (Campus → Department). */
   collegeId?: string
-
 }
 
 
 
-function migrateDepartments(raw: LegacyDepartment[], colleges: College[]): Department[] {
-
+/** Departments belong straight to a campus; a stored college link is dropped. */
+function migrateDepartments(raw: LegacyDepartment[]): Department[] {
   return raw.map((dept) => {
-
-    const campusId = dept.campusId ?? DEFAULT_CAMPUS_ID
-
-    const collegeId =
-
-      dept.collegeId ??
-
-      colleges.find((c) => c.campusId === campusId)?.id ??
-
-      colleges[0]?.id ??
-
-      DEFAULT_COLLEGE_ID
-
-    return { ...dept, campusId, collegeId }
-
+    const { collegeId: _retired, ...rest } = dept
+    return { ...rest, campusId: dept.campusId ?? DEFAULT_CAMPUS_ID }
   })
-
 }
 
 
@@ -118,14 +96,6 @@ export function useOrgStructure() {
 
   )
 
-  const [colleges, setColleges] = useApiCollection<College[]>(
-
-    ORG_STORAGE_KEYS.colleges,
-
-    [],
-
-  )
-
   const [departmentsRaw, setDepartmentsRaw] = useApiCollection<LegacyDepartment[]>(
 
     ORG_STORAGE_KEYS.departments,
@@ -146,9 +116,8 @@ export function useOrgStructure() {
 
   const departments = useMemo(
 
-    () => migrateDepartments(departmentsRaw, colleges),
-
-    [departmentsRaw, colleges],
+    () => migrateDepartments(departmentsRaw),
+    [departmentsRaw],
 
   )
 
@@ -160,7 +129,7 @@ export function useOrgStructure() {
 
       setDepartmentsRaw((prev) => {
 
-        const current = migrateDepartments(prev, colleges)
+        const current = migrateDepartments(prev)
 
         const next = typeof updater === 'function' ? updater(current) : updater
 
@@ -170,7 +139,7 @@ export function useOrgStructure() {
 
     },
 
-    [setDepartmentsRaw, colleges],
+    [setDepartmentsRaw],
 
   )
 
@@ -196,29 +165,9 @@ export function useOrgStructure() {
 
 
 
-  const getCollegesForCampus = useCallback(
-
-    (campusId: string) => colleges.filter((c) => c.campusId === campusId),
-
-    [colleges],
-
-  )
-
-
-
   const getDepartmentsForCampus = useCallback(
 
     (campusId: string) => departments.filter((d) => d.campusId === campusId),
-
-    [departments],
-
-  )
-
-
-
-  const getDepartmentsForCollege = useCallback(
-
-    (collegeId: string) => departments.filter((d) => d.collegeId === collegeId),
 
     [departments],
 
@@ -231,16 +180,6 @@ export function useOrgStructure() {
     (campusId: string) => campuses.find((c) => c.id === campusId),
 
     [campuses],
-
-  )
-
-
-
-  const getCollegeById = useCallback(
-
-    (collegeId: string) => colleges.find((c) => c.id === collegeId),
-
-    [colleges],
 
   )
 
@@ -322,54 +261,6 @@ export function useOrgStructure() {
 
 
 
-  const addCollege = useCallback(
-
-    (input: Omit<College, 'id'>) => {
-
-      const college: College = {
-
-        id: createId('college'),
-
-        name: input.name.trim(),
-
-        deanName: input.deanName.trim() || 'To be assigned',
-
-        campusId: input.campusId,
-
-        description: input.description?.trim(),
-
-      }
-
-      setColleges((prev) => [...prev, college])
-
-      return college
-
-    },
-
-    [setColleges],
-
-  )
-
-
-
-  const updateCollege = useCallback(
-
-    (collegeId: string, patch: Partial<Omit<College, 'id'>>) => {
-
-      setColleges((prev) =>
-
-        prev.map((c) => (c.id === collegeId ? { ...c, ...patch, name: patch.name?.trim() ?? c.name } : c)),
-
-      )
-
-    },
-
-    [setColleges],
-
-  )
-
-
-
   const ssoProviders = useMemo((): SsoProvider[] => {
 
     const settings = readSettings()
@@ -428,16 +319,14 @@ export function useOrgStructure() {
 
     const hasStructure =
 
-      activeCampuses.length > 0 &&
-
-      colleges.length > 0 &&
-
-      departments.some((d) => d.collegeId && d.name.trim())
+      activeCampuses.length > 0 && departments.some((d) => d.campusId && d.name.trim())
 
     const hasCalendar = readAcademicTermsFromCache().some((t) => t.isCurrent)
 
+    // Programs exist and each active one has a curriculum.
+    const activePrograms = readProgramsFromCache().filter((p) => p.status === 'active')
     const hasDepartmentsConfigured =
-      departments.length > 0 && departments.every((d) => (d.maxYears ?? 0) > 0)
+      activePrograms.length > 0 && activePrograms.every((p) => (p.curriculum?.length ?? 0) > 0)
 
     const hasCatalog = readCoursesFromCache().length > 0
 
@@ -473,7 +362,7 @@ export function useOrgStructure() {
 
         title: 'Academic Structure',
 
-        subtitle: 'Configure campuses, colleges and departments',
+        subtitle: 'Configure campuses and their departments',
 
         done: hasStructure,
 
@@ -499,18 +388,14 @@ export function useOrgStructure() {
 
         id: 'departments',
 
-        title: 'Departments & Programs',
-
-        subtitle: 'Program code, level, and duration (Year 1 … Year N)',
+        title: 'Programs & Curriculum',
+        subtitle: 'Degrees each department offers, with courses by year and semester',
 
         done: hasDepartmentsConfigured,
 
-        href: '/admin/institution/departments',
-
+        href: '/admin/institution/programs',
       },
-
       {
-
         id: 'catalog',
 
         title: 'Course Catalog',
@@ -567,7 +452,7 @@ export function useOrgStructure() {
 
     ]
 
-  }, [activeCampuses.length, colleges.length, departments, campusRecords, departmentsRaw])
+  }, [activeCampuses.length, departments, campusRecords, departmentsRaw])
 
 
 
@@ -591,11 +476,7 @@ export function useOrgStructure() {
 
     campusRecords,
 
-    setCampusRecords,
-
-    colleges,
-
-    setColleges,
+    setCampusRecords,
 
     departments,
 
@@ -607,25 +488,15 @@ export function useOrgStructure() {
 
     activeCampuses,
 
-    getCollegesForCampus,
-
     getDepartmentsForCampus,
 
-    getDepartmentsForCollege,
-
     getCampusById,
-
-    getCollegeById,
 
     addCampus,
 
     updateCampus,
 
-    activateCampus,
-
-    addCollege,
-
-    updateCollege,
+    activateCampus,
 
     ssoProviders,
 

@@ -9,18 +9,9 @@ export interface InstitutionEntity {
   subtitle: string
   status: 'active' | 'pending' | 'inactive'
   departmentsCount: number
-  collegesCount: number
   studentsCount: number
   facultyCount: number
   completionRate: number
-}
-
-export interface College {
-  id: string
-  name: string
-  deanName: string
-  campusId: string
-  description?: string
 }
 
 export type DepartmentStatus = 'active' | 'inactive'
@@ -34,16 +25,7 @@ export interface Department {
   facultyCount: number
   icon: string
   campusId: string
-  collegeId: string
   description?: string
-  /** Degree / program code, e.g. BSC-CS */
-  programCode?: string
-  /** Undergraduate, Postgraduate, etc. */
-  programLevel?: ProgramLevel
-  /** How many study years (Year 1 … Year N) students progress through */
-  maxYears?: number
-  /** Semesters offered per study year (default 2: Fall + Spring) */
-  semestersPerYear?: number
   /** Corporate edition: active / inactive status. */
   status?: DepartmentStatus
 }
@@ -257,6 +239,22 @@ export type ProgramLevel =
   | 'Doctoral'
   | 'Certificate'
 
+/** One course placed in a program's study plan. */
+export interface CurriculumEntry {
+  courseId: string
+  /** Study year 1 … program.durationYears */
+  studyYear: number
+  /** Semester within that year, 1 … program.semestersPerYear */
+  semester: number
+  /** Core courses are required; electives are chosen. */
+  type: 'core' | 'elective'
+}
+
+/**
+ * A degree, diploma or certificate offered by a department. One department can
+ * offer several programs (e.g. BSc and MSc in Computer Science). Students belong
+ * to a program and progress through its years and semesters.
+ */
 export interface ProgramRow {
   id: string
   code: string
@@ -265,11 +263,17 @@ export interface ProgramRow {
   /** Owning department — required by the academic hierarchy. */
   departmentId: string
   department: string
-  collegeId?: string
   campusId: string
+  /** Display text, e.g. "4 years" (derived from durationYears). */
   duration: string
-  durationYears?: number
-  semestersPerYear?: number
+  durationYears: number
+  semestersPerYear: number
+  /** Credits needed to graduate. */
+  totalCredits?: number
+  description?: string
+  /** Study plan: which courses run in which year and semester. */
+  curriculum?: CurriculumEntry[]
+  /** Kept for older readers; computed from people and curriculum on screen. */
   enrolledCount: number
   courseCount: number
   status: 'active' | 'draft' | 'archived'
@@ -331,6 +335,8 @@ export interface CourseSummary {
   title: string
   instructor: string
   instructorId?: string
+  /** University: teaching assistants who support this course (grading, attendance). */
+  teachingAssistantIds?: string[]
   department: string
   level: string
   enrolledCount: number
@@ -458,15 +464,20 @@ export interface CourseEnrollment {
 
 /* ── People ───────────────────────────────────────────────── */
 export type PersonRole =
-  | 'Student'
-  | 'Instructor'
+  /* ── University Edition: exactly seven roles ─────────────── */
+  /** Institution admin: full control of the institution (admin portal). */
   | 'Admin'
-  /** Registrar: student records, enrolment and transcripts (admin portal). */
+  /** Registrar: academic structure, enrolment, records and transcripts (admin portal). */
   | 'Registrar'
+  /** Finance officer: tuition, invoices and payments (admin portal). */
+  | 'FinanceOfficer'
+  | 'Instructor'
+  /** Teaching assistant: grading and attendance on assigned courses (instructor portal). */
+  | 'TeachingAssistant'
+  | 'Student'
   | 'Guardian'
+  /* ── Corporate / Training editions only ──────────────────── */
   | 'Staff'
-  /** Head of department: runs one department (staff portal). */
-  | 'HeadOfDepartment'
   | 'HelpDesk'
   /** Corporate Edition: line manager of one or more teams (manager portal). */
   | 'Manager'
@@ -479,9 +490,11 @@ export interface PersonRow {
   department: string
   /** FK to department — preferred for students */
   departmentId?: string
-  /** Study year within department program (1 … department.maxYears) */
+  /** Students: the program they study (it belongs to their department). */
+  programId?: string
+  /** Study year within the program (1 … program.durationYears) */
   studyYear?: number
-  /** Semester within the current study year (1 … department.semestersPerYear) */
+  /** Semester within the current study year (1 … program.semestersPerYear) */
   programSemester?: number
   campusId?: string
   isDepartmentHead?: boolean

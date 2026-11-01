@@ -1,7 +1,8 @@
 """
 Per-role read views of LMS data-store collections.
 
-Tenant admins see everything. Every other role gets a view built on the server:
+Tenant admins see everything. Registrars see all academic data (not integration
+secrets). Every other role gets a view built on the server:
 their own records, the records of courses they teach or take, their linked
 children (guardians), and public catalog/structure data. People outside that
 scope appear only as a directory entry (name, role — no email or personal data).
@@ -14,6 +15,7 @@ from __future__ import annotations
 from typing import Any, Awaitable, Callable, Optional
 
 from app.core.permissions import Role
+from app.modules.assessments.questions import student_view
 
 Record = dict[str, Any]
 
@@ -21,7 +23,6 @@ Record = dict[str, Any]
 PUBLIC_COLLECTIONS = frozenset(
     {
         "campuses",
-        "colleges",
         "departments",
         "programs",
         "academic-years",
@@ -54,8 +55,10 @@ KEYED_COLLECTIONS = frozenset(
     }
 )
 
+# University staff roles that read every person record in full.
+OFFICE_ROLES = (Role.REGISTRAR, Role.FINANCE_OFFICER)
+
 DIRECTORY_FIELDS = ("id", "name", "role", "initials", "department", "departmentId", "campusId", "status")
-SECRET_QUESTION_FIELDS = ("correctAnswer", "explanation", "answerKey")
 TEACHING_ROLES = (Role.INSTRUCTOR, Role.TEACHING_ASSISTANT)
 
 
@@ -157,6 +160,8 @@ class ScopeContext:
             if c.get("instructorId") == self.person_id
             or c.get("submittedByInstructorId") == self.person_id
             or (name and c.get("instructor") == name)
+            # University: teaching assistants assigned to the course.
+            or self.person_id in (c.get("teachingAssistantIds") or [])
         }
         ids |= {
             o.get("courseId")
@@ -227,7 +232,7 @@ def _directory(person: Record) -> Record:
 
 async def _people_view(data: list[Record], ctx: ScopeContext) -> list[Record]:
     role = ctx.role
-    if role in (Role.DEPARTMENT_ADMIN, Role.FINANCE_OFFICER, Role.ACADEMIC_ADMIN):
+    if role in (*OFFICE_ROLES, Role.DEPARTMENT_ADMIN, Role.ACADEMIC_ADMIN):
         return data
     full_ids = {ctx.person_id}
     if role == Role.PARENT_GUARDIAN:
@@ -239,12 +244,25 @@ async def _people_view(data: list[Record], ctx: ScopeContext) -> list[Record]:
     return [p if p.get("id") in full_ids else _directory(p) for p in data]
 
 
+def _registrar_view(key: str, data: Any, pid: str) -> Any:
+    """Registrars read all academic data; tickets stay with their requesters."""
+    if key == "settings":
+        return {k: v for k, v in data.items() if k != "integrations"} if isinstance(data, dict) else {}
+    if key == "help-desk-tickets" and isinstance(data, list):
+        return [r for r in data if isinstance(r, dict) and r.get("requesterId") == pid]
+    if key == "integrations":
+        return [] if isinstance(data, list) else {}
+    return data
+
+
 async def filter_collection(key: str, data: Any, ctx: ScopeContext) -> Any:
     """Return the part of collection `key` that a non-admin principal may read."""
     if key in PUBLIC_COLLECTIONS:
         return data
     role = ctx.role
     pid = ctx.person_id
+    if role == Role.REGISTRAR:
+        return _registrar_view(key, data, pid)
 
     if key in KEYED_COLLECTIONS:
         if not isinstance(data, dict):
@@ -337,11 +355,8 @@ async def filter_collection(key: str, data: Any, ctx: ScopeContext) -> Any:
                 if quiz.get("courseId") in courses
                 for qid in (quiz.get("questionIds") or [])
             }
-            return [
-                {k: v for k, v in r.items() if k not in SECRET_QUESTION_FIELDS}
-                for r in records
-                if r.get("id") in quiz_questions
-            ]
+            # No answer keys; matching and ordering items arrive shuffled.
+            return [student_view(r) for r in records if r.get("id") in quiz_questions]
         return []
 
     if role == Role.MANAGER:
@@ -364,8 +379,14 @@ async def filter_collection(key: str, data: Any, ctx: ScopeContext) -> Any:
             return records
         return []
 
+    if role == Role.FINANCE_OFFICER:
+        # Finance bills students for the courses they are enrolled in.
+        if key == "enrollments":
+            return records
+        return []
+
     if role == Role.DEPARTMENT_ADMIN:
-        # Department admins and heads of department see their own department.
+        # Corporate / Training staff see their own department.
         if key == "enrollments":
             return records
         department = await ctx.my_department()

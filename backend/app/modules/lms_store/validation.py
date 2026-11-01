@@ -1,7 +1,7 @@
 """
 Structural rules for the academic hierarchy.
 
-    Campus → College → Department → Program → Course → Course Offering → Enrollment
+    Campus → Department → Program (curriculum) → Course → Course Offering → Enrollment
     Academic Year → Academic Term (an offering runs in one term)
 
 Every write is checked against the data already stored, so a record can never
@@ -68,12 +68,9 @@ async def check_structure(
     """
     is_new = old is None
 
-    if collection == "colleges":
-        await _require(load, new, "campusId", "campuses", "Campus", required=False)
-
-    elif collection == "departments":
-        await _require(load, new, "collegeId", "colleges", "College", required=False)
-        await _require(load, new, "campusId", "campuses", "Campus", required=False)
+    if collection == "departments":
+        # University departments sit directly under a campus (there are no colleges).
+        await _require(load, new, "campusId", "campuses", "Campus", required=is_new and university)
 
     elif collection == "programs":
         await _require(load, new, "departmentId", "departments", "Department", required=is_new)
@@ -87,6 +84,8 @@ async def check_structure(
             load, new, "academicTermId", "academic-terms", "Academic term", required=is_new
         )
         await _require(load, new, "departmentId", "departments", "Department", required=False)
+        # A section serves one program's curriculum (Department → Program → Section).
+        await _require(load, new, "programId", "programs", "Program", required=False)
 
     elif collection == "enrollments":
         await _require(load, new, "studentId", "people", "Student", required=True)
@@ -108,5 +107,5 @@ async def check_structure(
 
 # Collections whose records are validated on a whole-collection replace as well.
 VALIDATED_COLLECTIONS = frozenset(
-    {"colleges", "departments", "programs", "academic-terms", "course-offerings", "enrollments"}
+    {"departments", "programs", "academic-terms", "course-offerings", "enrollments"}
 )

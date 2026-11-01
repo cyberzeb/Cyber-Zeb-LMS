@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { BookOpen, FileDown, FileText, PlayCircle, Plus, Search } from 'lucide-react'
 import { Button } from '../../../shared/components/Button'
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { useTeachingPermissions } from '../../../shared/auth/rolePermissions'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { StatusPill } from '../../../shared/components/StatusPill'
 import { Monogram } from '../../../shared/components/Monogram'
@@ -10,6 +11,7 @@ import { InstructorPageError, InstructorPageLoading } from '../components/Instru
 import { useInstructorDashboard } from '../hooks/useInstructorDashboard'
 
 export function InstructorResourcesPage() {
+  const { canAuthor } = useTeachingPermissions()
   const { data, isLoading, isError } = useInstructorDashboard()
 
   const stats = useMemo(() => {
@@ -36,10 +38,12 @@ export function InstructorResourcesPage() {
               <Search size={15} />
               Search
             </Button>
-            <Button variant="primary">
-              <Plus size={15} />
-              Upload resource
-            </Button>
+            {canAuthor ? (
+              <Button variant="primary">
+                <Plus size={15} />
+                Upload resource
+              </Button>
+            ) : null}
           </>
         }
       />
@@ -95,10 +99,12 @@ export function InstructorResourcesPage() {
                   {resource.size} · {resource.updatedAt}
                 </p>
                 <p className="mt-1 text-[12px] text-navy-700 font-semibold">{resource.downloads} downloads</p>
-                <Button variant="secondary" size="sm" className="mt-3">
-                  <FileDown size={13} />
-                  Manage
-                </Button>
+                {canAuthor ? (
+                  <Button variant="secondary" size="sm" className="mt-3">
+                    <FileDown size={13} />
+                    Manage
+                  </Button>
+                ) : null}
               </div>
             </div>
           </GlassCard>

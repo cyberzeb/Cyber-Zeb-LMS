@@ -26,8 +26,8 @@ const terminology: TerminologyMap = {
   cohorts: 'Class Sections',
   trainingProgram: 'Academic Program',
   trainingPrograms: 'Academic Programs',
-  trainingDivision: 'College / School',
-  trainingDivisions: 'Colleges / Schools',
+  trainingDivision: 'Department',
+  trainingDivisions: 'Departments',
   learner: 'Student',
   learners: 'Students',
   instructorPortal: 'Instructor Portal',
@@ -39,7 +39,6 @@ export const universityEditionConfig: EditionConfig = {
   terminology,
   modules: {
     campuses: true,
-    colleges: true,
     programs: true,
     students: true,
     instructors: true,

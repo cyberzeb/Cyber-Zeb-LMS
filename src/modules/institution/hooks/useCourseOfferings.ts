@@ -14,6 +14,8 @@ export type CreateOfferingInput = {
   courseTitle: string
   departmentId: string
   departmentName: string
+  programId?: string
+  programName?: string
   studyYear: number
   programSemester: number
   academicTermId: string

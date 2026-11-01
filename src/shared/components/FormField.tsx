@@ -6,6 +6,8 @@ interface FormFieldProps {
   onChange: (value: string) => void
   type?: 'text' | 'number' | 'select' | 'textarea' | 'date' | 'datetime-local'
   options?: string[]
+  /** Display text for select options whose value is not human readable. */
+  optionLabels?: Record<string, string>
   placeholder?: string
   hint?: string
   min?: string
@@ -18,6 +20,7 @@ export function FormField({
   onChange,
   type = 'text',
   options = [],
+  optionLabels,
   placeholder,
   hint,
   min,
@@ -40,7 +43,7 @@ export function FormField({
         >
           {options.map((opt) => (
             <option key={opt} value={opt}>
-              {tx(opt)}
+              {tx(optionLabels?.[opt] ?? opt)}
             </option>
           ))}
         </select>

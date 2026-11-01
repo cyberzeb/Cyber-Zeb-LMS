@@ -6,12 +6,15 @@ import {
   GraduationCap,
   Headset,
   HeartHandshake,
+  Landmark,
   Loader2,
   Mail,
   Shield,
   ShieldCheck,
   UserRound,
+  UserRoundPen,
   UsersRound,
+  Wallet,
 } from 'lucide-react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 
@@ -41,6 +44,9 @@ import { GlassCard } from '../../../shared/layout/GlassCard'
 import { getSessionPerson, readPortalSession, writePortalSession } from '../../../shared/storage/session'
 
 function roleIcon(role: LoginRole) {
+  if (role === 'Registrar') return Landmark
+  if (role === 'FinanceOfficer') return Wallet
+  if (role === 'TeachingAssistant') return UserRoundPen
   if (role === 'Student') return GraduationCap
   if (role === 'Guardian') return HeartHandshake
   if (role === 'HelpDesk') return Headset

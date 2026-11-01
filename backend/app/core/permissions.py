@@ -8,10 +8,15 @@ this enum so the permission matrix stays centrally auditable.
 from enum import Enum
 
 
+# University Edition uses exactly seven portal roles:
+#   institution_admin, registrar, finance_officer, instructor,
+#   teaching_assistant, student, parent_guardian
+# The others serve the Corporate and Training editions.
 class Role(str, Enum):
     PLATFORM_SUPER_ADMIN = "platform_super_admin"
     INSTITUTION_ADMIN = "institution_admin"
-    ACADEMIC_ADMIN = "academic_admin"          # Registrar
+    REGISTRAR = "registrar"                    # University: academic records and enrolment
+    ACADEMIC_ADMIN = "academic_admin"          # Legacy full academic admin (not used by University)
     TRAINING_ADMIN = "training_admin"
     DEPARTMENT_ADMIN = "department_admin"      # Campus / department scoped
     INSTRUCTOR = "instructor"

@@ -1,13 +1,6 @@
 import { useMemo, useState } from 'react'
-import {
-  BookOpen,
-  ChevronRight,
-  Layers,
-  Plus,
-  Trash2,
-  UserRoundCog,
-  Users,
-} from 'lucide-react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { BookOpen, ChevronRight, Layers, Plus, Trash2, UserRoundCog, Users, Wand2 } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { StatBlock } from '../../../shared/components/StatBlock'
 import { Button } from '../../../shared/components/Button'
@@ -19,13 +12,19 @@ import { StatusPill } from '../../../shared/components/StatusPill'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { useCampusContext } from '../context/CampusContext'
 import { useAcademicCalendar } from '../hooks/useAcademicCalendar'
-import { useCourseOfferings } from '../hooks/useCourseOfferings'
+import { useCourseOfferings, type CreateOfferingInput } from '../hooks/useCourseOfferings'
 import { useCourses } from '../hooks/useCourses'
 import { usePeople } from '../hooks/usePeople'
+import { usePrograms } from '../hooks/usePrograms'
 import { offeringDisplayLabel } from '../utils/offeringUtils'
 import {
-  departmentMaxYears,
-  departmentSemestersPerYear,
+  curriculumForSlot,
+  programSemesters,
+  programYears,
+  resolveOfferingProgramId,
+  termSemesterNumber,
+} from '../utils/programUtils'
+import {
   formatProgramSemester,
   formatProgramSlot,
   formatStudyYear,
@@ -33,6 +32,7 @@ import {
   studyYearOptions,
 } from '../utils/studyYearUtils'
 import type { CourseOfferingDeliveryMode, CourseOfferingStatus } from '../types/academic'
+import type { ProgramRow } from '../types'
 
 const STAT = 17
 
@@ -50,8 +50,6 @@ const statusTone = (status: CourseOfferingStatus) => {
       return 'success' as const
     case 'planned':
       return 'info' as const
-    case 'completed':
-      return 'neutral' as const
     case 'cancelled':
       return 'danger' as const
     default:
@@ -60,7 +58,7 @@ const statusTone = (status: CourseOfferingStatus) => {
 }
 
 const emptyOfferingForm = {
-  departmentId: '',
+  programId: '',
   studyYear: 1,
   programSemester: 1,
   academicTermId: '',
@@ -73,11 +71,17 @@ const emptyOfferingForm = {
   location: '',
 }
 
+/**
+ * Course sections for each term. A section is one curriculum course of a
+ * program (year + semester) running in a calendar term, with its instructor.
+ */
 export function CourseOfferingsPage() {
   const { notify } = useToast()
+  const [searchParams] = useSearchParams()
   const { departments } = useCampusContext()
   const { courses } = useCourses()
   const { people } = usePeople()
+  const { programs } = usePrograms()
   const { offerings, addOffering, updateOffering, removeOffering } = useCourseOfferings()
   const { terms, currentTerm } = useAcademicCalendar()
 
@@ -85,36 +89,35 @@ export function CourseOfferingsPage() {
     () => people.filter((p) => p.role === 'Instructor' && p.status === 'active'),
     [people],
   )
+  const courseById = useMemo(() => new Map(courses.map((c) => [c.id, c])), [courses])
+  const programById = useMemo(() => new Map(programs.map((p) => [p.id, p])), [programs])
 
-  const catalogCourses = useMemo(
-    () => courses.filter((c) => c.status === 'published' || c.status === 'draft'),
-    [courses],
-  )
-
-  const [deptFilter, setDeptFilter] = useState('')
-  const [yearFilter, setYearFilter] = useState<string>('')
-  const [semesterFilter, setSemesterFilter] = useState<string>('')
+  const [programFilter, setProgramFilter] = useState(searchParams.get('program') ?? '')
+  const [termFilter, setTermFilter] = useState('')
+  const [yearFilter, setYearFilter] = useState('')
+  const [semesterFilter, setSemesterFilter] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [form, setForm] = useState(emptyOfferingForm)
+  const [generateOpen, setGenerateOpen] = useState(false)
+  const [generateTermId, setGenerateTermId] = useState('')
+  const [generateProgramIds, setGenerateProgramIds] = useState<string[]>([])
 
-  const filterDept = deptFilter ? departments.find((d) => d.id === deptFilter) : undefined
-  const filterSemestersPerYear = departmentSemestersPerYear(filterDept)
+  const filterProgram = programFilter ? programById.get(programFilter) : undefined
+
+  const programOf = (offering: (typeof offerings)[number]): ProgramRow | undefined => {
+    const id = resolveOfferingProgramId(offering, programs)
+    return id ? programById.get(id) : undefined
+  }
 
   const filteredOfferings = useMemo(() => {
     return offerings.filter((o) => {
-      if (deptFilter && o.departmentId !== deptFilter) return false
+      if (programFilter && resolveOfferingProgramId(o, programs) !== programFilter) return false
+      if (termFilter && o.academicTermId !== termFilter) return false
       if (yearFilter && o.studyYear !== Number(yearFilter)) return false
       if (semesterFilter && (o.programSemester ?? 1) !== Number(semesterFilter)) return false
       return true
     })
-  }, [offerings, deptFilter, yearFilter, semesterFilter])
-
-  const deptCourses = useMemo(() => {
-    if (!form.departmentId) return catalogCourses
-    const dept = departments.find((d) => d.id === form.departmentId)
-    if (!dept) return catalogCourses
-    return catalogCourses.filter((c) => c.department === dept.name)
-  }, [catalogCourses, departments, form.departmentId])
+  }, [offerings, programs, programFilter, termFilter, yearFilter, semesterFilter])
 
   const stats = useMemo(() => {
     const open = filteredOfferings.filter((o) => o.status === 'open' || o.status === 'in_progress').length
@@ -123,79 +126,147 @@ export function CourseOfferingsPage() {
     return { total: filteredOfferings.length, open, enrolled, withInstructor }
   }, [filteredOfferings])
 
+  /* ── Create one section ───────────────────────────────── */
+
+  const formProgram = programById.get(form.programId)
+  const formYears = programYears(formProgram)
+  const formSemesters = programSemesters(formProgram)
+
+  // Courses offered in this slot come from the program's curriculum.
+  const slotCourses = curriculumForSlot(formProgram, form.studyYear, form.programSemester)
+    .map((e) => courseById.get(e.courseId))
+    .filter((c): c is NonNullable<typeof c> => Boolean(c))
+
   const openCreateModal = () => {
-    const defaultDept = deptFilter || departments[0]?.id || ''
-    const defaultDeptMeta = departments.find((d) => d.id === defaultDept)
-    setForm({
-      ...emptyOfferingForm,
-      departmentId: defaultDept,
-      studyYear: yearFilter ? Number(yearFilter) : 1,
-      programSemester: semesterFilter ? Number(semesterFilter) : 1,
-      courseId: '',
-      academicTermId: currentTerm?.id ?? terms[0]?.id ?? '',
-      primaryInstructorId: instructors[0]?.id ?? '',
-    })
-    if (!defaultDept) {
-      notify('Add a department first.', 'error')
+    const programId = programFilter || programs.find((p) => p.status === 'active')?.id || ''
+    if (!programId) {
+      notify('Add a program and its curriculum first.', 'error')
       return
     }
-    if (!defaultDeptMeta) return
+    setForm({
+      ...emptyOfferingForm,
+      programId,
+      studyYear: yearFilter ? Number(yearFilter) : 1,
+      programSemester: semesterFilter ? Number(semesterFilter) : 1,
+      academicTermId: termFilter || currentTerm?.id || terms[0]?.id || '',
+    })
     setModalOpen(true)
   }
 
-  const handleCreate = () => {
-    const dept = departments.find((d) => d.id === form.departmentId)
-    const course = deptCourses.find((c) => c.id === form.courseId)
-    if (!dept || !course) {
-      notify('Complete department, study year, program semester, and course selection.', 'error')
-      return
-    }
-
-    const instructor = instructors.find((i) => i.id === form.primaryInstructorId)
-    const duplicate = offerings.some(
-      (o) =>
-        o.courseId === course.id &&
-        o.departmentId === dept.id &&
-        o.studyYear === form.studyYear &&
-        (o.programSemester ?? 1) === form.programSemester &&
-        o.sectionCode === form.sectionCode.trim(),
-    )
-    if (duplicate) {
-      notify('This section already exists for this department, year, and semester.', 'error')
-      return
-    }
-
-    const term = terms.find((t) => t.id === form.academicTermId)
-    if (!term) {
-      notify('Choose the academic term this section runs in.', 'error')
-      return
-    }
-
-    addOffering({
+  const buildSection = (
+    program: ProgramRow,
+    courseId: string,
+    studyYear: number,
+    programSemester: number,
+    termId: string,
+    sectionCode: string,
+  ): CreateOfferingInput | null => {
+    const course = courseById.get(courseId)
+    const term = terms.find((t) => t.id === termId)
+    const dept = departments.find((d) => d.id === program.departmentId)
+    if (!course || !term) return null
+    const instructor = instructors.find((i) => i.id === course.instructorId)
+    return {
       courseId: course.id,
       courseCode: course.code,
       courseTitle: course.title,
-      departmentId: dept.id,
-      departmentName: dept.name,
-      studyYear: form.studyYear,
-      programSemester: form.programSemester,
+      departmentId: program.departmentId,
+      departmentName: dept?.name ?? program.department,
+      programId: program.id,
+      programName: program.name,
+      studyYear,
+      programSemester,
       academicTermId: term.id,
       academicTermName: term.name,
-      campusId: dept.campusId,
-      sectionCode: form.sectionCode.trim() || '01',
+      campusId: program.campusId,
+      sectionCode,
       primaryInstructorId: instructor?.id,
       primaryInstructorName: instructor?.name,
+      deliveryMode: 'in_person',
+      maxEnrollment: 60,
+      status: 'planned',
+    }
+  }
+
+  const sectionExists = (programId: string, courseId: string, year: number, semester: number, termId: string, code = '01') =>
+    offerings.some(
+      (o) =>
+        o.courseId === courseId &&
+        resolveOfferingProgramId(o, programs) === programId &&
+        o.studyYear === year &&
+        (o.programSemester ?? 1) === semester &&
+        o.academicTermId === termId &&
+        o.sectionCode === code,
+    )
+
+  const handleCreate = () => {
+    if (!formProgram || !form.courseId) {
+      notify('Choose the program, year, semester and course.', 'error')
+      return
+    }
+    if (!form.academicTermId) {
+      notify('Choose the academic term this section runs in.', 'error')
+      return
+    }
+    const code = form.sectionCode.trim() || '01'
+    if (sectionExists(formProgram.id, form.courseId, form.studyYear, form.programSemester, form.academicTermId, code)) {
+      notify(`Section ${code} of this course already exists for this term.`, 'error')
+      return
+    }
+    const base = buildSection(formProgram, form.courseId, form.studyYear, form.programSemester, form.academicTermId, code)
+    if (!base) return
+    const instructor = instructors.find((i) => i.id === form.primaryInstructorId)
+    addOffering({
+      ...base,
+      primaryInstructorId: instructor?.id ?? base.primaryInstructorId,
+      primaryInstructorName: instructor?.name ?? base.primaryInstructorName,
       deliveryMode: form.deliveryMode,
       maxEnrollment: Number(form.maxEnrollment) || undefined,
-      status: 'planned',
       scheduleSummary: form.scheduleSummary.trim() || undefined,
       location: form.location.trim() || undefined,
     })
     setModalOpen(false)
-    notify(
-      `Offering created: ${dept.name} · ${formatProgramSlot(form.studyYear, form.programSemester)} · ${course.code}.`,
-      'success',
+    notify(`Section created: ${base.courseCode} §${code} · ${formProgram.code} ${formatProgramSlot(form.studyYear, form.programSemester)}.`)
+  }
+
+  /* ── Generate a term's sections from the curriculum ───── */
+
+  const generateTerm = terms.find((t) => t.id === generateTermId)
+  const generateSemester = generateTerm ? termSemesterNumber(generateTerm) : 1
+
+  // Every curriculum course running this term that has no section yet.
+  const generatePlan: CreateOfferingInput[] = []
+  if (generateTerm) {
+    for (const program of programs) {
+      if (!generateProgramIds.includes(program.id)) continue
+      if (generateSemester > programSemesters(program)) continue
+      for (let year = 1; year <= programYears(program); year += 1) {
+        for (const entry of curriculumForSlot(program, year, generateSemester)) {
+          if (sectionExists(program.id, entry.courseId, year, generateSemester, generateTerm.id)) continue
+          const section = buildSection(program, entry.courseId, year, generateSemester, generateTerm.id, '01')
+          if (section) generatePlan.push(section)
+        }
+      }
+    }
+  }
+
+  const openGenerate = () => {
+    const term = termFilter || currentTerm?.id || terms[0]?.id || ''
+    setGenerateTermId(term)
+    setGenerateProgramIds(
+      programFilter ? [programFilter] : programs.filter((p) => p.status === 'active').map((p) => p.id),
     )
+    setGenerateOpen(true)
+  }
+
+  const handleGenerate = () => {
+    if (generatePlan.length === 0) {
+      notify('Nothing to create: every curriculum course already has a section this term.', 'info')
+      return
+    }
+    for (const section of generatePlan) addOffering(section)
+    setGenerateOpen(false)
+    notify(`${generatePlan.length} section${generatePlan.length === 1 ? '' : 's'} created for ${generateTerm?.name}. Assign instructors where missing.`)
   }
 
   const assignInstructor = (offeringId: string, instructorId: string) => {
@@ -203,58 +274,65 @@ export function CourseOfferingsPage() {
     updateOffering(offeringId, {
       primaryInstructorId: instructorId,
       primaryInstructorName: instructor?.name,
-      status: 'in_progress',
     })
     notify(instructor ? `Assigned ${instructor.name}.` : 'Instructor assigned.')
   }
 
-  const formDept = departments.find((d) => d.id === form.departmentId)
-  const formMaxYears = departmentMaxYears(formDept)
-  const formSemestersPerYear = departmentSemestersPerYear(formDept)
-
-  const filterLabel =
-    yearFilter && semesterFilter
-      ? formatProgramSlot(Number(yearFilter), Number(semesterFilter))
-      : yearFilter
-        ? formatStudyYear(Number(yearFilter))
-        : semesterFilter
-          ? formatProgramSemester(Number(semesterFilter))
-          : 'All program slots'
+  const filterLabel = [
+    filterProgram?.code,
+    termFilter ? terms.find((t) => t.id === termFilter)?.name : undefined,
+    yearFilter ? formatStudyYear(Number(yearFilter)) : undefined,
+    semesterFilter ? formatProgramSemester(Number(semesterFilter)) : undefined,
+  ]
+    .filter(Boolean)
+    .join(' · ') || 'All sections'
 
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Course Offerings"
-        subtitle="Define curriculum sections by department, study year, and program semester — where students land as they progress."
+        subtitle="The sections running each term. Generate them from each program's curriculum, then assign instructors."
         actions={
-          <Button variant="primary" onClick={openCreateModal}>
-            <Plus size={16} />
-            New Offering
-          </Button>
+          <>
+            <Button variant="secondary" onClick={openGenerate} disabled={programs.length === 0 || terms.length === 0}>
+              <Wand2 size={15} />
+              Generate from curriculum
+            </Button>
+            <Button variant="primary" onClick={openCreateModal}>
+              <Plus size={16} />
+              New Section
+            </Button>
+          </>
         }
       />
 
       <GlassCard className="p-4">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-secondary-text mb-3">
-          Filter offerings
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">Department</label>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Program</label>
             <SelectMenu
-              value={deptFilter}
+              value={programFilter}
               onChange={(id) => {
-                setDeptFilter(id)
+                setProgramFilter(id)
+                setYearFilter('')
                 setSemesterFilter('')
               }}
-              placeholder="All departments"
+              placeholder="All programs"
               options={[
-                { value: '', label: 'All departments' },
-                ...departments.map((d) => ({
-                  value: d.id,
-                  label: d.name,
-                  hint: d.programCode ?? `${d.maxYears ?? 4} years`,
-                })),
+                { value: '', label: 'All programs' },
+                ...programs.map((p) => ({ value: p.id, label: p.name, hint: p.department })),
+              ]}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Term</label>
+            <SelectMenu
+              value={termFilter}
+              onChange={setTermFilter}
+              placeholder="All terms"
+              options={[
+                { value: '', label: 'All terms' },
+                ...terms.map((t) => ({ value: t.id, label: t.name, hint: t.isCurrent ? 'Current' : undefined })),
               ]}
             />
           </div>
@@ -266,7 +344,7 @@ export function CourseOfferingsPage() {
               placeholder="All years"
               options={[
                 { value: '', label: 'All years' },
-                ...studyYearOptions(deptFilter ? departmentMaxYears(filterDept) : 5).map((y) => ({
+                ...studyYearOptions(filterProgram ? programYears(filterProgram) : 5).map((y) => ({
                   value: String(y),
                   label: formatStudyYear(y),
                 })),
@@ -274,14 +352,14 @@ export function CourseOfferingsPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">Program semester</label>
+            <label className="block text-xs font-medium text-slate-600 mb-1">Semester</label>
             <SelectMenu
               value={semesterFilter}
               onChange={setSemesterFilter}
               placeholder="All semesters"
               options={[
                 { value: '', label: 'All semesters' },
-                ...programSemesterOptions(filterSemestersPerYear).map((s) => ({
+                ...programSemesterOptions(programSemesters(filterProgram)).map((s) => ({
                   value: String(s),
                   label: formatProgramSemester(s),
                 })),
@@ -292,30 +370,35 @@ export function CourseOfferingsPage() {
       </GlassCard>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-        <StatBlock label="Offerings" value={stats.total} icon={<Layers size={STAT} />} />
+        <StatBlock label="Sections" value={stats.total} icon={<Layers size={STAT} />} />
         <StatBlock label="Active / Open" value={stats.open} icon={<BookOpen size={STAT} />} />
         <StatBlock label="Students Enrolled" value={stats.enrolled} icon={<Users size={STAT} />} />
-        <StatBlock label="With Instructor" value={stats.withInstructor} icon={<UserRoundCog size={STAT} />} />
+        <StatBlock
+          label="With Instructor"
+          value={`${stats.withInstructor} / ${stats.total}`}
+          icon={<UserRoundCog size={STAT} />}
+        />
       </div>
 
       <GlassCard className="overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-200/60">
-          <h3 className="text-sm font-semibold text-slate-800">
-            Offerings · {filterLabel} ({filteredOfferings.length})
+        <div className="px-5 py-4 border-b border-divider/60">
+          <h3 className="text-sm font-semibold text-navy-900">
+            {filterLabel} ({filteredOfferings.length})
           </h3>
         </div>
         {filteredOfferings.length === 0 ? (
-          <p className="p-5 text-sm text-slate-500">
-            No offerings match your filters. Create one using department → study year → program semester → course.
+          <p className="p-5 text-sm text-secondary-text">
+            No sections match your filters. Use <strong>Generate from curriculum</strong> to create a term's sections
+            in one step.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-slate-500 border-b border-slate-200/60">
+                <tr className="text-left text-xs uppercase tracking-wide text-secondary-text border-b border-divider/60">
                   <th className="px-5 py-3 font-medium">Section</th>
-                  <th className="px-5 py-3 font-medium">Program slot</th>
-                  <th className="px-5 py-3 font-medium">Department</th>
+                  <th className="px-5 py-3 font-medium">Program · slot</th>
+                  <th className="px-5 py-3 font-medium">Term</th>
                   <th className="px-5 py-3 font-medium">Instructor</th>
                   <th className="px-5 py-3 font-medium">Enrolled</th>
                   <th className="px-5 py-3 font-medium">Status</th>
@@ -323,157 +406,149 @@ export function CourseOfferingsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredOfferings.map((offering) => (
-                  <tr key={offering.id} className="border-b border-slate-100 last:border-0">
-                    <td className="px-5 py-3">
-                      <div className="font-medium text-navy-900">
-                        {offering.courseCode} §{offering.sectionCode}
-                      </div>
-                      <div className="text-xs text-slate-500 truncate max-w-[220px]">{offering.courseTitle}</div>
-                    </td>
-                    <td className="px-5 py-3 text-slate-600 text-xs">
-                      {formatProgramSlot(offering.studyYear, offering.programSemester ?? 1)}
-                      <div className="text-[11px] text-slate-500">
+                {filteredOfferings.map((offering) => {
+                  const program = programOf(offering)
+                  return (
+                    <tr key={offering.id} className="border-b border-divider/40 last:border-0">
+                      <td className="px-5 py-3">
+                        <div className="font-medium text-navy-900">
+                          {offering.courseCode} §{offering.sectionCode}
+                        </div>
+                        <div className="text-xs text-secondary-text truncate max-w-[220px]">{offering.courseTitle}</div>
+                      </td>
+                      <td className="px-5 py-3 text-xs">
+                        {program ? (
+                          <Link
+                            to={`/admin/institution/programs/${program.id}`}
+                            className="font-semibold text-navy-900 hover:text-lemon-700"
+                          >
+                            {program.code}
+                          </Link>
+                        ) : (
+                          <span className="text-warning font-semibold">No program</span>
+                        )}
+                        <div className="text-[11px] text-secondary-text">
+                          {formatProgramSlot(offering.studyYear, offering.programSemester ?? 1)}
+                        </div>
+                      </td>
+                      <td className="px-5 py-3 text-xs text-secondary-text">
                         {terms.find((t) => t.id === offering.academicTermId)?.name ?? (
                           <span className="text-warning font-semibold">No term set</span>
                         )}
-                      </div>
-                    </td>
-                    <td className="px-5 py-3 text-slate-600">{offering.departmentName}</td>
-                    <td className="px-5 py-3 min-w-[180px]">
-                      <SelectMenu
-                        value={offering.primaryInstructorId ?? ''}
-                        onChange={(id) => assignInstructor(offering.id, id)}
-                        placeholder="Assign instructor"
-                        options={instructors.map((i) => ({
-                          value: i.id,
-                          label: i.name,
-                          hint: i.department,
-                        }))}
-                      />
-                    </td>
-                    <td className="px-5 py-3 text-slate-600">
-                      {offering.enrolledCount}
-                      {offering.maxEnrollment ? ` / ${offering.maxEnrollment}` : ''}
-                    </td>
-                    <td className="px-5 py-3">
-                      <StatusPill label={offering.status.replace('_', ' ')} tone={statusTone(offering.status)} />
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex justify-end">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-danger hover:bg-danger-bg"
-                          onClick={() => {
-                            if (!window.confirm(`Delete offering ${offeringDisplayLabel(offering)}?`)) return
-                            removeOffering(offering.id)
-                            notify('Offering removed.', 'info')
-                          }}
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-5 py-3 min-w-[180px]">
+                        <SelectMenu
+                          value={offering.primaryInstructorId ?? ''}
+                          onChange={(id) => assignInstructor(offering.id, id)}
+                          placeholder="Assign instructor"
+                          options={instructors.map((i) => ({ value: i.id, label: i.name }))}
+                        />
+                      </td>
+                      <td className="px-5 py-3 text-secondary-text">
+                        {offering.enrolledCount}
+                        {offering.maxEnrollment ? ` / ${offering.maxEnrollment}` : ''}
+                      </td>
+                      <td className="px-5 py-3">
+                        <StatusPill label={offering.status.replace('_', ' ')} tone={statusTone(offering.status)} />
+                      </td>
+                      <td className="px-5 py-3">
+                        <div className="flex justify-end">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-danger hover:bg-danger-bg"
+                            onClick={() => {
+                              if (!window.confirm(`Delete section ${offeringDisplayLabel(offering)}?`)) return
+                              removeOffering(offering.id)
+                              notify('Section removed.', 'info')
+                            }}
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
         )}
       </GlassCard>
 
+      {/* Create one section */}
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         icon={<Layers size={18} />}
-        title="Create Course Offering"
-        description="Department → study year → program semester → catalog course → section details"
+        title="New Section"
+        description="Program → year → semester → curriculum course → term"
         footer={
           <>
             <Button variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button variant="primary" onClick={handleCreate}>
+            <Button variant="primary" onClick={handleCreate} disabled={!form.courseId}>
               <ChevronRight size={15} />
-              Create Offering
+              Create Section
             </Button>
           </>
         }
       >
         <FormField
-          label="1. Department"
+          label="1. Program"
           type="select"
-          value={formDept?.name ?? ''}
-          options={departments.map((d) => d.name)}
-          onChange={(name) => {
-            const dept = departments.find((d) => d.name === name)
-            if (dept) {
-              setForm({
-                ...form,
-                departmentId: dept.id,
-                studyYear: 1,
-                programSemester: 1,
-                courseId: '',
-              })
-            }
-          }}
+          value={form.programId}
+          options={programs.map((p) => p.id)}
+          optionLabels={Object.fromEntries(programs.map((p) => [p.id, `${p.name} (${p.department})`]))}
+          onChange={(id) => setForm({ ...form, programId: id, studyYear: 1, programSemester: 1, courseId: '' })}
         />
-        {formDept ? (
-          <p className="text-[11px] text-secondary-text -mt-2">
-            {formDept.programCode ?? 'Program'} · {formDept.programLevel ?? 'Undergraduate'} ·{' '}
-            {formMaxYears} years · {formSemestersPerYear} semesters/year
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            label="2. Study year"
+            type="select"
+            value={String(form.studyYear)}
+            options={studyYearOptions(formYears).map(String)}
+            optionLabels={Object.fromEntries(studyYearOptions(formYears).map((y) => [String(y), formatStudyYear(y)]))}
+            onChange={(v) => setForm({ ...form, studyYear: Number(v), courseId: '' })}
+          />
+          <FormField
+            label="3. Semester"
+            type="select"
+            value={String(form.programSemester)}
+            options={programSemesterOptions(formSemesters).map(String)}
+            optionLabels={Object.fromEntries(
+              programSemesterOptions(formSemesters).map((s) => [String(s), formatProgramSemester(s)]),
+            )}
+            onChange={(v) => setForm({ ...form, programSemester: Number(v), courseId: '' })}
+          />
+        </div>
+        {slotCourses.length > 0 ? (
+          <FormField
+            label="4. Course (from the curriculum)"
+            type="select"
+            value={form.courseId}
+            options={['', ...slotCourses.map((c) => c.id)]}
+            optionLabels={{ '': 'Choose a course…', ...Object.fromEntries(slotCourses.map((c) => [c.id, `${c.code} — ${c.title}`])) }}
+            onChange={(id) => setForm({ ...form, courseId: id })}
+          />
+        ) : (
+          <p className="text-[12px] text-warning font-medium rounded-lg bg-warning-bg/50 px-3 py-2">
+            The curriculum has no courses for this year and semester.{' '}
+            {formProgram ? (
+              <Link to={`/admin/institution/programs/${formProgram.id}`} className="underline font-semibold">
+                Add them to the curriculum
+              </Link>
+            ) : null}{' '}
+            first.
           </p>
-        ) : null}
-
-        <FormField
-          label="2. Study year"
-          type="select"
-          value={formatStudyYear(form.studyYear)}
-          options={studyYearOptions(formMaxYears).map(formatStudyYear)}
-          onChange={(label) => {
-            const year = studyYearOptions(formMaxYears).find((y) => formatStudyYear(y) === label)
-            if (year) setForm({ ...form, studyYear: year, courseId: '' })
-          }}
-        />
-
-        <FormField
-          label="3. Program semester"
-          type="select"
-          value={formatProgramSemester(form.programSemester)}
-          options={programSemesterOptions(formSemestersPerYear).map(formatProgramSemester)}
-          onChange={(label) => {
-            const sem = programSemesterOptions(formSemestersPerYear).find(
-              (s) => formatProgramSemester(s) === label,
-            )
-            if (sem) setForm({ ...form, programSemester: sem, courseId: '' })
-          }}
-          hint="Which semester within this study year — not a calendar year like 2026."
-        />
-
-        <FormField
-          label="4. Catalog course"
-          type="select"
-          value={
-            deptCourses.find((c) => c.id === form.courseId)
-              ? `${deptCourses.find((c) => c.id === form.courseId)!.code} — ${deptCourses.find((c) => c.id === form.courseId)!.title}`
-              : ''
-          }
-          options={deptCourses.map((c) => `${c.code} — ${c.title}`)}
-          onChange={(label) => {
-            const course = deptCourses.find((c) => `${c.code} — ${c.title}` === label)
-            if (course) setForm({ ...form, courseId: course.id })
-          }}
-        />
-
+        )}
         <FormField
           label="5. Academic term"
           type="select"
-          value={terms.find((t) => t.id === form.academicTermId)?.name ?? ''}
-          options={terms.map((t) => t.name)}
-          onChange={(label) => {
-            const term = terms.find((t) => t.name === label)
-            setForm({ ...form, academicTermId: term?.id ?? '' })
-          }}
-          hint="Calendar term this section runs in — grades and transcripts are grouped by it."
+          value={form.academicTermId}
+          options={terms.map((t) => t.id)}
+          optionLabels={Object.fromEntries(terms.map((t) => [t.id, t.name]))}
+          onChange={(id) => setForm({ ...form, academicTermId: id })}
+          hint="Grades and transcripts are grouped by this term."
         />
 
         <p className="text-[11px] font-bold uppercase tracking-wide text-secondary-text pt-1">6. Section details</p>
@@ -494,30 +569,98 @@ export function CourseOfferingsPage() {
         <FormField
           label="Primary instructor"
           type="select"
-          value={instructors.find((i) => i.id === form.primaryInstructorId)?.name ?? ''}
-          options={instructors.map((i) => i.name)}
-          onChange={(name) => {
-            const instructor = instructors.find((i) => i.name === name)
-            setForm({ ...form, primaryInstructorId: instructor?.id ?? '' })
-          }}
+          value={form.primaryInstructorId}
+          options={['', ...instructors.map((i) => i.id)]}
+          optionLabels={{ '': "Course's default instructor", ...Object.fromEntries(instructors.map((i) => [i.id, i.name])) }}
+          onChange={(id) => setForm({ ...form, primaryInstructorId: id })}
         />
-        <FormField
-          label="Delivery mode"
-          type="select"
-          value={deliveryLabels[form.deliveryMode]}
-          options={Object.values(deliveryLabels)}
-          onChange={(label) => {
-            const mode = (Object.entries(deliveryLabels).find(([, v]) => v === label)?.[0] ??
-              'in_person') as CourseOfferingDeliveryMode
-            setForm({ ...form, deliveryMode: mode })
-          }}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            label="Delivery mode"
+            type="select"
+            value={form.deliveryMode}
+            options={Object.keys(deliveryLabels)}
+            optionLabels={deliveryLabels}
+            onChange={(v) => setForm({ ...form, deliveryMode: v as CourseOfferingDeliveryMode })}
+          />
+          <FormField
+            label="Room"
+            value={form.location}
+            onChange={(v) => setForm({ ...form, location: v })}
+            placeholder="e.g. Block B, Room 204"
+          />
+        </div>
         <FormField
           label="Schedule"
           value={form.scheduleSummary}
           onChange={(v) => setForm({ ...form, scheduleSummary: v })}
           placeholder="e.g. Mon/Wed 10:00–11:30"
         />
+      </Modal>
+
+      {/* Generate a term's sections from every program's curriculum */}
+      <Modal
+        open={generateOpen}
+        onClose={() => setGenerateOpen(false)}
+        icon={<Wand2 size={18} />}
+        title="Generate sections from curriculum"
+        description="Creates one section for every curriculum course that runs this term and has no section yet."
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setGenerateOpen(false)}>Cancel</Button>
+            <Button variant="primary" onClick={handleGenerate} disabled={generatePlan.length === 0}>
+              Create {generatePlan.length} section{generatePlan.length === 1 ? '' : 's'}
+            </Button>
+          </>
+        }
+      >
+        <FormField
+          label="Term"
+          type="select"
+          value={generateTermId}
+          options={terms.map((t) => t.id)}
+          optionLabels={Object.fromEntries(terms.map((t) => [t.id, `${t.name}${t.isCurrent ? ' (current)' : ''}`]))}
+          onChange={setGenerateTermId}
+          hint={generateTerm ? `${generateTerm.name} runs semester ${generateSemester} of each study year.` : undefined}
+        />
+        <div>
+          <div className="text-[12px] font-semibold text-navy-900 mb-1.5">Programs</div>
+          <div className="max-h-48 overflow-y-auto app-scroll space-y-1 rounded-xl border border-divider/70 p-2">
+            {programs.map((p) => (
+              <label key={p.id} className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-navy-50/60 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={generateProgramIds.includes(p.id)}
+                  onChange={() =>
+                    setGenerateProgramIds((prev) =>
+                      prev.includes(p.id) ? prev.filter((id) => id !== p.id) : [...prev, p.id],
+                    )
+                  }
+                  className="accent-lemon-600"
+                />
+                <span className="text-[12.5px] font-semibold text-navy-900">{p.name}</span>
+                <span className="ml-auto text-[11px] text-secondary-text">{p.department}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-xl nested-panel p-3 text-[12px]">
+          {generatePlan.length === 0 ? (
+            <span className="text-secondary-text">Nothing new to create for this term.</span>
+          ) : (
+            <>
+              <div className="font-semibold text-navy-900 mb-1.5">Will create {generatePlan.length} sections:</div>
+              <ul className="max-h-36 overflow-y-auto app-scroll space-y-0.5 text-secondary-text">
+                {generatePlan.map((s) => (
+                  <li key={`${s.programId}-${s.courseId}-${s.studyYear}`}>
+                    {s.courseCode} §01 · {programById.get(s.programId ?? '')?.code} Y{s.studyYear}
+                    {s.primaryInstructorName ? ` · ${s.primaryInstructorName}` : ' · no instructor yet'}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
       </Modal>
     </div>
   )

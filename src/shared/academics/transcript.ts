@@ -31,6 +31,7 @@ import {
   readQuizRecords,
   readStudentSubmissions,
 } from '../storage/readers'
+import { studentProgramName } from '../../modules/institution/utils/programUtils'
 
 export interface TranscriptComponent {
   id: string
@@ -228,7 +229,7 @@ export function buildTranscript(
   return {
     studentId: student.id,
     studentName: student.name,
-    program: student.department || '—',
+    program: studentProgramName(student),
     terms,
     cumulativeGpa,
     creditsAttempted: allGraded.reduce((sum, c) => sum + c.credits, 0),

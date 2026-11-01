@@ -45,18 +45,19 @@ TenantPrincipal = DemoPrincipal
 
 
 def map_frontend_role(role: str) -> Role:
+    """Portal role on a person record -> permission role carried in the token."""
     mapping = {
-        "Student": Role.STUDENT,
-        "Instructor": Role.INSTRUCTOR,
+        # University Edition (seven roles)
         "Admin": Role.INSTITUTION_ADMIN,
-        "Registrar": Role.ACADEMIC_ADMIN,
-        "AcademicAdmin": Role.ACADEMIC_ADMIN,
-        "FinanceAdmin": Role.FINANCE_OFFICER,
+        "Registrar": Role.REGISTRAR,
+        "FinanceOfficer": Role.FINANCE_OFFICER,
+        "Instructor": Role.INSTRUCTOR,
+        "TeachingAssistant": Role.TEACHING_ASSISTANT,
+        "Student": Role.STUDENT,
         "Guardian": Role.PARENT_GUARDIAN,
+        # Corporate / Training editions
         "Staff": Role.DEPARTMENT_ADMIN,
-        "HeadOfDepartment": Role.DEPARTMENT_ADMIN,
         "HelpDesk": Role.SUPPORT_AGENT,
-        # Corporate Edition: a line manager follows their own teams.
         "Manager": Role.MANAGER,
     }
     return mapping.get(role, Role.STUDENT)

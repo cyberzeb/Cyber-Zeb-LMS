@@ -22,11 +22,13 @@ import { AcademicCalendarPage } from '../modules/institution/pages/AcademicCalen
 import { CourseOfferingsPage } from '../modules/institution/pages/CourseOfferingsPage'
 import { CoursesPage } from '../modules/institution/pages/CoursesPage'
 import { ProgramsPage } from '../modules/institution/pages/ProgramsPage'
+import { ProgramDetailPage } from '../modules/institution/pages/ProgramDetailPage'
 import { TranscriptsPage } from '../modules/institution/pages/TranscriptsPage'
 import { AcademicReportsPage } from '../modules/institution/pages/AcademicReportsPage'
 import { ResourcesAdminPage } from '../modules/institution/pages/ResourcesAdminPage'
 import { PeoplePage } from '../modules/institution/pages/PeoplePage'
 import { InstructorsPage } from '../modules/institution/pages/InstructorsPage'
+import { TeachingAssistantsPage } from '../modules/institution/pages/TeachingAssistantsPage'
 import { StaffPage } from '../modules/institution/pages/StaffPage'
 import { GuardiansPage } from '../modules/institution/pages/GuardiansPage'
 import { AdministratorsPage } from '../modules/institution/pages/AdministratorsPage'
@@ -354,6 +356,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
+    // Corporate / Training editions: department staff portal.
     path: '/staff',
     element: <StaffLayout />,
     children: [
@@ -455,6 +458,11 @@ export const router = createBrowserRouter([
         element: <ProgramsPage />,
       },
       {
+        // One program and its curriculum.
+        path: 'institution/programs/:programId',
+        element: <ProgramDetailPage />,
+      },
+      {
         path: 'transcripts',
         element: <TranscriptsPage />,
       },
@@ -509,6 +517,11 @@ export const router = createBrowserRouter([
       {
         path: 'instructors',
         element: <InstructorsPage />,
+      },
+      {
+        // University Edition: teaching assistants assigned to courses.
+        path: 'teaching-assistants',
+        element: <TeachingAssistantsPage />,
       },
       {
         // Corporate Edition: line managers who use the manager portal.

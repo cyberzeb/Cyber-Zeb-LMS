@@ -3,7 +3,17 @@ Write-permission policy for LMS data-store collections.
 
 Tenant admins (institution / academic / training admin) may change anything in
 their own tenant. Every other role may only change the collections listed here,
-and only the records the rule allows. A collection or role that is not listed is
+and only the records the rule allows.
+
+University Edition roles:
+- Registrar: academic calendar, structure, catalog, offerings, enrolment,
+  certificates, and the accounts of students, instructors, teaching assistants
+  and guardians. Never payments, settings or administrator accounts.
+- Finance Officer: invoices and payments.
+- Instructor: the courses they teach and everything inside them.
+- Teaching Assistant: grading and attendance for their assigned courses only;
+  no course content, quizzes, assignments, live classes or certificates.
+- Student / Guardian: their own submissions, progress and tickets. A collection or role that is not listed is
 read-only for that role. Read access is handled separately in `scope.py`.
 
 Collections come in two shapes:
@@ -130,6 +140,14 @@ async def _staff_submission_is_pending(record: Record, ctx: ScopeContext) -> boo
     return record.get("verificationStatus") == "pending" and record.get("submittedById") == ctx.person_id
 
 
+# Accounts a registrar may create and maintain (never administrators or finance).
+REGISTRAR_MANAGED_ROLES = frozenset({"Student", "Instructor", "TeachingAssistant", "Guardian"})
+
+
+async def _registrar_managed_person(record: Record, _ctx: ScopeContext) -> bool:
+    return record.get("role") in REGISTRAR_MANAGED_ROLES
+
+
 async def _forum_message_create(record: Record, ctx: ScopeContext) -> bool:
     # The campus chat welcome message is generated client-side as a "system" message.
     if record.get("senderId") not in (ctx.person_id, "system"):
@@ -147,6 +165,7 @@ async def _forum_chat_create(record: Record, ctx: ScopeContext) -> bool:
 
 TEACHING_ROLES = (Role.INSTRUCTOR, Role.TEACHING_ASSISTANT)
 ALL_PORTAL_ROLES = (
+    Role.REGISTRAR,
     Role.STUDENT,
     Role.INSTRUCTOR,
     Role.TEACHING_ASSISTANT,
@@ -158,7 +177,11 @@ ALL_PORTAL_ROLES = (
 )
 
 _course_scoped = Rule(owner=_in_taught_course, create=True, update=True, delete=True)
+# Course content belongs to the instructor; teaching assistants only support it.
+_authoring = {Role.INSTRUCTOR: _course_scoped}
 _teaching = {role: _course_scoped for role in TEACHING_ROLES}
+# Registrar keeps the academic records of the whole institution.
+_registrar_full = Rule(create=True, update=True, delete=True)
 _ticket_requester = Rule(owner=owned_by("requesterId"), create=True, update=True)
 _announcement_viewer = Rule(shared_update_fields=frozenset({"views", "viewedBy"}))
 _announcement_author = Rule(
@@ -173,28 +196,36 @@ _last_message_fields = frozenset(
 )
 
 POLICY: dict[str, dict[Role, Rule]] = {
+    # Academic structure and calendar — registrar.
+    "academic-years": {Role.REGISTRAR: _registrar_full},
+    "academic-terms": {Role.REGISTRAR: _registrar_full},
+    "departments": {Role.REGISTRAR: _registrar_full},
+    "programs": {Role.REGISTRAR: _registrar_full},
+    "course-offerings": {Role.REGISTRAR: _registrar_full},
+    "certificate-templates": {Role.REGISTRAR: _registrar_full},
     # Teaching content — instructors manage records of the courses they teach.
-    "live-sessions": dict(_teaching),
-    "assignments": dict(_teaching),
-    "quizzes": dict(_teaching),
+    "live-sessions": dict(_authoring),
+    "assignments": dict(_authoring),
+    "quizzes": dict(_authoring),
+    # Teaching assistants take attendance for their courses.
     "attendances": dict(_teaching),
-    "certificates": dict(_teaching),
+    "certificates": {**_authoring, Role.REGISTRAR: _registrar_full},
     # Training: a cohort's trainer takes its attendance.
     "cohort-attendance": {
         role: Rule(owner=_led_cohort, create=True, update=True, delete=True) for role in TEACHING_ROLES
     },
     "question-bank": {
-        role: Rule(owner=_question_owned, create=True, update=True, delete=True) for role in TEACHING_ROLES
+        Role.INSTRUCTOR: Rule(owner=_question_owned, create=True, update=True, delete=True),
     },
     "courses": {
-        role: Rule(
+        Role.INSTRUCTOR: Rule(
             owner=_course_owned,
             create=True,
             update=True,
             create_check=_course_create,
             update_check=_course_update,
-        )
-        for role in TEACHING_ROLES
+        ),
+        Role.REGISTRAR: _registrar_full,
     },
     # Learner activity.
     "student-submissions": {
@@ -220,6 +251,7 @@ POLICY: dict[str, dict[Role, Rule]] = {
         ),
         # A line manager may assign training to their own team members.
         Role.MANAGER: Rule(owner=_managed_employee, create=True, update=True),
+        Role.REGISTRAR: _registrar_full,
     },
     "payments": {Role.FINANCE_OFFICER: Rule(create=True, update=True, delete=True)},
     # Support.
@@ -230,7 +262,10 @@ POLICY: dict[str, dict[Role, Rule]] = {
     # Communication.
     "announcements": {
         **{role: _announcement_viewer for role in ALL_PORTAL_ROLES},
-        **{role: _announcement_author for role in TEACHING_ROLES},
+        # Teaching assistants read announcements; they do not publish them.
+        Role.INSTRUCTOR: _announcement_author,
+        Role.REGISTRAR: _announcement_author,
+        Role.FINANCE_OFFICER: _announcement_author,
     },
     "forum-chats": {
         role: Rule(
@@ -252,8 +287,10 @@ POLICY: dict[str, dict[Role, Rule]] = {
         )
         for role in ALL_PORTAL_ROLES
     },
-    # Staff submit new people for admin verification.
     "people": {
+        # Registrar manages learner and teaching accounts, never staff or admins.
+        Role.REGISTRAR: Rule(owner=_registrar_managed_person, create=True, update=True, delete=True),
+        # Corporate / Training staff submit new people for admin verification.
         Role.DEPARTMENT_ADMIN: Rule(
             owner=_staff_submission_is_pending,
             create=True,

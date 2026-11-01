@@ -20,6 +20,7 @@ import { ToggleRow } from './settings/ToggleRow'
 import { courseLevelOptions, UNASSIGNED_DEPARTMENT } from '../data/courseSeedData'
 import { SelectMenu } from '../../../shared/components/SelectMenu'
 import { getEligibleCourseInstructors } from '../utils/courseAssignmentUtils'
+import { imageFileToDataUrl, isPersistentImageUrl } from '../../../shared/utils/imageUtils'
 import {
   computeCourseProgress,
   courseDeliveryModeOptions,
@@ -88,6 +89,8 @@ export function CourseCreateModal({
   const isAdmin = !isInstructor
   const isEdit = course != null
   const thumbnailRef = useRef<HTMLInputElement>(null)
+  const [thumbnailBusy, setThumbnailBusy] = useState(false)
+  const [thumbnailError, setThumbnailError] = useState('')
   const resourceFileRef = useRef<HTMLInputElement>(null)
   const [activeTab, setActiveTab] = useState('Basics')
   const [form, setForm] = useState<CourseCreateInput>(() => createEmptyCourseForm())
@@ -151,9 +154,17 @@ export function CourseCreateModal({
     })
   }
 
-  const handleThumbnailPick = (file: File) => {
-    const url = URL.createObjectURL(file)
-    updateForm({ thumbnailUrl: url })
+  // Stored inside the course as a small JPEG so every user sees it after reload.
+  const handleThumbnailPick = async (file: File) => {
+    setThumbnailError('')
+    setThumbnailBusy(true)
+    try {
+      updateForm({ thumbnailUrl: await imageFileToDataUrl(file) })
+    } catch (err) {
+      setThumbnailError(err instanceof Error ? err.message : 'The image could not be used.')
+    } finally {
+      setThumbnailBusy(false)
+    }
   }
 
   const handleResourceFilePick = (resourceId: string, file: File) => {
@@ -393,7 +404,7 @@ export function CourseCreateModal({
 
           <SectionLabel>Cover Image</SectionLabel>
           <div className="flex flex-col sm:flex-row gap-4 items-start">
-            {form.thumbnailUrl ? (
+            {isPersistentImageUrl(form.thumbnailUrl) ? (
               <div className="relative w-full sm:w-40 h-24 rounded-xl overflow-hidden border border-divider bg-navy-50">
                 <img
                   src={form.thumbnailUrl}
@@ -416,7 +427,7 @@ export function CourseCreateModal({
                 className="w-full sm:w-40 h-24 rounded-xl border-2 border-dashed border-divider hover:border-lemon-500/50 bg-navy-50/50 flex flex-col items-center justify-center gap-1.5 text-secondary-text hover:text-navy-900 transition-colors cursor-pointer"
               >
                 <Upload size={18} />
-                <span className="text-[11px] font-semibold">Upload cover</span>
+                <span className="text-[11px] font-semibold">{thumbnailBusy ? 'Processing…' : 'Upload cover'}</span>
               </button>
             )}
             <input
@@ -426,12 +437,18 @@ export function CourseCreateModal({
               className="hidden"
               onChange={(e) => {
                 const file = e.target.files?.[0]
-                if (file) handleThumbnailPick(file)
+                if (file) void handleThumbnailPick(file)
                 e.target.value = ''
               }}
             />
             <div className="text-[11.5px] text-secondary-text leading-relaxed flex-1">
               Recommended 16:9 image for course cards and the learner catalog. JPG or PNG, up to 5 MB.
+              {form.thumbnailUrl && !isPersistentImageUrl(form.thumbnailUrl) ? (
+                <p className="mt-1.5 text-warning font-semibold">
+                  The previous cover was saved as a temporary link and no longer loads. Upload it again.
+                </p>
+              ) : null}
+              {thumbnailError ? <p className="mt-1.5 text-danger font-semibold">{thumbnailError}</p> : null}
             </div>
           </div>
         </div>

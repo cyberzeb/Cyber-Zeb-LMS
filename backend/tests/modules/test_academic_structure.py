@@ -1,7 +1,7 @@
 """
 University hierarchy rules: a record may never point at a parent that does not exist.
 
-    Campus → College → Department → Program → Course → Offering → Enrollment
+    Campus → Department → Program → Course → Offering → Enrollment
     Academic Year → Academic Term (an offering runs in one term)
 """
 from __future__ import annotations
@@ -58,7 +58,8 @@ async def test_term_requires_academic_year(env):
 async def test_program_requires_department(env):
     client, tenants = env
     assert (await _patch(client, tenants, "programs", {"id": "p-1", "name": "BSc CS"})).status_code == 422
-    await _patch(client, tenants, "departments", {"id": "d-1", "name": "Computer Science"})
+    await _patch(client, tenants, "campuses", {"id": "CAMPUS", "name": "Main"})
+    await _patch(client, tenants, "departments", {"id": "d-1", "name": "Computer Science", "campusId": "CAMPUS"})
     ok = await _patch(client, tenants, "programs", {"id": "p-1", "name": "BSc CS", "departmentId": "d-1"})
     assert ok.status_code == 200
 
@@ -89,11 +90,17 @@ async def test_enrollment_must_point_at_an_offering_of_the_same_course(env):
     assert ok.status_code == 200
 
 
-async def test_department_college_and_campus_must_exist(env):
+async def test_department_needs_an_existing_campus(env):
     client, tenants = env
-    bad = await _patch(client, tenants, "departments", {"id": "d-2", "name": "Law", "collegeId": "ghost"})
-    assert bad.status_code == 422
-    ok = await _patch(client, tenants, "departments", {"id": "d-2", "name": "Law"})
+    missing = await _patch(client, tenants, "departments", {"id": "d-2", "name": "Law"})
+    assert missing.status_code == 422
+    ghost = await _patch(client, tenants, "departments", {"id": "d-2", "name": "Law", "campusId": "ghost"})
+    await _patch(client, tenants, "campuses", {"id": "CAMPUS", "name": "Main"})
+    assert ghost.status_code == 422
+    # There are no colleges any more: a leftover collegeId is not checked.
+    ok = await _patch(
+        client, tenants, "departments", {"id": "d-2", "name": "Law", "campusId": "CAMPUS", "collegeId": "old"}
+    )
     assert ok.status_code == 200
 
 
@@ -105,3 +112,22 @@ async def test_whole_collection_replace_is_validated(env):
         headers=_admin(tenants),
     )
     assert res.status_code == 422
+
+
+async def test_offering_program_must_exist(env):
+    client, tenants = env
+    await _patch(client, tenants, "academic-years", {"id": "ay-1", "code": "2026"})
+    await _patch(client, tenants, "academic-terms", {"id": "t-1", "name": "Fall", "academicYearId": "ay-1"})
+    ghost = await _patch(
+        client, tenants, "course-offerings",
+        {"id": "off-p", "courseId": "c1", "academicTermId": "t-1", "programId": "ghost"},
+    )
+    assert ghost.status_code == 422
+    await _patch(client, tenants, "campuses", {"id": "CAMPUS", "name": "Main"})
+    await _patch(client, tenants, "departments", {"id": "d-1", "name": "CS", "campusId": "CAMPUS"})
+    await _patch(client, tenants, "programs", {"id": "p-msc", "name": "MSc CS", "departmentId": "d-1"})
+    ok = await _patch(
+        client, tenants, "course-offerings",
+        {"id": "off-p", "courseId": "c1", "academicTermId": "t-1", "programId": "p-msc"},
+    )
+    assert ok.status_code == 200

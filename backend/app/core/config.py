@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     # Demo login: fixed OTP code 000000, the demo account picker (/auth/demo-login)
     # and the code echoed back in API responses. Never enable on a real tenant's server.
     DEMO_LOGIN_ENABLED: bool = False
+    # Send every sign-in code by email (random, single-use) even when DEMO_LOGIN_ENABLED
+    # is on. Use it to show real emailed codes (e.g. in Mailpit) while keeping the
+    # other demo conveniences such as instantly settled demo payments.
+    OTP_ALWAYS_EMAIL: bool = False
     OTP_TTL_MINUTES: int = 10
     OTP_MAX_ATTEMPTS: int = 5
     OTP_RESEND_COOLDOWN_SECONDS: int = 30

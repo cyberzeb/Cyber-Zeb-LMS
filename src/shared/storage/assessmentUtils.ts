@@ -175,7 +175,9 @@ export function toStudentQuizzes(
         status = 'Completed'
         score = `${Math.round((submission.score / (submission.maxScore ?? q.maxPoints)) * 100)}%`
       } else if (submission?.status === 'submitted') {
+        // Essays wait for the instructor before a final score exists.
         status = 'Completed'
+        score = 'Awaiting review'
       } else if (pastDue) {
         status = 'Locked'
       }
@@ -237,6 +239,7 @@ export function toInstructorQuizzes(
         submissions: quizSubs.filter((s) => s.status !== 'not-submitted').length,
         enrolled: countEnrolledInCourse(q.courseId),
         avgScore,
+        toReview: quizSubs.filter((s) => (s.pendingReview?.length ?? 0) > 0).length,
       }
     })
 }

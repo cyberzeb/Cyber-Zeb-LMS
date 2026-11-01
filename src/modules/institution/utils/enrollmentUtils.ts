@@ -1,6 +1,7 @@
-import type { CourseEnrollment, CourseRecord, Department, PersonRow } from '../types'
+import type { CourseEnrollment, CourseRecord, Department, PersonRow, ProgramRow } from '../types'
 import type { CourseOfferingRecord } from '../types/academic'
 import { isEnrollableOffering } from './offeringUtils'
+import { resolveOfferingProgramId, resolveStudentProgram, studentProgramName } from './programUtils'
 import {
   resolveStudentDepartmentId,
   resolveStudentProgramSemester,
@@ -40,7 +41,42 @@ export function isAlreadyEnrolled(
   )
 }
 
+/** Students of one program in one year/semester slot (the cohort a section serves). */
 export function getStudentsForProgramSlot(
+  students: PersonRow[],
+  programId: string,
+  studyYear: number,
+  programSemester: number,
+  programs: ProgramRow[],
+  departments: Department[],
+): PersonRow[] {
+  return students.filter((student) => {
+    if (student.role !== 'Student' || !isEnrollableStudent(student.status)) return false
+    if (resolveStudentProgram(student, programs, departments)?.id !== programId) return false
+    if ((student.studyYear ?? 1) !== studyYear) return false
+    return resolveStudentProgramSemester(student) === programSemester
+  })
+}
+
+/** Sections that serve one program's year/semester slot. */
+export function getOfferingsForProgramSlot(
+  offerings: CourseOfferingRecord[],
+  programId: string,
+  studyYear: number,
+  programSemester: number,
+  programs: ProgramRow[],
+): CourseOfferingRecord[] {
+  return offerings.filter(
+    (offering) =>
+      isEnrollableOffering(offering) &&
+      resolveOfferingProgramId(offering, programs) === programId &&
+      offering.studyYear === studyYear &&
+      (offering.programSemester ?? 1) === programSemester,
+  )
+}
+
+/** Demo seeding only: students of a department slot, before programs exist. */
+export function getStudentsForDepartmentSlot(
   students: PersonRow[],
   departmentId: string,
   studyYear: number,
@@ -56,7 +92,8 @@ export function getStudentsForProgramSlot(
   })
 }
 
-export function getOfferingsForProgramSlot(
+/** Demo seeding only: sections of a department slot, before programs exist. */
+export function getOfferingsForDepartmentSlot(
   offerings: CourseOfferingRecord[],
   departmentId: string,
   studyYear: number,
@@ -117,7 +154,7 @@ export function buildCohortEnrollmentRows(
         courseCode: offering.courseCode,
         courseTitle: offering.courseTitle,
         courseOfferingId: offering.id,
-        program: student.department,
+        program: studentProgramName(student),
         campus: student.campusId,
         enrolledOn: new Date().toISOString(),
         status: 'active',

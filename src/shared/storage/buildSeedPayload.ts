@@ -8,7 +8,6 @@ import {
 } from '../../modules/institution/data/academicSeedData'
 import {
   seedCampuses,
-  seedColleges,
   seedDepartments,
 } from '../../modules/institution/data/orgSeedData'
 import { seedPeople } from '../../modules/institution/data/peopleSeedData'
@@ -34,7 +33,7 @@ import {
   seedCourseRecords,
 } from './seedBuilders'
 import { buildAcademicHistory } from '../../modules/institution/data/academicHistorySeed'
-import { buildProgramsFromDepartments } from '../../modules/institution/data/programsSeedData'
+import { buildSeedPrograms, programIdForDepartment } from '../../modules/institution/data/programsSeedData'
 
 function mergeDemoLearningCourse(catalog: CourseRecord[]): CourseRecord[] {
   const demo = createDemoLearningCourse()
@@ -57,26 +56,23 @@ function mergeDemoLearningCourse(catalog: CourseRecord[]): CourseRecord[] {
 export function buildSeedPayload(): Record<string, unknown> {
   const catalog = seedCourseRecords()
   const coursesBase = mergeDemoLearningCourse(catalog)
-  const { courses, courseOfferings, enrollments } = buildSeedOfferingsAndEnrollments(coursesBase)
-  const people = ensureDemoStudentInPeople(seedPeople)
+  const { courses, courseOfferings: deptOfferings, enrollments } = buildSeedOfferingsAndEnrollments(coursesBase)
 
-  // Degree programs sit between department and course in the hierarchy.
-  const programs = buildProgramsFromDepartments(seedDepartments, Object.fromEntries(
-    seedDepartments.map((department) => [
-      department.id,
-      {
-        students: people.filter((p) => p.role === 'Student' && p.departmentId === department.id).length,
-        courses: courses.filter((c) => c.department === department.name).length,
-      },
-    ]),
-  ))
+  // Department → Program: each student studies their department's bachelor's
+  // program, and each section serves that program's curriculum.
+  const people = ensureDemoStudentInPeople(seedPeople).map((p) =>
+    p.role === 'Student' && p.departmentId && !p.programId
+      ? { ...p, programId: programIdForDepartment(p.departmentId) }
+      : p,
+  )
+  const courseOfferings = deptOfferings.map((o) => ({ ...o, programId: o.programId ?? programIdForDepartment(o.departmentId) }))
+  const programs = buildSeedPrograms(seedDepartments, courseOfferings, people, courses)
 
   // Coursework and grades for every offering, so transcripts have real history.
   const history = buildAcademicHistory(courseOfferings, enrollments, courses, seedAcademicTerms)
 
   return {
     campuses: seedCampuses,
-    colleges: seedColleges,
     departments: seedDepartments,
     'academic-years': seedAcademicYears,
     'academic-terms': seedAcademicTerms,

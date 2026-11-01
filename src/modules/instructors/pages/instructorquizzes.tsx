@@ -11,6 +11,7 @@ import { GlassCard } from '../../../shared/layout/GlassCard'
 import { readQuizRecords } from '../../../shared/storage/readers'
 import { useQuizzes } from '../../institution/hooks/useAssessments'
 import { CreateQuizModal } from '../components/CreateQuizModal'
+import { QuizReviewModal } from '../components/QuizReviewModal'
 import { InstructorPageError, InstructorPageLoading } from '../components/InstructorPageStates'
 import { useInstructorDashboard } from '../hooks/useInstructorDashboard'
 import type { InstructorQuiz } from '../types'
@@ -29,6 +30,7 @@ export function InstructorQuizzesPage() {
   const { data, isLoading, isError, reload } = useInstructorDashboard()
   const [activeTab, setActiveTab] = useState('All')
   const [modalOpen, setModalOpen] = useState(false)
+  const [reviewQuizId, setReviewQuizId] = useState<string | null>(null)
 
   const stats = useMemo(() => {
     if (!data) return { published: 0, draft: 0, closed: 0, avgScore: '—' }
@@ -119,6 +121,9 @@ export function InstructorQuizzesPage() {
                       {quiz.avgScore ? (
                         <span className="font-bold text-success">Avg: {quiz.avgScore}</span>
                       ) : null}
+                      {quiz.toReview ? (
+                        <span className="font-bold text-warning">{quiz.toReview} to mark</span>
+                      ) : null}
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {record?.status === 'draft' ? (
@@ -129,6 +134,11 @@ export function InstructorQuizzesPage() {
                       {record?.status === 'published' ? (
                         <Button variant="secondary" size="sm" onClick={() => handleClose(quiz.id)}>
                           Close quiz
+                        </Button>
+                      ) : null}
+                      {quiz.toReview ? (
+                        <Button variant="primary" size="sm" onClick={() => setReviewQuizId(quiz.id)}>
+                          Mark answers
                         </Button>
                       ) : null}
                     </div>
@@ -150,6 +160,13 @@ export function InstructorQuizzesPage() {
           </Button>
         </GlassCard>
       ) : null}
+
+      <QuizReviewModal
+        open={reviewQuizId !== null}
+        quizId={reviewQuizId}
+        onClose={() => setReviewQuizId(null)}
+        onSaved={() => void reload()}
+      />
 
       <CreateQuizModal
         open={modalOpen}

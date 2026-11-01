@@ -55,7 +55,7 @@ restarts automatically when you change a backend `.py` file.
 ```bash
 cd backend
 .venv/Scripts/python -m uvicorn app.main:app --host 127.0.0.1 --port 8001    # macOS/Linux: .venv/bin/python
-.venv/Scripts/python -m pytest -q                                               # 54 tests
+.venv/Scripts/python -m pytest -q                                               # 124 tests
 ```
 
 - API docs (Swagger): `http://127.0.0.1:8001/docs`
@@ -88,9 +88,10 @@ For email setup and Super Admin accounts, see
 | Marketing | `/` | Public landing page |
 | Sign in | `/login` | Email → role → 6-digit code |
 | Student | `/student/*` | Student accounts |
-| Instructor | `/instructor/*` | Instructor accounts |
-| Admin | `/admin/*` | Institution admins (layout follows the tenant's edition) |
-| Staff / Guardian / Help desk | `/staff`, `/guardian`, `/help-desk` | Matching roles |
+| Instructor | `/instructor/*` | Instructors and teaching assistants (assistants get a reduced menu) |
+| Admin | `/admin/*` | Institution admins, registrars and finance officers — each sees only their office's pages |
+| Guardian | `/guardian/*` | Parents / guardians |
+| Staff / Help desk / Manager | `/staff`, `/help-desk`, `/manager` | Corporate and Training editions only |
 | Super Admin | `/super-admin/*` | Platform super admin |
 
 ### Sign-in and demo accounts
@@ -106,14 +107,17 @@ emailed, even on a demo server, because the console can create, suspend and dele
 institutions. Read it in Mailpit at `http://localhost:8025` — see
 [docs/EMAIL_AND_SUPER_ADMIN.md](docs/EMAIL_AND_SUPER_ADMIN.md).
 
+The University Edition has seven roles (see [docs/UNIVERSITY_EDITION.md](docs/UNIVERSITY_EDITION.md#4-roles-university-edition)):
+
 | Role | Demo email |
 |------|------------|
-| Student | `amina.lemma@student.berana.edu` (enrolled in CS-201, CS-340, CYB-101) |
+| Institution Admin | `h.desta@berana.edu` |
+| Registrar | `g.nega@berana.edu` |
+| Finance Officer | `r.assefa@berana.edu` |
 | Instructor | `a.selassie@berana.edu` |
-| Admin | `h.desta@berana.edu` |
-| Staff | `g.nega@berana.edu` |
-| Guardian | `yonas.t@gmail.com` |
-| Help desk | `m.haile@berana.edu` |
+| Teaching Assistant | `l.mengistu@berana.edu` (assists on CS-101 and CS-201) |
+| Student | `amina.lemma@student.berana.edu` (enrolled in CS-201, CS-340, CYB-101) |
+| Parent / Guardian | `yonas.t@gmail.com` |
 
 The Corporate Edition demo tenant (`horizon` — Horizon Bank) is seeded too. Sign
 in as `selam.girma@horizonbank.et` (employee) or `m.bekele@horizonbank.et`
@@ -132,7 +136,7 @@ records no longer overwrite each other.
 ### Institution Admin
 
 - Institution overview, org structure, departments, programs
-- People management (students, instructors, staff, guardians, admins)
+- People management (students, instructors, teaching assistants, guardians, and admin / registrar / finance accounts)
 - Courses, enrollments, attendance, certificates
 - Announcements and discussion forum
 - **Live Classes** — schedule and manage virtual sessions

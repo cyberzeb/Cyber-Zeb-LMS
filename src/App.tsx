@@ -14,10 +14,9 @@ import type {
 const mockCampus: InstitutionEntity = {
   id: '1',
   name: 'Main Campus — Addis Ababa',
-  subtitle: 'College of Computing, Business & Sciences · Established 2011',
+  subtitle: 'Established 2011',
   status: 'active',
   departmentsCount: 6,
-  collegesCount: 3,
   studentsCount: 2066,
   facultyCount: 142,
   completionRate: 94,
@@ -32,7 +31,6 @@ const mockDepartments: Department[] = [
     facultyCount: 42,
     icon: '💻',
     campusId: 'c1',
-    collegeId: 'col1',
   },
   {
     id: 'd2',
@@ -42,7 +40,6 @@ const mockDepartments: Department[] = [
     facultyCount: 35,
     icon: '📊',
     campusId: 'c1',
-    collegeId: 'col2',
   },
   {
     id: 'd3',
@@ -52,7 +49,6 @@ const mockDepartments: Department[] = [
     facultyCount: 38,
     icon: '⚙️',
     campusId: 'c1',
-    collegeId: 'col3',
   },
   {
     id: 'd4',
@@ -62,7 +58,6 @@ const mockDepartments: Department[] = [
     facultyCount: 27,
     icon: '🌍',
     campusId: 'c2',
-    collegeId: 'col4',
   },
 ]
 

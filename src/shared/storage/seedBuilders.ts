@@ -5,8 +5,8 @@ import { seedDepartments } from '../../modules/institution/data/orgSeedData'
 import { seedPeople } from '../../modules/institution/data/peopleSeedData'
 import {
   buildCohortEnrollmentRows,
-  getOfferingsForProgramSlot,
-  getStudentsForProgramSlot,
+  getOfferingsForDepartmentSlot,
+  getStudentsForDepartmentSlot,
   isEnrollableStudent,
 } from '../../modules/institution/utils/enrollmentUtils'
 import { createId } from '../hooks/useLocalStorageState'
@@ -73,14 +73,14 @@ export function seedEnrollmentRecords(
   }
 
   for (const slot of slots.values()) {
-    const cohortStudents = getStudentsForProgramSlot(
+    const cohortStudents = getStudentsForDepartmentSlot(
       students,
       slot.departmentId,
       slot.studyYear,
       slot.programSemester,
       seedDepartments,
     )
-    const catalog = getOfferingsForProgramSlot(
+    const catalog = getOfferingsForDepartmentSlot(
       offerings,
       slot.departmentId,
       slot.studyYear,

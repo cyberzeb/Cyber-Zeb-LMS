@@ -4,16 +4,14 @@ import { Modal } from '../../../shared/components/Modal'
 import { Button } from '../../../shared/components/Button'
 import { FormField } from '../../../shared/components/FormField'
 import { useCourses } from '../hooks/useCourses'
-import { DEFAULT_SEMESTERS_PER_YEAR } from '../utils/academicTermUtils'
 import { SelectMenu } from '../../../shared/components/SelectMenu'
 import { getEligibleDepartmentHeads, resolveDepartmentHeadId } from '../utils/departmentHeadUtils'
-import type { Campus, College, Department, PersonRow, ProgramLevel } from '../types'
+import type { Campus, Department, PersonRow } from '../types'
 
 interface DepartmentEditModalProps {
   open: boolean
   department: Department | null
   campuses: Campus[]
-  colleges: College[]
   people?: PersonRow[]
   onClose: () => void
   onSaved: (department: Department, prevName: string) => void
@@ -24,7 +22,6 @@ export function DepartmentEditModal({
   open,
   department,
   campuses,
-  colleges,
   onClose,
   onSaved,
   onDelete,
@@ -37,11 +34,7 @@ export function DepartmentEditModal({
     headName: '',
     headId: '',
     campusId: '',
-    collegeId: '',
     description: '',
-    programCode: '',
-    programLevel: 'Undergraduate' as ProgramLevel,
-    maxYears: '4',
   })
   const [error, setError] = useState('')
 
@@ -52,11 +45,7 @@ export function DepartmentEditModal({
       headName: department.headName,
       headId: resolveDepartmentHeadId(department, people),
       campusId: department.campusId,
-      collegeId: department.collegeId,
       description: department.description ?? '',
-      programCode: department.programCode ?? '',
-      programLevel: department.programLevel ?? 'Undergraduate',
-      maxYears: String(department.maxYears ?? 4),
     })
     setError('')
   }, [department, open, people])
@@ -76,44 +65,23 @@ export function DepartmentEditModal({
     [campuses],
   )
 
-  const collegeOptions = useMemo(
-    () => colleges.filter((c) => c.campusId === form.campusId),
-    [colleges, form.campusId],
-  )
-
-  useEffect(() => {
-    if (!collegeOptions.some((c) => c.id === form.collegeId)) {
-      setForm((prev) => ({ ...prev, collegeId: collegeOptions[0]?.id ?? '' }))
-    }
-  }, [collegeOptions, form.collegeId])
-
   const handleSave = () => {
     if (!department) return
     if (!form.name.trim()) {
       setError('Department name is required.')
       return
     }
-    if (!form.collegeId) {
-      setError('Please select a college.')
-      return
-    }
 
     const prevName = department.name
     const nextName = form.name.trim()
     const headPerson = people.find((p) => p.id === form.headId)
-    const maxYears = Math.max(1, Number(form.maxYears) || 4)
     const updated: Department = {
       ...department,
       name: nextName,
       headId: form.headId || undefined,
       headName: headPerson?.name ?? (form.headName.trim() || 'To be assigned'),
       campusId: form.campusId,
-      collegeId: form.collegeId,
       description: form.description.trim(),
-      programCode: form.programCode.trim() || undefined,
-      programLevel: form.programLevel,
-      maxYears,
-      semestersPerYear: department.semestersPerYear ?? DEFAULT_SEMESTERS_PER_YEAR,
     }
 
     renameDepartmentInCourses(prevName, nextName)
@@ -154,7 +122,7 @@ export function DepartmentEditModal({
       ) : null}
 
       <div className="flex flex-col gap-3.5">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <FormField
             label="Campus"
             type="select"
@@ -166,24 +134,7 @@ export function DepartmentEditModal({
             }
             onChange={(label) => {
               const campus = campusOptions.find((c) => c.label === label)
-              if (campus) {
-                const firstCollege = colleges.find((c) => c.campusId === campus.id)?.id ?? ''
-                setForm({ ...form, campusId: campus.id, collegeId: firstCollege })
-              }
-            }}
-          />
-          <FormField
-            label="College"
-            type="select"
-            value={collegeOptions.find((c) => c.id === form.collegeId)?.name ?? ''}
-            options={
-              collegeOptions.length > 0
-                ? collegeOptions.map((c) => c.name)
-                : ['No colleges on this campus']
-            }
-            onChange={(label) => {
-              const college = collegeOptions.find((c) => c.name === label)
-              if (college) setForm({ ...form, collegeId: college.id })
+              if (campus) setForm({ ...form, campusId: campus.id })
             }}
           />
         </div>
@@ -192,30 +143,8 @@ export function DepartmentEditModal({
           value={form.name}
           onChange={(v) => setForm({ ...form, name: v })}
           placeholder="e.g. Computer Science"
-          hint="Final academic unit — e.g. Computer Science, Software Engineering"
+          hint="Its degrees (BSc, MSc …) are managed on the Programs page."
         />
-        <FormField
-          label="Program Code"
-          value={form.programCode}
-          onChange={(v) => setForm({ ...form, programCode: v })}
-          placeholder="e.g. BSC-CS"
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FormField
-            label="Program Level"
-            type="select"
-            value={form.programLevel}
-            options={['Undergraduate', 'Postgraduate', 'Doctoral', 'Certificate']}
-            onChange={(v) => setForm({ ...form, programLevel: v as ProgramLevel })}
-          />
-          <FormField
-            label="Program Duration (years)"
-            value={form.maxYears}
-            onChange={(v) => setForm({ ...form, maxYears: v })}
-            placeholder="4"
-            hint={`${DEFAULT_SEMESTERS_PER_YEAR} semesters per year are provisioned on the academic calendar.`}
-          />
-        </div>
         {headCandidates.length > 0 ? (
           <div>
             <label className="block text-[12px] font-bold text-navy-800 mb-1.5">
@@ -278,11 +207,10 @@ export function DepartmentEditModal({
           </div>
           <div className="rounded-xl bg-navy-50/80 px-3 py-2.5 ring-1 ring-navy-900/5">
             <div className="text-[18px] font-extrabold text-navy-900 truncate">
-              {collegeOptions.find((c) => c.id === form.collegeId)?.name.split(' ').slice(-1)[0] ??
-                '—'}
+              {campuses.find((c) => c.id === form.campusId)?.code ?? '—'}
             </div>
             <div className="text-[10px] uppercase tracking-wider text-secondary-text font-semibold">
-              College
+              Campus
             </div>
           </div>
         </div>

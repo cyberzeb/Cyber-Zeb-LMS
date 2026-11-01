@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Building2, GraduationCap, Network } from 'lucide-react'
+import { Building2, Network } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../../../shared/components/Button'
 import { FormField } from '../../../shared/components/FormField'
@@ -23,26 +23,17 @@ const emptyCampusForm = {
   subtitle: '',
 }
 
-const emptyCollegeForm = {
-  name: '',
-  deanName: '',
-  description: '',
-  campusId: '',
-}
-
 export function OrgStructurePage() {
   const { t } = useLanguage()
   const navigate = useNavigate()
   const { notify } = useToast()
   const {
     campuses,
-    colleges,
     departments,
     activeCampuses,
     addCampus,
     updateCampus,
     activateCampus,
-    addCollege,
     ssoProviders,
     setupSteps,
     setupPercent,
@@ -50,21 +41,18 @@ export function OrgStructurePage() {
   } = useCampusContext()
 
   const [campusModalOpen, setCampusModalOpen] = useState(false)
-  const [collegeModalOpen, setCollegeModalOpen] = useState(false)
   const [editingCampus, setEditingCampus] = useState<CampusRecord | null>(null)
   const [campusForm, setCampusForm] = useState(emptyCampusForm)
-  const [collegeForm, setCollegeForm] = useState(emptyCollegeForm)
 
   const totals = useMemo(() => {
     const pending = campuses.filter((c) => c.status === 'pending').length
     return {
       campuses: campuses.length,
       active: activeCampuses.length,
-      colleges: colleges.length,
       departments: departments.length,
       pending,
     }
-  }, [campuses, activeCampuses.length, colleges.length, departments.length])
+  }, [campuses, activeCampuses.length, departments.length])
 
   const openAddCampusModal = () => {
     setEditingCampus(null)
@@ -83,11 +71,6 @@ export function OrgStructurePage() {
     setCampusModalOpen(true)
   }
 
-  const openAddCollegeModal = (campusId: string) => {
-    setCollegeForm({ ...emptyCollegeForm, campusId })
-    setCollegeModalOpen(true)
-  }
-
   const handleSaveCampus = () => {
     if (!campusForm.name.trim() || !campusForm.code.trim()) {
       notify('Campus name and code are required.', 'error')
@@ -104,16 +87,6 @@ export function OrgStructurePage() {
     setCampusModalOpen(false)
   }
 
-  const handleSaveCollege = () => {
-    if (!collegeForm.name.trim() || !collegeForm.campusId) {
-      notify('College name and campus are required.', 'error')
-      return
-    }
-    addCollege(collegeForm)
-    setCollegeModalOpen(false)
-    notify(`College “${collegeForm.name.trim()}” added.`)
-  }
-
   return (
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
@@ -127,9 +100,8 @@ export function OrgStructurePage() {
         }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5">
         <StatBlock label="Campuses" value={totals.campuses} icon={<Building2 size={STAT} />} />
-        <StatBlock label="Colleges" value={totals.colleges} icon={<GraduationCap size={STAT} />} />
         <StatBlock label="Departments" value={totals.departments} icon={<Network size={STAT} />} />
         <StatBlock
           label="Setup Progress"
@@ -155,19 +127,16 @@ export function OrgStructurePage() {
 
       <OrgStructureTree
         campuses={campuses}
-        colleges={colleges}
         departments={departments}
         onAddCampus={openAddCampusModal}
-        onAddCollege={openAddCollegeModal}
         onCampusClick={(campusId) => navigate(`/admin/institution/profile/${campusId}`)}
         onEditCampus={(campus) => openEditCampusModal(campus)}
         onActivateCampus={(campusId) => {
           activateCampus(campusId)
-          notify('Campus activated. Add colleges and departments next.', 'info')
+          notify('Campus activated. Add its departments next.', 'info')
         }}
-        onManageDepartments={(campusId, collegeId) => {
+        onManageDepartments={(campusId) => {
           const params = new URLSearchParams({ campus: campusId })
-          if (collegeId) params.set('college', collegeId)
           navigate(`/admin/institution/departments?${params.toString()}`)
         }}
       />
@@ -179,7 +148,7 @@ export function OrgStructurePage() {
         title={editingCampus ? 'Edit Campus' : 'Add Campus'}
         description={
           editingCampus
-            ? 'Update campus details. Colleges and departments stay linked.'
+            ? 'Update campus details. Its departments stay linked.'
             : 'New campuses start as pending until you activate them.'
         }
         footer={
@@ -220,43 +189,6 @@ export function OrgStructurePage() {
         />
       </Modal>
 
-      <Modal
-        open={collegeModalOpen}
-        onClose={() => setCollegeModalOpen(false)}
-        icon={<GraduationCap size={18} />}
-        title="Add College"
-        description="Colleges group related departments under a campus."
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setCollegeModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={handleSaveCollege}>
-              Add College
-            </Button>
-          </>
-        }
-      >
-        <FormField
-          label="College Name"
-          value={collegeForm.name}
-          onChange={(v) => setCollegeForm({ ...collegeForm, name: v })}
-          placeholder="e.g. College of Computing & IT"
-        />
-        <FormField
-          label="Dean"
-          value={collegeForm.deanName}
-          onChange={(v) => setCollegeForm({ ...collegeForm, deanName: v })}
-          placeholder="e.g. Dr. Aaron Selassie"
-        />
-        <FormField
-          label="Description"
-          type="textarea"
-          value={collegeForm.description}
-          onChange={(v) => setCollegeForm({ ...collegeForm, description: v })}
-          placeholder="Brief overview of the college..."
-        />
-      </Modal>
     </div>
   )
 }

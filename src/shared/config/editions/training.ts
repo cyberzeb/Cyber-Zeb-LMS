@@ -39,7 +39,6 @@ export const trainingEditionConfig: EditionConfig = {
   terminology,
   modules: {
     campuses: false,
-    colleges: false,
     programs: true,
     students: true,
     instructors: true,

@@ -15,7 +15,7 @@ import {
   Users,
   UsersRound,
 } from 'lucide-react'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from '../../../shared/layout/Sidebar'
 import { AdminTopHeader } from '../../../shared/layout/AdminTopHeader'
 import { AdminFooter } from '../../../shared/layout/AdminFooter'
@@ -24,6 +24,8 @@ import { PortalAuthRedirect } from '../../../shared/components/PortalAuthRedirec
 import { getSessionPerson, readPortalSession } from '../../../shared/storage/session'
 import { readInstitutionName } from '../../../shared/storage/readers'
 import { useOrganizationConfig } from '../../../shared/config/useOrganizationConfig'
+import { canUsePortal } from '../../../shared/auth/portalRoutes'
+import { canOpenInstructorPage } from '../../../shared/auth/rolePermissions'
 
 const ICON_SIZE = 17
 
@@ -55,8 +57,14 @@ export function InstructorLayout() {
   const session = readPortalSession()
   const person = getSessionPerson()
 
-  if (!session || session.role !== 'Instructor' || !person) {
+  if (!session || !canUsePortal('/instructor', session.role) || !person) {
     return <PortalAuthRedirect role="Instructor" />
+  }
+  // Teaching assistants share this portal without quizzes or certificates.
+  const role = session.role
+  const isAssistant = role === 'TeachingAssistant'
+  if (!canOpenInstructorPage(role, path)) {
+    return <Navigate to="/instructor" replace />
   }
 
   const isActive = (to: string) => {
@@ -64,7 +72,7 @@ export function InstructorLayout() {
     return path === to || path.startsWith(`${to}/`)
   }
 
-  const navSections = [
+  const rawSections = [
     {
       title: 'Teaching',
       items: [
@@ -184,6 +192,14 @@ export function InstructorLayout() {
     },
   ]
 
+  const navSections = rawSections.map((section) => ({
+    ...section,
+    items: section.items.map((item) => ({
+      ...item,
+      show: item.show !== false && canOpenInstructorPage(role, item.to),
+    })),
+  }))
+
   const breadcrumb = breadcrumbLabels[path] ?? 'Dashboard'
   const isForumPage = path === '/instructor/forum'
 
@@ -200,7 +216,7 @@ export function InstructorLayout() {
       <div className="flex flex-col flex-1 min-w-0">
         <AdminTopHeader
           userName={person.name}
-          userRole={t.trainer}
+          userRole={isAssistant ? 'Teaching Assistant' : t.trainer}
           institutionName={readInstitutionName()}
           breadcrumb={breadcrumb}
         />

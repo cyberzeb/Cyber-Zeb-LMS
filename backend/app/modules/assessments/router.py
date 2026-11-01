@@ -17,13 +17,17 @@ router = APIRouter()
 
 
 class QuizAttemptIn(BaseModel):
-    answers: dict[str, str] = Field(default_factory=dict)
+    # Text for most formats; a list (multi-select, fill-blank, ordering) or a
+    # mapping (matching) for the others. See assessments/questions.py.
+    answers: dict[str, Any] = Field(default_factory=dict)
 
 
 class QuizAttemptOut(BaseModel):
     submission: dict[str, Any]
-    score: int
-    max_score: int
+    score: float
+    max_score: float
+    # Answers the instructor still has to mark (essays).
+    pending_review: int = 0
 
 
 @router.post("/quizzes/{quiz_id}/attempts", response_model=QuizAttemptOut)

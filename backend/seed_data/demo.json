@@ -18,22 +18,6 @@
         "status": "pending"
       }
     ],
-    "colleges": [
-      {
-        "id": "col1",
-        "name": "College of Computing & IT",
-        "deanName": "Dr. Aaron Selassie",
-        "campusId": "c1",
-        "description": "Computer science, software engineering, and information technology"
-      },
-      {
-        "id": "col2",
-        "name": "College of Business",
-        "deanName": "Dr. Martha Bekele",
-        "campusId": "c1",
-        "description": "Business administration, management, and finance"
-      }
-    ],
     "departments": [
       {
         "id": "d1",
@@ -43,12 +27,7 @@
         "studentsCount": 320,
         "facultyCount": 18,
         "icon": "",
-        "campusId": "c1",
-        "collegeId": "col1",
-        "programCode": "BSC-CS",
-        "programLevel": "Undergraduate",
-        "maxYears": 4,
-        "semestersPerYear": 2
+        "campusId": "c1"
       },
       {
         "id": "d2",
@@ -58,12 +37,7 @@
         "studentsCount": 210,
         "facultyCount": 12,
         "icon": "",
-        "campusId": "c1",
-        "collegeId": "col1",
-        "programCode": "BSC-SE",
-        "programLevel": "Undergraduate",
-        "maxYears": 4,
-        "semestersPerYear": 2
+        "campusId": "c1"
       },
       {
         "id": "d3",
@@ -73,12 +47,7 @@
         "studentsCount": 140,
         "facultyCount": 8,
         "icon": "",
-        "campusId": "c1",
-        "collegeId": "col1",
-        "programCode": "BSC-IT",
-        "programLevel": "Undergraduate",
-        "maxYears": 4,
-        "semestersPerYear": 2
+        "campusId": "c1"
       },
       {
         "id": "d4",
@@ -88,12 +57,7 @@
         "studentsCount": 280,
         "facultyCount": 16,
         "icon": "",
-        "campusId": "c1",
-        "collegeId": "col2",
-        "programCode": "BBA",
-        "programLevel": "Undergraduate",
-        "maxYears": 4,
-        "semestersPerYear": 2
+        "campusId": "c1"
       }
     ],
     "academic-years": [
@@ -293,7 +257,8 @@
         "enrolledCount": 13,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d1"
       },
       {
         "id": "off-cs-101-y1-s1",
@@ -315,7 +280,8 @@
         "enrolledCount": 13,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d1"
       },
       {
         "id": "off-cs-201-y2-s1",
@@ -337,7 +303,8 @@
         "enrolledCount": 13,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d1"
       },
       {
         "id": "off-cs-340-y3-s2",
@@ -359,7 +326,8 @@
         "enrolledCount": 9,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d1"
       },
       {
         "id": "off-bus-110-y1-s2",
@@ -381,7 +349,8 @@
         "enrolledCount": 11,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d4"
       },
       {
         "id": "off-se-210-y2-s1",
@@ -403,7 +372,8 @@
         "enrolledCount": 11,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d2"
       },
       {
         "id": "off-cs-102-y1-s2",
@@ -425,7 +395,8 @@
         "enrolledCount": 10,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d1"
       },
       {
         "id": "off-cs-220-y2-s1",
@@ -447,7 +418,8 @@
         "enrolledCount": 13,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d1"
       },
       {
         "id": "off-cs-301-y3-s1",
@@ -469,7 +441,8 @@
         "enrolledCount": 8,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d1"
       },
       {
         "id": "off-se-101-y1-s1",
@@ -491,7 +464,8 @@
         "enrolledCount": 10,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d2"
       },
       {
         "id": "off-se-220-y2-s2",
@@ -513,7 +487,8 @@
         "enrolledCount": 8,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d2"
       },
       {
         "id": "off-it-101-y1-s1",
@@ -535,7 +510,8 @@
         "enrolledCount": 10,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d3"
       },
       {
         "id": "off-it-205-y2-s1",
@@ -557,7 +533,8 @@
         "enrolledCount": 10,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d3"
       },
       {
         "id": "off-it-210-y2-s2",
@@ -579,7 +556,8 @@
         "enrolledCount": 8,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d3"
       },
       {
         "id": "off-bus-101-y1-s1",
@@ -601,7 +579,8 @@
         "enrolledCount": 12,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d4"
       },
       {
         "id": "off-bus-120-y1-s2",
@@ -623,7 +602,8 @@
         "enrolledCount": 11,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d4"
       },
       {
         "id": "off-bus-210-y2-s1",
@@ -645,7 +625,8 @@
         "enrolledCount": 10,
         "status": "in_progress",
         "allowSelfEnrollment": false,
-        "certificateEnabled": true
+        "certificateEnabled": true,
+        "programId": "prog-d4"
       }
     ],
     "people": [
@@ -662,7 +643,8 @@
         "status": "active",
         "lastActive": "30 min ago",
         "initials": "AL",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "u-inst",
@@ -677,20 +659,6 @@
         "verificationStatus": "verified"
       },
       {
-        "id": "u-hod-cs",
-        "name": "Dr. Hanna Girma",
-        "email": "h.girma@berana.edu",
-        "role": "HeadOfDepartment",
-        "department": "Computer Science",
-        "departmentId": "d1",
-        "isDepartmentHead": true,
-        "campusId": "c1",
-        "status": "active",
-        "lastActive": "Today",
-        "initials": "HG",
-        "verificationStatus": "verified"
-      },
-      {
         "id": "u-reg",
         "name": "Getachew Nega",
         "email": "g.nega@berana.edu",
@@ -700,6 +668,42 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "GN",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u-fin",
+        "name": "Rahel Assefa",
+        "email": "r.assefa@berana.edu",
+        "role": "FinanceOfficer",
+        "department": "Finance Office",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "Today",
+        "initials": "RA",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u-ta-1",
+        "name": "Liya Mengistu",
+        "email": "l.mengistu@berana.edu",
+        "role": "TeachingAssistant",
+        "department": "Teaching Assistant",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "1 hour ago",
+        "initials": "LM",
+        "verificationStatus": "verified"
+      },
+      {
+        "id": "u-ta-2",
+        "name": "Natnael Bekele",
+        "email": "n.bekele@berana.edu",
+        "role": "TeachingAssistant",
+        "department": "Teaching Assistant",
+        "campusId": "c1",
+        "status": "active",
+        "lastActive": "Yesterday",
+        "initials": "NB",
         "verificationStatus": "verified"
       },
       {
@@ -771,7 +775,8 @@
         "status": "active",
         "lastActive": "2 hours ago",
         "initials": "SG",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "u10",
@@ -786,7 +791,8 @@
         "status": "active",
         "lastActive": "30 min ago",
         "initials": "BA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "u17",
@@ -801,7 +807,8 @@
         "status": "active",
         "lastActive": "1 hour ago",
         "initials": "SN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "u18",
@@ -816,7 +823,8 @@
         "status": "active",
         "lastActive": "3 hours ago",
         "initials": "TB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "u4",
@@ -824,22 +832,14 @@
         "email": "yonas.t@gmail.com",
         "role": "Guardian",
         "department": "Selam Girma",
+        "linkedStudentId": "u1",
+        "linkedStudentIds": [
+          "u1"
+        ],
         "campusId": "c1",
         "status": "active",
         "lastActive": "3 days ago",
         "initials": "YT",
-        "verificationStatus": "verified"
-      },
-      {
-        "id": "u14",
-        "name": "Mekdes Haile",
-        "email": "m.haile@berana.edu",
-        "role": "HelpDesk",
-        "department": "IT Support",
-        "campusId": "c1",
-        "status": "active",
-        "lastActive": "1 hour ago",
-        "initials": "MH",
         "verificationStatus": "verified"
       },
       {
@@ -855,7 +855,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "AT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s1-02",
@@ -870,7 +871,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "HT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s1-03",
@@ -885,7 +887,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "DT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s1-04",
@@ -900,7 +903,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "MT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s1-05",
@@ -915,7 +919,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "ST",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s1-06",
@@ -930,7 +935,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "LT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s1-07",
@@ -945,7 +951,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "NT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s1-08",
@@ -960,7 +967,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "RT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s1-09",
@@ -975,7 +983,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "YT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s1-10",
@@ -990,7 +999,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "ST",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s1-11",
@@ -1005,7 +1015,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "FT",
-        "verificationStatus": "pending"
+        "verificationStatus": "pending",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s1-12",
@@ -1020,7 +1031,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "BT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s2-01",
@@ -1035,7 +1047,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "KT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s2-02",
@@ -1050,7 +1063,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "ET",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s2-03",
@@ -1065,7 +1079,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "ST",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s2-04",
@@ -1080,7 +1095,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "MT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s2-05",
@@ -1095,7 +1111,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "HT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s2-06",
@@ -1110,7 +1127,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "TT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s2-07",
@@ -1125,7 +1143,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "BT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s2-08",
@@ -1140,7 +1159,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "HT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s2-09",
@@ -1155,7 +1175,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "ET",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y1s2-10",
@@ -1170,7 +1191,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "FT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s1-01",
@@ -1185,7 +1207,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "DT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s1-02",
@@ -1200,7 +1223,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "MT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s1-03",
@@ -1215,7 +1239,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "RT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s1-04",
@@ -1230,7 +1255,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "ST",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s1-05",
@@ -1245,7 +1271,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "MT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s1-06",
@@ -1260,7 +1287,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "AT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s1-07",
@@ -1275,7 +1303,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "NT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s1-08",
@@ -1290,7 +1319,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "TT",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s1-09",
@@ -1305,7 +1335,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "AM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s1-10",
@@ -1320,7 +1351,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "HM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s1-11",
@@ -1335,7 +1367,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "DM",
-        "verificationStatus": "pending"
+        "verificationStatus": "pending",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s1-12",
@@ -1350,7 +1383,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "MM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s2-01",
@@ -1365,7 +1399,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "SM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s2-02",
@@ -1380,7 +1415,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "LM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s2-03",
@@ -1395,7 +1431,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "NM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s2-04",
@@ -1410,7 +1447,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "RM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s2-05",
@@ -1425,7 +1463,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "YM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s2-06",
@@ -1440,7 +1479,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "SM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s2-07",
@@ -1455,7 +1495,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "FM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s2-08",
@@ -1470,7 +1511,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "BM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s2-09",
@@ -1485,7 +1527,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "KM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y2s2-10",
@@ -1500,7 +1543,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "EM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s1-01",
@@ -1515,7 +1559,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "SM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s1-02",
@@ -1530,7 +1575,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "MM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s1-03",
@@ -1545,7 +1591,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "HM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s1-04",
@@ -1560,7 +1607,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "TM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s1-05",
@@ -1575,7 +1623,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "BM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s1-06",
@@ -1590,7 +1639,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "HM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s1-07",
@@ -1605,7 +1655,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "EM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s1-08",
@@ -1620,7 +1671,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "FM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s2-01",
@@ -1635,7 +1687,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "DM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s2-02",
@@ -1650,7 +1703,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "MM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s2-03",
@@ -1665,7 +1719,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "RM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s2-04",
@@ -1680,7 +1735,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "SM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s2-05",
@@ -1695,7 +1751,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "MM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s2-06",
@@ -1710,7 +1767,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "AM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s2-07",
@@ -1725,7 +1783,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "NM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y3s2-08",
@@ -1740,7 +1799,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "TM",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y4s1-01",
@@ -1755,7 +1815,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "AH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y4s1-02",
@@ -1770,7 +1831,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "HH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y4s1-03",
@@ -1785,7 +1847,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "DH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y4s1-04",
@@ -1800,7 +1863,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "MH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y4s1-05",
@@ -1815,7 +1879,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "SH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-cs-y4s1-06",
@@ -1830,7 +1895,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "LH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d1"
       },
       {
         "id": "stu-se-y1s1-01",
@@ -1845,7 +1911,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "NH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s1-02",
@@ -1860,7 +1927,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "RH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s1-03",
@@ -1875,7 +1943,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "YH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s1-04",
@@ -1890,7 +1959,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "SH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s1-05",
@@ -1905,7 +1975,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "FH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s1-06",
@@ -1920,7 +1991,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "BH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s1-07",
@@ -1935,7 +2007,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "KH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s1-08",
@@ -1950,7 +2023,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "EH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s1-09",
@@ -1965,7 +2039,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "SH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s1-10",
@@ -1980,7 +2055,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "MH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s2-01",
@@ -1995,7 +2071,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "HH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s2-02",
@@ -2010,7 +2087,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "TH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s2-03",
@@ -2025,7 +2103,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "BH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s2-04",
@@ -2040,7 +2119,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "HH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s2-05",
@@ -2055,7 +2135,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "EH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s2-06",
@@ -2070,7 +2151,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "FH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s2-07",
@@ -2085,7 +2167,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "DH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y1s2-08",
@@ -2100,7 +2183,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "MH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s1-01",
@@ -2115,7 +2199,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "RH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s1-02",
@@ -2130,7 +2215,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "SH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s1-03",
@@ -2145,7 +2231,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "MH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s1-04",
@@ -2160,7 +2247,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "AH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s1-05",
@@ -2175,7 +2263,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "NH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s1-06",
@@ -2190,7 +2279,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "TH",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s1-07",
@@ -2205,7 +2295,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "AB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s1-08",
@@ -2220,7 +2311,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "HB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s1-09",
@@ -2235,7 +2327,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "DB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s1-10",
@@ -2250,7 +2343,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "MB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s2-01",
@@ -2265,7 +2359,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "SB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s2-02",
@@ -2280,7 +2375,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "LB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s2-03",
@@ -2295,7 +2391,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "NB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s2-04",
@@ -2310,7 +2407,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "RB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s2-05",
@@ -2325,7 +2423,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "YB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s2-06",
@@ -2340,7 +2439,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "SB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s2-07",
@@ -2355,7 +2455,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "FB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y2s2-08",
@@ -2370,7 +2471,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "BB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y3s1-01",
@@ -2385,7 +2487,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "KB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y3s1-02",
@@ -2400,7 +2503,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "EB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y3s1-03",
@@ -2415,7 +2519,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "SB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y3s1-04",
@@ -2430,7 +2535,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "MB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y3s1-05",
@@ -2445,7 +2551,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "HB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-se-y3s1-06",
@@ -2460,7 +2567,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "TB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d2"
       },
       {
         "id": "stu-it-y1s1-01",
@@ -2475,7 +2583,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "BB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s1-02",
@@ -2490,7 +2599,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "HB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s1-03",
@@ -2505,7 +2615,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "EB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s1-04",
@@ -2520,7 +2631,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "FB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s1-05",
@@ -2535,7 +2647,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "DB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s1-06",
@@ -2550,7 +2663,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "MB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s1-07",
@@ -2565,7 +2679,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "RB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s1-08",
@@ -2580,7 +2695,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "SB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s1-09",
@@ -2595,7 +2711,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "MB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s1-10",
@@ -2610,7 +2727,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "AB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s2-01",
@@ -2625,7 +2743,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "NB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s2-02",
@@ -2640,7 +2759,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "TB",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s2-03",
@@ -2655,7 +2775,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "AA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s2-04",
@@ -2670,7 +2791,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "HA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s2-05",
@@ -2685,7 +2807,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "DA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s2-06",
@@ -2700,7 +2823,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "MA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s2-07",
@@ -2715,7 +2839,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "SA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y1s2-08",
@@ -2730,7 +2855,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "LA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s1-01",
@@ -2745,7 +2871,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "NA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s1-02",
@@ -2760,7 +2887,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "RA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s1-03",
@@ -2775,7 +2903,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "YA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s1-04",
@@ -2790,7 +2919,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "SA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s1-05",
@@ -2805,7 +2935,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "FA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s1-06",
@@ -2820,7 +2951,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "BA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s1-07",
@@ -2835,7 +2967,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "KA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s1-08",
@@ -2850,7 +2983,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "EA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s1-09",
@@ -2865,7 +2999,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "SA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s1-10",
@@ -2880,7 +3015,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "MA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s2-01",
@@ -2895,7 +3031,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "HA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s2-02",
@@ -2910,7 +3047,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "TA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s2-03",
@@ -2925,7 +3063,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "BA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s2-04",
@@ -2940,7 +3079,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "HA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s2-05",
@@ -2955,7 +3095,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "EA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s2-06",
@@ -2970,7 +3111,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "FA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s2-07",
@@ -2985,7 +3127,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "DA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-it-y2s2-08",
@@ -3000,7 +3143,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "MA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d3"
       },
       {
         "id": "stu-bus-y1s1-01",
@@ -3015,7 +3159,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "RA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s1-02",
@@ -3030,7 +3175,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "SA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s1-03",
@@ -3045,7 +3191,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "MA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s1-04",
@@ -3060,7 +3207,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "AA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s1-05",
@@ -3075,7 +3223,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "NA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s1-06",
@@ -3090,7 +3239,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "TA",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s1-07",
@@ -3105,7 +3255,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "AN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s1-08",
@@ -3120,7 +3271,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "HN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s1-09",
@@ -3135,7 +3287,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "DN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s1-10",
@@ -3150,7 +3303,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "MN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s1-11",
@@ -3165,7 +3319,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "SN",
-        "verificationStatus": "pending"
+        "verificationStatus": "pending",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s1-12",
@@ -3180,7 +3335,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "LN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s2-01",
@@ -3195,7 +3351,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "NN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s2-02",
@@ -3210,7 +3367,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "RN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s2-03",
@@ -3225,7 +3383,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "YN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s2-04",
@@ -3240,7 +3399,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "SN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s2-05",
@@ -3255,7 +3415,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "FN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s2-06",
@@ -3270,7 +3431,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "BN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s2-07",
@@ -3285,7 +3447,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "KN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s2-08",
@@ -3300,7 +3463,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "EN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s2-09",
@@ -3315,7 +3479,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "SN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y1s2-10",
@@ -3330,7 +3495,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "MN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s1-01",
@@ -3345,7 +3511,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "HN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s1-02",
@@ -3360,7 +3527,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "TN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s1-03",
@@ -3375,7 +3543,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "BN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s1-04",
@@ -3390,7 +3559,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "HN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s1-05",
@@ -3405,7 +3575,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "EN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s1-06",
@@ -3420,7 +3591,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "FN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s1-07",
@@ -3435,7 +3607,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "DN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s1-08",
@@ -3450,7 +3623,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "MN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s1-09",
@@ -3465,7 +3639,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "RN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s1-10",
@@ -3480,7 +3655,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "SN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s2-01",
@@ -3495,7 +3671,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "MN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s2-02",
@@ -3510,7 +3687,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "AN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s2-03",
@@ -3525,7 +3703,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "NN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s2-04",
@@ -3540,7 +3719,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "TN",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s2-05",
@@ -3555,7 +3735,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "AG",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s2-06",
@@ -3570,7 +3751,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "HG",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s2-07",
@@ -3585,7 +3767,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "DG",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y2s2-08",
@@ -3600,7 +3783,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "MG",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y3s1-01",
@@ -3615,7 +3799,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "SG",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y3s1-02",
@@ -3630,7 +3815,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "LG",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y3s1-03",
@@ -3645,7 +3831,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "NG",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y3s1-04",
@@ -3660,7 +3847,8 @@
         "status": "active",
         "lastActive": "Yesterday",
         "initials": "RG",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y3s1-05",
@@ -3675,7 +3863,8 @@
         "status": "active",
         "lastActive": "2 days ago",
         "initials": "YG",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       },
       {
         "id": "stu-bus-y3s1-06",
@@ -3690,7 +3879,8 @@
         "status": "active",
         "lastActive": "Today",
         "initials": "SG",
-        "verificationStatus": "verified"
+        "verificationStatus": "verified",
+        "programId": "prog-d4"
       }
     ],
     "courses": [
@@ -3914,6 +4104,9 @@
         "code": "CS-101",
         "title": "Introduction to Programming",
         "instructor": "Dr. Aaron Selassie",
+        "teachingAssistantIds": [
+          "u-ta-1"
+        ],
         "department": "Computer Science",
         "level": "Undergraduate",
         "enrolledCount": 13,
@@ -3934,6 +4127,9 @@
         "code": "CS-201",
         "title": "Data Structures & Algorithms",
         "instructor": "Dr. Aaron Selassie",
+        "teachingAssistantIds": [
+          "u-ta-1"
+        ],
         "department": "Computer Science",
         "level": "Undergraduate",
         "enrolledCount": 13,
@@ -3994,6 +4190,9 @@
         "code": "SE-210",
         "title": "Software Design Patterns",
         "instructor": "Prof. Elias Hailu",
+        "teachingAssistantIds": [
+          "u-ta-2"
+        ],
         "department": "Software Engineering",
         "level": "Undergraduate",
         "enrolledCount": 11,
@@ -4232,7 +4431,7 @@
     ],
     "enrollments": [
       {
-        "id": "enr-muj0aucf-adl96",
+        "id": "enr-mvxb5920-enmez",
         "studentId": "u-demo-amina",
         "studentName": "Amina Lemma",
         "courseId": "c2",
@@ -4247,7 +4446,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-u9kc7",
+        "id": "enr-mvxb5920-zggow",
         "studentId": "stu-cs-y2s1-01",
         "studentName": "Daniel Tesfaye",
         "courseId": "c2",
@@ -4262,7 +4461,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-z3q8p",
+        "id": "enr-mvxb5920-043tx",
         "studentId": "stu-cs-y2s1-02",
         "studentName": "Mahlet Tesfaye",
         "courseId": "c2",
@@ -4277,7 +4476,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-qozgm",
+        "id": "enr-mvxb5920-7zhez",
         "studentId": "stu-cs-y2s1-03",
         "studentName": "Robel Tesfaye",
         "courseId": "c2",
@@ -4292,7 +4491,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-e6r97",
+        "id": "enr-mvxb5920-vlhc9",
         "studentId": "stu-cs-y2s1-04",
         "studentName": "Senait Tesfaye",
         "courseId": "c2",
@@ -4307,7 +4506,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-40ds0",
+        "id": "enr-mvxb5920-7duwe",
         "studentId": "stu-cs-y2s1-05",
         "studentName": "Mikias Tesfaye",
         "courseId": "c2",
@@ -4322,7 +4521,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-pg90o",
+        "id": "enr-mvxb5920-9lwuj",
         "studentId": "stu-cs-y2s1-06",
         "studentName": "Almaz Tesfaye",
         "courseId": "c2",
@@ -4337,7 +4536,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-0k1pf",
+        "id": "enr-mvxb5920-0wga4",
         "studentId": "stu-cs-y2s1-07",
         "studentName": "Nahom Tesfaye",
         "courseId": "c2",
@@ -4352,7 +4551,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-td2s8",
+        "id": "enr-mvxb5920-aenjn",
         "studentId": "stu-cs-y2s1-08",
         "studentName": "Tsion Tesfaye",
         "courseId": "c2",
@@ -4367,7 +4566,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-dxez9",
+        "id": "enr-mvxb5920-ih5m1",
         "studentId": "stu-cs-y2s1-09",
         "studentName": "Abel Mekonnen",
         "courseId": "c2",
@@ -4382,7 +4581,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-qwody",
+        "id": "enr-mvxb5920-vzd1t",
         "studentId": "stu-cs-y2s1-10",
         "studentName": "Hanna Mekonnen",
         "courseId": "c2",
@@ -4397,7 +4596,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-8io58",
+        "id": "enr-mvxb5920-wf2a8",
         "studentId": "stu-cs-y2s1-11",
         "studentName": "Dawit Mekonnen",
         "courseId": "c2",
@@ -4412,7 +4611,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-at6dm",
+        "id": "enr-mvxb5920-kpfsy",
         "studentId": "stu-cs-y2s1-12",
         "studentName": "Meron Mekonnen",
         "courseId": "c2",
@@ -4427,7 +4626,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-dxxgw",
+        "id": "enr-mvxb5920-ofok0",
         "studentId": "u-demo-amina",
         "studentName": "Amina Lemma",
         "courseId": "c7",
@@ -4442,7 +4641,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-tfyjd",
+        "id": "enr-mvxb5920-vzqgw",
         "studentId": "stu-cs-y2s1-01",
         "studentName": "Daniel Tesfaye",
         "courseId": "c7",
@@ -4457,7 +4656,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-s7iep",
+        "id": "enr-mvxb5920-h24uq",
         "studentId": "stu-cs-y2s1-02",
         "studentName": "Mahlet Tesfaye",
         "courseId": "c7",
@@ -4472,7 +4671,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-gon62",
+        "id": "enr-mvxb5920-shv7s",
         "studentId": "stu-cs-y2s1-03",
         "studentName": "Robel Tesfaye",
         "courseId": "c7",
@@ -4487,7 +4686,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-7thbc",
+        "id": "enr-mvxb5920-x1qmc",
         "studentId": "stu-cs-y2s1-04",
         "studentName": "Senait Tesfaye",
         "courseId": "c7",
@@ -4502,7 +4701,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-ro89b",
+        "id": "enr-mvxb5920-vkttv",
         "studentId": "stu-cs-y2s1-05",
         "studentName": "Mikias Tesfaye",
         "courseId": "c7",
@@ -4517,7 +4716,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-jp9f8",
+        "id": "enr-mvxb5920-89xv5",
         "studentId": "stu-cs-y2s1-06",
         "studentName": "Almaz Tesfaye",
         "courseId": "c7",
@@ -4532,7 +4731,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-sw8d1",
+        "id": "enr-mvxb5920-163tb",
         "studentId": "stu-cs-y2s1-07",
         "studentName": "Nahom Tesfaye",
         "courseId": "c7",
@@ -4547,7 +4746,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-59x63",
+        "id": "enr-mvxb5920-wq3if",
         "studentId": "stu-cs-y2s1-08",
         "studentName": "Tsion Tesfaye",
         "courseId": "c7",
@@ -4562,7 +4761,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-lik3a",
+        "id": "enr-mvxb5920-d0rfy",
         "studentId": "stu-cs-y2s1-09",
         "studentName": "Abel Mekonnen",
         "courseId": "c7",
@@ -4577,7 +4776,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-rwqsy",
+        "id": "enr-mvxb5920-9t1cm",
         "studentId": "stu-cs-y2s1-10",
         "studentName": "Hanna Mekonnen",
         "courseId": "c7",
@@ -4592,7 +4791,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-8bh7u",
+        "id": "enr-mvxb5920-uqq4o",
         "studentId": "stu-cs-y2s1-11",
         "studentName": "Dawit Mekonnen",
         "courseId": "c7",
@@ -4607,7 +4806,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-zsrq8",
+        "id": "enr-mvxb5920-oegnw",
         "studentId": "stu-cs-y2s1-12",
         "studentName": "Meron Mekonnen",
         "courseId": "c7",
@@ -4622,7 +4821,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-zfjdx",
+        "id": "enr-mvxb5920-o67ed",
         "studentId": "u1",
         "studentName": "Selam Girma",
         "courseId": "demo-cyber-101",
@@ -4637,7 +4836,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-6shj0",
+        "id": "enr-mvxb5920-v4ldk",
         "studentId": "stu-cs-y1s1-01",
         "studentName": "Abel Tesfaye",
         "courseId": "demo-cyber-101",
@@ -4652,7 +4851,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-y9mj9",
+        "id": "enr-mvxb5920-9yho9",
         "studentId": "stu-cs-y1s1-02",
         "studentName": "Hanna Tesfaye",
         "courseId": "demo-cyber-101",
@@ -4667,7 +4866,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-0h4xs",
+        "id": "enr-mvxb5920-rgl1i",
         "studentId": "stu-cs-y1s1-03",
         "studentName": "Dawit Tesfaye",
         "courseId": "demo-cyber-101",
@@ -4682,7 +4881,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-hn0qc",
+        "id": "enr-mvxb5920-deuzd",
         "studentId": "stu-cs-y1s1-04",
         "studentName": "Meron Tesfaye",
         "courseId": "demo-cyber-101",
@@ -4697,7 +4896,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-xrb9r",
+        "id": "enr-mvxb5920-h3l80",
         "studentId": "stu-cs-y1s1-05",
         "studentName": "Samuel Tesfaye",
         "courseId": "demo-cyber-101",
@@ -4712,7 +4911,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-zewag",
+        "id": "enr-mvxb5920-ihn4x",
         "studentId": "stu-cs-y1s1-06",
         "studentName": "Liya Tesfaye",
         "courseId": "demo-cyber-101",
@@ -4727,7 +4926,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-x2sx7",
+        "id": "enr-mvxb5920-eqp11",
         "studentId": "stu-cs-y1s1-07",
         "studentName": "Natnael Tesfaye",
         "courseId": "demo-cyber-101",
@@ -4742,7 +4941,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-q41at",
+        "id": "enr-mvxb5920-2ywk9",
         "studentId": "stu-cs-y1s1-08",
         "studentName": "Rahel Tesfaye",
         "courseId": "demo-cyber-101",
@@ -4757,7 +4956,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-xn64j",
+        "id": "enr-mvxb5921-v7cey",
         "studentId": "stu-cs-y1s1-09",
         "studentName": "Yared Tesfaye",
         "courseId": "demo-cyber-101",
@@ -4772,7 +4971,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-oc1qq",
+        "id": "enr-mvxb5921-ys5od",
         "studentId": "stu-cs-y1s1-10",
         "studentName": "Sara Tesfaye",
         "courseId": "demo-cyber-101",
@@ -4787,7 +4986,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-xkfbb",
+        "id": "enr-mvxb5921-dfywi",
         "studentId": "stu-cs-y1s1-11",
         "studentName": "Fitsum Tesfaye",
         "courseId": "demo-cyber-101",
@@ -4802,7 +5001,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-dl75p",
+        "id": "enr-mvxb5921-ahwlr",
         "studentId": "stu-cs-y1s1-12",
         "studentName": "Bethel Tesfaye",
         "courseId": "demo-cyber-101",
@@ -4817,7 +5016,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-ls3u6",
+        "id": "enr-mvxb5921-4bxsc",
         "studentId": "u1",
         "studentName": "Selam Girma",
         "courseId": "c1",
@@ -4832,7 +5031,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-rlg1z",
+        "id": "enr-mvxb5921-7g2ii",
         "studentId": "stu-cs-y1s1-01",
         "studentName": "Abel Tesfaye",
         "courseId": "c1",
@@ -4847,7 +5046,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-j4u29",
+        "id": "enr-mvxb5921-qr617",
         "studentId": "stu-cs-y1s1-02",
         "studentName": "Hanna Tesfaye",
         "courseId": "c1",
@@ -4862,7 +5061,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-ut7do",
+        "id": "enr-mvxb5921-2b93e",
         "studentId": "stu-cs-y1s1-03",
         "studentName": "Dawit Tesfaye",
         "courseId": "c1",
@@ -4877,7 +5076,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-9yqge",
+        "id": "enr-mvxb5921-8g5ba",
         "studentId": "stu-cs-y1s1-04",
         "studentName": "Meron Tesfaye",
         "courseId": "c1",
@@ -4892,7 +5091,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-w0dac",
+        "id": "enr-mvxb5921-s8taa",
         "studentId": "stu-cs-y1s1-05",
         "studentName": "Samuel Tesfaye",
         "courseId": "c1",
@@ -4907,7 +5106,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-ld8pn",
+        "id": "enr-mvxb5921-p9omk",
         "studentId": "stu-cs-y1s1-06",
         "studentName": "Liya Tesfaye",
         "courseId": "c1",
@@ -4922,7 +5121,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-91mfm",
+        "id": "enr-mvxb5921-7tyoe",
         "studentId": "stu-cs-y1s1-07",
         "studentName": "Natnael Tesfaye",
         "courseId": "c1",
@@ -4937,7 +5136,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-q9pon",
+        "id": "enr-mvxb5921-dovkm",
         "studentId": "stu-cs-y1s1-08",
         "studentName": "Rahel Tesfaye",
         "courseId": "c1",
@@ -4952,7 +5151,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-aodzl",
+        "id": "enr-mvxb5921-finjn",
         "studentId": "stu-cs-y1s1-09",
         "studentName": "Yared Tesfaye",
         "courseId": "c1",
@@ -4967,7 +5166,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-9vpa2",
+        "id": "enr-mvxb5921-m2dfo",
         "studentId": "stu-cs-y1s1-10",
         "studentName": "Sara Tesfaye",
         "courseId": "c1",
@@ -4982,7 +5181,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-kdmrh",
+        "id": "enr-mvxb5921-wbxws",
         "studentId": "stu-cs-y1s1-11",
         "studentName": "Fitsum Tesfaye",
         "courseId": "c1",
@@ -4997,7 +5196,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucf-zxfsa",
+        "id": "enr-mvxb5921-qqb36",
         "studentId": "stu-cs-y1s1-12",
         "studentName": "Bethel Tesfaye",
         "courseId": "c1",
@@ -5012,7 +5211,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucg-hwnap",
+        "id": "enr-mvxb5921-83jht",
         "studentId": "u10",
         "studentName": "Bruk Alemu",
         "courseId": "c3",
@@ -5027,7 +5226,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-4mysz",
+        "id": "enr-mvxb5921-fqqye",
         "studentId": "stu-cs-y3s2-01",
         "studentName": "Daniel Mekonnen",
         "courseId": "c3",
@@ -5042,7 +5241,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-ieafg",
+        "id": "enr-mvxb5921-mkn4g",
         "studentId": "stu-cs-y3s2-02",
         "studentName": "Mahlet Mekonnen",
         "courseId": "c3",
@@ -5057,7 +5256,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-50pc1",
+        "id": "enr-mvxb5921-b56rb",
         "studentId": "stu-cs-y3s2-03",
         "studentName": "Robel Mekonnen",
         "courseId": "c3",
@@ -5072,7 +5271,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-mnse9",
+        "id": "enr-mvxb5921-6qhfs",
         "studentId": "stu-cs-y3s2-04",
         "studentName": "Senait Mekonnen",
         "courseId": "c3",
@@ -5087,7 +5286,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-cm027",
+        "id": "enr-mvxb5921-3ldel",
         "studentId": "stu-cs-y3s2-05",
         "studentName": "Mikias Mekonnen",
         "courseId": "c3",
@@ -5102,7 +5301,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-z6vk1",
+        "id": "enr-mvxb5921-2mfdu",
         "studentId": "stu-cs-y3s2-06",
         "studentName": "Almaz Mekonnen",
         "courseId": "c3",
@@ -5117,7 +5316,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-nmcmd",
+        "id": "enr-mvxb5921-1dpg9",
         "studentId": "stu-cs-y3s2-07",
         "studentName": "Nahom Mekonnen",
         "courseId": "c3",
@@ -5132,7 +5331,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-6yykx",
+        "id": "enr-mvxb5921-izv9y",
         "studentId": "stu-cs-y3s2-08",
         "studentName": "Tsion Mekonnen",
         "courseId": "c3",
@@ -5147,7 +5346,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-olbij",
+        "id": "enr-mvxb5921-f73ra",
         "studentId": "u17",
         "studentName": "Sara Negash",
         "courseId": "c5",
@@ -5162,7 +5361,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucg-wh9v2",
+        "id": "enr-mvxb5921-u4bfm",
         "studentId": "stu-se-y2s1-01",
         "studentName": "Robel Haile",
         "courseId": "c5",
@@ -5177,7 +5376,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucg-l7yvo",
+        "id": "enr-mvxb5921-o051j",
         "studentId": "stu-se-y2s1-02",
         "studentName": "Senait Haile",
         "courseId": "c5",
@@ -5192,7 +5391,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucg-oom99",
+        "id": "enr-mvxb5921-sm574",
         "studentId": "stu-se-y2s1-03",
         "studentName": "Mikias Haile",
         "courseId": "c5",
@@ -5207,7 +5406,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucg-krety",
+        "id": "enr-mvxb5921-a2mhx",
         "studentId": "stu-se-y2s1-04",
         "studentName": "Almaz Haile",
         "courseId": "c5",
@@ -5222,7 +5421,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucg-gyra0",
+        "id": "enr-mvxb5921-iwcsa",
         "studentId": "stu-se-y2s1-05",
         "studentName": "Nahom Haile",
         "courseId": "c5",
@@ -5237,7 +5436,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucg-pkwp6",
+        "id": "enr-mvxb5921-j8ygr",
         "studentId": "stu-se-y2s1-06",
         "studentName": "Tsion Haile",
         "courseId": "c5",
@@ -5252,7 +5451,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucg-7iqjj",
+        "id": "enr-mvxb5921-uc0de",
         "studentId": "stu-se-y2s1-07",
         "studentName": "Abel Bekele",
         "courseId": "c5",
@@ -5267,7 +5466,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucg-mk505",
+        "id": "enr-mvxb5921-73w5j",
         "studentId": "stu-se-y2s1-08",
         "studentName": "Hanna Bekele",
         "courseId": "c5",
@@ -5282,7 +5481,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucg-w7cpj",
+        "id": "enr-mvxb5921-xv0qw",
         "studentId": "stu-se-y2s1-09",
         "studentName": "Dawit Bekele",
         "courseId": "c5",
@@ -5297,7 +5496,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucg-76x7y",
+        "id": "enr-mvxb5921-aqsaa",
         "studentId": "stu-se-y2s1-10",
         "studentName": "Meron Bekele",
         "courseId": "c5",
@@ -5312,7 +5511,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucg-brhs4",
+        "id": "enr-mvxb5922-srwiw",
         "studentId": "u18",
         "studentName": "Tomas Bekele",
         "courseId": "c4",
@@ -5327,7 +5526,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-nvuw1",
+        "id": "enr-mvxb5922-zdkb3",
         "studentId": "stu-bus-y1s2-01",
         "studentName": "Natnael Negash",
         "courseId": "c4",
@@ -5342,7 +5541,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-rxmv7",
+        "id": "enr-mvxb5922-28zkf",
         "studentId": "stu-bus-y1s2-02",
         "studentName": "Rahel Negash",
         "courseId": "c4",
@@ -5357,7 +5556,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-yy1km",
+        "id": "enr-mvxb5922-uf1ta",
         "studentId": "stu-bus-y1s2-03",
         "studentName": "Yared Negash",
         "courseId": "c4",
@@ -5372,7 +5571,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-0r4pa",
+        "id": "enr-mvxb5922-64cyp",
         "studentId": "stu-bus-y1s2-04",
         "studentName": "Sara Negash",
         "courseId": "c4",
@@ -5387,7 +5586,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-8c2mz",
+        "id": "enr-mvxb5922-61q7t",
         "studentId": "stu-bus-y1s2-05",
         "studentName": "Fitsum Negash",
         "courseId": "c4",
@@ -5402,7 +5601,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-3z0ov",
+        "id": "enr-mvxb5922-6lo0f",
         "studentId": "stu-bus-y1s2-06",
         "studentName": "Bethel Negash",
         "courseId": "c4",
@@ -5417,7 +5616,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-361o5",
+        "id": "enr-mvxb5922-mzkmf",
         "studentId": "stu-bus-y1s2-07",
         "studentName": "Kaleb Negash",
         "courseId": "c4",
@@ -5432,7 +5631,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-pbf5l",
+        "id": "enr-mvxb5922-1rxpc",
         "studentId": "stu-bus-y1s2-08",
         "studentName": "Eden Negash",
         "courseId": "c4",
@@ -5447,7 +5646,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-ao8cf",
+        "id": "enr-mvxb5922-sekdz",
         "studentId": "stu-bus-y1s2-09",
         "studentName": "Solomon Negash",
         "courseId": "c4",
@@ -5462,7 +5661,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-avlj5",
+        "id": "enr-mvxb5922-dve6b",
         "studentId": "stu-bus-y1s2-10",
         "studentName": "Mahi Negash",
         "courseId": "c4",
@@ -5477,7 +5676,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-xaf2y",
+        "id": "enr-mvxb5922-dg9l2",
         "studentId": "u18",
         "studentName": "Tomas Bekele",
         "courseId": "c15",
@@ -5492,7 +5691,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-kgovo",
+        "id": "enr-mvxb5922-38bgn",
         "studentId": "stu-bus-y1s2-01",
         "studentName": "Natnael Negash",
         "courseId": "c15",
@@ -5507,7 +5706,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-wi9ai",
+        "id": "enr-mvxb5922-tw5ik",
         "studentId": "stu-bus-y1s2-02",
         "studentName": "Rahel Negash",
         "courseId": "c15",
@@ -5522,7 +5721,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-yu4xi",
+        "id": "enr-mvxb5922-qydwx",
         "studentId": "stu-bus-y1s2-03",
         "studentName": "Yared Negash",
         "courseId": "c15",
@@ -5537,7 +5736,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-utanu",
+        "id": "enr-mvxb5922-pn392",
         "studentId": "stu-bus-y1s2-04",
         "studentName": "Sara Negash",
         "courseId": "c15",
@@ -5552,7 +5751,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-h0qh4",
+        "id": "enr-mvxb5922-mjzv1",
         "studentId": "stu-bus-y1s2-05",
         "studentName": "Fitsum Negash",
         "courseId": "c15",
@@ -5567,7 +5766,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-q2exj",
+        "id": "enr-mvxb5922-fzxp5",
         "studentId": "stu-bus-y1s2-06",
         "studentName": "Bethel Negash",
         "courseId": "c15",
@@ -5582,7 +5781,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-5t6vk",
+        "id": "enr-mvxb5922-zhxjt",
         "studentId": "stu-bus-y1s2-07",
         "studentName": "Kaleb Negash",
         "courseId": "c15",
@@ -5597,7 +5796,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-g0y0p",
+        "id": "enr-mvxb5922-f3bly",
         "studentId": "stu-bus-y1s2-08",
         "studentName": "Eden Negash",
         "courseId": "c15",
@@ -5612,7 +5811,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-dvqw5",
+        "id": "enr-mvxb5922-9eupa",
         "studentId": "stu-bus-y1s2-09",
         "studentName": "Solomon Negash",
         "courseId": "c15",
@@ -5627,7 +5826,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucg-di68q",
+        "id": "enr-mvxb5922-9rap6",
         "studentId": "stu-bus-y1s2-10",
         "studentName": "Mahi Negash",
         "courseId": "c15",
@@ -5642,7 +5841,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auch-fmw9a",
+        "id": "enr-mvxb5922-mkenu",
         "studentId": "stu-cs-y1s2-01",
         "studentName": "Kaleb Tesfaye",
         "courseId": "c6",
@@ -5657,7 +5856,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auch-xpfza",
+        "id": "enr-mvxb5922-31z9j",
         "studentId": "stu-cs-y1s2-02",
         "studentName": "Eden Tesfaye",
         "courseId": "c6",
@@ -5672,7 +5871,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auch-d7kxj",
+        "id": "enr-mvxb5922-ieesp",
         "studentId": "stu-cs-y1s2-03",
         "studentName": "Solomon Tesfaye",
         "courseId": "c6",
@@ -5687,7 +5886,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auch-oc1cr",
+        "id": "enr-mvxb5922-rlpv0",
         "studentId": "stu-cs-y1s2-04",
         "studentName": "Mahi Tesfaye",
         "courseId": "c6",
@@ -5702,7 +5901,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auch-o4t5u",
+        "id": "enr-mvxb5922-umvbf",
         "studentId": "stu-cs-y1s2-05",
         "studentName": "Henok Tesfaye",
         "courseId": "c6",
@@ -5717,7 +5916,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auch-ofpp8",
+        "id": "enr-mvxb5922-aaco0",
         "studentId": "stu-cs-y1s2-06",
         "studentName": "Tigist Tesfaye",
         "courseId": "c6",
@@ -5732,7 +5931,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auch-w5ndy",
+        "id": "enr-mvxb5922-7p5v2",
         "studentId": "stu-cs-y1s2-07",
         "studentName": "Binyam Tesfaye",
         "courseId": "c6",
@@ -5747,7 +5946,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auch-osxk7",
+        "id": "enr-mvxb5922-wmxs5",
         "studentId": "stu-cs-y1s2-08",
         "studentName": "Helen Tesfaye",
         "courseId": "c6",
@@ -5762,7 +5961,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auch-jasid",
+        "id": "enr-mvxb5922-lxm7g",
         "studentId": "stu-cs-y1s2-09",
         "studentName": "Ermias Tesfaye",
         "courseId": "c6",
@@ -5777,7 +5976,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auch-h9x8j",
+        "id": "enr-mvxb5922-upyrj",
         "studentId": "stu-cs-y1s2-10",
         "studentName": "Feven Tesfaye",
         "courseId": "c6",
@@ -5792,7 +5991,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auch-siam0",
+        "id": "enr-mvxb5922-9dq82",
         "studentId": "stu-cs-y3s1-01",
         "studentName": "Solomon Mekonnen",
         "courseId": "c8",
@@ -5807,7 +6006,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-gmkni",
+        "id": "enr-mvxb5922-70nd1",
         "studentId": "stu-cs-y3s1-02",
         "studentName": "Mahi Mekonnen",
         "courseId": "c8",
@@ -5822,7 +6021,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-hjonw",
+        "id": "enr-mvxb5922-e668y",
         "studentId": "stu-cs-y3s1-03",
         "studentName": "Henok Mekonnen",
         "courseId": "c8",
@@ -5837,7 +6036,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-257uh",
+        "id": "enr-mvxb5922-wtc8c",
         "studentId": "stu-cs-y3s1-04",
         "studentName": "Tigist Mekonnen",
         "courseId": "c8",
@@ -5852,7 +6051,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-kd9m7",
+        "id": "enr-mvxb5922-stkrp",
         "studentId": "stu-cs-y3s1-05",
         "studentName": "Binyam Mekonnen",
         "courseId": "c8",
@@ -5867,7 +6066,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-t0qi6",
+        "id": "enr-mvxb5922-x17c1",
         "studentId": "stu-cs-y3s1-06",
         "studentName": "Helen Mekonnen",
         "courseId": "c8",
@@ -5882,7 +6081,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-fr163",
+        "id": "enr-mvxb5922-mdd2d",
         "studentId": "stu-cs-y3s1-07",
         "studentName": "Ermias Mekonnen",
         "courseId": "c8",
@@ -5897,7 +6096,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-tvckj",
+        "id": "enr-mvxb5922-zmqpi",
         "studentId": "stu-cs-y3s1-08",
         "studentName": "Feven Mekonnen",
         "courseId": "c8",
@@ -5912,7 +6111,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-3dhkq",
+        "id": "enr-mvxb5922-774hu",
         "studentId": "stu-se-y1s1-01",
         "studentName": "Natnael Haile",
         "courseId": "c9",
@@ -5927,7 +6126,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-gj3qm",
+        "id": "enr-mvxb5922-lnjtr",
         "studentId": "stu-se-y1s1-02",
         "studentName": "Rahel Haile",
         "courseId": "c9",
@@ -5942,7 +6141,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-2tqxf",
+        "id": "enr-mvxb5922-d69sn",
         "studentId": "stu-se-y1s1-03",
         "studentName": "Yared Haile",
         "courseId": "c9",
@@ -5957,7 +6156,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-qugwo",
+        "id": "enr-mvxb5922-v1rva",
         "studentId": "stu-se-y1s1-04",
         "studentName": "Sara Haile",
         "courseId": "c9",
@@ -5972,7 +6171,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-wznnv",
+        "id": "enr-mvxb5922-hptfp",
         "studentId": "stu-se-y1s1-05",
         "studentName": "Fitsum Haile",
         "courseId": "c9",
@@ -5987,7 +6186,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-3upsm",
+        "id": "enr-mvxb5922-vv2rd",
         "studentId": "stu-se-y1s1-06",
         "studentName": "Bethel Haile",
         "courseId": "c9",
@@ -6002,7 +6201,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-a2g0q",
+        "id": "enr-mvxb5922-4pig4",
         "studentId": "stu-se-y1s1-07",
         "studentName": "Kaleb Haile",
         "courseId": "c9",
@@ -6017,7 +6216,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-cp1gh",
+        "id": "enr-mvxb5922-ddbmo",
         "studentId": "stu-se-y1s1-08",
         "studentName": "Eden Haile",
         "courseId": "c9",
@@ -6032,7 +6231,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-i5ihk",
+        "id": "enr-mvxb5922-oi6e2",
         "studentId": "stu-se-y1s1-09",
         "studentName": "Solomon Haile",
         "courseId": "c9",
@@ -6047,7 +6246,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auch-esp5l",
+        "id": "enr-mvxb5922-ozt34",
         "studentId": "stu-se-y1s1-10",
         "studentName": "Mahi Haile",
         "courseId": "c9",
@@ -6062,7 +6261,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucj-7tyzc",
+        "id": "enr-mvxb5922-cadg3",
         "studentId": "stu-se-y2s2-01",
         "studentName": "Samuel Bekele",
         "courseId": "c10",
@@ -6077,7 +6276,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucj-ja5j8",
+        "id": "enr-mvxb5922-6ljbk",
         "studentId": "stu-se-y2s2-02",
         "studentName": "Liya Bekele",
         "courseId": "c10",
@@ -6092,7 +6291,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucj-0tjbb",
+        "id": "enr-mvxb5922-kb838",
         "studentId": "stu-se-y2s2-03",
         "studentName": "Natnael Bekele",
         "courseId": "c10",
@@ -6107,7 +6306,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucj-rkwh7",
+        "id": "enr-mvxb5922-x8rgl",
         "studentId": "stu-se-y2s2-04",
         "studentName": "Rahel Bekele",
         "courseId": "c10",
@@ -6122,7 +6321,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucj-gcie6",
+        "id": "enr-mvxb5922-egbgz",
         "studentId": "stu-se-y2s2-05",
         "studentName": "Yared Bekele",
         "courseId": "c10",
@@ -6137,7 +6336,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucj-cghlj",
+        "id": "enr-mvxb5922-s6bpi",
         "studentId": "stu-se-y2s2-06",
         "studentName": "Sara Bekele",
         "courseId": "c10",
@@ -6152,7 +6351,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucj-5ifou",
+        "id": "enr-mvxb5922-oazyk",
         "studentId": "stu-se-y2s2-07",
         "studentName": "Fitsum Bekele",
         "courseId": "c10",
@@ -6167,7 +6366,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucj-2jrhl",
+        "id": "enr-mvxb5922-j9max",
         "studentId": "stu-se-y2s2-08",
         "studentName": "Bethel Bekele",
         "courseId": "c10",
@@ -6182,7 +6381,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0aucj-gwsyk",
+        "id": "enr-mvxb5922-2lgg1",
         "studentId": "stu-it-y1s1-01",
         "studentName": "Binyam Bekele",
         "courseId": "c11",
@@ -6197,7 +6396,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucj-myta4",
+        "id": "enr-mvxb5922-580ld",
         "studentId": "stu-it-y1s1-02",
         "studentName": "Helen Bekele",
         "courseId": "c11",
@@ -6212,7 +6411,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucj-8t839",
+        "id": "enr-mvxb5922-00md5",
         "studentId": "stu-it-y1s1-03",
         "studentName": "Ermias Bekele",
         "courseId": "c11",
@@ -6227,7 +6426,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucj-f1jjd",
+        "id": "enr-mvxb5922-swg91",
         "studentId": "stu-it-y1s1-04",
         "studentName": "Feven Bekele",
         "courseId": "c11",
@@ -6242,7 +6441,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucj-ghdwl",
+        "id": "enr-mvxb5922-0xb9n",
         "studentId": "stu-it-y1s1-05",
         "studentName": "Daniel Bekele",
         "courseId": "c11",
@@ -6257,7 +6456,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucj-nfqng",
+        "id": "enr-mvxb5922-ownhy",
         "studentId": "stu-it-y1s1-06",
         "studentName": "Mahlet Bekele",
         "courseId": "c11",
@@ -6272,7 +6471,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucj-4usnw",
+        "id": "enr-mvxb5922-tjq75",
         "studentId": "stu-it-y1s1-07",
         "studentName": "Robel Bekele",
         "courseId": "c11",
@@ -6287,7 +6486,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucj-5uxwv",
+        "id": "enr-mvxb5922-yxqnl",
         "studentId": "stu-it-y1s1-08",
         "studentName": "Senait Bekele",
         "courseId": "c11",
@@ -6302,7 +6501,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucj-1am9c",
+        "id": "enr-mvxb5922-2ze88",
         "studentId": "stu-it-y1s1-09",
         "studentName": "Mikias Bekele",
         "courseId": "c11",
@@ -6317,7 +6516,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucj-ro3st",
+        "id": "enr-mvxb5922-up4p8",
         "studentId": "stu-it-y1s1-10",
         "studentName": "Almaz Bekele",
         "courseId": "c11",
@@ -6332,7 +6531,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucj-12suo",
+        "id": "enr-mvxb5923-t6w2x",
         "studentId": "stu-it-y2s1-01",
         "studentName": "Natnael Alemu",
         "courseId": "c12",
@@ -6347,7 +6546,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0aucj-mdnq4",
+        "id": "enr-mvxb5923-kkgcg",
         "studentId": "stu-it-y2s1-02",
         "studentName": "Rahel Alemu",
         "courseId": "c12",
@@ -6362,7 +6561,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-jl9a3",
+        "id": "enr-mvxb5923-ttj64",
         "studentId": "stu-it-y2s1-03",
         "studentName": "Yared Alemu",
         "courseId": "c12",
@@ -6377,7 +6576,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-s43ol",
+        "id": "enr-mvxb5923-0gwek",
         "studentId": "stu-it-y2s1-04",
         "studentName": "Sara Alemu",
         "courseId": "c12",
@@ -6392,7 +6591,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-r3hpt",
+        "id": "enr-mvxb5923-fn8v2",
         "studentId": "stu-it-y2s1-05",
         "studentName": "Fitsum Alemu",
         "courseId": "c12",
@@ -6407,7 +6606,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-cpjoa",
+        "id": "enr-mvxb5923-d0qt0",
         "studentId": "stu-it-y2s1-06",
         "studentName": "Bethel Alemu",
         "courseId": "c12",
@@ -6422,7 +6621,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-erxyy",
+        "id": "enr-mvxb5923-bo9qz",
         "studentId": "stu-it-y2s1-07",
         "studentName": "Kaleb Alemu",
         "courseId": "c12",
@@ -6437,7 +6636,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-kkapf",
+        "id": "enr-mvxb5923-pusx4",
         "studentId": "stu-it-y2s1-08",
         "studentName": "Eden Alemu",
         "courseId": "c12",
@@ -6452,7 +6651,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-2jytm",
+        "id": "enr-mvxb5923-aji7v",
         "studentId": "stu-it-y2s1-09",
         "studentName": "Solomon Alemu",
         "courseId": "c12",
@@ -6467,7 +6666,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-kxcv0",
+        "id": "enr-mvxb5923-n65nd",
         "studentId": "stu-it-y2s1-10",
         "studentName": "Mahi Alemu",
         "courseId": "c12",
@@ -6482,7 +6681,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-apfp5",
+        "id": "enr-mvxb5923-7jsz9",
         "studentId": "stu-it-y2s2-01",
         "studentName": "Henok Alemu",
         "courseId": "c13",
@@ -6497,7 +6696,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auck-uqccr",
+        "id": "enr-mvxb5923-5tyc1",
         "studentId": "stu-it-y2s2-02",
         "studentName": "Tigist Alemu",
         "courseId": "c13",
@@ -6512,7 +6711,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auck-lmulo",
+        "id": "enr-mvxb5923-0qt7t",
         "studentId": "stu-it-y2s2-03",
         "studentName": "Binyam Alemu",
         "courseId": "c13",
@@ -6527,7 +6726,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auck-ihn7c",
+        "id": "enr-mvxb5923-7f0zj",
         "studentId": "stu-it-y2s2-04",
         "studentName": "Helen Alemu",
         "courseId": "c13",
@@ -6542,7 +6741,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auck-f0za9",
+        "id": "enr-mvxb5923-ctfgy",
         "studentId": "stu-it-y2s2-05",
         "studentName": "Ermias Alemu",
         "courseId": "c13",
@@ -6557,7 +6756,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auck-unxph",
+        "id": "enr-mvxb5923-8nj2m",
         "studentId": "stu-it-y2s2-06",
         "studentName": "Feven Alemu",
         "courseId": "c13",
@@ -6572,7 +6771,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auck-rcm8b",
+        "id": "enr-mvxb5923-pe04l",
         "studentId": "stu-it-y2s2-07",
         "studentName": "Daniel Alemu",
         "courseId": "c13",
@@ -6587,7 +6786,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auck-9hvks",
+        "id": "enr-mvxb5923-iyhhm",
         "studentId": "stu-it-y2s2-08",
         "studentName": "Mahlet Alemu",
         "courseId": "c13",
@@ -6602,7 +6801,7 @@
         "academicTermId": "term-2026-spring"
       },
       {
-        "id": "enr-muj0auck-uxlv9",
+        "id": "enr-mvxb5923-xtji9",
         "studentId": "stu-bus-y1s1-01",
         "studentName": "Robel Alemu",
         "courseId": "c14",
@@ -6617,7 +6816,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-j2zgt",
+        "id": "enr-mvxb5923-ur6jx",
         "studentId": "stu-bus-y1s1-02",
         "studentName": "Senait Alemu",
         "courseId": "c14",
@@ -6632,7 +6831,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-kfnoo",
+        "id": "enr-mvxb5923-8czir",
         "studentId": "stu-bus-y1s1-03",
         "studentName": "Mikias Alemu",
         "courseId": "c14",
@@ -6647,7 +6846,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-53url",
+        "id": "enr-mvxb5923-nm7w1",
         "studentId": "stu-bus-y1s1-04",
         "studentName": "Almaz Alemu",
         "courseId": "c14",
@@ -6662,7 +6861,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-d6jjf",
+        "id": "enr-mvxb5923-xbmz1",
         "studentId": "stu-bus-y1s1-05",
         "studentName": "Nahom Alemu",
         "courseId": "c14",
@@ -6677,7 +6876,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-dwmrl",
+        "id": "enr-mvxb5923-aena1",
         "studentId": "stu-bus-y1s1-06",
         "studentName": "Tsion Alemu",
         "courseId": "c14",
@@ -6692,7 +6891,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-3i0r1",
+        "id": "enr-mvxb5923-fyqev",
         "studentId": "stu-bus-y1s1-07",
         "studentName": "Abel Negash",
         "courseId": "c14",
@@ -6707,7 +6906,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-4k1r2",
+        "id": "enr-mvxb5923-p0sef",
         "studentId": "stu-bus-y1s1-08",
         "studentName": "Hanna Negash",
         "courseId": "c14",
@@ -6722,7 +6921,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-9qd8n",
+        "id": "enr-mvxb5923-fmlup",
         "studentId": "stu-bus-y1s1-09",
         "studentName": "Dawit Negash",
         "courseId": "c14",
@@ -6737,7 +6936,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-vwz8l",
+        "id": "enr-mvxb5923-elzns",
         "studentId": "stu-bus-y1s1-10",
         "studentName": "Meron Negash",
         "courseId": "c14",
@@ -6752,7 +6951,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-sxask",
+        "id": "enr-mvxb5923-y0p8r",
         "studentId": "stu-bus-y1s1-11",
         "studentName": "Samuel Negash",
         "courseId": "c14",
@@ -6767,7 +6966,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-asky2",
+        "id": "enr-mvxb5923-w4h6j",
         "studentId": "stu-bus-y1s1-12",
         "studentName": "Liya Negash",
         "courseId": "c14",
@@ -6782,7 +6981,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-odr2v",
+        "id": "enr-mvxb5923-rj4p4",
         "studentId": "stu-bus-y2s1-01",
         "studentName": "Henok Negash",
         "courseId": "c16",
@@ -6797,7 +6996,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-7em22",
+        "id": "enr-mvxb5923-oq6nw",
         "studentId": "stu-bus-y2s1-02",
         "studentName": "Tigist Negash",
         "courseId": "c16",
@@ -6812,7 +7011,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-dhvcd",
+        "id": "enr-mvxb5923-il9rh",
         "studentId": "stu-bus-y2s1-03",
         "studentName": "Binyam Negash",
         "courseId": "c16",
@@ -6827,7 +7026,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-c6kc4",
+        "id": "enr-mvxb5923-j2y22",
         "studentId": "stu-bus-y2s1-04",
         "studentName": "Helen Negash",
         "courseId": "c16",
@@ -6842,7 +7041,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-7iy7p",
+        "id": "enr-mvxb5923-jt6iz",
         "studentId": "stu-bus-y2s1-05",
         "studentName": "Ermias Negash",
         "courseId": "c16",
@@ -6857,7 +7056,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-5dntc",
+        "id": "enr-mvxb5923-4h8ew",
         "studentId": "stu-bus-y2s1-06",
         "studentName": "Feven Negash",
         "courseId": "c16",
@@ -6872,7 +7071,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-hl75u",
+        "id": "enr-mvxb5923-lut9b",
         "studentId": "stu-bus-y2s1-07",
         "studentName": "Daniel Negash",
         "courseId": "c16",
@@ -6887,7 +7086,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-993wx",
+        "id": "enr-mvxb5923-92k3a",
         "studentId": "stu-bus-y2s1-08",
         "studentName": "Mahlet Negash",
         "courseId": "c16",
@@ -6902,7 +7101,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-ba9ax",
+        "id": "enr-mvxb5923-cymus",
         "studentId": "stu-bus-y2s1-09",
         "studentName": "Robel Negash",
         "courseId": "c16",
@@ -6917,7 +7116,7 @@
         "academicTermId": "term-2025-fall"
       },
       {
-        "id": "enr-muj0auck-v0qkx",
+        "id": "enr-mvxb5923-2sjze",
         "studentId": "stu-bus-y2s1-10",
         "studentName": "Senait Negash",
         "courseId": "c16",
@@ -6985,43 +7184,43 @@
         "campusId": "c1",
         "history": [
           {
-            "date": "2026-07-25",
+            "date": "2026-08-30",
             "status": "present"
           },
           {
-            "date": "2026-08-01",
+            "date": "2026-09-06",
             "status": "present"
           },
           {
-            "date": "2026-08-08",
+            "date": "2026-09-13",
             "status": "late"
           },
           {
-            "date": "2026-08-15",
+            "date": "2026-09-20",
             "status": "present"
           },
           {
-            "date": "2026-08-22",
+            "date": "2026-09-27",
             "status": "present"
           },
           {
-            "date": "2026-08-29",
+            "date": "2026-10-04",
             "status": "present"
           },
           {
-            "date": "2026-09-05",
+            "date": "2026-10-11",
             "status": "present"
           },
           {
-            "date": "2026-09-12",
+            "date": "2026-10-18",
             "status": "late"
           },
           {
-            "date": "2026-09-19",
+            "date": "2026-10-25",
             "status": "present"
           },
           {
-            "date": "2026-09-26",
+            "date": "2026-11-01",
             "status": "present"
           }
         ],
@@ -7032,7 +7231,7 @@
         "totalSessions": 10,
         "attendancePercent": 100,
         "riskLevel": "good",
-        "lastSessionDate": "2026-09-26"
+        "lastSessionDate": "2026-11-01"
       },
       {
         "id": "att-2",
@@ -7048,43 +7247,43 @@
         "campusId": "c1",
         "history": [
           {
-            "date": "2026-07-25",
+            "date": "2026-08-30",
             "status": "present"
           },
           {
-            "date": "2026-08-01",
+            "date": "2026-09-06",
             "status": "present"
           },
           {
-            "date": "2026-08-08",
+            "date": "2026-09-13",
             "status": "present"
           },
           {
-            "date": "2026-08-15",
+            "date": "2026-09-20",
             "status": "absent"
           },
           {
-            "date": "2026-08-22",
+            "date": "2026-09-27",
             "status": "present"
           },
           {
-            "date": "2026-08-29",
+            "date": "2026-10-04",
             "status": "present"
           },
           {
-            "date": "2026-09-05",
+            "date": "2026-10-11",
             "status": "present"
           },
           {
-            "date": "2026-09-12",
+            "date": "2026-10-18",
             "status": "present"
           },
           {
-            "date": "2026-09-19",
+            "date": "2026-10-25",
             "status": "present"
           },
           {
-            "date": "2026-09-26",
+            "date": "2026-11-01",
             "status": "present"
           }
         ],
@@ -7095,7 +7294,7 @@
         "totalSessions": 10,
         "attendancePercent": 90,
         "riskLevel": "good",
-        "lastSessionDate": "2026-09-26"
+        "lastSessionDate": "2026-11-01"
       },
       {
         "id": "att-3",
@@ -7111,43 +7310,43 @@
         "campusId": "c1",
         "history": [
           {
-            "date": "2026-07-25",
+            "date": "2026-08-30",
             "status": "present"
           },
           {
-            "date": "2026-08-01",
+            "date": "2026-09-06",
             "status": "late"
           },
           {
-            "date": "2026-08-08",
+            "date": "2026-09-13",
             "status": "present"
           },
           {
-            "date": "2026-08-15",
+            "date": "2026-09-20",
             "status": "present"
           },
           {
-            "date": "2026-08-22",
+            "date": "2026-09-27",
             "status": "present"
           },
           {
-            "date": "2026-08-29",
+            "date": "2026-10-04",
             "status": "present"
           },
           {
-            "date": "2026-09-05",
+            "date": "2026-10-11",
             "status": "late"
           },
           {
-            "date": "2026-09-12",
+            "date": "2026-10-18",
             "status": "present"
           },
           {
-            "date": "2026-09-19",
+            "date": "2026-10-25",
             "status": "present"
           },
           {
-            "date": "2026-09-26",
+            "date": "2026-11-01",
             "status": "present"
           }
         ],
@@ -7158,7 +7357,7 @@
         "totalSessions": 10,
         "attendancePercent": 100,
         "riskLevel": "good",
-        "lastSessionDate": "2026-09-26"
+        "lastSessionDate": "2026-11-01"
       },
       {
         "id": "att-4",
@@ -7174,43 +7373,43 @@
         "campusId": "c1",
         "history": [
           {
-            "date": "2026-07-25",
+            "date": "2026-08-30",
             "status": "present"
           },
           {
-            "date": "2026-08-01",
+            "date": "2026-09-06",
             "status": "present"
           },
           {
-            "date": "2026-08-08",
+            "date": "2026-09-13",
             "status": "present"
           },
           {
-            "date": "2026-08-15",
+            "date": "2026-09-20",
             "status": "present"
           },
           {
-            "date": "2026-08-22",
+            "date": "2026-09-27",
             "status": "late"
           },
           {
-            "date": "2026-08-29",
+            "date": "2026-10-04",
             "status": "present"
           },
           {
-            "date": "2026-09-05",
+            "date": "2026-10-11",
             "status": "present"
           },
           {
-            "date": "2026-09-12",
+            "date": "2026-10-18",
             "status": "present"
           },
           {
-            "date": "2026-09-19",
+            "date": "2026-10-25",
             "status": "present"
           },
           {
-            "date": "2026-09-26",
+            "date": "2026-11-01",
             "status": "present"
           }
         ],
@@ -7221,7 +7420,7 @@
         "totalSessions": 10,
         "attendancePercent": 100,
         "riskLevel": "good",
-        "lastSessionDate": "2026-09-26"
+        "lastSessionDate": "2026-11-01"
       },
       {
         "id": "att-5",
@@ -7237,43 +7436,43 @@
         "campusId": "c1",
         "history": [
           {
-            "date": "2026-07-25",
+            "date": "2026-08-30",
             "status": "present"
           },
           {
-            "date": "2026-08-01",
+            "date": "2026-09-06",
             "status": "present"
           },
           {
-            "date": "2026-08-08",
+            "date": "2026-09-13",
             "status": "present"
           },
           {
-            "date": "2026-08-15",
+            "date": "2026-09-20",
             "status": "present"
           },
           {
-            "date": "2026-08-22",
+            "date": "2026-09-27",
             "status": "present"
           },
           {
-            "date": "2026-08-29",
+            "date": "2026-10-04",
             "status": "present"
           },
           {
-            "date": "2026-09-05",
+            "date": "2026-10-11",
             "status": "present"
           },
           {
-            "date": "2026-09-12",
+            "date": "2026-10-18",
             "status": "present"
           },
           {
-            "date": "2026-09-19",
+            "date": "2026-10-25",
             "status": "present"
           },
           {
-            "date": "2026-09-26",
+            "date": "2026-11-01",
             "status": "present"
           }
         ],
@@ -7284,7 +7483,7 @@
         "totalSessions": 10,
         "attendancePercent": 100,
         "riskLevel": "good",
-        "lastSessionDate": "2026-09-26"
+        "lastSessionDate": "2026-11-01"
       }
     ],
     "settings": {
@@ -7745,6 +7944,30 @@
     ],
     "quizzes": [
       {
+        "id": "quiz-formats",
+        "title": "Week 6 — Data Structures Review",
+        "courseId": "c2",
+        "courseCode": "CS-201",
+        "courseTitle": "Data Structures & Algorithms",
+        "instructorId": "u2",
+        "instructorName": "Dr. Aaron Selassie",
+        "campusId": "c1",
+        "department": "Computer Science",
+        "dueAt": "2026-12-15T23:59:00.000Z",
+        "durationMinutes": 40,
+        "questionIds": [
+          "q-1",
+          "q-4",
+          "q-5",
+          "q-6",
+          "q-7",
+          "q-8",
+          "q-9"
+        ],
+        "status": "published",
+        "maxPoints": 41
+      },
+      {
         "id": "quiz-1",
         "title": "Week 3 — Trees & Graphs Quiz",
         "courseId": "c2",
@@ -8114,6 +8337,150 @@
         "difficulty": "medium",
         "points": 5,
         "createdAt": "2026-01-12T10:00:00.000Z"
+      },
+      {
+        "id": "q-4",
+        "stem": "Which of these data structures are linear?",
+        "type": "multi-select",
+        "options": [
+          "Array",
+          "Binary tree",
+          "Linked list",
+          "Queue",
+          "Graph"
+        ],
+        "correctAnswers": [
+          "Array",
+          "Linked list",
+          "Queue"
+        ],
+        "partialCredit": true,
+        "tags": [
+          "data-structures"
+        ],
+        "courseId": "c2",
+        "courseCode": "CS-201",
+        "department": "Computer Science",
+        "difficulty": "medium",
+        "points": 6,
+        "createdAt": "2026-01-14T10:00:00.000Z"
+      },
+      {
+        "id": "q-5",
+        "stem": "A queue removes items in ___ order, while a stack removes them in ___ order.",
+        "type": "fill-blank",
+        "blanks": [
+          [
+            "FIFO",
+            "first in first out",
+            "first-in first-out"
+          ],
+          [
+            "LIFO",
+            "last in first out",
+            "last-in first-out"
+          ]
+        ],
+        "partialCredit": true,
+        "tags": [
+          "data-structures"
+        ],
+        "courseId": "c2",
+        "courseCode": "CS-201",
+        "department": "Computer Science",
+        "difficulty": "easy",
+        "points": 4,
+        "createdAt": "2026-01-14T10:00:00.000Z"
+      },
+      {
+        "id": "q-6",
+        "stem": "Match each algorithm with its average time complexity.",
+        "type": "matching",
+        "pairs": [
+          {
+            "left": "Binary search",
+            "right": "O(log n)"
+          },
+          {
+            "left": "Merge sort",
+            "right": "O(n log n)"
+          },
+          {
+            "left": "Linear search",
+            "right": "O(n)"
+          },
+          {
+            "left": "Bubble sort",
+            "right": "O(n²)"
+          }
+        ],
+        "partialCredit": true,
+        "tags": [
+          "algorithms",
+          "complexity"
+        ],
+        "courseId": "c2",
+        "courseCode": "CS-201",
+        "department": "Computer Science",
+        "difficulty": "medium",
+        "points": 8,
+        "createdAt": "2026-01-14T10:00:00.000Z"
+      },
+      {
+        "id": "q-7",
+        "stem": "Put the steps of inserting into a binary search tree in order.",
+        "type": "ordering",
+        "orderItems": [
+          "Start at the root",
+          "Compare the new key with the current node",
+          "Move to the left or right child",
+          "Repeat until an empty spot is found",
+          "Attach the new node there"
+        ],
+        "partialCredit": true,
+        "tags": [
+          "trees"
+        ],
+        "courseId": "c2",
+        "courseCode": "CS-201",
+        "department": "Computer Science",
+        "difficulty": "medium",
+        "points": 5,
+        "createdAt": "2026-01-14T10:00:00.000Z"
+      },
+      {
+        "id": "q-8",
+        "stem": "How many edges does a tree with 12 nodes have?",
+        "type": "numeric",
+        "numericAnswer": 11,
+        "tolerance": 0,
+        "unit": "edges",
+        "tags": [
+          "trees",
+          "graphs"
+        ],
+        "courseId": "c2",
+        "courseCode": "CS-201",
+        "department": "Computer Science",
+        "difficulty": "easy",
+        "points": 3,
+        "createdAt": "2026-01-14T10:00:00.000Z"
+      },
+      {
+        "id": "q-9",
+        "stem": "Explain when you would choose a hash table over a balanced binary search tree. Give one example.",
+        "type": "essay",
+        "wordLimit": 200,
+        "explanation": "Full marks: O(1) average lookup vs ordered traversal / range queries, with a fitting example.",
+        "tags": [
+          "data-structures"
+        ],
+        "courseId": "c2",
+        "courseCode": "CS-201",
+        "department": "Computer Science",
+        "difficulty": "hard",
+        "points": 10,
+        "createdAt": "2026-01-14T10:00:00.000Z"
       }
     ],
     "student-submissions": [
@@ -12078,13 +12445,57 @@
         "code": "BSC-CS",
         "name": "BSc in Computer Science",
         "level": "Undergraduate",
-        "department": "Computer Science",
         "departmentId": "d1",
-        "collegeId": "col1",
+        "department": "Computer Science",
         "campusId": "c1",
         "duration": "4 years",
         "durationYears": 4,
         "semestersPerYear": 2,
+        "totalCredits": 140,
+        "curriculum": [
+          {
+            "courseId": "demo-cyber-101",
+            "studyYear": 1,
+            "semester": 1,
+            "type": "core"
+          },
+          {
+            "courseId": "c1",
+            "studyYear": 1,
+            "semester": 1,
+            "type": "core"
+          },
+          {
+            "courseId": "c6",
+            "studyYear": 1,
+            "semester": 2,
+            "type": "core"
+          },
+          {
+            "courseId": "c2",
+            "studyYear": 2,
+            "semester": 1,
+            "type": "core"
+          },
+          {
+            "courseId": "c7",
+            "studyYear": 2,
+            "semester": 1,
+            "type": "core"
+          },
+          {
+            "courseId": "c8",
+            "studyYear": 3,
+            "semester": 1,
+            "type": "core"
+          },
+          {
+            "courseId": "c3",
+            "studyYear": 3,
+            "semester": 2,
+            "type": "core"
+          }
+        ],
         "enrolledCount": 69,
         "courseCount": 7,
         "status": "active"
@@ -12094,13 +12505,33 @@
         "code": "BSC-SE",
         "name": "BSc in Software Engineering",
         "level": "Undergraduate",
-        "department": "Software Engineering",
         "departmentId": "d2",
-        "collegeId": "col1",
+        "department": "Software Engineering",
         "campusId": "c1",
         "duration": "4 years",
         "durationYears": 4,
         "semestersPerYear": 2,
+        "totalCredits": 140,
+        "curriculum": [
+          {
+            "courseId": "c9",
+            "studyYear": 1,
+            "semester": 1,
+            "type": "core"
+          },
+          {
+            "courseId": "c5",
+            "studyYear": 2,
+            "semester": 1,
+            "type": "core"
+          },
+          {
+            "courseId": "c10",
+            "studyYear": 2,
+            "semester": 2,
+            "type": "core"
+          }
+        ],
         "enrolledCount": 43,
         "courseCount": 3,
         "status": "active"
@@ -12110,13 +12541,33 @@
         "code": "BSC-IT",
         "name": "BSc in Information Technology",
         "level": "Undergraduate",
-        "department": "Information Technology",
         "departmentId": "d3",
-        "collegeId": "col1",
+        "department": "Information Technology",
         "campusId": "c1",
         "duration": "4 years",
         "durationYears": 4,
         "semestersPerYear": 2,
+        "totalCredits": 140,
+        "curriculum": [
+          {
+            "courseId": "c11",
+            "studyYear": 1,
+            "semester": 1,
+            "type": "core"
+          },
+          {
+            "courseId": "c12",
+            "studyYear": 2,
+            "semester": 1,
+            "type": "core"
+          },
+          {
+            "courseId": "c13",
+            "studyYear": 2,
+            "semester": 2,
+            "type": "core"
+          }
+        ],
         "enrolledCount": 36,
         "courseCount": 3,
         "status": "active"
@@ -12124,16 +12575,85 @@
       {
         "id": "prog-d4",
         "code": "BBA",
-        "name": "BSc in Business Administration",
+        "name": "Bachelor of Business Administration",
         "level": "Undergraduate",
-        "department": "Business Administration",
         "departmentId": "d4",
-        "collegeId": "col2",
+        "department": "Business Administration",
         "campusId": "c1",
         "duration": "4 years",
         "durationYears": 4,
         "semestersPerYear": 2,
+        "totalCredits": 140,
+        "curriculum": [
+          {
+            "courseId": "c14",
+            "studyYear": 1,
+            "semester": 1,
+            "type": "core"
+          },
+          {
+            "courseId": "c4",
+            "studyYear": 1,
+            "semester": 2,
+            "type": "core"
+          },
+          {
+            "courseId": "c15",
+            "studyYear": 1,
+            "semester": 2,
+            "type": "core"
+          },
+          {
+            "courseId": "c16",
+            "studyYear": 2,
+            "semester": 1,
+            "type": "core"
+          }
+        ],
         "enrolledCount": 47,
+        "courseCount": 4,
+        "status": "active"
+      },
+      {
+        "id": "prog-d1-msc",
+        "code": "MSC-CS",
+        "name": "MSc in Computer Science",
+        "level": "Postgraduate",
+        "departmentId": "d1",
+        "department": "Computer Science",
+        "campusId": "c1",
+        "duration": "2 years",
+        "durationYears": 2,
+        "semestersPerYear": 2,
+        "totalCredits": 60,
+        "description": "Advanced study in algorithms, systems and security, with a research thesis in year 2.",
+        "curriculum": [
+          {
+            "courseId": "c8",
+            "studyYear": 1,
+            "semester": 1,
+            "type": "core"
+          },
+          {
+            "courseId": "c7",
+            "studyYear": 1,
+            "semester": 1,
+            "type": "core"
+          },
+          {
+            "courseId": "c3",
+            "studyYear": 1,
+            "semester": 2,
+            "type": "core"
+          },
+          {
+            "courseId": "demo-cyber-101",
+            "studyYear": 1,
+            "semester": 2,
+            "type": "elective"
+          }
+        ],
+        "enrolledCount": 0,
         "courseCount": 4,
         "status": "active"
       }

@@ -7,7 +7,6 @@ import { Modal } from '../../../shared/components/Modal'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { useToast } from '../../../shared/components/toast/ToastProvider'
 import { AcademicCalendarWidget } from '../components/AcademicCalendarWidget'
-import { CollegeList } from '../components/CollegeList'
 import { DepartmentGrid } from '../components/DepartmentGrid'
 import { InstitutionHero } from '../components/InstitutionHero'
 import { LeadershipList } from '../components/LeadershipList'
@@ -67,7 +66,6 @@ export function CampusProfilePage() {
   const {
     campuses,
     getCampusById,
-    getCollegesForCampus,
     getDepartmentsForCampus,
     updateCampus,
     setSelectedCampusId,
@@ -84,11 +82,6 @@ export function CampusProfilePage() {
     subtitle: campus?.subtitle ?? '',
   })
 
-  const campusColleges = useMemo(
-    () => (campus ? getCollegesForCampus(campus.id) : []),
-    [campus, getCollegesForCampus],
-  )
-
   const campusDepartments = useMemo(
     () => (campus ? getDepartmentsForCampus(campus.id) : []),
     [campus, getDepartmentsForCampus],
@@ -104,12 +97,11 @@ export function CampusProfilePage() {
       subtitle: campus.subtitle,
       status: campus.status === 'active' ? 'active' : 'pending',
       departmentsCount: campusDepartments.length,
-      collegesCount: campusColleges.length,
       studentsCount: students,
       facultyCount: faculty,
       completionRate: 94,
     }
-  }, [campus, campusDepartments, campusColleges.length])
+  }, [campus, campusDepartments])
 
   if (!campus || !entity) {
     return (
@@ -146,7 +138,7 @@ export function CampusProfilePage() {
     <div className="flex flex-col gap-6 md:gap-8">
       <PageHeader
         title="Campus Profile"
-        subtitle="View and manage a campus, its colleges and academic departments."
+        subtitle="View and manage a campus and its academic departments."
         actions={
           <>
             <select
@@ -178,11 +170,6 @@ export function CampusProfilePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 items-start">
         <div className="lg:col-span-2 flex flex-col gap-6 md:gap-8">
-          <CollegeList
-            colleges={campusColleges}
-            departments={campusDepartments}
-            onViewAll={() => navigate('/admin/institution/structure')}
-          />
           <DepartmentGrid
             departments={campusDepartments}
             onAddDepartment={() =>

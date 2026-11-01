@@ -30,13 +30,13 @@ code. On this demo build the code is always **`000000`** and is shown on screen.
 
 | Role | Email | Lands on |
 |---|---|---|
-| Student | `amina.lemma@student.berana.edu` | `/student` |
+| Institution Admin | `h.desta@berana.edu` | `/admin` (every page) |
+| Registrar | `g.nega@berana.edu` | `/admin` (academic pages) |
+| Finance Officer | `r.assefa@berana.edu` | `/admin` (Finance Dashboard) |
 | Instructor | `a.selassie@berana.edu` | `/instructor` |
-| Institution Admin | `h.desta@berana.edu` | `/admin` |
-| Registrar | `g.nega@berana.edu` | `/admin` |
-| Head of Department | `h.girma@berana.edu` | `/staff` |
-| Guardian | `yonas.t@gmail.com` | `/guardian` |
-| Help Desk | `m.haile@berana.edu` | `/help-desk` |
+| Teaching Assistant | `l.mengistu@berana.edu` | `/instructor` (reduced menu) |
+| Student | `amina.lemma@student.berana.edu` | `/student` |
+| Parent / Guardian | `yonas.t@gmail.com` | `/guardian` |
 | Super Admin | `superadmin@berana.edu` | `/super-admin` |
 
 Use a separate browser window (or a private window) per role if you want two
@@ -111,12 +111,13 @@ Sign in as the instructor (`a.selassie@berana.edu`).
 
 ## 6. Admin and Registrar portal (`/admin`)
 
-Sign in as the admin or registrar (both land here; the registrar is the
-records-focused role).
+Sign in as the admin, then repeat as the registrar and the finance officer.
+Each sees only their own office's pages; opening another admin URL sends them
+back to their dashboard.
 
 | Check | Where | Expected |
 |---|---|---|
-| Academic structure | Campuses → Colleges → Departments | Each level lists the one above it |
+| Academic structure | `/admin/institution/structure` | Campus → Department tree; no colleges anywhere |
 | Programs | `/admin/institution/programs` | 4 degree programs, each owned by a department |
 | Academic calendar | `/admin/institution/academic-calendar` | Years and terms; one term marked current (Spring Semester 2026) |
 | Course offerings | `/admin/course-offerings` | Every section shows a **term**; none says "No term set" |
@@ -125,7 +126,10 @@ records-focused role).
 | One transcript | click **Open** on a student | Their full record; PDF download works |
 | Academic reports | `/admin/academic-reports` | Enrolment by program, term summary, grade and standing distribution, students needing attention, Dean's List |
 | CSV export | any **CSV** button on that page | A `.csv` file downloads and opens in Excel |
-| People | `/admin/people` | Role filter includes Registrar and Head of Department |
+| People | `/admin/people` | Tabs for the seven roles; no Staff, Head of Department or Help Desk |
+| Registrar menu | sign in as `g.nega@berana.edu` | Academic pages only — no Payments, Settings, Administrators or Integrations |
+| Finance menu | sign in as `r.assefa@berana.edu` | Finance Dashboard, Payments, Announcements, Calendar only |
+| Office accounts | `/admin/admins` (admin) | Add a Registrar or Finance Officer; the role is kept when you edit them |
 
 **Structure enforcement (worth one test).** In the console as admin:
 
@@ -135,18 +139,20 @@ await fetch('/api/v1/data/course-offerings', {method:'PATCH', headers:{'Content-
 
 → `422` with a message naming what is missing. Nothing is saved.
 
-## 7. Head of Department portal (`/staff`)
+## 7. Teaching Assistant (`/instructor`)
 
-Sign in as `h.girma@berana.edu`.
+Sign in as `l.mengistu@berana.edu` (assists Dr. Aaron Selassie on CS-101 and CS-201).
 
-- `/staff/department` — Computer Science: 1 program, 7 courses, 7 sections,
-  69 students, average GPA 2.58, and the instructor list.
-- `/staff/submit-people` — submit a new person; they appear as **pending**.
-  Then sign in as the admin → `/admin/verify-people` → the submission is waiting
-  for approval.
-- Sign in as `g.nega@berana.edu` (registrar, an office not a department) and open
-  `/staff/department` → it explains that the account is not attached to an
-  academic department, instead of showing zeros.
+- The header says **Teaching Assistant**; the menu has no Quizzes or Certificates.
+- `/instructor/courses` — only CS-101 and CS-201, with no "Propose course" or
+  "Manage course" buttons.
+- `/instructor/assignments` — can review and grade submissions; no
+  "Create assignment".
+- `/instructor/attendance` — can take attendance for the assigned courses.
+- `/instructor/live-classes` — can **Join** a session; cannot schedule or end one.
+- `/instructor/quizzes` typed in the address bar → back to the dashboard.
+- As the admin, `/admin/teaching-assistants` → edit Liya → add a course → sign in
+  again as Liya and the new course appears.
 
 ## 8. Guardian portal (`/guardian`)
 

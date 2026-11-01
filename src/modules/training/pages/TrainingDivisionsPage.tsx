@@ -29,7 +29,7 @@ interface DivisionForm {
 
 export function TrainingDivisionsPage() {
   const { notify } = useToast()
-  const { departments, setDepartments, colleges } = useOrgStructure()
+  const { departments, setDepartments } = useOrgStructure()
   const { people } = usePeople()
   const { programs } = useTrainingPrograms()
   const { cohorts } = useCohorts()
@@ -73,7 +73,6 @@ export function TrainingDivisionsPage() {
         facultyCount: 0,
         icon: '📚',
         campusId: 'c1',
-        collegeId: colleges[0]?.id ?? '',
         status: 'active',
       }
       setDepartments((prev) => [...prev, division])

@@ -38,16 +38,50 @@ export function applyCourseAssignmentFields(input: CourseCreateInput): {
   }
 }
 
+/**
+ * True when this person teaches the course: its instructor, or (University) one
+ * of its teaching assistants. The instructor portal uses this for both roles.
+ */
 export function courseTeachesInstructor(
-  course: { instructor?: string; instructorId?: string; submittedByInstructorId?: string },
+  course: {
+    instructor?: string
+    instructorId?: string
+    submittedByInstructorId?: string
+    teachingAssistantIds?: string[]
+  },
   instructorId: string,
   instructorName: string,
 ): boolean {
   return (
     course.instructorId === instructorId ||
     course.submittedByInstructorId === instructorId ||
-    course.instructor === instructorName
+    course.instructor === instructorName ||
+    Boolean(course.teachingAssistantIds?.includes(instructorId))
   )
+}
+
+/* ── Teaching assistants ─────────────────────────────────── */
+
+export function getCoursesForAssistant(courses: CourseRecord[], assistantId: string): CourseRecord[] {
+  return courses.filter((c) => c.teachingAssistantIds?.includes(assistantId))
+}
+
+/** Replace every course assignment of one teaching assistant. */
+export function syncAssistantCourseAssignments(
+  courses: CourseRecord[],
+  assistantId: string,
+  courseIds: string[],
+): CourseRecord[] {
+  const selected = new Set(courseIds)
+  return courses.map((c) => {
+    const current = c.teachingAssistantIds ?? []
+    const has = current.includes(assistantId)
+    if (selected.has(c.id) && !has) return { ...c, teachingAssistantIds: [...current, assistantId] }
+    if (!selected.has(c.id) && has) {
+      return { ...c, teachingAssistantIds: current.filter((id) => id !== assistantId) }
+    }
+    return c
+  })
 }
 
 export function getCoursesForInstructor(

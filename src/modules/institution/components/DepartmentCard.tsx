@@ -1,5 +1,5 @@
 import type { KeyboardEvent } from 'react'
-import { Building2, GraduationCap, Settings2, Trash2, User } from 'lucide-react'
+import { Building2, GraduationCap, Plus, Settings2, Trash2, User } from 'lucide-react'
 import { GlassCard } from '../../../shared/layout/GlassCard'
 import { Monogram } from '../../../shared/components/Monogram'
 
@@ -8,12 +8,12 @@ interface DepartmentCardProps {
   headName: string
   studentsCount: number
   facultyCount: number
-  collegeName?: string
   campusName?: string
   campusCode?: string
-  programCode?: string
-  maxYears?: number
-  programLevel?: string
+  /** Programs this department offers (BSc, MSc …). */
+  programs?: { id: string; code: string; name: string }[]
+  onOpenProgram?: (programId: string) => void
+  onAddProgram?: () => void
   onClick?: () => void
   onDelete?: () => void
 }
@@ -23,12 +23,11 @@ export function DepartmentCard({
   headName,
   studentsCount,
   facultyCount,
-  collegeName,
   campusName,
   campusCode,
-  programCode,
-  maxYears,
-  programLevel,
+  programs = [],
+  onOpenProgram,
+  onAddProgram,
   onClick,
   onDelete,
 }: DepartmentCardProps) {
@@ -48,13 +47,9 @@ export function DepartmentCard({
               </div>
             ) : null}
             <h3 className="font-extrabold text-navy-900 text-[15px] leading-tight">{name}</h3>
-            {programCode ? (
-              <div className="text-[11px] text-secondary-text mt-0.5">
-                {programCode}
-                {programLevel ? ` · ${programLevel}` : ''}
-                {maxYears ? ` · ${maxYears} years` : ''}
-              </div>
-            ) : null}
+            <div className="text-[11px] text-secondary-text mt-0.5">
+              {programs.length} program{programs.length === 1 ? '' : 's'}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-0.5 shrink-0">
@@ -83,17 +78,42 @@ export function DepartmentCard({
           <User size={13} className="text-navy-500 shrink-0" />
           <span className="text-navy-700 font-medium truncate">{headName}</span>
         </div>
-        {collegeName ? (
-          <div className="flex items-center gap-2">
-            <GraduationCap size={13} className="text-navy-500 shrink-0" />
-            <span className="truncate">{collegeName}</span>
-          </div>
-        ) : null}
         {campusName ? (
           <div className="flex items-center gap-2">
             <Building2 size={13} className="text-navy-500 shrink-0" />
             <span className="truncate">{campusName}</span>
           </div>
+        ) : null}
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        {programs.map((program) => (
+          <button
+            key={program.id}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onOpenProgram?.(program.id)
+            }}
+            className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left nested-panel-strong hover:ring-1 hover:ring-lemon-500/40 transition-all cursor-pointer"
+          >
+            <GraduationCap size={13} className="text-lemon-700 shrink-0" />
+            <span className="text-[12px] font-semibold text-navy-900 truncate">{program.name}</span>
+            <span className="ml-auto text-[10.5px] text-secondary-text shrink-0">{program.code}</span>
+          </button>
+        ))}
+        {onAddProgram ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onAddProgram()
+            }}
+            className="self-start inline-flex items-center gap-1 text-[11.5px] font-bold text-lemon-700 hover:text-lemon-900 cursor-pointer px-1"
+          >
+            <Plus size={12} />
+            {programs.length === 0 ? 'Add first program' : 'Add program'}
+          </button>
         ) : null}
       </div>
 

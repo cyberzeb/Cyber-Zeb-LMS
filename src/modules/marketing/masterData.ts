@@ -62,8 +62,6 @@ export interface MasterDataForm {
   academic_structure: {
     campus_count: string
     campuses: string
-    colleges: string
-    faculties: string
     departments: string
     academic_units: string
   }
@@ -140,8 +138,6 @@ export const EMPTY_MASTER_DATA: MasterDataForm = {
   academic_structure: {
     campus_count: '',
     campuses: '',
-    colleges: '',
-    faculties: '',
     departments: '',
     academic_units: '',
   },
@@ -246,8 +242,6 @@ export const MASTER_DATA_FIELD_LABELS: Record<string, string> = {
   finance_contact: 'Finance contact',
   campus_count: 'Number of campuses',
   campuses: 'Campuses',
-  colleges: 'Colleges / schools',
-  faculties: 'Faculties',
   departments: 'Departments',
   academic_units: 'Academic units',
   current_academic_year: 'Current academic year',
@@ -335,8 +329,6 @@ export function toMasterDataPayload(form: MasterDataForm): Record<string, unknow
     academic_structure: {
       campus_count: num(form.academic_structure.campus_count),
       campuses: csv(form.academic_structure.campuses),
-      colleges: csv(form.academic_structure.colleges),
-      faculties: csv(form.academic_structure.faculties),
       departments: csv(form.academic_structure.departments),
       academic_units: csv(form.academic_structure.academic_units),
     },

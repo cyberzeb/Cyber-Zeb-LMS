@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:full": "node scripts/dev.mjs",
-    "build": "tsc -b && vite build",
+    "dev": "node init && vite",
+    "dev:full": "node init && node scripts/dev.mjs",
+    "build": "node init && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "export-seed": "npx tsx scripts/export-seed-data.ts",
